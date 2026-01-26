@@ -1,0 +1,107 @@
+# AISEO Monorepo - Unified .gitignore
+
+# ============================================
+# Node.js / NPM
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-debug.log*
+
+# ============================================
+# Next.js
+# ============================================
+.next/
+out/
+build/
+dist/
+.vercel
+
+# ============================================
+# Environment Variables (SECRETS)
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep .env.example for documentation
+!.env.example
+
+# ============================================
+# IDE / Editors
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+.nyc_output/
+*.lcov
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+pids/
+*.pid
+*.seed
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+Thumbs.db
+
+# ============================================
+# Python (for server/)
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+.pytest_cache/
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+.cache/
+
+# ============================================
+# BMAD Workflow (Keep these)
+# ============================================
+# _bmad/ - Keep (BMAD method files)
+# _bmad-output/ - Keep (planning artifacts)
+
+# ============================================
+# Claude Code (Exclude temporary files)
+# ============================================
+.claude/audio/
+.claude/projects/
+
+# ============================================
+# Build Artifacts
+# ============================================
+*.tsbuildinfo

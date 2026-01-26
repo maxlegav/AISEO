@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.notification-ios-font {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell;
+  letter-spacing: -0.01em;
+}
+
+@layer base {
+  /* Définition des polices selon la charte graphique */
+  body {
+    font-family:
+      var(--font-inter),
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      system-ui,
+      sans-serif;
+  }
+
+  /* Classes utilitaires pour respecter la charte graphique */
+  .font-title {
+    font-family: var(--font-playfair), "Playfair Display", serif;
+  }
+
+  .font-subtitle {
+    font-family: var(--font-grotesk), "Space Grotesk", sans-serif;
+  }
+}

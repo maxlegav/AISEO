@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__agentvibes__text_to_speech",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(.claude/hooks/play-tts.sh:*)",
+      "Skill(bmad:bmm:workflows:create-architecture)",
+      "WebFetch(domain:dreelio.framer.website)",
+      "WebFetch(domain:almond.framer.website)",
+      "WebFetch(domain:base44.com)",
+      "Skill(bmad:bmm:workflows:create-ux-design)",
+      "mcp__agentvibes__mute",
+      "Skill(bmad:bmm:workflows:generate-project-context)",
+      "Skill(bmad:bmm:workflows:check-implementation-readiness)",
+      "Bash(npm install:*)",
+      "Bash(bash:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm run build:*)",
+      "Bash(tee:*)",
+      "Bash(npm run dev:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "agentvibes"
+  ]
+}

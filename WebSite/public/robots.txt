@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://aiseo.com
+
+# Sitemaps
+Sitemap: https://aiseo.com/sitemap.xml
