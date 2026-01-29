@@ -1693,6 +1693,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 - Mongoose: Final safety net, database constraints, schema validation
 - Defense in depth: External AI API data needs extra validation
 
+### Concrete Implementation Examples (Story 1.3)
+
+**Import Pattern:**
+```typescript
+import { LoginSchema, type LoginInput, handleZodError } from '@/lib/validation';
+```
+
+**API Route Pattern (safeParse):**
+```typescript
+import { LoginSchema, handleZodError } from '@/lib/validation';
+import { handleApiError } from '@/lib/error-handler';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    // 1. Sanitize input
+    req.body = sanitizeInput(req.body);
+
+    // 2. Zod validation with safeParse (doesn't throw)
+    const result = LoginSchema.safeParse(req.body);
+    if (!result.success) {
+      return handleZodError(result.error, res);
+    }
+
+    // 3. Use validated data (fully typed)
+    const { email, password } = result.data;
+
+    // 4. Mongoose handles DB-level validation
+    const user = await User.findOne({ email });
+    // ... rest of logic
+
+  } catch (error) {
+    return handleApiError(error, res);
+  }
+}
+```
+
 ### 3. API Response Format (STANDARDIZED)
 
 **MANDATORY format for ALL API responses:**

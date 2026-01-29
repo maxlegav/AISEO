@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { SessionProvider } from "next-auth/react";
 import "@/styles/globals.css";
 import {
@@ -9,6 +10,7 @@ import {
 } from "next/font/google";
 import { NotificationProvider } from "../components/NotificationSystem";
 import { LanguageProvider } from "../components/LanguageContext";
+import { useUserStore } from "@/stores";
 import type { AppProps } from "next/app";
 
 // Configure fonts
@@ -50,6 +52,11 @@ export default function App({
   Component,
   pageProps: { session, ...pageProps },
 }: AppProps) {
+  // Rehydrate persisted stores on client mount (SSR-safe)
+  useEffect(() => {
+    useUserStore.persist.rehydrate();
+  }, []);
+
   return (
     <SessionProvider session={session}>
       <LanguageProvider>
