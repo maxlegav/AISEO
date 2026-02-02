@@ -23,7 +23,9 @@
       "Bash(tee:*)",
       "Bash(npm run dev:*)",
       "Bash(git push:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(/Users/chocomushrooms/AISEO/.claude/hooks/play-tts.sh:*)",
+      "Bash(node:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

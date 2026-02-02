@@ -1,0 +1,41 @@
+# AISEO Docker Compose Configuration
+# Local development setup for the scraping service
+
+services:
+  scraper:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: aiseo-scraper
+    ports:
+      - "8080:8080"
+
+    # Environment file for API keys
+    env_file:
+      - ./server/.env
+
+    # Volume mount for hot reload (DEVELOPMENT ONLY)
+    # DO NOT use in production - remove this line for production builds
+    volumes:
+      - ./server/src:/app/src:ro
+
+    # Override command for development with hot reload
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
+
+    # Resource limits (Chrome is memory-hungry)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Restart policy
+    restart: unless-stopped

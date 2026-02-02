@@ -1,0 +1,304 @@
+{
+    "questions_coffee_shop": [
+      {
+        "id": 1,
+        "type": "decouverte_generale",
+        "question": "Tu connais un bon café dans {neighborhood} ?"
+      },
+      {
+        "id": 2,
+        "type": "decouverte_generale",
+        "question": "Où est-ce que je peux prendre un café à {ville} ?"
+      },
+      {
+        "id": 3,
+        "type": "decouverte_generale",
+        "question": "Quel est le meilleur coffee shop près de {rue} ?"
+      },
+      {
+        "id": 4,
+        "type": "decouverte_generale",
+        "question": "Tu me recommandes un café sympa dans {quartier} ?"
+      },
+      {
+        "id": 5,
+        "type": "decouverte_generale",
+        "question": "Je cherche un bon café à {ville}, des suggestions ?"
+      },
+      {
+        "id": 6,
+        "type": "specialite_cafe",
+        "question": "Où trouver un bon {type_cafe} à {ville} ?"
+      },
+      {
+        "id": 7,
+        "type": "specialite_cafe",
+        "question": "Est-ce que {nom_business} fait des {type_cafe} ?"
+      },
+      {
+        "id": 8,
+        "type": "specialite_cafe",
+        "question": "Tu connais un café qui fait de bons {type_cafe} dans {quartier} ?"
+      },
+      {
+        "id": 9,
+        "type": "specialite_cafe",
+        "question": "Quel café sert les meilleurs {type_cafe} à {ville} ?"
+      },
+      {
+        "id": 10,
+        "type": "travail",
+        "question": "Tu connais un café avec wifi dans {quartier} ?"
+      },
+      {
+        "id": 11,
+        "type": "travail",
+        "question": "Où je peux aller travailler sur mon laptop à {ville} ?"
+      },
+      {
+        "id": 12,
+        "type": "travail",
+        "question": "Est-ce que {nom_business} est un bon endroit pour travailler ?"
+      },
+      {
+        "id": 13,
+        "type": "travail",
+        "question": "Tu connais un café calme pour étudier dans {quartier} ?"
+      },
+      {
+        "id": 14,
+        "type": "travail",
+        "question": "Est-ce qu'il y a des prises électriques chez {nom_business} ?"
+      },
+      {
+        "id": 15,
+        "type": "travail",
+        "question": "Quel café a une bonne connexion wifi à {ville} ?"
+      },
+      {
+        "id": 16,
+        "type": "options_lait",
+        "question": "Est-ce que {nom_business} a du lait d'amande ?"
+      },
+      {
+        "id": 17,
+        "type": "options_lait",
+        "question": "Tu connais un café avec des options sans lactose dans {quartier} ?"
+      },
+      {
+        "id": 18,
+        "type": "options_lait",
+        "question": "Est-ce que {nom_business} propose du lait végétal ?"
+      },
+      {
+        "id": 19,
+        "type": "options_lait",
+        "question": "Où trouver du lait d'avoine à {ville} ?"
+      },
+      {
+        "id": 20,
+        "type": "options_lait",
+        "question": "Est-ce que {nom_business} a du lait de soja ?"
+      },
+      {
+        "id": 21,
+        "type": "vegan",
+        "question": "Tu connais un café avec des options véganes dans {quartier} ?"
+      },
+      {
+        "id": 22,
+        "type": "vegan",
+        "question": "Est-ce que {nom_business} a des pâtisseries véganes ?"
+      },
+      {
+        "id": 23,
+        "type": "vegan",
+        "question": "Où trouver des options vegan à {ville} ?"
+      },
+      {
+        "id": 24,
+        "type": "vegan",
+        "question": "Est-ce que {nom_business} est vegan-friendly ?"
+      },
+      {
+        "id": 25,
+        "type": "sans_gluten",
+        "question": "Tu connais un café avec des options sans gluten dans {quartier} ?"
+      },
+      {
+        "id": 26,
+        "type": "sans_gluten",
+        "question": "Est-ce que {nom_business} a des pâtisseries sans gluten ?"
+      },
+      {
+        "id": 27,
+        "type": "sans_gluten",
+        "question": "Où je peux trouver des options gluten-free à {ville} ?"
+      },
+      {
+        "id": 28,
+        "type": "nourriture",
+        "question": "Est-ce que {nom_business} sert de la nourriture ?"
+      },
+      {
+        "id": 29,
+        "type": "nourriture",
+        "question": "Tu connais un café avec de bons sandwichs dans {quartier} ?"
+      },
+      {
+        "id": 30,
+        "type": "nourriture",
+        "question": "Où manger un croissant à {ville} ?"
+      },
+      {
+        "id": 31,
+        "type": "nourriture",
+        "question": "Est-ce que {nom_business} a des bagels ?"
+      },
+      {
+        "id": 32,
+        "type": "nourriture",
+        "question": "Quel café sert les meilleures pâtisseries à {ville} ?"
+      },
+      {
+        "id": 33,
+        "type": "ambiance",
+        "question": "Tu connais un café {ambiance} dans {quartier} ?"
+      },
+      {
+        "id": 34,
+        "type": "ambiance",
+        "question": "Où trouver un café avec une belle ambiance à {ville} ?"
+      },
+      {
+        "id": 35,
+        "type": "ambiance",
+        "question": "Est-ce que {nom_business} a une ambiance {ambiance} ?"
+      },
+      {
+        "id": 36,
+        "type": "terrasse",
+        "question": "Tu connais un café avec terrasse dans {quartier} ?"
+      },
+      {
+        "id": 37,
+        "type": "terrasse",
+        "question": "Est-ce que {nom_business} a une terrasse extérieure ?"
+      },
+      {
+        "id": 38,
+        "type": "terrasse",
+        "question": "Où boire un café dehors à {ville} ?"
+      },
+      {
+        "id": 39,
+        "type": "horaires",
+        "question": "Est-ce que {nom_business} ouvre tôt le matin ?"
+      },
+      {
+        "id": 40,
+        "type": "horaires",
+        "question": "Tu connais un café ouvert le dimanche dans {quartier} ?"
+      },
+      {
+        "id": 41,
+        "type": "horaires",
+        "question": "Quel café est ouvert tard à {ville} ?"
+      },
+      {
+        "id": 42,
+        "type": "torrefaction",
+        "question": "Est-ce que {nom_business} torréfie son propre café ?"
+      },
+      {
+        "id": 43,
+        "type": "torrefaction",
+        "question": "Tu connais un café qui fait sa propre torréfaction dans {quartier} ?"
+      },
+      {
+        "id": 44,
+        "type": "torrefaction",
+        "question": "Où trouver du café local à {ville} ?"
+      },
+      {
+        "id": 45,
+        "type": "specialite",
+        "question": "Quelle est la spécialité de {nom_business} ?"
+      },
+      {
+        "id": 46,
+        "type": "specialite",
+        "question": "Qu'est-ce que je devrais essayer chez {nom_business} ?"
+      },
+      {
+        "id": 47,
+        "type": "prix",
+        "question": "C'est cher chez {nom_business} ?"
+      },
+      {
+        "id": 48,
+        "type": "prix",
+        "question": "Tu connais un café abordable dans {quartier} ?"
+      },
+      {
+        "id": 49,
+        "type": "prix",
+        "question": "Quel est le café le plus {gamme_prix} à {ville} ?"
+      },
+      {
+        "id": 50,
+        "type": "rencontre",
+        "question": "Tu connais un bon café pour un premier rendez-vous dans {quartier} ?"
+      },
+      {
+        "id": 51,
+        "type": "rencontre",
+        "question": "Où je peux rencontrer quelqu'un pour un café à {ville} ?"
+      },
+      {
+        "id": 52,
+        "type": "rencontre",
+        "question": "Est-ce que {nom_business} est romantique ?"
+      },
+      {
+        "id": 53,
+        "type": "proximite",
+        "question": "Je suis à {adresse_repere}, quel café est proche ?"
+      },
+      {
+        "id": 54,
+        "type": "proximite",
+        "question": "Tu connais un café à 5 minutes de marche de {point_interet} ?"
+      },
+      {
+        "id": 55,
+        "type": "boissons_alternatives",
+        "question": "Est-ce que {nom_business} fait du matcha ?"
+      },
+      {
+        "id": 56,
+        "type": "boissons_alternatives",
+        "question": "Tu connais un café qui sert du chai latte dans {quartier} ?"
+      },
+      {
+        "id": 57,
+        "type": "boissons_alternatives",
+        "question": "Où trouver un bon thé à {ville} ?"
+      },
+      {
+        "id": 58,
+        "type": "boissons_froides",
+        "question": "Est-ce que {nom_business} fait des cold brew ?"
+      },
+      {
+        "id": 59,
+        "type": "boissons_froides",
+        "question": "Tu connais un café avec de bons smoothies dans {quartier} ?"
+      },
+      {
+        "id": 60,
+        "type": "boissons_froides",
+        "question": "Où trouver un bon café glacé à {ville} ?"
+      }
+    ]
+  }

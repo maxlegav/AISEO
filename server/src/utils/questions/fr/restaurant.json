@@ -1,0 +1,304 @@
+{
+    "questions_restaurant": [
+      {
+        "id": 1,
+        "type": "decouverte_cuisine",
+        "question": "Tu connais un bon restaurant de {type_cuisine} dans {quartier} ?"
+      },
+      {
+        "id": 2,
+        "type": "decouverte_cuisine",
+        "question": "Où est-ce que je peux manger {type_cuisine} à {ville} ?"
+      },
+      {
+        "id": 3,
+        "type": "decouverte_cuisine",
+        "question": "Recommande-moi un restaurant {type_cuisine} près de {rue} ?"
+      },
+      {
+        "id": 4,
+        "type": "decouverte_cuisine",
+        "question": "Quel est le meilleur restaurant {type_cuisine} à {ville} ?"
+      },
+      {
+        "id": 5,
+        "type": "decouverte_cuisine",
+        "question": "Je cherche un resto {type_cuisine} dans le coin de {quartier}, des suggestions ?"
+      },
+      {
+        "id": 6,
+        "type": "decouverte_ambiance",
+        "question": "Tu connais un restaurant {ambiance} à {ville} ?"
+      },
+      {
+        "id": 7,
+        "type": "decouverte_ambiance",
+        "question": "Où est-ce que je peux aller pour un dîner {ambiance} dans {quartier} ?"
+      },
+      {
+        "id": 8,
+        "type": "decouverte_ambiance",
+        "question": "Je cherche un endroit {ambiance} pour manger à {ville} ?"
+      },
+      {
+        "id": 9,
+        "type": "decouverte_prix",
+        "question": "Tu connais un bon restaurant {gamme_prix} dans {quartier} ?"
+      },
+      {
+        "id": 10,
+        "type": "decouverte_prix",
+        "question": "Où manger pour {gamme_prix} à {ville} ?"
+      },
+      {
+        "id": 11,
+        "type": "decouverte_prix",
+        "question": "Quel restaurant {gamme_prix} tu recommandes près de {rue} ?"
+      },
+      {
+        "id": 12,
+        "type": "occasion_speciale",
+        "question": "Où aller pour un {occasion} à {ville} ?"
+      },
+      {
+        "id": 13,
+        "type": "occasion_speciale",
+        "question": "Tu as un bon resto pour un {occasion} dans {quartier} ?"
+      },
+      {
+        "id": 14,
+        "type": "occasion_speciale",
+        "question": "Je cherche un restaurant pour {occasion}, des idées à {ville} ?"
+      },
+      {
+        "id": 15,
+        "type": "menu_specifique",
+        "question": "Est-ce que {nom_business} sert des {plat_signature} ?"
+      },
+      {
+        "id": 16,
+        "type": "menu_specifique",
+        "question": "Qu'est-ce qu'il y a au menu de {nom_business} ?"
+      },
+      {
+        "id": 17,
+        "type": "menu_specifique",
+        "question": "Quelle est la spécialité de {nom_business} ?"
+      },
+      {
+        "id": 18,
+        "type": "menu_specifique",
+        "question": "Est-ce que {nom_business} fait des {plat_recherche} ?"
+      },
+      {
+        "id": 19,
+        "type": "restrictions_alimentaires",
+        "question": "Est-ce que {nom_business} a des options végétariennes ?"
+      },
+      {
+        "id": 20,
+        "type": "restrictions_alimentaires",
+        "question": "Tu connais un restaurant avec des plats végans dans {quartier} ?"
+      },
+      {
+        "id": 21,
+        "type": "restrictions_alimentaires",
+        "question": "Est-ce que {nom_business} propose des options sans gluten ?"
+      },
+      {
+        "id": 22,
+        "type": "restrictions_alimentaires",
+        "question": "Où manger sans lactose à {ville} ?"
+      },
+      {
+        "id": 23,
+        "type": "restrictions_alimentaires",
+        "question": "Tu connais un resto halal dans {quartier} ?"
+      },
+      {
+        "id": 24,
+        "type": "restrictions_alimentaires",
+        "question": "Est-ce que {nom_business} accommode les allergies alimentaires ?"
+      },
+      {
+        "id": 25,
+        "type": "reservation",
+        "question": "Comment je peux réserver une table chez {nom_business} ?"
+      },
+      {
+        "id": 26,
+        "type": "reservation",
+        "question": "Est-ce qu'il faut réserver à {nom_business} ?"
+      },
+      {
+        "id": 27,
+        "type": "reservation",
+        "question": "Est-ce que {nom_business} accepte les réservations en ligne ?"
+      },
+      {
+        "id": 28,
+        "type": "livraison",
+        "question": "Est-ce que {nom_business} fait de la livraison ?"
+      },
+      {
+        "id": 29,
+        "type": "livraison",
+        "question": "Je peux commander {type_cuisine} pour emporter à {ville} ?"
+      },
+      {
+        "id": 30,
+        "type": "livraison",
+        "question": "Est-ce que {nom_business} est sur Uber Eats ?"
+      },
+      {
+        "id": 31,
+        "type": "terrasse",
+        "question": "Est-ce que {nom_business} a une terrasse ?"
+      },
+      {
+        "id": 32,
+        "type": "terrasse",
+        "question": "Tu connais un resto avec terrasse dans {quartier} ?"
+      },
+      {
+        "id": 33,
+        "type": "terrasse",
+        "question": "Où manger dehors à {ville} ?"
+      },
+      {
+        "id": 34,
+        "type": "groupe",
+        "question": "Est-ce que {nom_business} peut accueillir un groupe de {nb_personnes} personnes ?"
+      },
+      {
+        "id": 35,
+        "type": "groupe",
+        "question": "Tu connais un restaurant pour un groupe dans {quartier} ?"
+      },
+      {
+        "id": 36,
+        "type": "groupe",
+        "question": "Où aller manger avec {nb_personnes} personnes à {ville} ?"
+      },
+      {
+        "id": 37,
+        "type": "contexte_temporel",
+        "question": "Quel restaurant est ouvert tard dans {quartier} ?"
+      },
+      {
+        "id": 38,
+        "type": "contexte_temporel",
+        "question": "Où manger le dimanche à {ville} ?"
+      },
+      {
+        "id": 39,
+        "type": "contexte_temporel",
+        "question": "Tu connais un brunch à {ville} ?"
+      },
+      {
+        "id": 40,
+        "type": "contexte_temporel",
+        "question": "Est-ce que {nom_business} sert le petit-déjeuner ?"
+      },
+      {
+        "id": 41,
+        "type": "alcool",
+        "question": "Est-ce que {nom_business} a une licence d'alcool ?"
+      },
+      {
+        "id": 42,
+        "type": "alcool",
+        "question": "Tu connais un restaurant avec une bonne carte des vins dans {quartier} ?"
+      },
+      {
+        "id": 43,
+        "type": "alcool",
+        "question": "Est-ce que {nom_business} sert de la bière locale ?"
+      },
+      {
+        "id": 44,
+        "type": "alcool",
+        "question": "Quel resto a les meilleurs cocktails à {ville} ?"
+      },
+      {
+        "id": 45,
+        "type": "apportez_votre_vin",
+        "question": "Est-ce que {nom_business} est un apportez votre vin ?"
+      },
+      {
+        "id": 46,
+        "type": "apportez_votre_vin",
+        "question": "Tu connais un bon AVV dans {quartier} ?"
+      },
+      {
+        "id": 47,
+        "type": "familial",
+        "question": "Est-ce que {nom_business} est adapté pour les enfants ?"
+      },
+      {
+        "id": 48,
+        "type": "familial",
+        "question": "Tu connais un restaurant familial dans {quartier} ?"
+      },
+      {
+        "id": 49,
+        "type": "familial",
+        "question": "Où manger avec des enfants à {ville} ?"
+      },
+      {
+        "id": 50,
+        "type": "chef_proprietaire",
+        "question": "Qui est le chef de {nom_business} ?"
+      },
+      {
+        "id": 51,
+        "type": "chef_proprietaire",
+        "question": "Est-ce que {nom_business} a un chef renommé ?"
+      },
+      {
+        "id": 52,
+        "type": "contexte_geographique",
+        "question": "Je suis au {point_interet}, où est-ce que je peux manger près d'ici ?"
+      },
+      {
+        "id": 53,
+        "type": "contexte_geographique",
+        "question": "Quel restaurant tu recommandes à 5 minutes de marche de {adresse_repere} ?"
+      },
+      {
+        "id": 54,
+        "type": "contexte_geographique",
+        "question": "Je travaille près de {rue}, où je peux déjeuner ?"
+      },
+      {
+        "id": 55,
+        "type": "authenticite",
+        "question": "Tu connais un vrai restaurant {type_cuisine} authentique à {ville} ?"
+      },
+      {
+        "id": 56,
+        "type": "authenticite",
+        "question": "Quel est le restaurant {type_cuisine} le plus authentique dans {quartier} ?"
+      },
+      {
+        "id": 57,
+        "type": "nouveaute",
+        "question": "Quels sont les nouveaux restaurants à {ville} ?"
+      },
+      {
+        "id": 58,
+        "type": "nouveaute",
+        "question": "Est-ce que {nom_business} a ouvert récemment ?"
+      },
+      {
+        "id": 59,
+        "type": "comparaison_directe",
+        "question": "C'est mieux {nom_business} ou un autre restaurant {type_cuisine} dans {quartier} ?"
+      },
+      {
+        "id": 60,
+        "type": "experience_unique",
+        "question": "Tu connais un restaurant avec une expérience unique à {ville} ?"
+      }
+    ]
+  }

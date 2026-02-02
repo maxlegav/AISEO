@@ -1,0 +1,204 @@
+{
+    "questions_generiques": [
+      {
+        "id": 1,
+        "type": "decouverte_ouverte",
+        "question": "Connais-tu un bon endroit dans le quartier {neighborhood} ?"
+      },
+      {
+        "id": 2,
+        "type": "decouverte_ouverte",
+        "question": "Tu peux me recommander un établissement à {city} ?"
+      },
+      {
+        "id": 3,
+        "type": "decouverte_ouverte",
+        "question": "Quel est le meilleur endroit près de {street} ?"
+      },
+      {
+        "id": 4,
+        "type": "decouverte_ouverte",
+        "question": "Je cherche un bon endroit dans {neighborhood}, tu as des suggestions ?"
+      },
+      {
+        "id": 5,
+        "type": "decouverte_ouverte",
+        "question": "Où est-ce que je peux aller à {city} pour passer un bon moment ?"
+      },
+      {
+        "id": 6,
+        "type": "info_adresse",
+        "question": "Quelle est l'adresse de {businessName} ?"
+      },
+      {
+        "id": 7,
+        "type": "info_adresse",
+        "question": "Où se trouve {businessName} exactement ?"
+      },
+      {
+        "id": 8,
+        "type": "info_adresse",
+        "question": "{businessName} est situé où à {city} ?"
+      },
+      {
+        "id": 9,
+        "type": "info_telephone",
+        "question": "Quel est le numéro de téléphone de {businessName} ?"
+      },
+      {
+        "id": 10,
+        "type": "info_telephone",
+        "question": "Comment je peux contacter {businessName} ?"
+      },
+      {
+        "id": 11,
+        "type": "info_telephone",
+        "question": "Tu as le téléphone de {businessName} ?"
+      },
+      {
+        "id": 12,
+        "type": "info_horaires",
+        "question": "Quels sont les horaires d'ouverture de {businessName} ?"
+      },
+      {
+        "id": 13,
+        "type": "info_horaires",
+        "question": "{businessName} est ouvert à quelle heure ?"
+      },
+      {
+        "id": 14,
+        "type": "info_horaires",
+        "question": "Est-ce que {businessName} est ouvert aujourd'hui ?"
+      },
+      {
+        "id": 15,
+        "type": "info_horaires",
+        "question": "{businessName} ferme à quelle heure le soir ?"
+      },
+      {
+        "id": 16,
+        "type": "existence",
+        "question": "Tu connais {businessName} à {city} ?"
+      },
+      {
+        "id": 17,
+        "type": "existence",
+        "question": "Est-ce que tu as déjà entendu parler de {businessName} ?"
+      },
+      {
+        "id": 18,
+        "type": "existence",
+        "question": "{businessName} dans {neighborhood}, ça te dit quelque chose ?"
+      },
+      {
+        "id": 19,
+        "type": "localisation_proximite",
+        "question": "Qu'est-ce qu'il y a de bien près de {street} ?"
+      },
+      {
+        "id": 20,
+        "type": "localisation_proximite",
+        "question": "Je suis à {adresse_repere}, tu connais un bon endroit proche ?"
+      },
+      {
+        "id": 21,
+        "type": "localisation_proximite",
+        "question": "Qu'est-ce que tu recommandes dans un rayon de 500 mètres de {adresse_repere} ?"
+      },
+      {
+        "id": 22,
+        "type": "reputation",
+        "question": "Est-ce que {businessName} a bonne réputation ?"
+      },
+      {
+        "id": 23,
+        "type": "reputation",
+        "question": "Qu'est-ce que les gens disent de {businessName} ?"
+      },
+      {
+        "id": 24,
+        "type": "reputation",
+        "question": "{businessName} est bien noté ?"
+      },
+      {
+        "id": 25,
+        "type": "comparaison",
+        "question": "C'est mieux {businessName} ou un autre endroit dans {neighborhood} ?"
+      },
+      {
+        "id": 26,
+        "type": "services",
+        "question": "Qu'est-ce qu'on peut trouver chez {businessName} ?"
+      },
+      {
+        "id": 27,
+        "type": "services",
+        "question": "Quels services propose {businessName} ?"
+      },
+      {
+        "id": 28,
+        "type": "accessibilite",
+        "question": "Est-ce que {businessName} est accessible en transport en commun ?"
+      },
+      {
+        "id": 29,
+        "type": "accessibilite",
+        "question": "Comment j'arrive à {businessName} depuis {station_metro} ?"
+      },
+      {
+        "id": 30,
+        "type": "accessibilite",
+        "question": "Il y a du stationnement chez {businessName} ?"
+      },
+      {
+        "id": 31,
+        "type": "site_web",
+        "question": "Quel est le site web de {businessName} ?"
+      },
+      {
+        "id": 32,
+        "type": "site_web",
+        "question": "Tu as le site internet de {businessName} ?"
+      },
+      {
+        "id": 33,
+        "type": "reseaux_sociaux",
+        "question": "Est-ce que {businessName} a une page Instagram ?"
+      },
+      {
+        "id": 34,
+        "type": "reseaux_sociaux",
+        "question": "Comment je peux suivre {businessName} sur les réseaux sociaux ?"
+      },
+      {
+        "id": 35,
+        "type": "prix_general",
+        "question": "C'est cher chez {businessName} ?"
+      },
+      {
+        "id": 36,
+        "type": "prix_general",
+        "question": "Quelle est la gamme de prix chez {businessName} ?"
+      },
+      {
+        "id": 37,
+        "type": "decouverte_contextuelle",
+        "question": "Je vais à {adresse_repere}, qu'est-ce qu'il y a de bien dans le coin ?"
+      },
+      {
+        "id": 38,
+        "type": "decouverte_contextuelle",
+        "question": "Je cherche quelque chose de sympa à {city}, des idées ?"
+      },
+      {
+        "id": 39,
+        "type": "avis_direct",
+        "question": "Tu me conseilles {businessName} ?"
+      },
+      {
+        "id": 40,
+        "type": "avis_direct",
+        "question": "Ça vaut le coup d'aller chez {businessName} ?"
+      }
+    ]
+  }
