@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -7,10 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
-import { User } from "lucide-react";
+import { UserPlus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "@/public/logo.png";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,7 +22,6 @@ export default function SignupPage() {
   const [passwordError, setPasswordError] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Redirige vers le tableau de bord si déjà connecté
   useEffect(() => {
     if (status === "authenticated") {
       router.push("/dashboard");
@@ -37,19 +32,16 @@ export default function SignupPage() {
     setIsLoading(true);
     setAuthError(null);
 
-    // Stocker l'information que l'utilisateur vient de s'inscrire
     if (typeof window !== "undefined") {
       localStorage.setItem("isNewUser", "true");
-      // Indiquer que c'est une inscription via Google
       localStorage.setItem("googleSignup", "true");
     }
 
     try {
       await signIn("google", { callbackUrl: "/api/auth/session-redirect" });
-      // Note: Cette ligne ne sera pas atteinte si la redirection fonctionne
     } catch (error) {
-      console.error("Erreur lors de l'inscription avec Google:", error);
-      setAuthError("Une erreur est survenue lors de l'inscription avec Google");
+      console.error("Google signup error:", error);
+      setAuthError("An error occurred while signing up with Google");
       setIsLoading(false);
     }
   };
@@ -57,42 +49,39 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Réinitialiser les erreurs
     setNameError("");
     setCompanyError("");
     setEmailError("");
     setPasswordError("");
     setAuthError(null);
 
-    // Validation du nom
+    let isValid = true;
+
     if (!name.trim()) {
-      setNameError("Le nom est requis.");
-      return;
+      setNameError("Full name is required.");
+      isValid = false;
     }
 
-    // Validation de l'email
     if (!email) {
-      setEmailError("L'email est requis.");
-      return;
-    }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("Veuillez entrer une adresse email valide.");
-      return;
+      setEmailError("Email is required.");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
     }
 
-    // Validation du mot de passe
     if (!password) {
-      setPasswordError("Le mot de passe est requis.");
-      return;
+      setPasswordError("Password is required.");
+      isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters.");
+      isValid = false;
     }
-    if (password.length < 8) {
-      setPasswordError("Le mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
+
+    if (!isValid) return;
 
     setIsLoading(true);
     try {
-      // Créer le compte
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -107,19 +96,15 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de l'inscription");
+        throw new Error(data.error || "Error during signup");
       }
 
-      // Stocker l'email dans le localStorage pour la page d'abonnement
       localStorage.setItem("pendingSignupEmail", email);
-
-      // Rediriger directement vers la page d'abonnement
       router.push("/login");
     } catch (error: any) {
-      console.error("Erreur d'inscription:", error);
+      console.error("Signup error:", error);
       setAuthError(
-        error.message ||
-          "Une erreur inattendue s'est produite. Veuillez réessayer."
+        error.message || "An unexpected error occurred. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -128,55 +113,74 @@ export default function SignupPage() {
 
   if (status === "loading" || status === "authenticated") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Chargement...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
+        <div className="animate-pulse text-purple-600 font-medium">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-bg-classic to-primary-900 px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-10 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-orange-300/20 rounded-full blur-3xl" />
+
+      {/* Back to home */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 flex items-center gap-2 text-gray-600 hover:text-[#1E293B] transition-colors z-10"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="text-sm font-medium">Back to home</span>
+      </Link>
+
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <Image src={logo} alt="AutoInvoice Logo" width={40} height={40} />
-            <span className="text-3xl font-bold text-texte-header-black">
-              AutoInvoice
+          <Link href="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-xl flex items-center justify-center">
+              <span className="text-white text-sm font-bold">AI</span>
+            </div>
+            <span className="text-2xl font-bold text-gray-900">
+              SHOWYOURBRAND
             </span>
           </Link>
-          <h1 className="text-4xl font-extrabold text-texte-header-black leading-tight">
-            Créer un compte
+          <h1 className="font-heading text-4xl font-medium text-gray-900">
+            Create your account
           </h1>
+          <p className="text-gray-600 mt-2">
+            Start optimizing your AI visibility today
+          </p>
         </div>
 
         {authError && (
           <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
+            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6"
             role="alert"
           >
             <span className="block sm:inline">{authError}</span>
           </div>
         )}
 
-        <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
+        <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/50 space-y-6">
           {/* Google Sign-up */}
           <Button
             variant="outline"
-            className="w-full flex items-center justify-center space-x-2 border-gray-300 hover:bg-gray-50 text-texte-description-black font-medium"
+            className="w-full flex items-center justify-center gap-3 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium h-12 rounded-xl"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
             <FcGoogle size={20} />
-            <span>S&apos;inscrire avec Google</span>
+            <span>Sign up with Google</span>
           </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
+              <span className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">
-                Ou s&apos;inscrire avec email
+              <span className="bg-white px-3 text-gray-500">
+                Or sign up with email
               </span>
             </div>
           </div>
@@ -184,19 +188,19 @@ export default function SignupPage() {
           {/* Signup Form */}
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <Label htmlFor="name" className="text-texte-description-black">
-                Nom complet
+              <Label htmlFor="name" className="text-gray-700 font-medium">
+                Full Name
               </Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
                 autoComplete="name"
-                placeholder="Jean Dupont"
+                placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className={`mt-1 ${nameError ? "border-red-500" : "border-gray-300"}`}
+                className={`mt-1.5 h-12 rounded-xl ${nameError ? "border-red-500" : "border-gray-200"}`}
                 disabled={isLoading}
               />
               {nameError && (
@@ -205,18 +209,18 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <Label htmlFor="company" className="text-texte-description-black">
-                Entreprise (optionnel)
+              <Label htmlFor="company" className="text-gray-700 font-medium">
+                Company <span className="text-gray-400 font-normal">(optional)</span>
               </Label>
               <Input
                 id="company"
                 name="company"
                 type="text"
                 autoComplete="organization"
-                placeholder="Nom de votre entreprise"
+                placeholder="Your company name"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className={`mt-1 ${companyError ? "border-red-500" : "border-gray-300"}`}
+                className={`mt-1.5 h-12 rounded-xl ${companyError ? "border-red-500" : "border-gray-200"}`}
                 disabled={isLoading}
               />
               {companyError && (
@@ -225,19 +229,19 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <Label htmlFor="email" className="text-texte-description-black">
-                Adresse Email
+              <Label htmlFor="email" className="text-gray-700 font-medium">
+                Email Address
               </Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="vous@exemple.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className={`mt-1 ${emailError ? "border-red-500" : "border-gray-300"}`}
+                className={`mt-1.5 h-12 rounded-xl ${emailError ? "border-red-500" : "border-gray-200"}`}
                 disabled={isLoading}
               />
               {emailError && (
@@ -246,22 +250,19 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <Label
-                htmlFor="password"
-                className="text-texte-description-black"
-              >
-                Mot de passe
+              <Label htmlFor="password" className="text-gray-700 font-medium">
+                Password
               </Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
                 autoComplete="new-password"
-                placeholder="••••••••"
+                placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`mt-1 ${passwordError ? "border-red-500" : "border-gray-300"}`}
+                className={`mt-1.5 h-12 rounded-xl ${passwordError ? "border-red-500" : "border-gray-200"}`}
                 disabled={isLoading}
               />
               {passwordError && (
@@ -271,28 +272,39 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              className="w-full px-8 py-4 bg-bg-bouton-classic hover:bg-bg-bouton-hover text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1"
+              className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-medium rounded-xl shadow-lg"
               disabled={isLoading}
             >
               {isLoading ? (
-                "Inscription en cours..."
+                "Creating account..."
               ) : (
                 <>
-                  <User size={16} className="mr-2" />
-                  Créer un compte
+                  <UserPlus size={18} className="mr-2" />
+                  Create account
                 </>
               )}
             </Button>
           </form>
         </div>
 
-        <p className="mt-8 text-center text-sm text-texte-description-black">
-          Vous avez déjà un compte ?
+        <p className="mt-8 text-center text-sm text-gray-600">
+          Already have an account?{" "}
           <Link
             href="/login"
-            className="ml-1 font-medium text-texte-header-black hover:opacity-80"
+            className="font-semibold text-[#1E293B] hover:text-slate-700"
           >
-            Se connecter
+            Sign in
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-xs text-gray-500">
+          By creating an account, you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-[#1E293B]">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline hover:text-[#1E293B]">
+            Privacy Policy
           </Link>
         </p>
       </div>

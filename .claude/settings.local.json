@@ -24,8 +24,14 @@
       "Bash(npm run dev:*)",
       "Bash(git push:*)",
       "Bash(git reset:*)",
-      "Bash(/Users/chocomushrooms/AISEO/.claude/hooks/play-tts.sh:*)",
-      "Bash(node:*)"
+      "Bash(git remote add:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "WebSearch",
+      "Bash(git pull origin main)",
+      "Bash(git stash)"
     ]
   },
   "enableAllProjectMcpServers": true,

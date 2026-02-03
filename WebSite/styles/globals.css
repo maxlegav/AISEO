@@ -30,4 +30,8 @@
   .font-subtitle {
     font-family: var(--font-grotesk), "Space Grotesk", sans-serif;
   }
+
+  .font-heading {
+    font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  }
 }
