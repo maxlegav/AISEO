@@ -1,4 +1,4 @@
-# AISEO - GEO Audit Platform
+ # AISEO - GEO Audit Platform
 
 **Make your business visible in AI search engines** (ChatGPT, Claude, Perplexity, DeepSeek)
 
