@@ -32,13 +32,13 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 
 **Core Platform Capabilities:**
 - **User Management (FR1-FR7):** Account creation (email/password + Google OAuth), profile management, language preference (EN/FR), secure sessions (30-day JWT)
-- **Project Management (FR8-FR14):** Multi-project support with tier-based limits (Basic=1, Pro=5, Premium=10+), competitor URL tracking, CRUD operations
+- **Project Management (FR8-FR14):** Project/audit management, competitor URL tracking (Basic=1, Pro=5, Premium=unlimited), CRUD operations
 - **Audit Engine (FR15-FR22):** 100-prompt battery testing across 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek), GEO Health Score calculation (0-100%), competitive visibility comparison, prompt category analysis, audit history tracking
 - **HTML Scanner (FR23-FR30):** Schema.org markup detection, meta tag analysis, heading structure audit, image alt text quality assessment, top 30 keyword extraction (TF-IDF ranking)
 - **AI-Powered Recommendations (FR31-FR37):** FAQ generation (10 Q&A based on business category), schema.org code snippets (JSON-LD), AI-generated alt text suggestions, 3-level priority system (🔴 Critical / 🟠 Important / 🟢 Nice-to-have), Grade 8 reading level explanations
 - **Dashboard & Visualization (FR38-FR45):** Color-coded GEO Score display, Prompt Gap Analysis charts, competitor comparison visualizations, top priority issues, drill-down details, audit timeline, improvement tracking, bilingual UI (EN/FR switcher)
 - **Report Generation (FR46-FR53):** Professional PDF reports (brand logo, typography, charts), executive summary (1 page for business owners), technical details (5-10 pages for developers), localized reports (EN/FR), MongoDB GridFS storage, email notifications, shareable download links
-- **Subscription & Payment (FR54-FR62):** One-time audits (€300), tiered subscriptions (€50/€150/€300 monthly), project count limits enforcement, upgrade/downgrade flows, Stripe Customer Portal, webhook lifecycle handling
+- **Payments & Subscription (FR54-FR61):** One-shot audits (Basic €100, Pro €200), Premium subscription (€500/month with 20 audits included, +€20/extra), feature restrictions by tier (AI engines, competitors, history, white-label), Stripe Customer Portal, webhook handling
 - **Email Notifications (FR63-FR66):** Welcome emails, audit completion notifications, subscription confirmations, payment receipts (via Resend)
 - **Integration Capabilities (FR67-FR71, conditional):** Google Search Console OAuth, Google Analytics OAuth, SEO/traffic metric correlation (if APIs are free and easy to implement)
 - **Data Management & Compliance (FR72-FR77):** MongoDB Atlas encryption at rest, GDPR data export, account deletion, robots.txt compliance, rate-limited scraping, descriptive user-agent ("AISEO-Bot/1.0")
@@ -2622,13 +2622,14 @@ Project structure supports all architectural decisions:
 - Shareable download links via `/api/audits/pdf/download.ts`
 - Localized reports (EN/FR) based on user preference
 
-**Subscription & Payment (FR54-FR62):** ✅ FULLY SUPPORTED
+**Payments & Subscription (FR54-FR61):** ✅ FULLY SUPPORTED
 - Stripe integration (`/lib/stripe.ts`)
-- Three-tier subscriptions (Basic/Pro/Premium) with one-time audit option (€300)
-- Project count limits enforcement in `/api/projects/validate-limit.ts`
-- Upgrade/downgrade flows via Stripe Customer Portal
-- Webhook lifecycle handling (`/api/webhook/stripe.ts`)
-- Subscription model + embedded User.subscription
+- One-shot audits: Basic (€100, ChatGPT only, 1 competitor) and Pro (€200, all AI, 5 competitors, history)
+- Premium subscription (€500/month, 20 audits included, unlimited competitors, white-label, +€20/extra audit)
+- Feature restrictions by purchase type in `/api/audits/validate-features.ts`
+- Stripe Customer Portal for payment management
+- Webhook handling for one-time + subscription events (`/api/webhook/stripe.ts`)
+- Purchase model + embedded User.subscription for Premium
 
 **Email Notifications (FR63-FR66):** ✅ FULLY SUPPORTED
 - Resend integration (`/lib/email.ts`)

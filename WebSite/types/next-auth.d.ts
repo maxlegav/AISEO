@@ -3,7 +3,7 @@ import "next-auth/jwt";
 
 declare module "next-auth" {
   /**
-   * Extension de l'interface de session pour inclure l'ID utilisateur
+   * Extension de l'interface de session pour inclure l'ID utilisateur et subscription
    */
   interface Session {
     user: {
@@ -11,7 +11,11 @@ declare module "next-auth" {
       name: string;
       email: string;
       image?: string;
-      needsSubscription?: boolean;
+      username?: string;
+      subscriptionTier?: 'none' | 'basic' | 'pro' | 'premium';
+      subscriptionStatus?: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
+      auditCredits?: number;
+      language?: 'en' | 'fr';
     } & DefaultSession["user"];
   }
 
@@ -23,16 +27,25 @@ declare module "next-auth" {
     name: string;
     email: string;
     image?: string;
+    username?: string;
     company?: string;
+    subscriptionTier?: 'none' | 'basic' | 'pro' | 'premium';
+    subscriptionStatus?: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
+    auditCredits?: number;
+    language?: 'en' | 'fr';
   }
 }
 
 declare module "next-auth/jwt" {
   /**
-   * Extension du token JWT pour inclure l'ID utilisateur
+   * Extension du token JWT pour inclure l'ID utilisateur et subscription
    */
   interface JWT {
     id: string;
-    needsSubscription?: boolean;
+    username?: string;
+    subscriptionTier?: 'none' | 'basic' | 'pro' | 'premium';
+    subscriptionStatus?: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
+    auditCredits?: number;
+    language?: 'en' | 'fr';
   }
 }

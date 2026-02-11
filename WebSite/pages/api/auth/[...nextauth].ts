@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
           const user = await User.findOne({ email: credentials.email });
 
           if (!user) {
-            return null;
+            throw new Error("USER_NOT_FOUND");
           }
 
           const isPasswordValid = await user.comparePassword(
@@ -70,10 +70,7 @@ export const authOptions: NextAuthOptions = {
           };
         } catch (error: any) {
           console.error("Error during authentication:", error);
-          if (
-            error.message === "NO_ACTIVE_SUBSCRIPTION" ||
-            error.message === "SUBSCRIPTION_EXPIRED"
-          ) {
+          if (error.message === "USER_NOT_FOUND") {
             throw new Error(error.message);
           }
           return null;
@@ -90,11 +87,30 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
       }
 
+      // Always refresh user data from DB to keep session in sync
+      // (e.g. after Stripe webhook updates subscription)
+      if (token.id) {
+        await connectDB();
+        const dbUser = await User.findById(token.id);
+        if (dbUser) {
+          token.username = dbUser.username;
+          token.subscriptionTier = dbUser.subscriptionTier;
+          token.subscriptionStatus = dbUser.subscriptionStatus;
+          token.auditCredits = dbUser.auditCredits;
+          token.language = dbUser.language;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
+        session.user.username = token.username;
+        session.user.subscriptionTier = token.subscriptionTier;
+        session.user.subscriptionStatus = token.subscriptionStatus;
+        session.user.auditCredits = token.auditCredits;
+        session.user.language = token.language;
       }
       return session;
     },

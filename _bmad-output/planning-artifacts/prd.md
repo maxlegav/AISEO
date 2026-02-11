@@ -52,7 +52,7 @@ AISEO is a GEO (Generative Engine Optimization) audit platform that makes busine
 3. HTML Scanner (schema detection, meta tags, heading structure, alt text audit)
 4. AI-Optimized Content Suggestions (FAQ generation, schema snippets, keyword recommendations)
 5. Comprehensive Report Generation (PDF with executive + technical sections)
-6. Subscription Management (Stripe: Basic/Pro/Premium + one-shot €299 audits)
+6. Payment Management (Stripe: Basic €100 one-shot, Pro €200 one-shot, Premium €500/month subscription)
 7. Internationalization Architecture (English + French, extensible for future languages)
 8. Google Search Console & Analytics (conditional: if free and easy to implement)
 
@@ -113,8 +113,8 @@ C'est:
 **Phase 2: Scale (Mois 4-12)**
 - **Croissance agences:** 20-30 agences partenaires
 - **Volume audits:** 300+ audits/mois (Mois 6), 500+ audits/mois (Mois 12)
-- **Revenue target:** €50K MRR à Mois 12
-  - Breakdown: 25 agences × €500/mois + 50 audits one-shot/mois × €300 + 40 abonnements enterprise × €150/mois + 20 freelancers × €79/mois
+- **Revenue target:** €45-50K monthly à Mois 12
+  - Breakdown: 30 Premium subscriptions × €500/mois = €15K + 100 Basic one-shots × €100 = €10K + 75 Pro one-shots × €200 = €15K + Extra audits = €5K
 - **Market position:** Reconnu comme "THE GEO audit tool"
 - **Retention:** 80%+ retention rate, churn < 5%/mois
 
@@ -256,12 +256,12 @@ Si quelqu'un utilise AISEO, applique les recommandations, et son **ranking GEO n
 - Email notification when ready
 - **Pourquoi critique:** Deliverable final que l'agence/client reçoit et utilise
 
-**6. 🔴 Subscription Management (CRITIQUE)**
-- Stripe integration (Basic/Pro/Premium tiers)
-- One-shot payments (€299/audit)
-- Dual pricing model: subscription (incremental per URL) + one-time audits
-- Customer portal for plan management
-- Webhook handling for subscription lifecycle
+**6. 🔴 Payment Management (CRITIQUE)**
+- Stripe integration for one-shots (Basic €100, Pro €200) + subscription (Premium €500/month)
+- One-shot payments with feature differentiation (AI engines, competitors, history)
+- Premium subscription with 20 audits included + €20/extra
+- Customer portal for payment management
+- Webhook handling for payments + subscription lifecycle
 - **Pourquoi critique:** Revenue model enablement
 
 **7. 🔴 Internationalization (i18n) Architecture (CRITIQUE - ADDED TO MVP)**
@@ -398,7 +398,7 @@ Marc teste lui-même. ChatGPT, Claude, Perplexity - **aucun ne mentionne ses res
 
 Marc voit une pub Instagram: *"L'IA peut ne JAMAIS parler de vous - Test gratuit."*
 
-Il clique, entre l'URL de son site, paye €299 pour un audit one-shot complet.
+Il clique, entre l'URL de son site, paye €200 pour un audit Pro complet.
 
 **15 minutes plus tard**, il reçoit un email: *"Votre rapport GEO est prêt!"*
 
@@ -421,7 +421,7 @@ Le rapport propose des solutions **ultra-claires**:
 
 Marc transmet le rapport à Emma (sa développeuse freelance). Elle implémente les 3 recommandations prioritaires en **2 heures** (grâce au code copy-paste).
 
-**3 mois plus tard**, Marc paye €299 pour re-tester:
+**3 mois plus tard**, Marc paye €200 pour un nouveau Pro audit:
 - **GEO Health Score: 67%** (vert!)
 - **Vous apparaissez dans 54/100 prompts (54%)** - +29 points!
 
@@ -430,10 +430,10 @@ Marc transmet le rapport à Emma (sa développeuse freelance). Elle implémente 
 **6 mois après:**
 - Marc reçoit 2-3 clients/semaine qui disent: *"ChatGPT m'a recommandé vous"*
 - Il estime +€15K revenue additionnel (30 clients × €500 panier moyen)
-- Investment AISEO: €299 (one-shot) + €150 (re-test) = €449
-- **ROI = 33x**
+- Investment AISEO: €200 (Pro audit) + €200 (re-test) = €400
+- **ROI = 37x**
 
-Marc souscrit maintenant à l'abonnement mensuel (€79/mois) pour suivre l'évolution. Il dort mieux, sachant qu'il est **visible dans l'ère de l'IA.**
+Marc décide de souscrire au Premium (€500/mois) pour suivre l'évolution de ses 3 restaurants avec des audits réguliers. Il dort mieux, sachant qu'il est **visible dans l'ère de l'IA.**
 
 ---
 
@@ -482,7 +482,7 @@ Julien demande un témoignage. Le client accepte avec enthousiasme.
 
 **6 mois plus tard:**
 - Julien a 12 clients sur package SEO + GEO (€1,800/mois chacun) = €21,600 MRR
-- AISEO coût: €150/mois (12 URLs)
+- AISEO coût: €500/mois (Premium avec 20 audits, white-label pour ses clients)
 - Il se positionne comme **"Expert SEO + GEO"** (seul dans sa région)
 - Il charge **50% plus cher** que la concurrence et les clients payent (valeur perçue)
 - Il publie du contenu LinkedIn sur le GEO → devient thought leader local
@@ -869,52 +869,76 @@ User (Account)
 
 ---
 
-### Subscription Tiers & Pricing Model
+### Pricing Model - One-Shots + Subscription
 
-**Tier Structure: Basic / Pro / Premium**
+**Pricing Structure: 2 One-Shot Tiers + 1 Subscription**
 
-**Key Principle:** All tiers receive the SAME audit quality (100 prompts, full features). Difference = number of projects managed.
+**Key Principle:** One-shots (Basic/Pro) for single audits with different feature levels. Subscription (Premium) for agencies/enterprises with volume needs and advanced features.
 
-**Basic Tier:**
-- **1 project** (1 brand/URL)
-- 100 prompt battery testing (same as all tiers)
-- Full dashboard + PDF report
-- All audit features included
-- Email support
-- **Price:** €50/month
+---
 
-**Pro Tier:**
-- **5 projects** (5 brands/URLs)
-- 100 prompt battery testing per project (same quality as Basic)
-- Full dashboard + PDF report per project
-- All audit features included
-- Priority email support
-- **Price:** €150/month
+**BASIC (One-Shot) - €100**
+- **Type:** Single audit purchase
+- **AI Engines:** ChatGPT only
+- **Competitors:** 1 competitor analysis
+- **Dashboard:** ✅ Yes (reset with each new audit purchase, no history)
+- **PDF Report:** ✅ Yes, with code snippets
+- **Historical Tracking:** ❌ No (new dashboard each time)
+- **White-label:** ❌ No
+- **Target User:** Business owners wanting a quick GEO health check
+- **Cost:** ~€20 | **Margin:** €80 (80%)
 
-**Premium Tier:**
-- **10+ projects** (10 brands/URLs included)
-- 100 prompt battery testing per project (same quality as all tiers)
-- Full dashboard + PDF report per project
-- All audit features included
-- Priority support
-- White-label reports (custom branding)
-- **Price:** €300/month
+---
 
-**Additional Projects (Premium tier):**
-- Option to add beyond 10 projects at incremental cost
-- Pricing TBD: €X per additional project/month
+**PRO (One-Shot) - €200**
+- **Type:** Single audit purchase
+- **AI Engines:** All 4 (ChatGPT, Claude, Perplexity, DeepSeek)
+- **Competitors:** Up to 5 competitor analysis
+- **Dashboard:** ✅ Yes (persistent with history)
+- **PDF Report:** ✅ Yes, with code snippets
+- **Historical Tracking:** ✅ Yes (compare audits over time)
+- **White-label:** ❌ No
+- **Target User:** Businesses wanting comprehensive GEO analysis with tracking
+- **Cost:** ~€20 | **Margin:** €180 (90%)
 
-**One-Shot Pricing:**
-- Single audit (no subscription)
-- Full report with all recommendations
-- **Price:** €299 per audit
+---
+
+**PREMIUM (Subscription) - €500/month**
+- **Type:** Monthly subscription
+- **Audits Included:** 20 audits/month
+- **Extra Audits:** +€20 per audit beyond 20
+- **AI Engines:** All 4 (ChatGPT, Claude, Perplexity, DeepSeek)
+- **Competitors:** Unlimited competitor analysis
+- **Dashboard:** ✅ Yes (persistent with full history)
+- **PDF Report:** ✅ Yes, with code snippets
+- **Historical Tracking:** ✅ Yes (full evolution tracking across all audits)
+- **White-label:** ✅ Yes (custom branding on PDF reports)
+- **Target User:** Marketing agencies, enterprises with multiple clients/projects
+- **Cost:** ~€400 (20 audits) | **Margin:** €100 minimum (20%)
+- **Extra Audit Economics:** €20 cost, €20 price = break-even (strategic choice to retain high-volume clients)
+
+---
+
+**Pricing Comparison Table:**
+
+| Feature | Basic €100 | Pro €200 | Premium €500/mo |
+|---------|------------|----------|-----------------|
+| **Type** | One-shot | One-shot | Subscription |
+| **Audits** | 1 | 1 | 20 included (+€20/extra) |
+| **AI Engines** | ChatGPT | All 4 | All 4 |
+| **Competitors** | 1 | 5 | Unlimited |
+| **Dashboard** | ✅ (resets) | ✅ (persistent) | ✅ (persistent) |
+| **History & Evolution** | ❌ | ✅ | ✅ |
+| **PDF + Code** | ✅ | ✅ | ✅ |
+| **White-label** | ❌ | ❌ | ✅ |
+
+---
 
 **Pricing Strategy Notes:**
-- Final pricing dependent on cost analysis:
-  - AI API costs (OpenAI, Claude, Perplexity, DeepSeek)
-  - Compute costs (scraping, processing)
-  - Storage costs (reports in MongoDB)
-- Premium pricing = quality signal (not competing on low price)
+- **No cannibalisation:** Basic/Pro are one-shots (no recurring access), Premium is subscription with volume + white-label
+- **Clear upgrade path:** Basic → Pro (more AI, more competitors, history) → Premium (volume + white-label)
+- **Premium positioning:** Quality signal, not competing on low price
+- **Agency-friendly:** Premium designed for agencies reselling to clients
 
 ---
 
@@ -1350,17 +1374,19 @@ User (Account)
 
 ---
 
-### 8. Subscription & Payment Management
+### 8. Payments & Subscription Management
 
-- **FR54:** Users can purchase one-time audits (€300 per audit)
-- **FR55:** Users can subscribe to Basic tier (1 project, €50/month)
-- **FR56:** Users can subscribe to Pro tier (5 projects, €150/month)
-- **FR57:** Users can subscribe to Premium tier (10+ projects, €300/month)
-- **FR58:** Users can upgrade or downgrade their subscription tier
-- **FR59:** Users can cancel their subscription
-- **FR60:** Users can access Stripe Customer Portal to manage payment methods
-- **FR61:** System can process subscription lifecycle events via Stripe webhooks
-- **FR62:** System can restrict features based on subscription tier (project count limits: Basic=1, Pro=5, Premium=10+)
+- **FR54:** Users can purchase Basic one-shot audit (€100, ChatGPT only, 1 competitor, no history)
+- **FR55:** Users can purchase Pro one-shot audit (€200, all 4 AI engines, 5 competitors, with history)
+- **FR56:** Users can subscribe to Premium tier (€500/month, 20 audits included, unlimited competitors, white-label)
+- **FR57:** Premium subscribers can purchase extra audits beyond 20 at €20/audit
+- **FR58:** Premium subscribers can cancel their subscription
+- **FR59:** Users can access Stripe Customer Portal to manage payment methods
+- **FR60:** System can process payment events via Stripe webhooks (one-time purchases + subscription lifecycle)
+- **FR61:** System can restrict features based on purchase type:
+  - Basic: ChatGPT only, 1 competitor, dashboard resets each purchase
+  - Pro: All AI engines, 5 competitors, persistent dashboard with history
+  - Premium: All AI engines, unlimited competitors, history, white-label PDF
 
 ---
 

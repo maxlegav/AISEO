@@ -31,7 +31,15 @@
       "Bash(xargs kill:*)",
       "WebSearch",
       "Bash(git pull origin main)",
-      "Bash(git stash)"
+      "Bash(git stash)",
+      "Bash(git stash drop)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next lint)",
+      "Bash(npm run lint:*)",
+      "Bash(git diff:*)",
+      "Bash(node:*)",
+      "Bash(timeout 5 npm run dev:*)",
+      "Bash(test:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

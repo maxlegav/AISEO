@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,9 +35,14 @@ export default function LoginPage() {
     }
   }, [router.query.error, router.query.success, router]);
 
+  // If already authenticated, redirect to dashboard
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/dashboard");
+      // Small delay so user can see the page and use the "switch account" link if needed
+      const timer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [status, router]);
 
@@ -112,18 +117,15 @@ export default function LoginPage() {
         return "Unable to send sign-in email. Please try again later.";
       case "CredentialsSignin":
         return "Invalid credentials. Please check your email and password.";
-      case "NO_ACTIVE_SUBSCRIPTION":
-        setTimeout(() => router.push("/subscription-plans"), 0);
-        return "";
-      case "SUBSCRIPTION_EXPIRED":
-        setTimeout(() => router.push("/subscription-plans"), 0);
-        return "";
+      case "USER_NOT_FOUND":
+        setTimeout(() => router.push("/signup"), 0);
+        return "No account found with this email. Redirecting to signup...";
       default:
         return "Authentication failed. Please try again.";
     }
   };
 
-  if (status === "loading" || status === "authenticated") {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
         <div className="animate-pulse text-purple-600 font-medium">Loading...</div>
@@ -149,14 +151,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-xl flex items-center justify-center">
-              <span className="text-white text-sm font-bold">AI</span>
-            </div>
-            <span className="text-2xl font-bold text-gray-900">
-              SHOWYOURBRAND
-            </span>
-          </Link>
+          
           <h1 className="font-heading text-4xl font-medium text-gray-900">
             Welcome back
           </h1>
@@ -164,6 +159,29 @@ export default function LoginPage() {
             Sign in to access your GEO dashboard
           </p>
         </div>
+
+        {status === "authenticated" && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl mb-6">
+            <p className="text-sm">
+              You are already logged in as <span className="font-semibold">{_session?.user?.email}</span>.
+              Redirecting to dashboard...
+            </p>
+            <div className="flex gap-3 mt-2">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="text-sm font-medium text-blue-700 underline hover:text-blue-900"
+              >
+                Go to dashboard
+              </button>
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="text-sm font-medium text-red-600 underline hover:text-red-800"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
 
         {authError && (
           <div
@@ -182,6 +200,8 @@ export default function LoginPage() {
             <span className="block sm:inline">{successMessage}</span>
           </div>
         )}
+
+        
 
         <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/50 space-y-6">
           {/* Google Sign-in */}
@@ -289,11 +309,10 @@ export default function LoginPage() {
             </Button>
           </form>
         </div>
-
         <p className="mt-8 text-center text-sm text-gray-600">
           Don&apos;t have an account?{" "}
           <Link
-            href="/signup"
+            href="/signup?plan=pro"
             className="font-semibold text-[#1E293B] hover:text-slate-700"
           >
             Create an account

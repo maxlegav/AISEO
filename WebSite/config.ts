@@ -13,68 +13,60 @@ const config = {
   // Domain (TODO: Story 1.2 - set actual domain)
   domainName: "aiseo.com",
 
-  // Stripe Configuration (TODO: Story 1.2 - configure actual AISEO pricing)
+  // Stripe Configuration - AISEO Pricing (per BMAD specs)
   stripe: {
-    // Basic: 1 project, €50/month
+    // Basic One-Shot: €100 (ChatGPT only, 1 competitor, no history)
     basic: {
-      priceId: process.env.STRIPE_PRICE_ID_BASIC || "",
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_BASIC || "",
       name: "Basic",
-      price: 50,
+      price: 100,
       currency: "EUR",
-      interval: "month",
-      projectLimit: 1,
+      mode: "payment", // one-shot
       features: [
-        { name: "1 project (website)" },
+        { name: "1 complete GEO audit" },
+        { name: "ChatGPT analysis only" },
+        { name: "1 competitor comparison" },
         { name: "100 AI prompt testing" },
-        { name: "Full GEO audit reports" },
-        { name: "AI-powered recommendations" },
+        { name: "Full PDF report" },
         { name: "Email support" },
       ],
     },
-    // Pro: 5 projects, €150/month
+    // Pro One-Shot: €200 (all 4 AI engines, 5 competitors, with history)
     pro: {
-      priceId: process.env.STRIPE_PRICE_ID_PRO || "",
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO || "",
       name: "Pro",
-      price: 150,
+      price: 200,
       currency: "EUR",
-      interval: "month",
-      projectLimit: 5,
+      mode: "payment", // one-shot
       features: [
-        { name: "5 projects (websites)" },
-        { name: "100 AI prompt testing per project" },
-        { name: "Full GEO audit reports" },
-        { name: "AI-powered recommendations" },
+        { name: "1 complete GEO audit" },
+        { name: "All 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)" },
+        { name: "5 competitor comparisons" },
+        { name: "100 AI prompt testing" },
+        { name: "Full PDF report" },
+        { name: "Dashboard with history" },
         { name: "Priority email support" },
       ],
     },
-    // Premium: 10+ projects, €300/month
+    // Premium Subscription: €500/month (20 audits included, unlimited competitors, white-label)
     premium: {
-      priceId: process.env.STRIPE_PRICE_ID_PREMIUM || "",
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PREMIUM || "",
       name: "Premium",
-      price: 300,
+      price: 500,
       currency: "EUR",
       interval: "month",
-      projectLimit: 10,
+      mode: "subscription",
+      auditsIncluded: 20,
+      extraAuditPrice: 20,
       features: [
-        { name: "10+ projects (websites)" },
-        { name: "100 AI prompt testing per project" },
-        { name: "Full GEO audit reports" },
-        { name: "AI-powered recommendations" },
-        { name: "White-label reports (custom branding)" },
+        { name: "20 audits per month included" },
+        { name: "All 4 AI engines" },
+        { name: "Unlimited competitor comparisons" },
+        { name: "100 AI prompt testing per audit" },
+        { name: "White-label PDF reports (your branding)" },
+        { name: "Full dashboard with history" },
         { name: "Priority support" },
-      ],
-    },
-    // One-shot audit: €300
-    oneShot: {
-      priceId: process.env.STRIPE_PRICE_ID_ONE_SHOT || "",
-      name: "One-Time Audit",
-      price: 299,
-      currency: "EUR",
-      features: [
-        { name: "Single comprehensive GEO audit" },
-        { name: "100 AI prompt testing" },
-        { name: "Full PDF report" },
-        { name: "AI-powered recommendations" },
+        { name: "+€20 per extra audit beyond 20" },
       ],
     },
   },

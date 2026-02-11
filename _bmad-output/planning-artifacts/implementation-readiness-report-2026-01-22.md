@@ -122,16 +122,15 @@ date: '2026-01-22'
 - FR52: Users receive email notification when report is ready
 - FR53: Users can share report download links
 
-**8. Subscription & Payment Management (FR54-FR62)**
-- FR54: Users can purchase one-time audits (€300)
-- FR55: Users can subscribe to Basic tier (1 project, €50/month)
-- FR56: Users can subscribe to Pro tier (5 projects, €150/month)
-- FR57: Users can subscribe to Premium tier (10+ projects, €300/month)
-- FR58: Users can upgrade or downgrade subscription tier
-- FR59: Users can cancel subscription
-- FR60: Users can access Stripe Customer Portal
-- FR61: System can process subscription lifecycle events via Stripe webhooks
-- FR62: System can restrict features based on subscription tier
+**8. Payments & Subscription Management (FR54-FR61)**
+- FR54: Users can purchase Basic one-shot audit (€100, ChatGPT only, 1 competitor, no history)
+- FR55: Users can purchase Pro one-shot audit (€200, all 4 AI engines, 5 competitors, with history)
+- FR56: Users can subscribe to Premium tier (€500/month, 20 audits included, unlimited competitors, white-label)
+- FR57: Premium subscribers can purchase extra audits beyond 20 at €20/audit
+- FR58: Premium subscribers can cancel subscription
+- FR59: Users can access Stripe Customer Portal
+- FR60: System can process payment events via Stripe webhooks (one-time + subscription)
+- FR61: System can restrict features based on purchase type (AI engines, competitors, history, white-label)
 
 **9. Email Notifications (FR63-FR66)**
 - FR63: Users receive welcome email upon account creation
