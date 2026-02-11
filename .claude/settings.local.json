@@ -39,7 +39,12 @@
       "Bash(git diff:*)",
       "Bash(node:*)",
       "Bash(timeout 5 npm run dev:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(for i in {1..13})",
+      "Bash(do echo -n \"Epic $i: \")",
+      "Bash(done)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -6,7 +6,7 @@ inputDocuments:
   - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/ux-design-specification.md'
 totalEpics: 13
 totalFRs: 88
-totalStories: 71
+totalStories: 75
 status: 'stories_complete'
 ---
 
@@ -1273,7 +1273,9 @@ So that I can remove projects I no longer need.
 
 ## Epic 5: Audit Engine Core
 
-### Story 5.1: Implement Audit Initiation and Queue Management
+> **Spec détaillée :** Voir `_bmad-output/planning-artifacts/audit-engine-spec.md` pour le détail complet (scoring, prompts, détection, pipeline admin).
+
+### Story 5.1: Implement Audit Model and Initiation
 
 As a user,
 I want to initiate a GEO audit for my project,
@@ -1281,48 +1283,132 @@ So that I can start analyzing my website's AI visibility.
 
 **Acceptance Criteria:**
 
-**Given** I have a project with primary URL
+**Given** I have a project (Business) with primary URL, category, description, and targetKeywords
 **When** I click "Run Audit"
-**Then** An Audit document is created with status "pending"
-**And** Audit is queued for processing
+**Then** An Audit document is created in MongoDB with:
+  - status: "pending"
+  - businessSnapshot captured (name, primaryUrl, subUrls, competitorUrls, category, description, targetKeywords)
+  - enginesUsed: ["chatgpt", "claude", "perplexity", "gemini"]
+**And** WebSite calls Server Python via REST API + Bearer token with business metadata
 **And** I see a loading state with "Audit in progress" message
 **And** 10-second polling starts to check audit status
-**And** I cannot start another audit for the same project while one is in progress
+**And** I cannot start another audit for the same project while one is in progress (status pending/processing)
 
-### Story 5.2: Implement 100 AI Prompt Testing Across 4 Engines
+**Technical Notes:**
+- Audit model schema as defined in `audit-engine-spec.md` section 11
+- Status flow: pending → processing → review_pending → completed | rejected | failed
+- Server Python writes directly to MongoDB (no callback HTTP)
+
+### Story 5.2: Implement Dynamic Prompt Generation via LLM
 
 As a developer,
-I want the scraping service to test 100 AI prompts across ChatGPT, Claude, Perplexity, and DeepSeek in parallel,
-So that audits complete in 5-8 minutes instead of 20+ minutes.
+I want the Server Python to generate 100 customized prompts per business using a LLM,
+So that each audit has prompts tailored to the business's niche, not generic templates.
 
 **Acceptance Criteria:**
 
-**Given** An audit is queued
-**When** The Docker scraping service processes the audit
-**Then** 100 prompts are tested across 4 AI engines in parallel
-**And** Each prompt includes the business/brand name and relevant context
-**And** Responses are scraped and analyzed for business mentions
-**And** Results are stored in Audit document with prompt-level details
-**And** AI API rate limits are respected with exponential backoff (1s → 2s → 4s → 8s)
-**And** Audit times out after 10 minutes if not completed
+**Given** The Server Python receives business metadata (name, URL, category, description, keywords, competitors)
+**When** It starts processing an audit
+**Then** It calls a cheap LLM (GPT-4o-mini or Haiku) with the prompt generator template
+**And** The LLM returns exactly 100 prompts in strict JSON format (no markdown, no comments)
+**And** Prompts are structured in 5 levels × 20 prompts:
+  - Niveau 1 (Large): 5 ultra-larges + 15 catégorie — business name NOT in question
+  - Niveau 2 (Niche): 20 niche-specific — business name NOT in question
+  - Niveau 3 (Quasi-direct): 20 describing business without naming it
+  - Niveau 4 (Semi-direct): 20 with partial identifying details (city, unique trait)
+  - Niveau 5 (Direct): 20 explicitly naming the business or URL
+**And** Each prompt has: id (1-100), level (1-5), category (discovery|comparison|reputation|product|alternative|trust), question
+**And** Categories are balanced (min 10 prompts per category)
+**And** Validation checks: 100 prompts, 20 per level, valid categories, valid JSON
+**And** Generated prompts are stored in Audit.generatedPrompts
+**And** If LLM fails or returns invalid JSON: retry once, then fail the audit
 
-### Story 5.3: Implement GEO Health Score Calculation
+**Technical Notes:**
+- Prompt template in `audit-engine-spec.md` section 12
+- Cost: ~$0.01 per generation
+- JSON-only response enforced in system prompt
 
-As a user,
-I want to see a GEO Health Score (0-100%) for my audit,
-So that I can quickly understand my overall AI visibility.
+### Story 5.3: Implement 400 AI Request Execution (100 prompts × 4 engines)
+
+As a developer,
+I want the Server Python to execute 100 prompts across 4 AI engines in parallel,
+So that audits complete in 5-8 minutes.
 
 **Acceptance Criteria:**
 
-**Given** An audit has completed prompt testing
-**When** The system calculates the GEO Health Score
-**Then** Score is calculated as (mentions / total prompts) × 100
-**And** Score is color-coded (0-40% = red, 41-70% = orange, 71-100% = green)
-**And** Score is saved to Audit document
-**And** Score is displayed prominently on the dashboard
-**And** Historical score trends are trackable over multiple audits
+**Given** 100 prompts have been generated for an audit
+**When** The Server Python starts execution
+**Then** Status is updated to "processing"
+**And** 4 parallel workers are launched (one per AI engine: ChatGPT, Claude, Perplexity, Gemini)
+**And** Each worker executes its 100 prompts sequentially
+**And** AI API rate limits are respected with exponential backoff (1s → 2s → 4s → 8s, max 4 retries)
+**And** Each individual request has a 30-second timeout
+**And** Global timeout is 10 minutes
+**And** Minimum 2/4 engines must succeed for the audit to be valid
+**And** If an engine fails completely, audit continues with remaining engines
+**And** All raw responses are stored in Audit.promptResults
 
-### Story 5.4: Implement Competitor Visibility Comparison
+**Technical Notes:**
+- Parallel strategy: 4 async workers, each handling 100 prompts for their engine
+- Target engines: ChatGPT (gpt-4o-mini), Claude (haiku), Perplexity (pplx-7b-online), Gemini (gemini-1.5-flash)
+- Estimated cost: ~$0.12 per audit (400 requests)
+
+### Story 5.4: Implement Mention Detection (Regex + Fuzzy)
+
+As a developer,
+I want to detect business mentions in AI responses using regex and fuzzy matching,
+So that we can determine visibility without expensive LLM-as-judge calls.
+
+**Acceptance Criteria:**
+
+**Given** 400 raw responses have been collected
+**When** The mention detection runs
+**Then** For each response, detect if business is mentioned via:
+  - Exact name match (case-insensitive)
+  - URL variants match (with/without www, http, trailing slash)
+  - Fuzzy name match (fuzzywuzzy partial_ratio > 85%)
+**And** For each mention, calculate quality score (0-3):
+  - 0: Not mentioned
+  - 1: Mentioned in passing (1 occurrence, not in structured recommendation)
+  - 2: Recommended among others (appears in numbered/bulleted list)
+  - 3: Recommended first / response focused on the business
+**And** For each mention, calculate position (rank in response):
+  - Rank 1 → position multiplier ×1.5
+  - Rank 2-3 → ×1.0
+  - Rank 4+ → ×0.7
+**And** Results stored per prompt per engine: { mentioned, quality, position, rawResponse, responseTime, error }
+
+**Technical Notes:**
+- E-commerce context: if an AI recommends a site, it cites the name or URL — no implicit mentions
+- See `audit-engine-spec.md` section 6 for full algorithm
+
+### Story 5.5: Implement GEO Score Calculation and Aggregation
+
+As a developer,
+I want to calculate multi-level scores from raw mention data,
+So that users get actionable insights, not just raw numbers.
+
+**Acceptance Criteria:**
+
+**Given** Mention detection is complete for all 400 responses
+**When** The scoring engine runs
+**Then** It calculates:
+  1. **Per-prompt score** = Σ(quality × positionMultiplier) / (enginesResponded × 4.5) → 0.0-1.0
+  2. **Per-prompt mentionRate** = mentionedCount / enginesResponded → 0.0-1.0
+  3. **Per-category scores** (discovery, comparison, reputation, product, alternative, trust) = avg(promptScore)
+  4. **Per-level scores** (level 1-5) = avg(promptScore)
+  5. **Audit Engine Score** = weighted average of category scores × 100:
+     - discovery ×2.0, comparison ×1.5, reputation ×1.2, product ×1.0, alternative ×1.5, trust ×1.0
+  6. **Discoverability threshold** = lowest level where avgMentionRate ≥ 25%
+**And** All scores are saved to Audit document (categoryScores, levelScores, auditEngineScore, discoverabilityThreshold)
+**And** Status is updated to "review_pending"
+
+**Technical Notes:**
+- GEO Score final (70/30 with HTML Scanner) is calculated separately on WebSite side
+- Color coding: 0-30% red, 31-50% orange, 51-70% yellow, 71-85% green, 86-100% dark green
+- See `audit-engine-spec.md` sections 7-9 for full formulas
+
+### Story 5.6: Implement Competitor Visibility Comparison
 
 As a user,
 I want to see how my visibility compares to my competitors,
@@ -1330,30 +1416,53 @@ So that I can identify where I'm losing ground.
 
 **Acceptance Criteria:**
 
-**Given** My project has competitor URLs configured
+**Given** My project has competitor URLs configured (max 5)
 **When** An audit is run
-**Then** The same 100 prompts are tested for each competitor URL
-**And** Competitor GEO Health Scores are calculated
-**And** Dashboard displays a comparison chart (my score vs competitors)
+**Then** The same 100 generated prompts are tested for each competitor (name detection on competitor name/URL)
+**And** Competitor mention detection uses the same regex + fuzzy algorithm
+**And** Competitor auditEngineScore, mentionRate, categoryScores, and levelScores are calculated
+**And** Results stored in Audit.competitorResults
+**And** Dashboard displays comparison chart (my score vs competitors)
 **And** I can see which prompts competitors were mentioned in but I wasn't
-**And** Competitor data is stored in Audit document for historical comparison
 
-### Story 5.5: Implement Prompt Category Analysis
+**Technical Notes:**
+- Competitors are analyzed from the SAME 400 responses (no extra API calls)
+- The raw responses are already collected — we just run mention detection for each competitor name/URL
+
+### Story 5.7: Implement Prompt Category and Level Analysis Dashboard
 
 As a user,
-I want to identify which prompt categories show strongest/weakest visibility,
-So that I can focus optimization efforts on weak areas.
+I want to see my visibility broken down by prompt category and specificity level,
+So that I can understand WHERE and HOW I'm visible (or not).
 
 **Acceptance Criteria:**
 
-**Given** An audit is completed
+**Given** An audit is completed (status: completed)
 **When** I view audit results
-**Then** Prompts are categorized by type (e.g., "Local search", "Product recommendations", "Service providers", "Expert advice")
-**And** Visibility percentage is calculated per category
-**And** Dashboard displays category breakdown with strengths and weaknesses highlighted
-**And** I can drill down into specific prompts within each category
+**Then** I see a radar chart with 6 category scores (discovery, comparison, reputation, product, alternative, trust)
+**And** I see a bar chart with 5 level scores (Large → Direct) showing the "discoverability funnel"
+**And** I see the discoverability threshold highlighted ("Visible à partir du niveau 3")
+**And** I can drill down into specific prompts within each category/level
+**And** Each prompt shows: question, which engines mentioned us, quality, position, raw response preview
 
-### Story 5.6: Implement Audit History and Trend Tracking
+### Story 5.8: Implement Admin Review Pipeline
+
+As an admin,
+I want to review and validate audits before users see results,
+So that we ensure quality and catch anomalies.
+
+**Acceptance Criteria:**
+
+**Given** An audit has status "review_pending"
+**When** I open the admin dashboard
+**Then** I see a list of all review_pending audits sorted by creation date
+**And** For each audit I see: business name, URL, user email, auditEngineScore, engines succeeded (e.g. 3/4), global mentionRate
+**And** I can inspect: all 100 prompts with raw responses per engine, scores by category/level, anomalies
+**And** I can click "Validate" → status becomes "completed" + user is notified (email)
+**And** I can click "Reject" → status becomes "rejected" + user is notified with reason
+**And** Validation records: reviewedBy (admin userId), reviewedAt, reviewNotes
+
+### Story 5.9: Implement Audit History and Trend Tracking
 
 As a user,
 I want to view my audit history over time,
@@ -1363,11 +1472,28 @@ So that I can track improvements after implementing recommendations.
 
 **Given** I have run multiple audits for a project
 **When** I navigate to audit history
-**Then** I see a timeline of all audits with dates and GEO Health Scores
-**And** I can view trend charts showing score changes over time
-**And** I can compare any two audits to see which prompts changed
-**And** I can see which recommendations I implemented between audits
+**Then** I see a timeline of all completed audits with dates and GEO Scores
+**And** I can view trend charts showing score changes over time (line chart)
+**And** I can compare any two audits to see which prompts/categories changed
+**And** I can see the discoverability threshold evolution over time
 **And** Historical audit data is queryable for up to 12 months
+
+### Story 5.10: Implement GEO Score Final Calculation (70/30)
+
+As a developer,
+I want to combine Audit Engine Score and HTML Scanner Score into a final GEO Score,
+So that users see one unified visibility metric.
+
+**Acceptance Criteria:**
+
+**Given** Both auditEngineScore and htmlScannerScore are available for an audit
+**When** The GEO Score is calculated (on WebSite side)
+**Then** GEO Score = (auditEngineScore × 0.70) + (htmlScannerScore × 0.30)
+**And** Score is rounded to 1 decimal
+**And** Score is saved to Audit.geoScore
+**And** If HTML Scanner failed: GEO Score = auditEngineScore (×1.0)
+**And** If Audit Engine failed: audit is marked as failed, no GEO Score
+**And** Score is displayed on dashboard with color coding (0-30 red, 31-50 orange, 51-70 yellow, 71-85 green, 86-100 dark green)
 
 ---
 
