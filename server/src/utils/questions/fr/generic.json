@@ -1,5 +1,4 @@
-{
-    "questions_generiques": [
+[
       {
         "id": 1,
         "type": "decouverte_ouverte",
@@ -201,4 +200,3 @@
         "question": "Ça vaut le coup d'aller chez {businessName} ?"
       }
     ]
-  }

@@ -1,5 +1,5 @@
-{
-    "questions_coffee_shop": [
+
+    [
       {
         "id": 1,
         "type": "decouverte_generale",
@@ -301,4 +301,4 @@
         "question": "Où trouver un bon café glacé à {ville} ?"
       }
     ]
-  }
+  

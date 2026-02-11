@@ -46,31 +46,26 @@ def call_openai_api(
         from openai import OpenAI
         client = OpenAI(api_key=str(api_key))
         
-        # Build messages list
-        messages = conversation_history.copy() if conversation_history else []
-        messages.append({"role": "user", "content": message})
-        
         # Note: OpenAI doesn't have native web search
         if use_web_search:
-            print("Warning: OpenAI doesn't support native web search. Parameter ignored.")
+            pass
         
         # Make API call
-        response = client.chat.completions.create(
+        response = client.responses.create(
             model=model,
-            messages=messages,
+            tools=[{ "type": "web_search" }],
+            input=message,
             **kwargs
         )
         
         # Extract response
-        assistant_message = response.choices[0].message.content
+        assistant_message = response.output_text
         
-        # Update conversation history
-        messages.append({"role": "assistant", "content": assistant_message})
         
         return {
             "success": True,
             "response": assistant_message,
-            "conversation_history": messages,
+            "full_repsonse" : response,
             "metadata": {
                 "model": model,
                 "tokens_used": {
@@ -209,9 +204,12 @@ def call_google_api(
         Standardized response dict
     """
     try:
-        import google.generativeai as genai
+        from google import genai
+        from google.genai import types
         
         genai.configure(api_key=api_key)
+
+        client = genai.Client()
         
         # Create model instance
         generation_config = {}
@@ -221,35 +219,28 @@ def call_google_api(
             generation_config["max_output_tokens"] = kwargs.pop("max_tokens")
         
         # Configure web search (grounding)
-        tools = None
+        config = None
         if use_web_search:
-            tools = ["google_search_retrieval"]
+            grounding_tool = types.Tool(
+            google_search=types.GoogleSearch()
+             )
+
+            config = types.GenerateContentConfig(
+                tools=[grounding_tool]
+            )
         
-        model_instance = genai.GenerativeModel(
-            model_name=model,
-            generation_config=generation_config if generation_config else None,
-            tools=tools
+        response = client.models.generate_content(
+            model=model,
+            contents=message,
+            config=config
         )
         
-        # Build conversation
-        if conversation_history:
-            # Start chat with history
-            chat = model_instance.start_chat(history=conversation_history)
-            response = chat.send_message(message)
-        else:
-            # Single message
-            chat = model_instance.start_chat()
-            response = chat.send_message(message)
-        
         assistant_message = response.text
-        
-        # Get updated history
-        updated_history = chat.history
         
         return {
             "success": True,
             "response": assistant_message,
-            "conversation_history": updated_history,
+            "full_repsonse" : response,
             "metadata": {
                 "model": model,
                 "tokens_used": {
@@ -308,32 +299,21 @@ def call_perplexity_api(
             base_url="https://api.perplexity.ai"
         )
         
-        # Build messages list
-        messages = conversation_history.copy() if conversation_history else []
-        messages.append({"role": "user", "content": message})
-        
-        # For Perplexity, online models have web search built-in
-        # Use online models for web search, regular models without
-        if use_web_search and "online" not in model:
-            print("Note: For web search with Perplexity, use 'online' models (e.g., 'llama-3.1-sonar-large-128k-online')")
-        
         # Make API call
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
+        response = client.responses.create(
+            input=message,
             **kwargs
         )
         
         # Extract response
-        assistant_message = response.choices[0].message.content
+        assistant_message = response.output_text
         
         # Update conversation history
-        messages.append({"role": "assistant", "content": assistant_message})
         
         return {
             "success": True,
             "response": assistant_message,
-            "conversation_history": messages,
+            "full_repsonse" : response,
             "metadata": {
                 "model": model,
                 "tokens_used": {

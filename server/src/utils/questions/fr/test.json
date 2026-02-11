@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "type": "decouverte_generale",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"], 
+        "question": "Tu connais un bon coffee-shop dans {neighborhood} ?"
+    },
+    {
+        "id": 3,
+        "type": "decouverte_generale",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"], 
+        "question": "Quel est le meilleur coffee shop près de {street} ?"
+    },
+    {
+        "id": 4,
+        "type": "decouverte_generale",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"], 
+        "question": "Tu me recommandes un café sympa dans {neighborhood} ?"
+    },
+    {
+        "id": 6,
+        "type": "specialite_cafe",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Où trouver un bon {coffeeType} à {city} ?"
+    },
+    {
+        "id": 8,
+        "type": "specialite_cafe",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Tu connais un café qui fait de bons {coffeeType} dans {neighborhood} ?"
+    },
+    {
+        "id": 13,
+        "type": "travail",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Tu connais un café calme pour étudier dans {neighborhood} ?"
+    },
+    {
+        "id": 16,
+        "type": "options_lait",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Est-ce que {fullBusinessName} a du lait d'amande ?"
+      },
+      {
+        "id": 20,
+        "type": "localisation_proximite",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Je suis à {pointOfInterest}, tu connais un bon endroit proche ?"
+      },
+      {
+        "id": 21,
+        "type": "localisation_proximite",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Qu'est-ce que tu recommandes dans un rayon de 500 mètres de {pointOfInterest} ?"
+      },
+      {
+        "id": 22,
+        "type": "reputation",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Est-ce que {fullBusinessName} a bonne réputation ?"
+      },
+      {
+        "id": 23,
+        "type": "reputation",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "Qu'est-ce que les gens disent de {fullBusinessName} ?"
+      },
+      {
+        "id": 24,
+        "type": "reputation",
+        "AI" : ["OPENAI", "ANTHROPIC", "PERPLEXITY", "GEMINI"],
+        "question": "{fullBusinessName} est bien noté ?"
+    }
+]

@@ -1,0 +1,123 @@
+{
+  "OPENAI": {
+    "answers": {
+      "1": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: 'ResponseUsage' object has no attribute 'prompt_tokens'"
+        }
+      ],
+      "3": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "4": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "6": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "8": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "13": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "16": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "20": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "21": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "22": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "23": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ],
+      "24": [
+        {
+          "success": false,
+          "response": null,
+          "conversation_history": null,
+          "metadata": {},
+          "error": "OpenAI API Error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+        }
+      ]
+    }
+  },
+  "ANTHROPIC": {
+    "answers": {}
+  },
+  "PERPLEXITY": {
+    "answers": {}
+  },
+  "GEMINI": {
+    "answers": {}
+  }
+}

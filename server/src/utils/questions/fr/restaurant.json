@@ -1,5 +1,4 @@
-{
-    "questions_restaurant": [
+[
       {
         "id": 1,
         "type": "decouverte_cuisine",
@@ -301,4 +300,4 @@
         "question": "Tu connais un restaurant avec une expérience unique à {ville} ?"
       }
     ]
-  }
+  
