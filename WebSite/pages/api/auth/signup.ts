@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
 import User from "@/models/User";
+import { sendWelcomeEmail } from "@/lib/email";
 
 // Connect to MongoDB
 const connectDB = async () => {
@@ -24,7 +25,7 @@ export default async function handler(
 
   try {
     await connectDB();
-    const { name, company, email, password } = req.body;
+    const { name, company, email, password, onboardingDomain, onboardingActivity, onboardingSeoExperience, onboardingReferral } = req.body;
 
     // Validation
     if (!name || !email || !password) {
@@ -51,16 +52,34 @@ export default async function handler(
       company: company || "",
       email,
       password,
-      subStatus: "inactive",
-      subPlan: null,
+      subscriptionStatus: "inactive",
+      subscriptionTier: "none",
+      auditCredits: 0,
+      language: "en",
+      ...(onboardingDomain && { onboardingDomain }),
+      ...(onboardingActivity && { onboardingActivity }),
+      ...(onboardingSeoExperience && { onboardingSeoExperience }),
+      ...(onboardingReferral && { onboardingReferral }),
     });
 
     await newUser.save();
 
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(newUser.email, newUser.name, newUser.language || "en")
+      .then((result) => {
+        if (!result.success) {
+          console.error("[Signup] Failed to send welcome email:", result.error);
+        }
+      })
+      .catch((error) => {
+        console.error("[Signup] Welcome email error:", error);
+      });
+
     // Return success response without sensitive data
     return res.status(201).json({
-      message: "Utilisateur créé avec succès",
-      user: {
+      success: true,
+      message: "Account created successfully",
+      data: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,

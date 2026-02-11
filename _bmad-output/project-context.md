@@ -1153,28 +1153,60 @@ const config = {
 
   // Stripe configuration
   stripe: {
-    plans: {
+    // One-shot products (single purchase)
+    oneShots: {
       basic: {
-        priceId: process.env.STRIPE_PRICE_ID_BASIC!,
-        name: 'Basic',
-        price: 29,
+        priceId: process.env.STRIPE_PRICE_ID_BASIC_ONESHOT!,
+        name: 'Basic Audit',
+        price: 100,
+        type: 'one_time',
         features: [
-          'Up to 10 audits/month',
-          'Basic SEO analysis',
-          'Email reports',
+          '1 GEO audit',
+          'ChatGPT analysis only',
+          '1 competitor comparison',
+          'Dashboard (resets each purchase)',
+          'PDF report with code snippets',
         ],
       },
       pro: {
-        priceId: process.env.STRIPE_PRICE_ID_PRO!,
-        name: 'Pro',
-        price: 79,
+        priceId: process.env.STRIPE_PRICE_ID_PRO_ONESHOT!,
+        name: 'Pro Audit',
+        price: 200,
+        type: 'one_time',
         features: [
-          'Unlimited audits',
-          'Full SEO + GEO analysis',
-          'Priority support',
-          'API access',
+          '1 GEO audit',
+          'All 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)',
+          '5 competitor comparisons',
+          'Persistent dashboard with history',
+          'PDF report with code snippets',
+          'Audit comparison over time',
         ],
       },
+    },
+    // Subscription plan
+    subscriptions: {
+      premium: {
+        priceId: process.env.STRIPE_PRICE_ID_PREMIUM!,
+        name: 'Premium',
+        price: 500,
+        type: 'recurring',
+        interval: 'month',
+        features: [
+          '20 audits/month included',
+          'All 4 AI engines',
+          'Unlimited competitor comparisons',
+          'Persistent dashboard with full history',
+          'PDF reports with white-label branding',
+          'Audit comparison & evolution tracking',
+        ],
+      },
+    },
+    // Extra audit pricing for Premium subscribers
+    extraAudit: {
+      priceId: process.env.STRIPE_PRICE_ID_EXTRA_AUDIT!,
+      name: 'Extra Audit',
+      price: 20,
+      type: 'one_time',
     },
   },
 

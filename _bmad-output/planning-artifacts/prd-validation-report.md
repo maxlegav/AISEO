@@ -272,8 +272,8 @@ totalCorrections: 27
 User provided extensive feedback in French, clarifying all validation concerns:
 
 1. **Audit Philosophy:** Quality > Speed. No arbitrary time limits. 5-minute timeout only for hang prevention.
-2. **Pricing Model:** All tiers use 100 prompts. Plans differ by PROJECT COUNT only, not audit quality.
-3. **Pricing:** Fixed round numbers: €50 Basic, €150 Pro, €300 Premium.
+2. **Pricing Model:** Two one-shot tiers (Basic/Pro) + one subscription tier (Premium). Differs by AI engines, competitors, history, and white-label.
+3. **Pricing:** Basic €100 (one-shot), Pro €200 (one-shot), Premium €500/month (subscription with 20 audits, +€20/extra).
 4. **Priority Criteria:** User validated proposed criteria (Critical = blocks AI + easy implementation).
 5. **Technical Decisions:** User delegated all technical implementation details (reading level, sensitive data fields, backoff logic, performance targets).
 
@@ -310,13 +310,13 @@ User provided extensive feedback in French, clarifying all validation concerns:
 - **Rationale:** Explicit design requirements
 
 **FR54-57 - Pricing:**
-- ❌ **Before:** Estimated ranges (€49-79, €149-199, €299-399, €299)
-- ✅ **After:** Fixed pricing (€300 one-time, €50/€150/€300 monthly)
-- **Rationale:** Simplified billing, round numbers
+- ❌ **Before:** Estimated ranges and subscription-only model
+- ✅ **After:** Two one-shots (Basic €100, Pro €200) + Premium subscription (€500/month, 20 audits, +€20/extra)
+- **Rationale:** Clearer value proposition, one-shots for individuals, subscription for agencies
 
-**FR62 - Feature Restriction:**
-- ❌ **Before:** "restrict features based on subscription tier (prompt battery size, project count)"
-- ✅ **After:** "restrict features based on subscription tier (project count limits: Basic=1, Pro=5, Premium=10+)"
+**FR61 - Feature Restriction:**
+- ❌ **Before:** "restrict features based on subscription tier (project count limits)"
+- ✅ **After:** "restrict features based on purchase type (AI engines: Basic=ChatGPT only, Pro/Premium=all 4; Competitors: Basic=1, Pro=5, Premium=unlimited; History: Basic=no, Pro/Premium=yes; White-label: Premium only)"
 - **Rationale:** Removed prompt battery differentiation
 
 **FR72 - Sensitive Data:**

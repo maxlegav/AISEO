@@ -4,24 +4,115 @@ import bcrypt from "bcrypt";
 
 export interface UserDocument extends mongoose.Document {
   name: string;
+  username?: string;
   company?: string;
   email: string;
   password?: string;
   image?: string;
   emailVerified?: Date;
+
+  // Stripe Integration
+  stripeCustomerId?: string;
+
+  // Subscription Status
+  subscriptionTier: 'none' | 'basic' | 'pro' | 'premium';
+  subscriptionStatus: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
+  subscriptionId?: string;
+  subscriptionEndDate?: Date;
+
+  // One-shot Credits
+  auditCredits: number;
+
+  // Language Preference
+  language: 'en' | 'fr';
+
+  // Password Reset
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
+
+  // Onboarding Data
+  onboardingDomain?: string;
+  onboardingActivity?: string;
+  onboardingSeoExperience?: 'beginner' | 'intermediate' | 'expert';
+  onboardingReferral?: string;
+
+  // Account Deletion (soft delete for GDPR)
+  deletedAt?: Date;
+  deletionRequestedAt?: Date;
+
   createdAt: Date;
   updatedAt: Date;
+
+  // Methods
   comparePassword(candidatePassword: string): Promise<boolean>;
+
+  // Virtuals
+  hasActiveSubscription: boolean;
 }
 
 const UserSchema = new Schema<UserDocument>(
   {
     name: { type: String, required: true },
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+      match: /^[a-z0-9_-]+$/,
+    },
     company: { type: String },
     email: { type: String, required: true, unique: true },
     password: { type: String },
     image: { type: String },
     emailVerified: { type: Date },
+
+    // Stripe Integration
+    stripeCustomerId: { type: String, sparse: true },
+
+    // Subscription Status
+    subscriptionTier: {
+      type: String,
+      enum: ['none', 'basic', 'pro', 'premium'],
+      default: 'none'
+    },
+    subscriptionStatus: {
+      type: String,
+      enum: ['active', 'cancelled', 'past_due', 'trialing', 'inactive'],
+      default: 'inactive'
+    },
+    subscriptionId: { type: String },
+    subscriptionEndDate: { type: Date },
+
+    // One-shot Credits
+    auditCredits: { type: Number, default: 0 },
+
+    // Language Preference
+    language: {
+      type: String,
+      enum: ['en', 'fr'],
+      default: 'en'
+    },
+
+    // Password Reset
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
+
+    // Onboarding Data
+    onboardingDomain: { type: String },
+    onboardingActivity: { type: String },
+    onboardingSeoExperience: {
+      type: String,
+      enum: ['beginner', 'intermediate', 'expert'],
+    },
+    onboardingReferral: { type: String },
+
+    // Account Deletion (soft delete for GDPR)
+    deletedAt: { type: Date, default: null },
+    deletionRequestedAt: { type: Date },
+
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
@@ -56,6 +147,30 @@ UserSchema.methods.comparePassword = async function (
     return false;
   }
 };
+
+// Virtual for hasActiveSubscription
+UserSchema.virtual('hasActiveSubscription').get(function (this: UserDocument) {
+  // User has audit credits
+  if (this.auditCredits > 0) return true;
+
+  // User has no active subscription
+  if (this.subscriptionStatus !== 'active') return false;
+
+  // Subscription has expired
+  if (this.subscriptionEndDate && new Date() > this.subscriptionEndDate) return false;
+
+  return true;
+});
+
+// Ensure virtuals are included in JSON/Object output
+UserSchema.set('toJSON', { virtuals: true });
+UserSchema.set('toObject', { virtuals: true });
+
+// Indexes
+UserSchema.index({ stripeCustomerId: 1 }, { sparse: true });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ username: 1 }, { unique: true, sparse: true });
+UserSchema.index({ resetPasswordToken: 1 }, { sparse: true });
 
 const User = (models?.User || model<UserDocument>("User", UserSchema)) as mongoose.Model<UserDocument>;
 export default User;

@@ -127,8 +127,8 @@ When potential customers ask ChatGPT, Claude, Perplexity, or DeepSeek for recomm
 
 **6. Premium Positioning**
 - **Quality signaling through pricing** (not race to bottom)
-- Basic/Pro/Premium tiers reflect value and effort
-- Batteries of 100-500 prompt tests justify premium pricing
+- Clear tier structure: Basic €100 (one-shot) / Pro €200 (one-shot) / Premium €500/mo (subscription)
+- One-shots for individual audits, subscription for agencies with volume
 - Attracts serious clients (enterprises + agencies), not tire-kickers
 
 **7. MVP-First Pragmatism**
@@ -384,11 +384,12 @@ When potential customers ask ChatGPT, Claude, Perplexity, or DeepSeek for recomm
 **4. Revenue Growth**
 - **Goal**: Achieve €50K MRR by Month 12
 - **Breakdown**:
-  - 25 agencies × €500/month (multi-client subscriptions) = €12.5K
-  - 50 one-time audits/month × €300 = €15K
-  - 40 enterprise subscriptions × €150/month = €6K
-  - Freelancer tier × 20 users × €79/month = €1.6K
-- **Success Metric**: MRR growth rate, pricing tier distribution
+  - 30 Premium subscriptions × €500/month = €15K
+  - 100 Basic one-shots × €100 = €10K
+  - 75 Pro one-shots × €200 = €15K
+  - Extra audits (Premium overages) = €5K
+  - Total: €45K monthly revenue (mix of recurring + one-time)
+- **Success Metric**: Revenue growth rate, Premium subscription retention, one-shot conversion to Premium
 
 **5. Market Position**
 - **Goal**: Become known as "the GEO audit tool" before competitors enter market

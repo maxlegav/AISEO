@@ -1,300 +1,980 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
-import { User } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Globe,
+  Sparkles,
+  BarChart3,
+  Megaphone,
+  UserPlus,
+  CreditCard,
+  Check,
+} from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "@/public/logo.png";
+import config from "@/config";
+
+// Business categories (reused from landing page)
+const BUSINESS_CATEGORIES = [
+  "E-commerce / Retail",
+  "SaaS / Technology",
+  "Marketing Agency",
+  "Finance / Insurance",
+  "Healthcare",
+  "Real Estate",
+  "Education",
+  "Travel / Hospitality",
+  "Food & Restaurant",
+  "Professional Services",
+  "Other",
+];
+
+// SEO experience levels
+const SEO_EXPERIENCE_LEVELS = [
+  {
+    value: "beginner" as const,
+    label: "Beginner",
+    description: "New to SEO, just getting started",
+  },
+  {
+    value: "intermediate" as const,
+    label: "Intermediate",
+    description: "Familiar with SEO basics, some experience",
+  },
+  {
+    value: "expert" as const,
+    label: "Expert",
+    description: "Advanced SEO knowledge, years of experience",
+  },
+];
+
+// Referral sources
+const REFERRAL_SOURCES = [
+  "Google",
+  "LinkedIn",
+  "Twitter / X",
+  "YouTube",
+  "Podcast",
+  "A friend",
+  "Other",
+];
+
+// Step icons for the progress indicator
+const STEP_CONFIG = [
+  { icon: Globe, label: "Domain" },
+  { icon: Sparkles, label: "Industry" },
+  { icon: BarChart3, label: "Experience" },
+  { icon: Megaphone, label: "Referral" },
+  { icon: UserPlus, label: "Account" },
+  { icon: CreditCard, label: "Plan" },
+];
+
+// Pricing plan card for step 6
+const PlanCard = ({
+  name,
+  price,
+  period,
+  features,
+  highlighted = false,
+  onSelect,
+  isLoading,
+}: {
+  name: string;
+  price: string;
+  period: string;
+  features: string[];
+  highlighted?: boolean;
+  onSelect: () => void;
+  isLoading: boolean;
+}) => (
+  <div
+    className={`relative rounded-2xl p-6 transition-all duration-300 ${
+      highlighted
+        ? "bg-[#1E293B] text-white shadow-2xl scale-[1.02]"
+        : "bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg"
+    }`}
+  >
+    {highlighted && (
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <span className="bg-pink-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+          POPULAR
+        </span>
+      </div>
+    )}
+    <div
+      className={`text-sm font-semibold mb-3 ${highlighted ? "text-white" : "text-gray-900"}`}
+    >
+      {name}
+    </div>
+    <div className="flex items-baseline gap-1 mb-4">
+      <span
+        className={`text-4xl font-semibold ${highlighted ? "text-white" : "text-gray-900"}`}
+      >
+        {price}
+      </span>
+      <span className={highlighted ? "text-gray-300" : "text-gray-500"}>
+        /{period}
+      </span>
+    </div>
+    <ul className="space-y-2 mb-6">
+      {features.map((feature, i) => (
+        <li key={i} className="flex items-start gap-2 text-sm">
+          <Check
+            className={`w-4 h-4 mt-0.5 flex-shrink-0 ${highlighted ? "text-green-400" : "text-green-500"}`}
+          />
+          <span className={highlighted ? "text-gray-200" : "text-gray-600"}>
+            {feature}
+          </span>
+        </li>
+      ))}
+    </ul>
+    <Button
+      onClick={onSelect}
+      disabled={isLoading}
+      className={`w-full h-11 rounded-xl font-semibold transition-all ${
+        highlighted
+          ? "bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg"
+          : "bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+      }`}
+      size="lg"
+    >
+      {isLoading ? "Redirecting..." : "Select Plan"}
+    </Button>
+  </div>
+);
 
 export default function SignupPage() {
   const router = useRouter();
-  const { data: _session, status } = useSession();
+  const { status } = useSession();
+  const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
+  // Onboarding data (steps 1-4)
+  const [domain, setDomain] = useState("");
+  const [activity, setActivity] = useState("");
+  const [seoExperience, setSeoExperience] = useState<
+    "beginner" | "intermediate" | "expert" | ""
+  >("");
+  const [referral, setReferral] = useState("");
+
+  // Account data (step 5)
   const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [nameError, setNameError] = useState("");
-  const [companyError, setCompanyError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [authError, setAuthError] = useState<string | null>(null);
 
-  // Redirige vers le tableau de bord si déjà connecté
+  const totalSteps = 6;
+  const [initialRouted, setInitialRouted] = useState(false);
+
+  // Handle query params on mount
   useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
+    const { url, step: stepParam, plan } = router.query;
+    if (url && typeof url === "string") {
+      setDomain(url);
     }
-  }, [status, router]);
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    setAuthError(null);
-
-    // Stocker l'information que l'utilisateur vient de s'inscrire
-    if (typeof window !== "undefined") {
-      localStorage.setItem("isNewUser", "true");
-      // Indiquer que c'est une inscription via Google
-      localStorage.setItem("googleSignup", "true");
+    if (plan && typeof plan === "string") {
+      setSelectedPlan(plan);
     }
+    if (stepParam && typeof stepParam === "string") {
+      const parsed = parseInt(stepParam, 10);
+      if (parsed >= 1 && parsed <= totalSteps) {
+        setStep(parsed);
+      }
+    }
+  }, [router.query]);
+
+  // After OAuth return, send onboarding data to server
+  const sendOnboardingData = useCallback(async () => {
+    if (typeof window === "undefined") return;
+
+    const storedData = localStorage.getItem("signupOnboardingData");
+    if (!storedData) return;
 
     try {
-      await signIn("google", { callbackUrl: "/api/auth/session-redirect" });
-      // Note: Cette ligne ne sera pas atteinte si la redirection fonctionne
+      const data = JSON.parse(storedData);
+      await fetch("/api/user/update-onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      localStorage.removeItem("signupOnboardingData");
     } catch (error) {
-      console.error("Erreur lors de l'inscription avec Google:", error);
-      setAuthError("Une erreur est survenue lors de l'inscription avec Google");
-      setIsLoading(false);
+      console.error("Failed to save onboarding data:", error);
+    }
+  }, []);
+
+
+  // Handle authenticated users on the signup page (runs once on initial load)
+  useEffect(() => {
+    if (status !== "authenticated" || initialRouted) return;
+
+    const isOAuthReturn = router.query.oauth === "1";
+
+    if (isOAuthReturn) {
+      setInitialRouted(true);
+      const hasOnboardingData = typeof window !== "undefined" && !!localStorage.getItem("signupOnboardingData");
+
+      if (hasOnboardingData) {
+        // Came from signup page (filled steps 1-4 before clicking Google at step 5)
+        sendOnboardingData();
+        setStep(6);
+      } else {
+        // Came from login page - start onboarding from step 1
+        setStep(1);
+      }
+      return;
+    }
+
+    // Authenticated user with a plan parameter (e.g. from landing page CTA)
+    if (selectedPlan) {
+      setInitialRouted(true);
+      setStep(6);
+      return;
+    }
+
+    // Authenticated user with no special flow - go to dashboard
+    setInitialRouted(true);
+    router.push("/dashboard");
+  }, [status, router, selectedPlan, initialRouted, sendOnboardingData]);
+
+  const canProceed = () => {
+    switch (step) {
+      case 1:
+        return domain.trim().length > 0 && domain.includes(".");
+      case 2:
+        return activity.length > 0;
+      case 3:
+        return seoExperience.length > 0;
+      case 4:
+        return referral.length > 0;
+      case 5:
+        return true; // Validated on submit
+      case 6:
+        return true;
+      default:
+        return false;
     }
   };
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleNext = () => {
+    if (step < totalSteps && canProceed()) {
+      // Already authenticated (OAuth): skip step 5 (account creation), save onboarding and go to step 6
+      if (step === 4 && status === "authenticated") {
+        const onboardingData: Record<string, string> = {};
+        if (domain) onboardingData.onboardingDomain = domain;
+        if (activity) onboardingData.onboardingActivity = activity;
+        if (seoExperience) onboardingData.onboardingSeoExperience = seoExperience;
+        if (referral) onboardingData.onboardingReferral = referral;
 
-    // Réinitialiser les erreurs
+        fetch("/api/user/update-onboarding", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(onboardingData),
+        }).catch(console.error);
+
+        setStep(6);
+        return;
+      }
+      setStep(step + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (step <= 1) return;
+    // Already authenticated (OAuth): skip step 5 when going back from step 6
+    if (step === 6 && status === "authenticated") {
+      setStep(4);
+      return;
+    }
+    setStep(step - 1);
+  };
+
+  const handleCredentialsSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
     setNameError("");
-    setCompanyError("");
     setEmailError("");
     setPasswordError("");
     setAuthError(null);
 
-    // Validation du nom
+    let isValid = true;
     if (!name.trim()) {
-      setNameError("Le nom est requis.");
-      return;
+      setNameError("Full name is required.");
+      isValid = false;
     }
-
-    // Validation de l'email
     if (!email) {
-      setEmailError("L'email est requis.");
-      return;
+      setEmailError("Email is required.");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("Veuillez entrer une adresse email valide.");
-      return;
+    if (!password) {
+      setPasswordError("Password is required.");
+      isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters.");
+      isValid = false;
     }
 
-    // Validation du mot de passe
-    if (!password) {
-      setPasswordError("Le mot de passe est requis.");
-      return;
-    }
-    if (password.length < 8) {
-      setPasswordError("Le mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
+    if (!isValid) return;
 
     setIsLoading(true);
     try {
-      // Créer le compte
+      // Create account with onboarding data
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          company,
           email,
           password,
+          onboardingDomain: domain || undefined,
+          onboardingActivity: activity || undefined,
+          onboardingSeoExperience: seoExperience || undefined,
+          onboardingReferral: referral || undefined,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de l'inscription");
+        throw new Error(data.error || "Error during signup");
       }
 
-      // Stocker l'email dans le localStorage pour la page d'abonnement
-      localStorage.setItem("pendingSignupEmail", email);
+      // Auto-login after account creation
+      const loginRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-      // Rediriger directement vers la page d'abonnement
-      router.push("/login");
+      if (loginRes?.error) {
+        // Account created but login failed - redirect to login
+        router.push("/login");
+        return;
+      }
+
+      // If user selected a plan, redirect to checkout automatically
+      if (selectedPlan) {
+        // Map plan to priceId
+        const planToPriceId: Record<string, { priceId: string; mode: "payment" | "subscription" }> = {
+          basic: { priceId: config.stripe.basic.priceId, mode: "payment" },
+          pro: { priceId: config.stripe.pro.priceId, mode: "payment" },
+          premium: { priceId: config.stripe.premium.priceId, mode: "subscription" },
+        };
+
+        const planConfig = planToPriceId[selectedPlan];
+
+        if (planConfig?.priceId) {
+          // Redirect to Stripe Checkout
+          try {
+            const checkoutRes = await fetch("/api/checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                priceId: planConfig.priceId,
+                mode: planConfig.mode
+              }),
+            });
+
+            const checkoutData = await checkoutRes.json();
+            if (checkoutData.success && checkoutData.data?.url) {
+              window.location.href = checkoutData.data.url;
+              return;
+            }
+          } catch (error) {
+            console.error("Checkout error:", error);
+            // Fallback to step 6 if checkout fails
+            setStep(6);
+            return;
+          }
+        }
+      }
+
+      // No plan selected - advance to pricing step
+      setStep(6);
     } catch (error: any) {
-      console.error("Erreur d'inscription:", error);
-      setAuthError(
-        error.message ||
-          "Une erreur inattendue s'est produite. Veuillez réessayer."
-      );
+      console.error("Signup error:", error);
+      setAuthError(error.message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (status === "loading" || status === "authenticated") {
+  const handleGoogleSignup = async () => {
+    setIsLoading(true);
+    setAuthError(null);
+
+    // Store onboarding data in localStorage before OAuth redirect
+    if (typeof window !== "undefined") {
+      const onboardingData: Record<string, string> = {};
+      if (domain) onboardingData.onboardingDomain = domain;
+      if (activity) onboardingData.onboardingActivity = activity;
+      if (seoExperience) onboardingData.onboardingSeoExperience = seoExperience;
+      if (referral) onboardingData.onboardingReferral = referral;
+
+      localStorage.setItem(
+        "signupOnboardingData",
+        JSON.stringify(onboardingData)
+      );
+    }
+
+    try {
+      await signIn("google", {
+        callbackUrl: "/api/auth/session-redirect",
+      });
+    } catch (error) {
+      console.error("Google signup error:", error);
+      setAuthError("An error occurred while signing up with Google");
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectPlan = async (
+    priceId: string,
+    mode: "payment" | "subscription"
+  ) => {
+    if (!priceId) {
+      setAuthError("This plan is not yet configured. Please contact support.");
+      return;
+    }
+
+    setIsLoading(true);
+    setAuthError(null);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId, mode }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create checkout session");
+      }
+
+      // Redirect to Stripe Checkout
+      if (data.data?.url) {
+        window.location.href = data.data.url;
+      }
+    } catch (error: any) {
+      console.error("Checkout error:", error);
+      setAuthError(error.message || "Failed to start checkout.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Loading state
+  if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Chargement...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
+        <div className="animate-pulse text-purple-600 font-medium">
+          Loading...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-bg-classic to-primary-900 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-4">
-            <Image src={logo} alt="AutoInvoice Logo" width={40} height={40} />
-            <span className="text-3xl font-bold text-texte-header-black">
-              AutoInvoice
-            </span>
-          </Link>
-          <h1 className="text-4xl font-extrabold text-texte-header-black leading-tight">
-            Créer un compte
-          </h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-10 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-orange-300/20 rounded-full blur-3xl" />
+
+      {/* Back to home */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 flex items-center gap-2 text-gray-600 hover:text-[#1E293B] transition-colors z-10"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="text-sm font-medium">Back to home</span>
+      </Link>
+
+      <div className="w-full max-w-6xl relative z-10 mb-8">
+        {/* Logo */}
+        
+
+        {/* Step progress indicator */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          {STEP_CONFIG.map((s, i) => {
+            const StepIcon = s.icon;
+            const stepNum = i + 1;
+            const isActive = stepNum === step;
+            const isCompleted = stepNum < step;
+
+            return (
+              <React.Fragment key={stepNum}>
+                <div className="flex flex-col items-center gap-1 mt-5">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      isActive
+                        ? "bg-[#1E293B] text-white shadow-lg"
+                        : isCompleted
+                          ? "bg-purple-500 text-white"
+                          : "bg-white/80 text-gray-400 border border-gray-200"
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      <StepIcon className="w-5 h-5" />
+                    )}
+                  </div>
+                  <span
+                    className={`text-xs font-medium hidden sm:block ${
+                      isActive
+                        ? "text-gray-900"
+                        : isCompleted
+                          ? "text-purple-600"
+                          : "text-gray-400"
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                </div>
+                {i < STEP_CONFIG.length - 1 && (
+                  <div
+                    className={`w-6 h-0.5 mt-[-16px] sm:mt-[-4px] ${
+                      stepNum < step ? "bg-purple-400" : "bg-gray-200"
+                    }`}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
 
+        {/* Error message */}
         {authError && (
           <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
+            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6"
             role="alert"
           >
             <span className="block sm:inline">{authError}</span>
           </div>
         )}
 
-        <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
-          {/* Google Sign-up */}
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-center space-x-2 border-gray-300 hover:bg-gray-50 text-texte-description-black font-medium"
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-          >
-            <FcGoogle size={20} />
-            <span>S&apos;inscrire avec Google</span>
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
+        {/* Step content */}
+        <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/50">
+          {/* Step 1: Domain */}
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Globe className="w-8 h-8 text-purple-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  What is your domain name?
+                </h2>
+                <p className="text-gray-600">
+                  Enter the website URL you want to optimize for AI visibility
+                </p>
+              </div>
+              <div>
+                <Label
+                  htmlFor="domain"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Website URL
+                </Label>
+                <Input
+                  id="domain"
+                  type="url"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && canProceed() && handleNext()}
+                  placeholder="https://example.com"
+                  className="mt-2 h-12 rounded-xl"
+                  autoFocus
+                />
+              </div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">
-                Ou s&apos;inscrire avec email
-              </span>
-            </div>
-          </div>
+          )}
 
-          {/* Signup Form */}
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="text-texte-description-black">
-                Nom complet
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                placeholder="Jean Dupont"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className={`mt-1 ${nameError ? "border-red-500" : "border-gray-300"}`}
+          {/* Step 2: Activity/Industry */}
+          {step === 2 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-8 h-8 text-pink-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  What&apos;s your industry?
+                </h2>
+                <p className="text-gray-600">
+                  This helps us generate relevant AI prompts for your audit
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {BUSINESS_CATEGORIES.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setActivity(category)}
+                    className={`p-3 text-sm rounded-xl border-2 transition-all text-left ${
+                      activity === category
+                        ? "border-purple-500 bg-purple-50 text-purple-700"
+                        : "border-gray-200 hover:border-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: SEO Experience */}
+          {step === 3 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-8 h-8 text-blue-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  How much SEO experience do you have?
+                </h2>
+                <p className="text-gray-600">
+                  We&apos;ll tailor recommendations to your level
+                </p>
+              </div>
+              <div className="space-y-3">
+                {SEO_EXPERIENCE_LEVELS.map((level) => (
+                  <button
+                    key={level.value}
+                    onClick={() => setSeoExperience(level.value)}
+                    className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                      seoExperience === level.value
+                        ? "border-purple-500 bg-purple-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div
+                      className={`font-medium ${
+                        seoExperience === level.value
+                          ? "text-purple-700"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      {level.label}
+                    </div>
+                    <div
+                      className={`text-sm mt-1 ${
+                        seoExperience === level.value
+                          ? "text-purple-600"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {level.description}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Referral */}
+          {step === 4 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Megaphone className="w-8 h-8 text-orange-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  How did you hear about us?
+                </h2>
+                <p className="text-gray-600">
+                  Help us understand where our users come from
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {REFERRAL_SOURCES.map((source) => (
+                  <button
+                    key={source}
+                    onClick={() => setReferral(source)}
+                    className={`p-3 text-sm rounded-xl border-2 transition-all text-left ${
+                      referral === source
+                        ? "border-purple-500 bg-purple-50 text-purple-700"
+                        : "border-gray-200 hover:border-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {source}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Account Creation */}
+          {step === 5 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <UserPlus className="w-8 h-8 text-green-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  Create your account
+                </h2>
+                <p className="text-gray-600">
+                  Sign up to start your AI visibility audit
+                </p>
+                {selectedPlan && (
+                  <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
+                    <p className="text-sm font-medium text-purple-700">
+                      You&apos;re signing up for the{" "}
+                      <span className="font-bold capitalize">{selectedPlan}</span> plan
+                      {selectedPlan === "basic" && " - €100"}
+                      {selectedPlan === "pro" && " - €200"}
+                      {selectedPlan === "premium" && " - €500/month"}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Google Sign-up */}
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-3 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium h-12 rounded-xl"
+                onClick={handleGoogleSignup}
                 disabled={isLoading}
-              />
-              {nameError && (
-                <p className="text-red-500 text-xs mt-1">{nameError}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="company" className="text-texte-description-black">
-                Entreprise (optionnel)
-              </Label>
-              <Input
-                id="company"
-                name="company"
-                type="text"
-                autoComplete="organization"
-                placeholder="Nom de votre entreprise"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                className={`mt-1 ${companyError ? "border-red-500" : "border-gray-300"}`}
-                disabled={isLoading}
-              />
-              {companyError && (
-                <p className="text-red-500 text-xs mt-1">{companyError}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="email" className="text-texte-description-black">
-                Adresse Email
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                placeholder="vous@exemple.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className={`mt-1 ${emailError ? "border-red-500" : "border-gray-300"}`}
-                disabled={isLoading}
-              />
-              {emailError && (
-                <p className="text-red-500 text-xs mt-1">{emailError}</p>
-              )}
-            </div>
-
-            <div>
-              <Label
-                htmlFor="password"
-                className="text-texte-description-black"
               >
-                Mot de passe
-              </Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className={`mt-1 ${passwordError ? "border-red-500" : "border-gray-300"}`}
-                disabled={isLoading}
-              />
-              {passwordError && (
-                <p className="text-red-500 text-xs mt-1">{passwordError}</p>
-              )}
-            </div>
+                <FcGoogle size={20} />
+                <span>Sign up with Google</span>
+              </Button>
 
-            <Button
-              type="submit"
-              className="w-full px-8 py-4 bg-bg-bouton-classic hover:bg-bg-bouton-hover text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                "Inscription en cours..."
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-3 text-gray-500">
+                    Or sign up with email
+                  </span>
+                </div>
+              </div>
+
+              {/* Email Signup Form */}
+              <form onSubmit={handleCredentialsSignup} className="space-y-4">
+                <div>
+                  <Label htmlFor="name" className="text-gray-700 font-medium">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={`mt-1.5 h-12 rounded-xl ${nameError ? "border-red-500" : "border-gray-200"}`}
+                    disabled={isLoading}
+                  />
+                  {nameError && (
+                    <p className="text-red-500 text-xs mt-1">{nameError}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="email" className="text-gray-700 font-medium">
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={`mt-1.5 h-12 rounded-xl ${emailError ? "border-red-500" : "border-gray-200"}`}
+                    disabled={isLoading}
+                  />
+                  {emailError && (
+                    <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label
+                    htmlFor="password"
+                    className="text-gray-700 font-medium"
+                  >
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="At least 8 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`mt-1.5 h-12 rounded-xl ${passwordError ? "border-red-500" : "border-gray-200"}`}
+                    disabled={isLoading}
+                  />
+                  {passwordError && (
+                    <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-medium rounded-xl shadow-lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating account..." : "Create account"}
+                </Button>
+              </form>
+
+              <p className="text-center text-sm text-gray-600">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="font-semibold text-[#1E293B] hover:text-slate-700"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          )}
+
+          {/* Step 6: Pricing */}
+          {step === 6 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="w-8 h-8 text-indigo-600" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  Choose your plan
+                </h2>
+                <p className="text-gray-600">
+                  
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6 items-center">
+                <PlanCard
+                  name={config.stripe.basic.name}
+                  price={`\u20AC${config.stripe.basic.price}`}
+                  period="one-time"
+                  features={config.stripe.basic.features.map((f) => f.name)}
+                  onSelect={() =>
+                    handleSelectPlan(config.stripe.basic.priceId, "payment")
+                  }
+                  isLoading={isLoading}
+                />
+                <PlanCard
+                  name={config.stripe.pro.name}
+                  price={`\u20AC${config.stripe.pro.price}`}
+                  period="one-time"
+                  features={config.stripe.pro.features.map((f) => f.name)}
+                  highlighted
+                  onSelect={() =>
+                    handleSelectPlan(config.stripe.pro.priceId, "payment")
+                  }
+                  isLoading={isLoading}
+                />
+                <PlanCard
+                  name={config.stripe.premium.name}
+                  price={`\u20AC${config.stripe.premium.price}`}
+                  period="mo"
+                  features={config.stripe.premium.features
+                    .slice(0, 4)
+                    .map((f) => f.name)}
+                  onSelect={() =>
+                    handleSelectPlan(
+                      config.stripe.premium.priceId,
+                      "subscription"
+                    )
+                  }
+                  isLoading={isLoading}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Navigation (steps 1-4 only, step 5 has its own submit, step 6 has plan buttons) */}
+          {step <= 4 && (
+            <div className="flex items-center justify-between mt-8">
+              {step > 1 ? (
+                <Button
+                  variant="ghost"
+                  onClick={handleBack}
+                  className="text-gray-600"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
               ) : (
-                <>
-                  <User size={16} className="mr-2" />
-                  Créer un compte
-                </>
+                <div />
               )}
-            </Button>
-          </form>
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-xl px-6"
+              >
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          )}
+
+          {/* Back button for step 5 */}
+          {step === 5 && (
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                className="text-gray-600"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </div>
+          )}
+
+          {/* Back button for step 6 (pricing) */}
+          {step === 6 && (
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                className="text-gray-600"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </div>
+          )}
         </div>
 
-        <p className="mt-8 text-center text-sm text-texte-description-black">
-          Vous avez déjà un compte ?
-          <Link
-            href="/login"
-            className="ml-1 font-medium text-texte-header-black hover:opacity-80"
-          >
-            Se connecter
-          </Link>
-        </p>
+        {/* Terms */}
+        {step === 5 && (
+          <p className="mt-4 text-center text-xs text-gray-500">
+            By creating an account, you agree to our{" "}
+            <Link href="/terms" className="underline hover:text-[#1E293B]">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="underline hover:text-[#1E293B]">
+              Privacy Policy
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

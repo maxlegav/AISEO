@@ -336,7 +336,7 @@ These interactions must require **zero cognitive load** - completely natural and
 
 **Why Critical:**
 - If improvements aren't measurable, user churns
-- Marc needs to justify €299 audit cost to himself
+- Marc needs to justify €100-200 audit cost to himself
 - Sophie needs proof to sell more GEO packages to other clients
 - Julien needs case study testimonial for LinkedIn
 
@@ -451,7 +451,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 
 **Trust > Skepticism**
 
-**Why Critical:** Agencies must trust tool to present to clients; business owners invest €299 based on credibility
+**Why Critical:** Agencies must trust tool to present to clients; business owners invest €100-200 based on credibility
 
 **Design Implications:**
 - Evidence-based visualizations (competitive comparisons, not just self-assessment)

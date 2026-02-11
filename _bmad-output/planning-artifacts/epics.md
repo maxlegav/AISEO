@@ -87,16 +87,15 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR52: Users can receive email notification when report is ready
 - FR53: Users can share report download links with team members or clients
 
-**8. Subscription & Payment Management**
-- FR54: Users can purchase one-time audits (€300 per audit)
-- FR55: Users can subscribe to Basic tier (1 project, €50/month)
-- FR56: Users can subscribe to Pro tier (5 projects, €150/month)
-- FR57: Users can subscribe to Premium tier (10+ projects, €300/month)
-- FR58: Users can upgrade or downgrade their subscription tier
-- FR59: Users can cancel their subscription
-- FR60: Users can access Stripe Customer Portal to manage payment methods
-- FR61: System can process subscription lifecycle events via Stripe webhooks
-- FR62: System can restrict features based on subscription tier (project count limits)
+**8. Payments & Subscription Management**
+- FR54: Users can purchase Basic one-shot audit (€100, ChatGPT only, 1 competitor, no history)
+- FR55: Users can purchase Pro one-shot audit (€200, all 4 AI engines, 5 competitors, with history)
+- FR56: Users can subscribe to Premium tier (€500/month, 20 audits included, unlimited competitors, white-label)
+- FR57: Premium subscribers can purchase extra audits beyond 20 at €20/audit
+- FR58: Premium subscribers can cancel their subscription
+- FR59: Users can access Stripe Customer Portal to manage payment methods
+- FR60: System can process payment events via Stripe webhooks (one-time + subscription)
+- FR61: System can restrict features based on purchase type (AI engines, competitors, history, white-label)
 
 **9. Email Notifications**
 - FR63: Users can receive welcome email upon account creation
@@ -222,16 +221,15 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR6: Account deletion with data removal
 - FR7: Secure session management (30 days)
 
-**Epic 3: Subscription & Payment System**
-- FR54: One-time audit purchase (€300)
-- FR55: Basic tier subscription (1 project, €50/month)
-- FR56: Pro tier subscription (5 projects, €150/month)
-- FR57: Premium tier subscription (10+ projects, €300/month)
-- FR58: Subscription upgrade/downgrade
-- FR59: Subscription cancellation
-- FR60: Stripe Customer Portal access
-- FR61: Stripe webhook event processing
-- FR62: Feature restrictions by tier
+**Epic 3: Payments & Subscription System**
+- FR54: Basic one-shot audit purchase (€100)
+- FR55: Pro one-shot audit purchase (€200)
+- FR56: Premium subscription (€500/month, 20 audits)
+- FR57: Extra audit purchase for Premium (+€20/audit)
+- FR58: Subscription cancellation
+- FR59: Stripe Customer Portal access
+- FR60: Stripe webhook event processing
+- FR61: Feature restrictions by purchase type
 
 **Epic 4: Project Management**
 - FR8: Project creation (brand name, primary URL)
@@ -349,12 +347,12 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 
 ---
 
-### Epic 3: Subscription & Payment System
-**Goal:** Users can purchase one-time audits or subscribe to recurring plans, manage subscriptions, and process payments securely.
+### Epic 3: Payments & Subscription System
+**Goal:** Users can purchase one-shot audits (Basic/Pro) or subscribe to Premium for volume usage, manage payments, and process transactions securely.
 
-**User Outcome:** Users can purchase €300 one-time audits or subscribe to Basic (€50/month), Pro (€150/month), or Premium (€300/month) tiers, upgrade/downgrade subscriptions, cancel subscriptions, and manage payment methods via Stripe Customer Portal.
+**User Outcome:** Users can purchase Basic one-shot audits (€100, ChatGPT only, 1 competitor) or Pro one-shot audits (€200, all AI engines, 5 competitors, history). Agencies/enterprises can subscribe to Premium (€500/month, 20 audits included, unlimited competitors, white-label). Premium subscribers can purchase extra audits at €20 each beyond their 20 included. All users can manage payments via Stripe Customer Portal.
 
-**FRs Covered:** FR54, FR55, FR56, FR57, FR58, FR59, FR60, FR61, FR62
+**FRs Covered:** FR54, FR55, FR56, FR57, FR58, FR59, FR60, FR61
 
 **Dependencies:** Epic 2 (requires user accounts)
 
@@ -1066,73 +1064,94 @@ So that I can exercise my GDPR right to erasure.
 
 ---
 
-## Epic 3: Subscription & Payment System
+## Epic 3: Payments & Subscription System
 
-### Story 3.1: Implement Stripe Checkout for One-Time Audits
+### Story 3.1: Implement Stripe Checkout for Basic One-Shot Audit
 
 As a user,
-I want to purchase a one-time audit for €300,
-So that I can test AISEO without a recurring subscription.
+I want to purchase a Basic one-shot audit for €100,
+So that I can get a quick GEO health check with ChatGPT analysis.
 
 **Acceptance Criteria:**
 
 **Given** I am logged in
-**When** I click "Purchase One-Time Audit"
-**Then** I am redirected to Stripe Checkout with €300 price
-**And** After successful payment, I am redirected back to the dashboard
-**And** My account is credited with 1 audit credit
+**When** I click "Purchase Basic Audit" (€100)
+**Then** I am redirected to Stripe Checkout with €100 price
+**And** After successful payment, I am redirected to a new dashboard for this audit
+**And** Dashboard resets (no history from previous audits)
+**And** Audit runs with ChatGPT only, 1 competitor maximum
 **And** I receive a payment receipt email via Resend
-**And** Stripe webhook updates User document with credit
+**And** Stripe webhook creates Purchase record with type='basic'
 
-### Story 3.2: Implement Subscription Tier Selection and Checkout
+### Story 3.2: Implement Stripe Checkout for Pro One-Shot Audit
 
 As a user,
-I want to subscribe to Basic (€50), Pro (€150), or Premium (€300) tiers,
-So that I can access recurring project limits and audits.
+I want to purchase a Pro one-shot audit for €200,
+So that I can get comprehensive GEO analysis with all AI engines and historical tracking.
 
 **Acceptance Criteria:**
 
-**Given** I am on the subscription plans page
-**When** I select a tier (Basic/Pro/Premium) and click "Subscribe"
-**Then** I am redirected to Stripe Checkout with the correct price
+**Given** I am logged in
+**When** I click "Purchase Pro Audit" (€200)
+**Then** I am redirected to Stripe Checkout with €200 price
+**And** After successful payment, I am redirected to my persistent dashboard
+**And** Audit runs with all 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)
+**And** I can analyze up to 5 competitors
+**And** Audit history is preserved and I can compare with previous Pro audits
+**And** I receive a payment receipt email via Resend
+**And** Stripe webhook creates Purchase record with type='pro'
+
+### Story 3.3: Implement Premium Subscription Checkout
+
+As an agency or enterprise user,
+I want to subscribe to Premium for €500/month,
+So that I can run up to 20 audits per month with white-label branding.
+
+**Acceptance Criteria:**
+
+**Given** I am on the pricing page
+**When** I click "Subscribe to Premium" (€500/month)
+**Then** I am redirected to Stripe Checkout for recurring subscription
 **And** After successful payment, Stripe webhook creates Subscription document
-**And** User document is updated with active subscription status and tier
-**And** I am redirected to the dashboard with tier-appropriate project limits
+**And** User document is updated with active Premium subscription status
+**And** I have access to: all AI engines, unlimited competitors, historical tracking, white-label PDFs
 **And** I receive a subscription confirmation email
+**And** My monthly audit counter is set to 0/20
 
-### Story 3.3: Implement Subscription Upgrade/Downgrade
+### Story 3.4: Implement Extra Audit Purchase for Premium Subscribers
 
-As a user,
-I want to upgrade or downgrade my subscription tier,
-So that I can adjust my plan based on my needs.
+As a Premium subscriber,
+I want to purchase extra audits at €20 each when I exceed my 20 included audits,
+So that I can continue running audits without waiting for the next billing cycle.
 
 **Acceptance Criteria:**
 
-**Given** I have an active subscription
-**When** I navigate to subscription management and select a different tier
-**Then** I am redirected to Stripe Checkout for the new tier
-**And** Stripe handles proration calculations automatically
-**And** After payment, my subscription tier is updated via webhook
-**And** Project limits are updated immediately to match new tier
-**And** I receive an email confirming the plan change
+**Given** I am a Premium subscriber who has used all 20 monthly audits
+**When** I try to run another audit
+**Then** I am prompted to purchase an extra audit for €20
+**And** If I confirm, I am redirected to Stripe Checkout for €20 one-time purchase
+**And** After payment, my audit counter allows one additional audit
+**And** Stripe webhook records the extra audit purchase
+**And** I receive a payment receipt email
 
-### Story 3.4: Implement Subscription Cancellation
+### Story 3.5: Implement Premium Subscription Cancellation
 
-As a user,
+As a Premium subscriber,
 I want to cancel my subscription,
 So that I am not charged for future billing periods.
 
 **Acceptance Criteria:**
 
-**Given** I have an active subscription
+**Given** I have an active Premium subscription
 **When** I navigate to subscription management and click "Cancel Subscription"
 **Then** I am prompted to confirm cancellation
 **And** Stripe webhook marks subscription as "canceled" at period end
 **And** I retain access until the current billing period ends
 **And** After the period ends, my subscription status is updated to "inactive"
+**And** I can still purchase Basic/Pro one-shot audits after cancellation
 **And** I receive a cancellation confirmation email
 
-### Story 3.5: Implement Stripe Customer Portal Integration
+### Story 3.6: Implement Stripe Customer Portal Integration
 
 As a user,
 I want to manage my payment methods and billing history,
@@ -1140,14 +1159,14 @@ So that I can update my card or view past invoices.
 
 **Acceptance Criteria:**
 
-**Given** I have an active subscription
-**When** I click "Manage Billing" in subscription settings
+**Given** I have made purchases or have an active subscription
+**When** I click "Manage Billing" in account settings
 **Then** I am redirected to Stripe Customer Portal
 **And** I can add, update, or remove payment methods
-**And** I can view billing history and download invoices
+**And** I can view billing history and download invoices (one-shots + subscription)
 **And** Changes in Stripe Customer Portal are synced to my account via webhooks
 
-### Story 3.6: Implement Stripe Webhook Handler
+### Story 3.7: Implement Stripe Webhook Handler
 
 As a developer,
 I want to process Stripe webhook events reliably,
@@ -1175,14 +1194,16 @@ So that I can audit a website for GEO visibility.
 
 **Acceptance Criteria:**
 
-**Given** I am logged in with an active subscription
+**Given** I am logged in
 **When** I navigate to "Create Project" and enter brand name and primary URL
 **Then** A new Project document is created in MongoDB
 **And** URL is validated (must be valid HTTP/HTTPS URL)
 **And** Project is associated with my user account
 **And** I am redirected to the project details page
-**And** Project count is checked against my subscription tier limit (Basic=1, Pro=5, Premium=10+)
-**And** Error is shown if I exceed my tier limit
+**And** Competitor limits are enforced based on purchase type:
+  - Basic one-shot: 1 competitor maximum
+  - Pro one-shot: 5 competitors maximum
+  - Premium subscription: Unlimited competitors
 
 ### Story 4.2: Implement Sub-URL and Competitor URL Addition
 

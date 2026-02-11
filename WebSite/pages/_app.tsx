@@ -7,6 +7,7 @@ import {
   Space_Grotesk,
   Poppins,
   Lato,
+  Cormorant_Garamond,
 } from "next/font/google";
 import { NotificationProvider } from "../components/NotificationSystem";
 import { LanguageProvider } from "../components/LanguageContext";
@@ -48,6 +49,13 @@ const lato = Lato({
   display: "swap",
 });
 
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
@@ -61,7 +69,7 @@ export default function App({
     <SessionProvider session={session}>
       <LanguageProvider>
         <div
-          className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} ${poppins.variable} ${lato.variable} font-sans`}
+          className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} ${poppins.variable} ${lato.variable} ${cormorantGaramond.variable} font-sans`}
         >
           <NotificationProvider position="top-right" maxNotifications={3}>
             <Component {...pageProps} />
