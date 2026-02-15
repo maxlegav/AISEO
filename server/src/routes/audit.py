@@ -1,189 +1,375 @@
 """
-Audit endpoint placeholder for AISEO scraping service.
+Audit endpoint — Complete GEO audit pipeline.
 
-Full audit processing logic will be implemented in Epic 4.
-This placeholder returns 501 Not Implemented.
+Orchestrates: prompt generation → AI querying → mention detection →
+scoring → HTML scanning → GEO Score → MongoDB write.
 """
 
-import json
-from typing import Annotated, Any
-import os
-from datetime import datetime
-from fastapi import APIRouter, Depends, status
+import asyncio
+import logging
+import time
+from datetime import datetime, timezone
+from typing import Annotated
+
+from bson import ObjectId
+from bson.errors import InvalidId
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-import progressbar
-import re
 
 from auth import verify_bearer_token
+import config as app_config
+from models.business import AuditRequest
+from models.audit import (
+    BusinessSnapshot,
+    EngineResult,
+    PromptResult,
+    ResultsBlob,
+)
+from models.business import LocalityTier
+from services.prompt_generator import generate_prompts
+from services.ai_executor import execute_all_engines
+from services.mention_detector import detect_mention
+from services.locality_classifier import classify_locality_tier
+from services.scoring import (
+    calculate_prompt_score,
+    calculate_category_scores,
+    calculate_level_scores,
+    calculate_audit_engine_score,
+    calculate_discoverability_threshold,
+    calculate_geo_score,
+    score_competitor,
+)
+from services.html_scanner import scan_website
 
-
-from utils.dbal.ai_api_wrapper import call_anthropic_api, call_google_api, call_perplexity_api, call_openai_api
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Audit"])
 
 
-class coffeeShopData(BaseModel):
-    """Placeholder request model for audit endpoint."""
+def _build_location_context(request: AuditRequest) -> dict | None:
+    """Build per-engine location context based on locality tier.
 
-    businessUrl: str
-    businessType: str
-    language: str = "en"
-    businessName: str
-    fullBusinessName: str
-    street: str
-    number: str
-    city: str
-    neighborhood: list = []
-    rounding: str | None = None
-    pointOfInterest: list = []
-    coffeeType: list = []
-
-class restaurantData(BaseModel):
-    businessType: str
-    language: str = "en"
-    businessUrl: str
-    businessName: str
-    fullBusinessName: str
-    street: str
-    number: str
-    city: str
-    neighborhood: list = []
-    rounding: str | None = None
-    pointOfInterest: list = []
-    restaurantType: list = []
-
-
-
-@router.post("/audit", status_code=200)
-async def create_audit(
-    _token: Annotated[str, Depends(verify_bearer_token)],
-    request,
-) -> JSONResponse:
+    Returns None for GLOBAL businesses (no location bias).
+    For HYPER_LOCAL: neighborhood + city + country.
+    For NATIONAL: country (+ region if available).
     """
-    Audit processing endpoint (placeholder).
+    if request.localityTier == LocalityTier.GLOBAL:
+        return None
 
-    Full implementation will be added in Epic 4 (Audit Engine).
-    Currently returns 501 Not Implemented.
-    """
+    # Build human-readable text hint (for ChatGPT / Claude message prefix)
+    parts: list[str] = []
+    perplexity_loc: dict = {}
 
-    print("Checking the business type...")
+    if request.localityTier == LocalityTier.HYPER_LOCAL:
+        if request.neighborhood:
+            parts.append(request.neighborhood)
+        if request.city:
+            parts.append(request.city)
+            perplexity_loc["city"] = request.city
+        if request.region:
+            parts.append(request.region)
+            perplexity_loc["region"] = request.region
+        if request.country:
+            parts.append(request.country)
+            perplexity_loc["country"] = request.country
 
-    businessPossibleTypes = [("coffee-shop", coffeeShopData), ("restaurant", restaurantData)]
+    elif request.localityTier == LocalityTier.NATIONAL:
+        if request.region:
+            parts.append(request.region)
+            perplexity_loc["region"] = request.region
+        if request.country:
+            parts.append(request.country)
+            perplexity_loc["country"] = request.country
+
+    if not parts:
+        return None
+
+    return {
+        "text_hint": ", ".join(parts),
+        "perplexity_options": {"user_location": perplexity_loc} if perplexity_loc else None,
+    }
 
 
-    for businessPossibleType, businessDataArchitecture  in businessPossibleTypes:
-        if request["businessType"] == businessPossibleType:
-            businessData = businessDataArchitecture(request)
-
-    print(f"DATA : {businessData}")
-
-    ai_raw_responses = make_ai_questions(businessData)
-
-    with open(f"data/raw/{request['businessId']}_{datetime.now().strftime('%Y%m%d')}_ai_audit_results.json", "w+") as f:
-        json.dump(ai_raw_responses, f, indent=2)
-
-
-    if True: # TODO: Checks the answers and add check of quality of response.
-        return JSONResponse(
-            status_code=200,
-            content="Audit completed successfully"
-        )
-
-    return JSONResponse(
-        status_code=403,
-        content={
-            "success": False,
-            "error": "AI_AUDIT_FAILED",
-            "message": "AI audit failed",
-        },
+def _create_business_snapshot(request: AuditRequest) -> BusinessSnapshot:
+    """Capture all business metadata at audit time (snapshot pattern)."""
+    return BusinessSnapshot(
+        name=request.businessName,
+        primaryUrl=request.businessUrl,
+        subUrls=request.subUrls,
+        competitorUrls=request.competitorUrls,
+        competitorNames=request.competitorNames,
+        category=request.category,
+        description=request.description,
+        targetKeywords=request.targetKeywords,
+        businessType=request.businessType,
+        localityTier=request.localityTier.value if request.localityTier else None,
+        allMetadata=request.model_dump(exclude={"auditId", "businessId", "userId"}),
     )
 
 
+async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRequest):
+    """Run the full audit pipeline (prompts → AI → mentions → scoring → DB write)."""
+    db = app_config.get_db()
+    start_time = time.time()
 
-"""
-    This function is used to ask the AIs all the questions and get the answers for the business data.
-    It takes business data as input and can adapt based on the business type and language.
-    It returns a dictionary with the answers for each question for each AI.
-"""
-def make_ai_questions(business_data):
-    
-    providers = [
-        ("OPENAI", call_openai_api, "gpt-5-nano"),
-        ("ANTHROPIC", call_anthropic_api, "claude-3-haiku-20240307"),
-        ("PERPLEXITY", call_perplexity_api, "auto"),
-        ("GEMINI", call_google_api, "gemini-2.5-flash-lite"),
-    ]
+    # 1b. Auto-classify locality tier if not provided
+    if request.localityTier is None:
+        request.localityTier = classify_locality_tier(
+            request.businessType, request.city, request.country,
+        )
+    logger.info(f"[{audit_id}] Locality tier: {request.localityTier.value}")
 
-    results = {
-        "OPENAI" : {"answers": {}},
-        "ANTHROPIC" : {"answers": {}},
-        "PERPLEXITY" : {"answers": {}},
-        "GEMINI" : {"answers": {}},
-    }
+    # 2. Create business snapshot
+    snapshot = _create_business_snapshot(request)
 
-    print(f"Starting audit with ai agents for {business_data.businessName}...")
+    # 3. Generate 100 prompts
+    logger.info(f"[{audit_id}] Generating prompts...")
+    prompts = await generate_prompts(request)
 
+    # Store prompts immediately (so admin can see them even if execution fails)
+    # Schema v2: store inside results blob, keep top-level slim
+    await db.audits.update_one(
+        {"_id": oid},
+        {
+            "$set": {
+                "businessName": request.businessName,
+                "schemaVersion": 2,
+                "results.businessSnapshot": snapshot.model_dump(),
+                "results.localityTier": request.localityTier.value if request.localityTier else None,
+                "results.generatedPrompts": [p.model_dump() for p in prompts],
+            }
+        },
+    )
+    logger.info(f"[{audit_id}] {len(prompts)} prompts generated and stored")
 
-    questions = []
+    # 4. Execute AI queries + HTML scan in parallel
+    # F8: Use return_exceptions=True so HTML scan failure doesn't kill AI execution
+    location_context = _build_location_context(request)
+    if location_context:
+        logger.info(f"[{audit_id}] Location context: {location_context['text_hint']}")
 
-    try:
-        with open(f"utils/questions/{business_data.language}/generic.json") as f :
-            generic_questions = json.load(f)
-        questions.extend(generic_questions)
+    ai_task = execute_all_engines(prompts, location_context)
+    html_task = scan_website(request.businessUrl, request.subUrls, request.language)
 
-        with open(f"utils/questions/{business_data.language}/{business_data.businessType}.json") as f :
-            specific_questions = json.load(f)
-        questions.extend(specific_questions)
-  
-    except Exception as e:
-        print(f"Got wrong answer when tried to read the file with questions : {e}")
-        return {
-            "success": False,
-            "error": "QUESTIONS_FILE_NOT_FOUND",
-            "message": f"Question file not found: {e}",
-        }
+    results = await asyncio.gather(
+        ai_task,
+        html_task,
+        return_exceptions=True,
+    )
 
-    for ai_name, ai_caller, ai_model in providers:
-        b = progressbar.ProgressBar(maxval=len(generic_questions))
-        b.start()
-        c=0
-        api_key = os.environ.get(f"{ai_name}_API_KEY")
+    # Unpack AI results (mandatory — re-raise if failed)
+    if isinstance(results[0], BaseException):
+        raise results[0]
+    ai_results_tuple = results[0]
 
-        for question in generic_questions:
-            
-            # Checking for parameters in the question
-            question_params = re.findall(r"{(\w+)}", question['question'])
+    # Unpack HTML results (optional — graceful degradation)
+    if isinstance(results[1], BaseException):
+        logger.warning(f"[{audit_id}] HTML scan failed: {results[1]}")
+        html_result = None
+    else:
+        html_result = results[1]
 
-            no_question_params = False
-            for question_param in question_params:
-                if question_param not in business_data.model_dump().keys():
-                    print(f"Can't find {question_param}")
-                    no_question_params = True
-                    break
-            if not no_question_params:
-                results[ai_name]["answers"][question["id"]] = {"answers": [], "question": question["question"], "number_of_answers": 0, "success": False}
+    engine_results, engines_used, engines_succeeded = ai_results_tuple
+
+    # 5. Detect mentions for each prompt × each engine
+    logger.info(f"[{audit_id}] Detecting mentions...")
+    prompt_results: list[PromptResult] = []
+
+    for prompt in prompts:
+        engines_data: dict[str, EngineResult] = {}
+
+        for engine_name in engine_results:
+            # Find the result for this prompt from this engine
+            engine_prompt_results = engine_results[engine_name]
+            engine_prompt_result = next(
+                (r for r in engine_prompt_results if r["promptId"] == prompt.id),
+                None,
+            )
+
+            if engine_prompt_result is None or engine_prompt_result.get("error"):
+                engines_data[engine_name] = EngineResult(
+                    error=engine_prompt_result.get("error") if engine_prompt_result else "No result",
+                    responseTime=engine_prompt_result.get("responseTime", 0) if engine_prompt_result else 0,
+                )
                 continue
-            
-            answers = []
 
-            for question_param in question_params:
-                if business_data.question_param is list:
-                    for business_param in business_data.question_param:
-                        formated_question = question["question"].format(business_param_name=business_param, **business_data.model_dump())
-                        ai_answer = ai_caller(api_key, formated_question, ai_model, use_web_search=True)
-                        answers.append(ai_answer)
-                else:
-                    formated_question = question["question"].format(**business_data.model_dump())
-                    ai_answer = ai_caller(api_key, formated_question, ai_model, use_web_search=True)
-                    answers.append(ai_answer)
+            # Run mention detection
+            mention_result = detect_mention(
+                engine_prompt_result["rawResponse"],
+                request.businessName,
+                request.businessUrl,
+            )
+            mention_result.responseTime = engine_prompt_result.get("responseTime", 0)
+            engines_data[engine_name] = mention_result
+
+        # Calculate prompt-level scores
+        prompt_score, mention_rate = calculate_prompt_score(engines_data)
+
+        prompt_results.append(PromptResult(
+            promptId=prompt.id,
+            level=prompt.level,
+            category=prompt.category,
+            question=prompt.question,
+            engines=engines_data,
+            promptScore=prompt_score,
+            mentionRate=mention_rate,
+        ))
+
+    # 6. Calculate all scores
+    logger.info(f"[{audit_id}] Calculating scores...")
+    cat_scores = calculate_category_scores(prompt_results)
+    lvl_scores = calculate_level_scores(prompt_results)
+    engine_score = calculate_audit_engine_score(cat_scores)
+    threshold = calculate_discoverability_threshold(lvl_scores)
+    html_scanner_score = html_result.htmlScannerScore if html_result else None
+    geo_score = calculate_geo_score(engine_score, html_scanner_score)
+
+    # 7. Score competitors
+    logger.info(f"[{audit_id}] Scoring {len(request.competitorNames)} competitors...")
+    competitor_results = []
+    for comp_name, comp_url in zip(request.competitorNames, request.competitorUrls):
+        comp_result = score_competitor(prompt_results, comp_name, comp_url)
+        competitor_results.append(comp_result)
+
+    # 8. Calculate totals
+    processing_time = int((time.time() - start_time) * 1000)
+    total_responses = sum(
+        1 for pr in prompt_results
+        for er in pr.engines.values()
+        if er.error is None
+    )
+
+    # 9. Build ResultsBlob and write to MongoDB (schema v2)
+    logger.info(f"[{audit_id}] Writing results to MongoDB...")
+    results_blob = ResultsBlob(
+        businessSnapshot=snapshot,
+        localityTier=request.localityTier.value if request.localityTier else None,
+        generatedPrompts=prompts,
+        promptResults=prompt_results,
+        categoryScores=cat_scores,
+        levelScores=lvl_scores,
+        auditEngineScore=engine_score,
+        htmlScan=html_result,
+        htmlScannerScore=html_scanner_score,
+        discoverabilityThreshold=threshold,
+        competitorResults=competitor_results,
+        enginesUsed=engines_used,
+        enginesSucceeded=engines_succeeded,
+        totalPromptsProcessed=len(prompts),
+        totalResponsesReceived=total_responses,
+        processingTimeMs=processing_time,
+    )
+
+    await db.audits.update_one(
+        {"_id": oid},
+        {
+            "$set": {
+                "status": "review_pending",
+                "businessName": request.businessName,
+                "geoScore": geo_score,
+                "schemaVersion": 2,
+                "results": results_blob.model_dump(),
+                "completedAt": datetime.now(timezone.utc).isoformat(),
+            }
+        },
+    )
+
+    logger.info(
+        f"[{audit_id}] Audit complete — GEO Score: {geo_score}, "
+        f"Engine: {engine_score}, HTML: {html_scanner_score}, "
+        f"Time: {processing_time}ms"
+    )
 
 
-            results[ai_name]["answers"][question["id"]] = {"answers": answers, "question": question["question"], "number_of_answers": len(answers), "success": True}
-            c += 1
-            b.update(c)
-        b.finish()
-    return results
-        
+async def _run_audit_background(audit_id: str, oid: ObjectId, request: AuditRequest):
+    """Wrapper that catches all exceptions and marks the audit as failed in MongoDB."""
+    try:
+        await _execute_audit_pipeline(audit_id, oid, request)
+    except Exception as e:
+        logger.error(f"[{audit_id}] Background audit failed: {e}", exc_info=True)
+        try:
+            db = app_config.get_db()
+            await db.audits.update_one(
+                {"_id": oid},
+                {
+                    "$set": {
+                        "status": "failed",
+                        "error": str(e),
+                        "completedAt": datetime.now(timezone.utc).isoformat(),
+                    },
+                },
+            )
+        except Exception as db_err:
+            logger.critical(f"[{audit_id}] Could not write failed status: {db_err}")
 
 
+@router.post("/audit", status_code=202)
+async def run_audit(
+    _token: Annotated[str, Depends(verify_bearer_token)],
+    request: AuditRequest,
+) -> JSONResponse:
+    """
+    Accept an audit request and process it in the background.
+
+    Returns 202 immediately. The caller should poll MongoDB for results.
+    """
+    db = app_config.get_db()
+    audit_id = request.auditId
+
+    # Validate auditId format
+    try:
+        oid = ObjectId(audit_id)
+    except (InvalidId, Exception):
+        return JSONResponse(
+            status_code=400,
+            content={
+                "success": False,
+                "error": "INVALID_AUDIT_ID",
+                "message": "The provided auditId is not a valid identifier",
+            },
+        )
+
+    # Verify audit document exists
+    existing = await db.audits.find_one({"_id": oid}, {"_id": 1, "status": 1})
+    if not existing:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "success": False,
+                "error": "AUDIT_NOT_FOUND",
+                "message": "No audit document found with the provided auditId",
+            },
+        )
+
+    # Prevent double-submission
+    current_status = existing.get("status")
+    if current_status in ("processing", "review_pending", "completed"):
+        return JSONResponse(
+            status_code=409,
+            content={
+                "success": False,
+                "error": "AUDIT_ALREADY_PROCESSED",
+                "message": f"Audit is already in '{current_status}' state",
+            },
+        )
+
+    # Update status → processing
+    await db.audits.update_one(
+        {"_id": oid},
+        {"$set": {"status": "processing"}},
+    )
+    logger.info(f"[{audit_id}] Audit accepted for {request.businessName}")
+
+    # Fire-and-forget: process in background
+    asyncio.create_task(_run_audit_background(audit_id, oid, request))
+
+    return JSONResponse(
+        status_code=202,
+        content={
+            "success": True,
+            "data": {
+                "auditId": audit_id,
+                "status": "processing",
+            },
+        },
+    )

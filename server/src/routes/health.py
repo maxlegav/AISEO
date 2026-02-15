@@ -5,24 +5,18 @@ Used by Docker healthcheck and container orchestration
 to verify service availability.
 """
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends
-
-from auth import verify_bearer_token
+from fastapi import APIRouter
 
 router = APIRouter(tags=["Health"])
 
 
 @router.get("/health")
-async def health_check(
-    _token: Annotated[str, Depends(verify_bearer_token)],
-) -> dict:
+async def health_check() -> dict:
     """
     Health check endpoint.
 
     Returns service status for monitoring and orchestration.
-    Requires valid Bearer token authentication.
+    No authentication required — used by Docker HEALTHCHECK and load balancers.
     """
     return {
         "success": True,

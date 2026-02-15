@@ -45,27 +45,28 @@ def call_openai_api(
     try:
         from openai import OpenAI
         client = OpenAI(api_key=str(api_key))
-        
-        # Note: OpenAI doesn't have native web search
-        if use_web_search:
-            pass
-        
-        # Make API call
-        response = client.responses.create(
+
+        # Build messages list
+        messages = conversation_history.copy() if conversation_history else []
+        messages.append({"role": "user", "content": message})
+
+        # OpenAI Chat Completions API (web_search not natively supported — ignored)
+        response = client.chat.completions.create(
             model=model,
-            tools=[{ "type": "web_search" }],
-            input=message,
+            messages=messages,
             **kwargs
         )
-        
+
         # Extract response
-        assistant_message = response.output_text
-        
-        
+        assistant_message = response.choices[0].message.content
+
+        # Update conversation history
+        messages.append({"role": "assistant", "content": assistant_message})
+
         return {
             "success": True,
             "response": assistant_message,
-            "full_repsonse" : response,
+            "conversation_history": messages,
             "metadata": {
                 "model": model,
                 "tokens_used": {
@@ -272,55 +273,68 @@ def call_perplexity_api(
     model: str,
     conversation_history: Optional[List[Dict]] = None,
     use_web_search: bool = True,
+    web_search_options: Optional[Dict[str, Any]] = None,
     **kwargs
 ) -> Dict[str, Any]:
     """
     Call Perplexity API
-    
+
     Args:
         api_key: Perplexity API key
         model: Model name (e.g., 'llama-3.1-sonar-large-128k-online', 'llama-3.1-sonar-small-128k-online')
         message: User message to send
         conversation_history: List of message dicts [{"role": "user/assistant", "content": "..."}]
         use_web_search: Enable web search (default True, this is Perplexity's main feature)
+        web_search_options: Perplexity native search options (e.g., {"user_location": {"country": "FR", "city": "Paris"}})
         **kwargs: Additional parameters (temperature, max_tokens, etc.)
-    
+
     Returns:
         Standardized response dict
-    
+
     Note: Perplexity uses OpenAI-compatible API format
     """
     try:
         from openai import OpenAI
-        
-        # Perplexity uses OpenAI-compatible API
+
+        # Perplexity uses OpenAI-compatible Chat Completions API
         client = OpenAI(
             api_key=api_key,
             base_url="https://api.perplexity.ai"
         )
-        
-        # Make API call
-        response = client.responses.create(
-            input=message,
-            **kwargs
-        )
-        
+
+        # Build messages list
+        messages = conversation_history.copy() if conversation_history else []
+        messages.append({"role": "user", "content": message})
+
+        # Build API params — include web_search_options if provided
+        api_params = {
+            "model": model,
+            "messages": messages,
+            **kwargs,
+        }
+        if web_search_options:
+            api_params["web_search_options"] = web_search_options
+
+        response = client.chat.completions.create(**api_params)
+
         # Extract response
-        assistant_message = response.output_text
-        
+        assistant_message = response.choices[0].message.content
+
         # Update conversation history
-        
+        messages.append({"role": "assistant", "content": assistant_message})
+
         return {
             "success": True,
             "response": assistant_message,
-            "full_repsonse" : response,
+            "conversation_history": messages,
             "metadata": {
                 "model": model,
                 "tokens_used": {
-                    "prompt": response.usage.prompt_tokens,
-                    "completion": response.usage.completion_tokens,
-                    "total": response.usage.total_tokens
-                }
+                    "prompt": response.usage.prompt_tokens if response.usage else None,
+                    "completion": response.usage.completion_tokens if response.usage else None,
+                    "total": response.usage.total_tokens if response.usage else None,
+                },
+                "finish_reason": response.choices[0].finish_reason if response.choices else None,
             },
             "error": None
         }
@@ -498,6 +512,79 @@ def call_xai_api(
             "conversation_history": conversation_history,
             "metadata": {},
             "error": f"xAI API Error: {str(e)}"
+        }
+
+
+# ============================================================================
+# OLLAMA (Local AI)
+# ============================================================================
+
+def call_ollama_api(
+    api_key: str,
+    message: str,
+    model: str,
+    conversation_history: Optional[List[Dict]] = None,
+    use_web_search: bool = False,
+    base_url: str = "http://localhost:11434/v1",
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Call Ollama via its OpenAI-compatible API.
+
+    Args:
+        api_key: Ignored (Ollama needs no real key; pass any string).
+        message: User message to send.
+        model: Ollama model tag (e.g., 'qwen3:4b').
+        conversation_history: List of message dicts.
+        use_web_search: Ignored — Ollama has no web-search support.
+        base_url: Ollama OpenAI-compatible endpoint.
+        **kwargs: Extra params forwarded to chat.completions.create.
+
+    Returns:
+        Standardized response dict.
+    """
+    try:
+        from openai import OpenAI
+
+        client = OpenAI(api_key=api_key or "ollama", base_url=base_url)
+
+        messages = conversation_history.copy() if conversation_history else []
+        messages.append({"role": "user", "content": message})
+
+        # Strip kwargs that Ollama doesn't support
+        kwargs.pop("web_search_options", None)
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            **kwargs
+        )
+
+        assistant_message = response.choices[0].message.content
+        messages.append({"role": "assistant", "content": assistant_message})
+
+        return {
+            "success": True,
+            "response": assistant_message,
+            "conversation_history": messages,
+            "metadata": {
+                "model": model,
+                "tokens_used": {
+                    "prompt": getattr(response.usage, "prompt_tokens", None) if response.usage else None,
+                    "completion": getattr(response.usage, "completion_tokens", None) if response.usage else None,
+                    "total": getattr(response.usage, "total_tokens", None) if response.usage else None,
+                },
+            },
+            "error": None,
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "response": None,
+            "conversation_history": conversation_history,
+            "metadata": {},
+            "error": f"Ollama API Error: {str(e)}",
         }
 
 

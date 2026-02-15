@@ -22,20 +22,20 @@ services:
     # Override command for development with hot reload
     command: uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
 
-    # Resource limits (Chrome is memory-hungry)
+    # Resource limits (JRE + Chromium + 4 parallel AI workers need more resources)
     deploy:
       resources:
         limits:
-          memory: 2G
-          cpus: '1.0'
+          memory: 4G
+          cpus: '2.0'
 
     # Health check
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
     # Restart policy
     restart: unless-stopped

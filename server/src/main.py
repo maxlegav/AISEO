@@ -13,14 +13,24 @@ from typing import Annotated, Any
 from auth import verify_bearer_token
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from routes.health import router as health_router
 from routes.audit import router as audit_router
+from routes.html_scan import router as html_scan_router
+
+import config as app_config
 
 # Load environment variables
 load_dotenv()
+
+# Rate limiter (per-IP)
+limiter = Limiter(key_func=get_remote_address)
 
 # Configure logging
 logging.basicConfig(
@@ -41,36 +51,65 @@ async def lifespan(app: FastAPI):
     logger.info("AISEO Scraping Service starting up...")
 
     # Validate required environment variables
-    required_vars = ["PROCESSING_SERVICE_API_KEY"]
-    missing = [var for var in required_vars if not os.getenv(var)]
+    missing = app_config.validate_env()
     if missing:
         logger.error(f"Missing required environment variables: {missing}")
         raise RuntimeError(f"Missing required environment variables: {missing}")
 
     logger.info("Environment validated successfully")
+
+    # Connect to MongoDB and verify
+    try:
+        db = app_config.get_db()
+        await db.command("ping")
+        logger.info("MongoDB connection established (database: showyourbrand)")
+
+        # Create indexes on audits collection
+        await db.audits.create_index([("businessId", 1), ("createdAt", -1)])
+        await db.audits.create_index([("userId", 1), ("status", 1)])
+        await db.audits.create_index([("status", 1), ("createdAt", -1)])
+        logger.info("MongoDB indexes created on audits collection")
+    except Exception as e:
+        logger.error(f"MongoDB connection failed: {e}")
+        raise RuntimeError(f"MongoDB connection failed: {e}")
+
     logger.info("Service ready to accept requests on port 8080")
 
     yield
 
     # Shutdown
     logger.info("AISEO Scraping Service shutting down...")
+    await app_config.close_db()
 
 
 # Create FastAPI application
-# Note: In production, set docs_url=None to disable OpenAPI docs
+# Docs enabled — service is already behind bearer token auth
 app = FastAPI(
     title="AISEO Scraping Service",
     description="Docker-based processing service for website scraping and AI analysis",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
-    docs_url=None, # Disable docs (Swagger UI)
-    redoc_url=None, # Disable redoc
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
+# Rate limiter setup
+app.state.limiter = limiter
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"success": False, "error": "RATE_LIMITED", "message": "Too many requests"},
+    )
+
+
 # Configure CORS for Next.js frontend
+_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js dev server
+    allow_origins=[o.strip() for o in _cors_origins.split(",") if o.strip()],
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
@@ -79,6 +118,7 @@ app.add_middleware(
 # Include routers
 app.include_router(health_router)
 app.include_router(audit_router)
+app.include_router(html_scan_router)
 
 
 @app.get("/")
@@ -86,13 +126,12 @@ async def root(
     _token: Annotated[str, Depends(verify_bearer_token)]
 ):
     """Root endpoint - service info."""
-    
+
     return {
         "success": True,
         "data": {
             "service": "aiseo-scraper",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "docs": "/docs",
         },
     }
-    
