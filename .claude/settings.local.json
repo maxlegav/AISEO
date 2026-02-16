@@ -45,7 +45,7 @@
       "Bash(for i in {1..13})",
       "Bash(do echo -n \"Epic $i: \")",
       "Bash(done)",
-      "Bash(git -C /Users/chocomushrooms/AISEO log --oneline -10)",
+      "Bash(git -C /Users/chocomushrooms/ShowYourBrand log --oneline -10)",
       "Bash(python3:*)",
       "Bash(docker info:*)",
       "Bash(open:*)",
@@ -94,7 +94,7 @@
       "WebFetch(domain:docs.perplexity.ai)",
       "Bash(/Users/chocomushrooms/.claude/hooks/play-tts.sh:*)",
       "Bash(docker exec:*)",
-      "Bash(# First, get the bearer token from .env grep BEARER_TOKEN /Users/chocomushrooms/AISEO/server/.env)",
+      "Bash(# First, get the bearer token from .env grep BEARER_TOKEN /Users/chocomushrooms/ShowYourBrand/server/.env)",
       "Bash(TOKEN=\"p6jgXU4DDgWKt3Mp5WEtIZtoeS9m+ZKncQpCNW6ShBg\")",
       "Bash(__NEW_LINE_298b4e16bc18d7cd__ echo \"=== Test 1: Invalid auditId \\(expect 400\\) ===\")",
       "Bash(__NEW_LINE_298b4e16bc18d7cd__ echo \"\")",
@@ -111,7 +111,9 @@
       "Bash(python -m tests.test_full_audit:*)",
       "Bash(/Users/chocomushrooms/AISEO/.claude/hooks/play-tts.sh:*)",
       "Bash(docker build:*)",
-      "Bash(docker rm:*)"
+      "Bash(docker rm:*)",
+      "Bash(npx next build:*)",
+      "Bash(git rm:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

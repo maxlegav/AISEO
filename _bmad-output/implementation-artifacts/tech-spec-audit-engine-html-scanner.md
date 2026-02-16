@@ -1,8 +1,8 @@
 ---
-title: 'AISEO Audit Engine & HTML Scanner — Python Server'
-slug: 'audit-engine-html-scanner'
-created: '2026-02-11'
-status: 'review-complete'
+title: "ShowYourBrand Audit Engine & HTML Scanner — Python Server"
+slug: "audit-engine-html-scanner"
+created: "2026-02-11"
+status: "review-complete"
 stepsCompleted: [1, 2, 3, 4]
 tech_stack:
   - python@3.11
@@ -51,7 +51,7 @@ test_patterns:
   - Fixture-based test data (sample business, sample prompts, sample AI responses)
 ---
 
-# Tech-Spec: AISEO Audit Engine & HTML Scanner — Python Server
+# Tech-Spec: ShowYourBrand Audit Engine & HTML Scanner — Python Server
 
 **Created:** 2026-02-11
 
@@ -66,7 +66,7 @@ The Python server has a solid foundation (FastAPI, AI API wrappers for 6 provide
 - Detects business mentions in AI responses using regex + fuzzy matching
 - Calculates a comprehensive scoring pipeline (per-response, per-prompt, per-category, per-level, global)
 - Analyzes website HTML for technical SEO health (schema.org, meta tags, headings, alt text, links)
-- Computes the final GEO Score (auditEngine * 0.7 + htmlScanner * 0.3)
+- Computes the final GEO Score (auditEngine _ 0.7 + htmlScanner _ 0.3)
 - Writes everything to MongoDB
 
 ### Solution
@@ -84,6 +84,7 @@ The server computes the final GEO Score and writes the complete audit document (
 ### Scope
 
 **In Scope:**
+
 - Fix all existing bugs in audit.py (inverted logic, attribute errors, sequential-only execution)
 - Fix OpenAI and Perplexity API wrappers (wrong API method: Responses API → Chat Completions API)
 - Replace hardcoded business types with flexible, business-type-agnostic metadata model
@@ -95,13 +96,14 @@ The server computes the final GEO Score and writes the complete audit document (
 - Discoverability threshold calculation
 - HTML Scanner: W3C validation (vnu.jar), Lychee link checking, schema.org detection (extruct), meta tag analysis, heading structure, alt text audit, keyword extraction (TF-IDF via scikit-learn)
 - HTML Scanner Score (0-100) calculation
-- GEO Score calculation: auditEngineScore * 0.7 + htmlScannerScore * 0.3
+- GEO Score calculation: auditEngineScore _ 0.7 + htmlScannerScore _ 0.3
 - MongoDB integration via Motor async driver (write full Audit document per audit-engine-spec schema)
 - Docker multi-stage build (Python + vnu.jar/JRE + Lychee binary)
 - Proper async architecture with progress tracking
 - Status flow: pending → processing → review_pending / failed
 
 **Out of Scope:**
+
 - Next.js API endpoints (separate tech-spec)
 - Admin review dashboard UI
 - PDF report generation
@@ -115,6 +117,7 @@ The server computes the final GEO Score and writes the complete audit document (
 ### Codebase Patterns
 
 **Existing patterns (keep):**
+
 - AI API wrappers return standardized `{ success, response, metadata, error }` format
 - Bearer token auth via `verify_bearer_token` dependency
 - FastAPI with async lifespan handlers
@@ -122,6 +125,7 @@ The server computes the final GEO Score and writes the complete audit document (
 - Docker container runs as non-root `appuser`
 
 **New patterns (introduce):**
+
 - Service layer: routes call services, services call DB/APIs — keeps routes thin
 - Motor async MongoDB: single global `AsyncIOMotorClient`, closed on app shutdown
 - `asyncio.gather()` for parallel AI engine execution (4 concurrent workers)
@@ -130,18 +134,18 @@ The server computes the final GEO Score and writes the complete audit document (
 
 ### Files to Reference
 
-| File | Purpose |
-| ---- | ------- |
-| `server/src/routes/audit.py` | Current audit endpoint — complete rewrite needed |
-| `server/src/utils/dbal/ai_api_wrapper.py` | AI provider wrappers — fix OpenAI + Perplexity, keep Anthropic + Gemini |
-| `server/src/main.py` | FastAPI app entry point — add Motor lifecycle + new routers |
-| `server/src/auth.py` | Bearer token authentication — keep as-is |
-| `server/Dockerfile` | Docker build — needs multi-stage for vnu.jar + lychee |
-| `docker-compose.yml` | Local dev orchestration — update resources |
-| `server/.env` | Environment variables (API keys, MongoDB URI already present) |
+| File                                                   | Purpose                                                                                |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `server/src/routes/audit.py`                           | Current audit endpoint — complete rewrite needed                                       |
+| `server/src/utils/dbal/ai_api_wrapper.py`              | AI provider wrappers — fix OpenAI + Perplexity, keep Anthropic + Gemini                |
+| `server/src/main.py`                                   | FastAPI app entry point — add Motor lifecycle + new routers                            |
+| `server/src/auth.py`                                   | Bearer token authentication — keep as-is                                               |
+| `server/Dockerfile`                                    | Docker build — needs multi-stage for vnu.jar + lychee                                  |
+| `docker-compose.yml`                                   | Local dev orchestration — update resources                                             |
+| `server/.env`                                          | Environment variables (API keys, MongoDB URI already present)                          |
 | `_bmad-output/planning-artifacts/audit-engine-spec.md` | **PRIMARY REFERENCE** — Authoritative spec for scoring, prompts, detection (in French) |
-| `_bmad-output/planning-artifacts/architecture.md` | Architecture decisions |
-| `WebSite/models/Business.ts` | Business model (reference for snapshot fields) |
+| `_bmad-output/planning-artifacts/architecture.md`      | Architecture decisions                                                                 |
+| `WebSite/models/Business.ts`                           | Business model (reference for snapshot fields)                                         |
 
 ### Technical Decisions
 
@@ -174,15 +178,15 @@ The server computes the final GEO Score and writes the complete audit document (
 
 ### Known Bugs to Fix
 
-| File | Line | Bug | Fix |
-| ---- | ---- | --- | --- |
-| `audit.py` | 77 | `businessDataArchitecture(request)` — request is dict, not unpacked | Complete rewrite (new model) |
-| `audit.py` | 158-166 | Inverted logic — skips questions WITH valid params | Complete rewrite |
-| `audit.py` | 171 | `business_data.question_param` — string used as attribute | Complete rewrite |
-| `audit.py` | 83 | Writes to `data/raw/` which doesn't exist | Complete rewrite (use MongoDB) |
-| `audit.py` | 147-153 | Only loops `generic_questions`, ignores `specific_questions` | Complete rewrite |
-| `ai_api_wrapper.py` | 54-62 | OpenAI uses Responses API instead of Chat Completions | Fix to `chat.completions.create()` |
-| `ai_api_wrapper.py` | 303-309 | Perplexity uses Responses API, missing model and messages | Fix to `chat.completions.create()` with messages |
+| File                | Line    | Bug                                                                 | Fix                                              |
+| ------------------- | ------- | ------------------------------------------------------------------- | ------------------------------------------------ |
+| `audit.py`          | 77      | `businessDataArchitecture(request)` — request is dict, not unpacked | Complete rewrite (new model)                     |
+| `audit.py`          | 158-166 | Inverted logic — skips questions WITH valid params                  | Complete rewrite                                 |
+| `audit.py`          | 171     | `business_data.question_param` — string used as attribute           | Complete rewrite                                 |
+| `audit.py`          | 83      | Writes to `data/raw/` which doesn't exist                           | Complete rewrite (use MongoDB)                   |
+| `audit.py`          | 147-153 | Only loops `generic_questions`, ignores `specific_questions`        | Complete rewrite                                 |
+| `ai_api_wrapper.py` | 54-62   | OpenAI uses Responses API instead of Chat Completions               | Fix to `chat.completions.create()`               |
+| `ai_api_wrapper.py` | 303-309 | Perplexity uses Responses API, missing model and messages           | Fix to `chat.completions.create()` with messages |
 
 ---
 
@@ -228,6 +232,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
   - File: `server/src/models/business.py` (NEW)
   - File: `server/src/models/__init__.py` (NEW)
   - Action: Create `AuditRequest` Pydantic model that accepts any business type. The model should include:
+
     ```python
     class AuditRequest(BaseModel):
         # Required fields — every business must provide these
@@ -266,11 +271,13 @@ Tasks are ordered by dependency — each task builds on the previous ones.
         # Any additional custom fields the business provides
         customFields: dict = {}              # Catch-all for business-specific data
     ```
+
   - Notes: The `customFields` dict allows ANY business to pass extra data. The prompt generator LLM receives ALL fields and adapts. Be creative with what you accept — the more data, the better the prompts. The LLM system prompt must list ALL available fields so it knows what it can use.
 
 - [x] **Task 4: Create audit Pydantic models matching MongoDB schema**
   - File: `server/src/models/audit.py` (NEW)
   - Action: Create Pydantic models that match the MongoDB Audit schema from `audit-engine-spec.md` section 11. Key models:
+
     ```python
     class EngineResult(BaseModel):
         mentioned: bool = False
@@ -366,6 +373,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
         createdAt: str = ""           # ISO 8601
         completedAt: str | None = None
     ```
+
   - Notes: These models are used for validation and serialization. When writing to MongoDB, call `.model_dump()` to convert to dict. When reading from MongoDB, the `_id` field is an ObjectId — convert with `str()`.
 
 - [x] **Task 5: Update main.py — MongoDB lifecycle + new routers**
@@ -391,6 +399,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 - [x] **Task 6: Fix OpenAI wrapper — Responses API → Chat Completions API**
   - File: `server/src/utils/dbal/ai_api_wrapper.py`
   - Action: In `call_openai_api()` (lines 44-78), replace:
+
     ```python
     # BEFORE (wrong — Responses API):
     response = client.responses.create(
@@ -411,13 +420,16 @@ Tasks are ordered by dependency — each task builds on the previous ones.
     )
     assistant_message = response.choices[0].message.content
     ```
+
     Also fix metadata extraction: `response.choices[0].finish_reason` (this part was actually correct but inconsistent with the Responses API usage above).
     Remove the web_search tool (OpenAI Chat Completions doesn't support it natively).
+
   - Notes: The `use_web_search` param should be ignored for OpenAI (add a comment). Keep the standardized return format.
 
 - [x] **Task 7: Fix Perplexity wrapper — Responses API → Chat Completions API**
   - File: `server/src/utils/dbal/ai_api_wrapper.py`
   - Action: In `call_perplexity_api()` (lines 293-335), replace:
+
     ```python
     # BEFORE (wrong — Responses API, missing model + messages):
     response = client.responses.create(
@@ -437,7 +449,9 @@ Tasks are ordered by dependency — each task builds on the previous ones.
     assistant_message = response.choices[0].message.content
     messages.append({"role": "assistant", "content": assistant_message})
     ```
+
     Fix metadata: use `response.choices[0].finish_reason`, `response.usage.prompt_tokens`, etc.
+
   - Notes: Perplexity web search is activated by using "online" model variants (e.g., `llama-3.1-sonar-large-128k-online`), not via a parameter. The `use_web_search` flag can select between online/offline models.
 
 ---
@@ -468,12 +482,14 @@ Tasks are ordered by dependency — each task builds on the previous ones.
     6. Return `list[GeneratedPrompt]`
 
     Key function signature:
+
     ```python
     async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
         """Generate 100 tailored prompts for the business using a high-end LLM."""
     ```
 
     The system prompt must explicitly tell the LLM which parameters are available. Example template (adapt from `audit-engine-spec.md` section 12):
+
     ```
     You are an expert in GEO (Generative Engine Optimization). Generate exactly 100 prompts
     to test the visibility of a business in AI engine responses.
@@ -511,6 +527,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
     Return ONLY valid JSON, no markdown, no explanation.
     [{ "id": 1, "level": 1, "category": "discovery", "question": "..." }, ...]
     ```
+
   - Notes: Use `json.loads()` to parse. If the LLM wraps in markdown code blocks, strip them first. The system prompt template is in `audit-engine-spec.md` section 12 (line 645+) — adapt it to include ALL the metadata fields.
 
 ---
@@ -612,7 +629,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
   - File: `server/src/services/html_scanner.py` (NEW)
   - Action: Create service that fetches a website and performs comprehensive HTML analysis. Functions:
     1. `async def fetch_page(url: str) -> str` — Fetch HTML content using `httpx` async client with:
-       - User-agent: `"AISEO-Bot/1.0 (+https://aiseo.com)"` (per FR77)
+       - User-agent: `"ShowYourBrand-Bot/1.0 (+https://ShowYourBrand.com)"` (per FR77)
        - Timeout: 30 seconds
        - Follow redirects
        - Respect robots.txt (check before fetching)
@@ -694,6 +711,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 - [x] **Task 14: Rewrite audit.py — complete audit pipeline endpoint**
   - File: `server/src/routes/audit.py` (COMPLETE REWRITE)
   - Action: Replace the entire file. The new endpoint orchestrates the full audit pipeline:
+
     ```python
     @router.post("/audit")
     async def run_audit(
@@ -701,6 +719,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
         request: AuditRequest,
     ) -> JSONResponse:
     ```
+
     Pipeline steps (in order):
     1. **Update status** → `processing` in MongoDB:
        ```python
@@ -762,6 +781,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
     - If prompt generation fails → status = `failed` (can't continue without prompts)
     - If <2 engines succeed → status = `failed`
     - If HTML scan fails → continue (use auditEngineScore as geoScore)
+
   - Notes: Delete the old `coffeeShopData`, `restaurantData` classes, the `make_ai_questions` function, and all static question file loading. Remove `progressbar` import. The entire audit.py is a fresh start.
 
 ---
@@ -771,6 +791,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 - [x] **Task 15: Update Dockerfile — multi-stage build with vnu.jar + lychee**
   - File: `server/Dockerfile`
   - Action: Rewrite as multi-stage build:
+
     ```dockerfile
     # Stage 1: Download vnu.jar
     FROM eclipse-temurin:11-jre-jammy AS vnu-stage
@@ -827,6 +848,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 
     CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
     ```
+
   - Notes: The image will be larger (~800MB-1GB) due to JRE + Chromium + lychee. This is acceptable for a processing service. Start period increased to 15s for JRE warmup. Health check now hits `/health` instead of `/` (which requires auth).
 
 - [x] **Task 16: Update docker-compose.yml — increase resources**
@@ -836,8 +858,8 @@ Tasks are ordered by dependency — each task builds on the previous ones.
     deploy:
       resources:
         limits:
-          memory: 4G    # was 2G — need more for JRE + Chromium + AI processing
-          cpus: '2.0'   # was 1.0 — parallel AI execution benefits from more CPU
+          memory: 4G # was 2G — need more for JRE + Chromium + AI processing
+          cpus: "2.0" # was 1.0 — parallel AI execution benefits from more CPU
     ```
   - Notes: The 4 parallel AI workers + HTML scanning + JRE need more resources than before.
 
@@ -896,6 +918,7 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 ### Dependencies
 
 **Python packages (new):**
+
 - `motor>=3.3.0` — async MongoDB driver
 - `rapidfuzz>=3.0.0` — fast fuzzy string matching (C-based)
 - `beautifulsoup4>=4.12.0` — HTML parsing
@@ -908,10 +931,12 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 - `pytest-asyncio>=0.23.0` — async test support
 
 **External tools (Docker):**
+
 - `vnu.jar` — W3C Nu Html Checker (requires JRE 11+)
 - `lychee` — Rust-based link checker binary
 
 **API keys (already in .env):**
+
 - `OPENAI_API_KEY` — ChatGPT querying + prompt generation
 - `ANTHROPIC_API_KEY` — Claude querying
 - `GEMINI_API_KEY` — Gemini querying
@@ -922,9 +947,11 @@ Tasks are ordered by dependency — each task builds on the previous ones.
 ### MongoDB Schema
 
 The Audit document follows the schema defined in `audit-engine-spec.md` section 11 (lines 466-632). Key collections:
+
 - `audits` — main audit documents (~300-600KB each)
 
 Required indexes:
+
 - `{ businessId: 1, createdAt: -1 }` — audit history per business
 - `{ userId: 1, status: 1 }` — user dashboard queries
 - `{ status: 1, createdAt: -1 }` — admin pending-audits list
@@ -932,16 +959,19 @@ Required indexes:
 ### Testing Strategy
 
 **Unit Tests (no real API calls):**
+
 - `test_mention_detector.py` — Test regex, URL variants, fuzzy matching, quality scoring, position detection with known inputs/outputs
 - `test_scoring.py` — Test all scoring formulas with pre-computed expected values matching `audit-engine-spec.md` examples
 - `test_prompt_validator.py` — Test prompt validation logic (100 prompts, 20/level, 10+/category)
 - `test_html_scanner_scoring.py` — Test HTML scanner scoring formula with known HTML inputs
 
 **Integration Tests (mock AI APIs):**
+
 - `test_audit_pipeline.py` — Full pipeline with mocked AI responses: request → prompts → mocked AI results → mention detection → scoring → MongoDB write → verify document
 - `test_html_scanner_integration.py` — Test scanner with a known HTML file (no network calls)
 
 **Manual Testing:**
+
 1. Build and start Docker: `docker-compose up --build`
 2. Call `/health` endpoint — verify 200
 3. Call `/audit` with a test business — verify complete pipeline

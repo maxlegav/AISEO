@@ -1,8 +1,8 @@
 ---
-title: 'Setup Zustand State Management and Zod Validation'
-slug: 'story-1-3-zustand-zod-setup'
-created: '2026-01-29'
-status: 'completed'
+title: "Setup Zustand State Management and Zod Validation"
+slug: "story-1-3-zustand-zod-setup"
+created: "2026-01-29"
+status: "completed"
 stepsCompleted: [1, 2, 3, 4]
 tech_stack:
   - next@16.1.4
@@ -49,7 +49,7 @@ adversarial_review:
 
 ### Problem Statement
 
-AISEO needs a state management foundation (Zustand) and API validation layer (Zod) to enable predictable frontend state and runtime type safety across the app. Currently, no stores or validation schemas exist, leaving the app without standardized patterns for state and input validation.
+ShowYourBrand needs a state management foundation (Zustand) and API validation layer (Zod) to enable predictable frontend state and runtime type safety across the app. Currently, no stores or validation schemas exist, leaving the app without standardized patterns for state and input validation.
 
 ### Solution
 
@@ -64,6 +64,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
 ### Scope
 
 **In Scope:**
+
 - Install Zustand 4.x with persist and devtools middleware
 - Create `stores/useUserStore.ts` with SSR-safe persistence (theme only)
 - Create `stores/useAuditStore.ts` (current audit, progress, polling state)
@@ -76,6 +77,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
 - Update project-context.md with concrete validation examples
 
 **Out of Scope:**
+
 - Full API validation suite (tracked as future task)
 - Complex store logic (audit polling implementation is Story 4.x)
 - Business/Audit domain schemas (will come with their epics)
@@ -115,25 +117,26 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
 
 ### Files to Reference
 
-| File | Purpose |
-| ---- | ------- |
-| `lib/error-handler.ts` | Error types, ApiError class - Zod errors integrate via helper |
-| `types/index.ts` | Barrel export pattern for types |
-| `components/LanguageContext.tsx` | Existing localStorage pattern (don't duplicate for language) |
-| `models/User.ts` | UserDocument interface - reference for user-related schemas |
-| `tsconfig.json` | Path alias `@/*`, strict mode settings |
-| `_bmad-output/project-context.md` | Architecture patterns to follow |
+| File                              | Purpose                                                       |
+| --------------------------------- | ------------------------------------------------------------- |
+| `lib/error-handler.ts`            | Error types, ApiError class - Zod errors integrate via helper |
+| `types/index.ts`                  | Barrel export pattern for types                               |
+| `components/LanguageContext.tsx`  | Existing localStorage pattern (don't duplicate for language)  |
+| `models/User.ts`                  | UserDocument interface - reference for user-related schemas   |
+| `tsconfig.json`                   | Path alias `@/*`, strict mode settings                        |
+| `_bmad-output/project-context.md` | Architecture patterns to follow                               |
 
 ### Technical Decisions
 
 1. **Zustand persist with SSR safety**: Use `skipHydration: true` to prevent hydration mismatch
+
    ```typescript
    // Pattern for SSR-safe hydration
    persist(storeConfig, {
-     name: 'user-store',
+     name: "user-store",
      skipHydration: true,
      partialize: (state) => ({ theme: state.theme }),
-   })
+   });
 
    // In _app.tsx or layout, call after mount:
    useEffect(() => {
@@ -142,6 +145,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
    ```
 
 2. **Zustand devtools**: Enable in development only
+
    ```typescript
    const useStore = create<State>()(
      devtools(
@@ -175,6 +179,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
    - `toggleSidebar`, `setFilters`, `clearFilters`, `resetAllStores`
 
 8. **Selector pattern**: Always use selectors for performance
+
    ```typescript
    // Good
    const theme = useUserStore((s) => s.theme);
@@ -210,6 +215,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - File: `WebSite/types/audit.ts` (CREATE)
   - Action: Create placeholder interface for Audit (will be expanded in Epic 4)
   - Implementation:
+
     ```typescript
     /**
      * Placeholder Audit interface for Story 1.3
@@ -219,7 +225,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       _id: string;
       userId: string;
       businessId: string;
-      status: 'pending' | 'processing' | 'completed' | 'failed';
+      status: "pending" | "processing" | "completed" | "failed";
       geoScore: number | null;
       createdAt: string; // ISO date string
       completedAt: string | null;
@@ -237,8 +243,8 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - Action: Add export for audit types
   - Implementation:
     ```typescript
-    export * from './FAQ';
-    export * from './audit';
+    export * from "./FAQ";
+    export * from "./audit";
     ```
 
 #### Phase 3: Create Zustand Stores
@@ -247,9 +253,10 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - File: `WebSite/stores/useUserStore.ts` (CREATE)
   - Action: Create store with persist + devtools middleware
   - Implementation:
+
     ```typescript
-    import { create } from 'zustand';
-    import { devtools, persist } from 'zustand/middleware';
+    import { create } from "zustand";
+    import { devtools, persist } from "zustand/middleware";
 
     export interface UserProfile {
       id: string;
@@ -257,8 +264,8 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       email: string;
     }
 
-    export type Theme = 'light' | 'dark' | 'system';
-    export type SubscriptionTier = 'none' | 'basic' | 'pro' | 'premium';
+    export type Theme = "light" | "dark" | "system";
+    export type SubscriptionTier = "none" | "basic" | "pro" | "premium";
 
     export interface UserState {
       // State
@@ -274,9 +281,9 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
     }
 
     const initialState = {
-      theme: 'system' as Theme,
+      theme: "system" as Theme,
       userProfile: null,
-      subscriptionTier: 'none' as SubscriptionTier,
+      subscriptionTier: "none" as SubscriptionTier,
     };
 
     export const useUserStore = create<UserState>()(
@@ -285,31 +292,35 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
           (set) => ({
             ...initialState,
 
-            setTheme: (theme) => set({ theme }, false, 'setTheme'),
-            setUserProfile: (userProfile) => set({ userProfile }, false, 'setUserProfile'),
-            setSubscriptionTier: (subscriptionTier) => set({ subscriptionTier }, false, 'setSubscriptionTier'),
-            clearUser: () => set(initialState, false, 'clearUser'),
+            setTheme: (theme) => set({ theme }, false, "setTheme"),
+            setUserProfile: (userProfile) =>
+              set({ userProfile }, false, "setUserProfile"),
+            setSubscriptionTier: (subscriptionTier) =>
+              set({ subscriptionTier }, false, "setSubscriptionTier"),
+            clearUser: () => set(initialState, false, "clearUser"),
           }),
           {
-            name: 'user-store',
+            name: "user-store",
             skipHydration: true, // SSR-safe: manually rehydrate on client
             partialize: (state) => ({ theme: state.theme }), // Only persist theme
-          }
+          },
         ),
-        { name: 'UserStore', enabled: process.env.NODE_ENV === 'development' }
-      )
+        { name: "UserStore", enabled: process.env.NODE_ENV === "development" },
+      ),
     );
     ```
-  - Notes: Must call `useUserStore.persist.rehydrate()` in _app.tsx useEffect
+
+  - Notes: Must call `useUserStore.persist.rehydrate()` in \_app.tsx useEffect
 
 - [x] **Task 4: Create useAuditStore**
   - File: `WebSite/stores/useAuditStore.ts` (CREATE)
   - Action: Create store for audit state management
   - Implementation:
+
     ```typescript
-    import { create } from 'zustand';
-    import { devtools } from 'zustand/middleware';
-    import type { Audit, AuditProgress } from '@/types';
+    import { create } from "zustand";
+    import { devtools } from "zustand/middleware";
+    import type { Audit, AuditProgress } from "@/types";
 
     export interface AuditState {
       // State
@@ -338,27 +349,36 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
         (set) => ({
           ...initialState,
 
-          setCurrentAudit: (currentAudit) => set({ currentAudit }, false, 'setCurrentAudit'),
-          updateProgress: (auditProgress) => set({ auditProgress }, false, 'updateProgress'),
-          setPolling: (isPolling) => set({ isPolling }, false, 'setPolling'),
-          setAuditHistory: (auditHistory) => set({ auditHistory }, false, 'setAuditHistory'),
-          clearAudit: () => set(initialState, false, 'clearAudit'),
+          setCurrentAudit: (currentAudit) =>
+            set({ currentAudit }, false, "setCurrentAudit"),
+          updateProgress: (auditProgress) =>
+            set({ auditProgress }, false, "updateProgress"),
+          setPolling: (isPolling) => set({ isPolling }, false, "setPolling"),
+          setAuditHistory: (auditHistory) =>
+            set({ auditHistory }, false, "setAuditHistory"),
+          clearAudit: () => set(initialState, false, "clearAudit"),
         }),
-        { name: 'AuditStore', enabled: process.env.NODE_ENV === 'development' }
-      )
+        { name: "AuditStore", enabled: process.env.NODE_ENV === "development" },
+      ),
     );
     ```
+
   - Notes: No persistence - session only
 
 - [x] **Task 5: Create useDashboardStore**
   - File: `WebSite/stores/useDashboardStore.ts` (CREATE)
   - Action: Create store for dashboard UI state
   - Implementation:
-    ```typescript
-    import { create } from 'zustand';
-    import { devtools } from 'zustand/middleware';
 
-    export type DashboardView = 'overview' | 'audits' | 'businesses' | 'settings';
+    ```typescript
+    import { create } from "zustand";
+    import { devtools } from "zustand/middleware";
+
+    export type DashboardView =
+      | "overview"
+      | "audits"
+      | "businesses"
+      | "settings";
 
     export interface DashboardFilters {
       dateStart: string | null; // ISO string, not Date (serialization-safe)
@@ -385,12 +405,12 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       dateStart: null,
       dateEnd: null,
       status: [],
-      search: '',
+      search: "",
     };
 
     const initialState = {
       isSidebarCollapsed: false,
-      activeView: 'overview' as DashboardView,
+      activeView: "overview" as DashboardView,
       filters: initialFilters,
     };
 
@@ -399,44 +419,63 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
         (set) => ({
           ...initialState,
 
-          toggleSidebar: () => set(
-            (state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed }),
-            false,
-            'toggleSidebar'
-          ),
-          setSidebarCollapsed: (isSidebarCollapsed) => set({ isSidebarCollapsed }, false, 'setSidebarCollapsed'),
-          setActiveView: (activeView) => set({ activeView }, false, 'setActiveView'),
-          setFilters: (newFilters) => set(
-            (state) => ({ filters: { ...state.filters, ...newFilters } }),
-            false,
-            'setFilters'
-          ),
-          clearFilters: () => set({ filters: initialFilters }, false, 'clearFilters'),
+          toggleSidebar: () =>
+            set(
+              (state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed }),
+              false,
+              "toggleSidebar",
+            ),
+          setSidebarCollapsed: (isSidebarCollapsed) =>
+            set({ isSidebarCollapsed }, false, "setSidebarCollapsed"),
+          setActiveView: (activeView) =>
+            set({ activeView }, false, "setActiveView"),
+          setFilters: (newFilters) =>
+            set(
+              (state) => ({ filters: { ...state.filters, ...newFilters } }),
+              false,
+              "setFilters",
+            ),
+          clearFilters: () =>
+            set({ filters: initialFilters }, false, "clearFilters"),
         }),
-        { name: 'DashboardStore', enabled: process.env.NODE_ENV === 'development' }
-      )
+        {
+          name: "DashboardStore",
+          enabled: process.env.NODE_ENV === "development",
+        },
+      ),
     );
     ```
+
   - Notes: Uses ISO strings for dates (not Date objects) to avoid serialization issues
 
 - [x] **Task 6: Create stores barrel export with resetAllStores**
   - File: `WebSite/stores/index.ts` (CREATE)
   - Action: Create barrel export with coordinated reset utility
   - Implementation:
+
     ```typescript
-    export { useUserStore } from './useUserStore';
-    export { useAuditStore } from './useAuditStore';
-    export { useDashboardStore } from './useDashboardStore';
+    export { useUserStore } from "./useUserStore";
+    export { useAuditStore } from "./useAuditStore";
+    export { useDashboardStore } from "./useDashboardStore";
 
     // Re-export types
-    export type { UserState, UserProfile, Theme, SubscriptionTier } from './useUserStore';
-    export type { AuditState } from './useAuditStore';
-    export type { DashboardState, DashboardView, DashboardFilters } from './useDashboardStore';
+    export type {
+      UserState,
+      UserProfile,
+      Theme,
+      SubscriptionTier,
+    } from "./useUserStore";
+    export type { AuditState } from "./useAuditStore";
+    export type {
+      DashboardState,
+      DashboardView,
+      DashboardFilters,
+    } from "./useDashboardStore";
 
     // Coordinated reset for logout
-    import { useUserStore } from './useUserStore';
-    import { useAuditStore } from './useAuditStore';
-    import { useDashboardStore } from './useDashboardStore';
+    import { useUserStore } from "./useUserStore";
+    import { useAuditStore } from "./useAuditStore";
+    import { useDashboardStore } from "./useDashboardStore";
 
     /**
      * Reset all stores to initial state (call on logout)
@@ -445,7 +484,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       useUserStore.getState().clearUser();
       useAuditStore.getState().clearAudit();
       useDashboardStore.getState().clearFilters();
-      useDashboardStore.getState().setActiveView('overview');
+      useDashboardStore.getState().setActiveView("overview");
       useDashboardStore.getState().setSidebarCollapsed(false);
     }
     ```
@@ -456,13 +495,14 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - File: `WebSite/lib/validation/common.ts` (CREATE)
   - Action: Create base validation schemas used across the app
   - Implementation:
+
     ```typescript
-    import { z } from 'zod';
+    import { z } from "zod";
 
     // MongoDB ObjectId validation (named to avoid mongoose collision)
     export const ObjectIdStringSchema = z
       .string()
-      .regex(/^[a-f\d]{24}$/i, 'Invalid ID format');
+      .regex(/^[a-f\d]{24}$/i, "Invalid ID format");
     export type ObjectIdString = z.infer<typeof ObjectIdStringSchema>;
 
     // Common ID param for API routes
@@ -476,50 +516,55 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       page: z.coerce.number().int().min(1).default(1),
       limit: z.coerce.number().int().min(1).max(100).default(20),
       sortBy: z.string().optional(),
-      sortOrder: z.enum(['asc', 'desc']).default('desc'),
+      sortOrder: z.enum(["asc", "desc"]).default("desc"),
     });
     export type PaginationInput = z.infer<typeof PaginationSchema>;
 
     // Email validation (reusable) - applies lowercase + trim
     export const EmailSchema = z
       .string()
-      .email('Invalid email address')
+      .email("Invalid email address")
       .toLowerCase()
       .trim();
 
     // Password validation (reusable)
     export const PasswordSchema = z
       .string()
-      .min(8, 'Password must be at least 8 characters')
-      .max(100, 'Password too long');
+      .min(8, "Password must be at least 8 characters")
+      .max(100, "Password too long");
     ```
 
 - [x] **Task 8: Create user validation schemas**
   - File: `WebSite/lib/validation/user.ts` (CREATE)
   - Action: Create login and signup validation schemas
   - Implementation:
+
     ```typescript
-    import { z } from 'zod';
-    import { EmailSchema, PasswordSchema } from './common';
+    import { z } from "zod";
+    import { EmailSchema, PasswordSchema } from "./common";
 
     // Login schema - password just needs to be present (don't enforce rules on login)
     export const LoginSchema = z.object({
       email: EmailSchema,
-      password: z.string().min(1, 'Password is required'),
+      password: z.string().min(1, "Password is required"),
     });
     export type LoginInput = z.infer<typeof LoginSchema>;
 
     // Signup schema - full password validation + confirmation match
     export const SignupSchema = z
       .object({
-        name: z.string().min(2, 'Name must be at least 2 characters').max(100).trim(),
+        name: z
+          .string()
+          .min(2, "Name must be at least 2 characters")
+          .max(100)
+          .trim(),
         email: EmailSchema,
         password: PasswordSchema,
         confirmPassword: z.string(),
       })
       .refine((data) => data.password === data.confirmPassword, {
-        message: 'Passwords do not match',
-        path: ['confirmPassword'],
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
       });
     export type SignupInput = z.infer<typeof SignupSchema>;
 
@@ -535,10 +580,11 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - File: `WebSite/lib/validation/helpers.ts` (CREATE)
   - Action: Create helper to convert ZodError to API response
   - Implementation:
+
     ```typescript
-    import { NextApiResponse } from 'next';
-    import { ZodError } from 'zod';
-    import { ErrorType } from '@/lib/error-handler';
+    import { NextApiResponse } from "next";
+    import { ZodError } from "zod";
+    import { ErrorType } from "@/lib/error-handler";
 
     /**
      * Format Zod errors into a user-friendly structure
@@ -547,7 +593,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       const errors: Record<string, string> = {};
 
       for (const issue of error.issues) {
-        const path = issue.path.join('.');
+        const path = issue.path.join(".");
         // Only keep first error per field
         if (!errors[path]) {
           errors[path] = issue.message;
@@ -571,14 +617,14 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
     export function handleZodError(
       error: ZodError,
       res: NextApiResponse,
-      customMessage?: string
+      customMessage?: string,
     ) {
       const fieldErrors = formatZodErrors(error);
 
       return res.status(400).json({
         success: false,
         error: ErrorType.VALIDATION,
-        message: customMessage || 'Validation failed',
+        message: customMessage || "Validation failed",
         details: fieldErrors,
       });
     }
@@ -595,6 +641,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - File: `WebSite/lib/validation/index.ts` (CREATE)
   - Action: Create barrel export for all schemas, types, and helpers
   - Implementation:
+
     ```typescript
     // Common schemas
     export {
@@ -603,35 +650,19 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
       PaginationSchema,
       EmailSchema,
       PasswordSchema,
-    } from './common';
+    } from "./common";
 
     // Common types
-    export type {
-      ObjectIdString,
-      IdParam,
-      PaginationInput,
-    } from './common';
+    export type { ObjectIdString, IdParam, PaginationInput } from "./common";
 
     // User schemas
-    export {
-      LoginSchema,
-      SignupSchema,
-      UpdateProfileSchema,
-    } from './user';
+    export { LoginSchema, SignupSchema, UpdateProfileSchema } from "./user";
 
     // User types
-    export type {
-      LoginInput,
-      SignupInput,
-      UpdateProfileInput,
-    } from './user';
+    export type { LoginInput, SignupInput, UpdateProfileInput } from "./user";
 
     // Helpers
-    export {
-      formatZodErrors,
-      handleZodError,
-      isZodError,
-    } from './helpers';
+    export { formatZodErrors, handleZodError, isZodError } from "./helpers";
     ```
 
 #### Phase 5: Documentation & Verification
@@ -640,20 +671,31 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
   - File: `_bmad-output/project-context.md` (UPDATE)
   - Action: Find section "## Dual Validation Pattern" (around line 1653) and add concrete examples
   - Changes to add after existing content:
-    ```markdown
+
+    ````markdown
     ### Concrete Implementation Examples (Story 1.3)
 
     **Import Pattern:**
+
     ```typescript
-    import { LoginSchema, type LoginInput, handleZodError } from '@/lib/validation';
+    import {
+      LoginSchema,
+      type LoginInput,
+      handleZodError,
+    } from "@/lib/validation";
     ```
+    ````
 
     **API Route Pattern (safeParse):**
-    ```typescript
-    import { LoginSchema, handleZodError } from '@/lib/validation';
-    import { handleApiError } from '@/lib/error-handler';
 
-    export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    ```typescript
+    import { LoginSchema, handleZodError } from "@/lib/validation";
+    import { handleApiError } from "@/lib/error-handler";
+
+    export default async function handler(
+      req: NextApiRequest,
+      res: NextApiResponse,
+    ) {
       try {
         // 1. Sanitize input
         req.body = sanitizeInput(req.body);
@@ -670,28 +712,33 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
         // 4. Mongoose handles DB-level validation
         const user = await User.findOne({ email });
         // ... rest of logic
-
       } catch (error) {
         return handleApiError(error, res);
       }
     }
     ```
+
     ```
+
+    ```
+
   - Notes: If section doesn't exist exactly, create it under "## Data Patterns"
 
-- [x] **Task 12: Add SSR rehydration to _app.tsx**
+- [x] **Task 12: Add SSR rehydration to \_app.tsx**
   - File: `WebSite/pages/_app.tsx` (UPDATE)
   - Action: Add useEffect to rehydrate persisted stores on client
   - Changes to add:
+
     ```typescript
-    import { useEffect } from 'react';
-    import { useUserStore } from '@/stores';
+    import { useEffect } from "react";
+    import { useUserStore } from "@/stores";
 
     // Inside App component:
     useEffect(() => {
       useUserStore.persist.rehydrate();
     }, []);
     ```
+
   - Notes: This prevents SSR hydration mismatch with localStorage
 
 - [x] **Task 13: Verify build passes**
@@ -705,7 +752,7 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
 ### Zustand Stores
 
 - [ ] **AC1**: Given Zustand is installed, when I import `useUserStore` from `@/stores`, then the store is available with `theme`, `userProfile`, and `subscriptionTier` state
-- [ ] **AC2**: Given the app loads on client, when `persist.rehydrate()` is called in _app.tsx, then `theme` preference loads from localStorage without hydration mismatch
+- [ ] **AC2**: Given the app loads on client, when `persist.rehydrate()` is called in \_app.tsx, then `theme` preference loads from localStorage without hydration mismatch
 - [ ] **AC3**: Given I use `useAuditStore`, when I call `setCurrentAudit(audit)`, then `currentAudit` state updates and components re-render
 - [ ] **AC4**: Given I use `useDashboardStore`, when I call `toggleSidebar()`, then `isSidebarCollapsed` toggles between true/false
 - [ ] **AC5**: Given all stores exist, when I import from `@/stores`, then all stores, types, and `resetAllStores()` are available
@@ -738,14 +785,17 @@ AISEO needs a state management foundation (Zustand) and API validation layer (Zo
 ### Dependencies
 
 **To Install:**
+
 ```bash
 cd WebSite && npm install zustand
 ```
 
 **Already Installed:**
+
 - zod@3.22.2
 
 **No External Dependencies:**
+
 - Stores don't call APIs directly (that's component responsibility)
 - Schemas are pure validation (no database calls)
 
@@ -771,6 +821,7 @@ cd WebSite && npm install zustand
    - Test `handleZodError()` returns correct response format
 
 **Future Testing (After Story 1.5):**
+
 - Unit tests for store actions
 - Unit tests for schema validation edge cases
 - Integration tests for persist middleware + SSR
@@ -778,6 +829,7 @@ cd WebSite && npm install zustand
 ### Notes
 
 **Findings Addressed from Adversarial Review:**
+
 1. F1: Added `skipHydration: true` + rehydrate pattern for SSR safety
 2. F2: Created `types/audit.ts` with placeholder Audit interface
 3. F3: Created `lib/validation/helpers.ts` with `handleZodError()` bridge
@@ -792,10 +844,12 @@ cd WebSite && npm install zustand
 12. F12: Added devtools middleware to all stores
 
 **Known Limitations:**
+
 - Validation error messages are English-only (i18n deferred)
 - Audit type is placeholder - full implementation in Epic 4
 
 **Future Considerations (Out of Scope):**
+
 - Migrate LanguageContext to Zustand (not recommended - works fine)
 - i18n for Zod error messages (add in future when needed)
 - Expand validation schemas for all API endpoints (tracked as future task)
@@ -806,6 +860,7 @@ cd WebSite && npm install zustand
 **Priority:** Medium
 **Epic:** 2-4 (as API routes are built)
 **Description:** Add validation schemas for all API endpoints:
+
 - CreateBusinessSchema, UpdateBusinessSchema
 - CreateAuditSchema, UpdateAuditStatusSchema
 - SubscriptionSchema, WebhookPayloadSchemas
@@ -821,6 +876,7 @@ cd WebSite && npm install zustand
 **Resolution Approach:** Auto-fix
 
 ### Fixes Applied:
+
 - F1: Restructured stores/index.ts to avoid duplicate imports
 - F2: Added JSDoc comments to all store interfaces and types
 - F3: Enhanced PasswordSchema with uppercase, lowercase, digit requirements
@@ -832,4 +888,5 @@ cd WebSite && npm install zustand
 - F10: Documented UpdateProfileSchema PATCH semantics
 
 ### Skipped:
+
 - F7 (noise): Zustand 5.x installed instead of 4.x - backwards compatible, no action needed

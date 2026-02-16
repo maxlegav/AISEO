@@ -1,1 +1,1 @@
-# AISEO Scraping Service - Utils Package
+# ShowYourBrand Scraping Service - Utils Package

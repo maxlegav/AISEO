@@ -1,8 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import mongoose from 'mongoose';
-import User from '@/models/User';
-import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
-import { UsernameSchema } from '@/lib/validation/business';
+import type { NextApiRequest, NextApiResponse } from "next";
+import mongoose from "mongoose";
+import User from "@/models/User";
+import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
+import { UsernameSchema } from "@/lib/validation/business";
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -10,36 +10,63 @@ const connectDB = async () => {
 };
 
 const RESERVED_USERNAMES = [
-  'admin', 'api', 'auth', 'dashboard', 'settings', 'login', 'signup',
-  'logout', 'projects', 'checkout', 'webhook', 'cron', 'static',
-  'public', 'assets', 'images', 'css', 'js', 'fonts',
-  'username-setup', 'forgot-password', 'reset-password',
-  'subscription-plans', 'aiseo', 'support', 'help',
+  "admin",
+  "api",
+  "auth",
+  "dashboard",
+  "settings",
+  "login",
+  "signup",
+  "logout",
+  "projects",
+  "checkout",
+  "webhook",
+  "cron",
+  "static",
+  "public",
+  "assets",
+  "images",
+  "css",
+  "js",
+  "fonts",
+  "username-setup",
+  "forgot-password",
+  "reset-password",
+  "subscription-plans",
+  "ShowYourBrand",
+  "support",
+  "help",
 ];
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  if (req.method !== 'GET') {
+  if (req.method !== "GET") {
     return res.status(405).json({
       success: false,
-      error: 'METHOD_NOT_ALLOWED',
-      message: 'Only GET method is allowed',
+      error: "METHOD_NOT_ALLOWED",
+      message: "Only GET method is allowed",
     });
   }
 
   try {
     const raw = req.query.username;
-    if (!raw || typeof raw !== 'string') {
-      throw new ApiError(ErrorType.VALIDATION, 'Username query parameter is required');
+    if (!raw || typeof raw !== "string") {
+      throw new ApiError(
+        ErrorType.VALIDATION,
+        "Username query parameter is required",
+      );
     }
 
     const parsed = UsernameSchema.safeParse(raw);
     if (!parsed.success) {
       return res.status(200).json({
         success: true,
-        data: { available: false, reason: parsed.error.issues[0]?.message || 'Invalid username' },
+        data: {
+          available: false,
+          reason: parsed.error.issues[0]?.message || "Invalid username",
+        },
       });
     }
 
@@ -48,7 +75,7 @@ export default async function handler(
     if (RESERVED_USERNAMES.includes(username)) {
       return res.status(200).json({
         success: true,
-        data: { available: false, reason: 'This username is not available' },
+        data: { available: false, reason: "This username is not available" },
       });
     }
 

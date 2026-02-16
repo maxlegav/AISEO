@@ -5,6 +5,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import ProjectList from "@/components/projects/ProjectList";
 import { useLanguage } from "@/components/LanguageContext";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   FolderKanban,
   FileText,
@@ -14,6 +15,7 @@ import {
   Clock,
   CheckCircle2,
   Loader2,
+  User,
 } from "lucide-react";
 
 interface Business {
@@ -86,13 +88,100 @@ function StatusBadge({ status }: { status: "completed" | "processing" | "pending
   );
 }
 
+// Display Name Popup Component
+function DisplayNameModal({
+  onSave,
+}: {
+  onSave: (name: string) => void;
+}) {
+  const { t } = useLanguage();
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/user/set-display-name", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName: name.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        onSave(data.data.displayName);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <div className="p-8">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-orange-600" />
+            </div>
+            <h3 className="text-2xl font-serif font-medium text-gray-900 mb-2">
+              {String(t("displayName.title"))}
+            </h3>
+            <p className="text-gray-500 text-sm">
+              {String(t("displayName.subtitle"))}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <label
+              htmlFor="displayName"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              {String(t("displayName.label"))}
+            </label>
+            <input
+              id="displayName"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={String(t("displayName.placeholder"))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-gray-900 mb-6"
+              maxLength={50}
+              autoFocus
+            />
+            <Button
+              type="submit"
+              disabled={!name.trim() || submitting}
+              className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white h-12 text-base rounded-xl disabled:opacity-50"
+            >
+              {submitting ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                String(t("displayName.confirm"))
+              )}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function UserProfilePage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const { username } = router.query;
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDisplayNameModal, setShowDisplayNameModal] = useState(false);
+  const [localDisplayName, setLocalDisplayName] = useState<string | null>(null);
+  const [hasClosedModal, setHasClosedModal] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -101,7 +190,7 @@ export default function UserProfilePage() {
     }
 
     if (status === "authenticated" && !session?.user?.username) {
-      router.push("/username-setup");
+      router.push("/dashboard");
       return;
     }
 
@@ -115,6 +204,19 @@ export default function UserProfilePage() {
       return;
     }
   }, [status, session, username, router]);
+
+  // Show display name popup if not set (only once, never re-open after close)
+  useEffect(() => {
+    if (
+      status === "authenticated" &&
+      session?.user &&
+      !session.user.displayName &&
+      !localDisplayName &&
+      !hasClosedModal
+    ) {
+      setShowDisplayNameModal(true);
+    }
+  }, [status, session, localDisplayName, hasClosedModal]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -184,12 +286,26 @@ export default function UserProfilePage() {
     },
   ];
 
+  const displayName = localDisplayName || session?.user?.displayName || session?.user?.name?.split(" ")[0];
+
   return (
     <DashboardLayout activeMenu="dashboard">
+      {/* Display Name Popup */}
+      {showDisplayNameModal && (
+        <DisplayNameModal
+          onSave={async (name) => {
+            setLocalDisplayName(name);
+            setHasClosedModal(true);
+            setShowDisplayNameModal(false);
+            await update();
+          }}
+        />
+      )}
+
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-serif font-medium text-gray-900 mb-2">
-          {String(t("dashboard.welcome"))}, {session?.user?.name?.split(" ")[0]}
+          {String(t("dashboard.welcome"))}, {displayName}
         </h1>
         <p className="text-gray-500">
           {String(t("dashboard.projectsSubtitle"))}

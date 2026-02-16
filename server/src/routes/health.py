@@ -1,5 +1,5 @@
 """
-Health check endpoint for AISEO scraping service.
+Health check endpoint for ShowYourBrand scraping service.
 
 Used by Docker healthcheck and container orchestration
 to verify service availability.
@@ -22,6 +22,6 @@ async def health_check() -> dict:
         "success": True,
         "data": {
             "status": "healthy",
-            "service": "aiseo-scraper",
+            "service": "ShowYourBrand-scraper",
         },
     }

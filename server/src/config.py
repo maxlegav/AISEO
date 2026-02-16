@@ -1,5 +1,5 @@
 """
-AISEO Server Configuration — MongoDB connection, environment validation, constants.
+ShowYourBrand Server Configuration — MongoDB connection, environment validation, constants.
 
 Single global Motor client instance, reused across all requests.
 """

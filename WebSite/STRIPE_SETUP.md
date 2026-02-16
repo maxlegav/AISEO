@@ -1,6 +1,7 @@
 # Configuration Stripe pour le développement
 
 ## Problème
+
 Les clés Stripe actuelles dans `.env.local` sont invalides (valeurs "CHANGE_ME"). Le checkout échoue à cause de cela.
 
 ## Solution
@@ -24,25 +25,25 @@ Les clés Stripe actuelles dans `.env.local` sont invalides (valeurs "CHANGE_ME"
 2. Créez les produits suivants (prix en euros) :
 
    **Basic Plan:**
-   - Nom : "AISEO Basic Plan"
+   - Nom : "ShowYourBrand Basic Plan"
    - Prix : €50.00 / mois
    - Récurrent : Mensuel
    - Copiez le **Price ID** (commence par `price_...`)
 
    **Pro Plan:**
-   - Nom : "AISEO Pro Plan"
+   - Nom : "ShowYourBrand Pro Plan"
    - Prix : €150.00 / mois
    - Récurrent : Mensuel
    - Copiez le **Price ID** (commence par `price_...`)
 
    **Premium Plan:**
-   - Nom : "AISEO Premium Plan"
+   - Nom : "ShowYourBrand Premium Plan"
    - Prix : €300.00 / mois
    - Récurrent : Mensuel
    - Copiez le **Price ID** (commence par `price_...`)
 
    **One-Shot Audit:**
-   - Nom : "AISEO One-Shot Audit"
+   - Nom : "ShowYourBrand One-Shot Audit"
    - Prix : €299.00
    - One-time payment (pas de récurrence)
    - Copiez le **Price ID** (commence par `price_...`)
@@ -86,22 +87,26 @@ npm run dev
 Stripe fournit des cartes de test pour simuler différents scénarios :
 
 ### Succès
+
 - **Numéro** : `4242 4242 4242 4242`
 - **Date d'expiration** : N'importe quelle date future (ex: `12/25`)
 - **CVC** : N'importe quel 3 chiffres (ex: `123`)
 - **Code postal** : N'importe quel code postal valide
 
 ### Paiement refusé
+
 - **Numéro** : `4000 0000 0000 0002`
 - **Date d'expiration** : N'importe quelle date future
 - **CVC** : N'importe quel 3 chiffres
 
 ### Authentification 3D Secure requise
+
 - **Numéro** : `4000 0027 6000 3184`
 - **Date d'expiration** : N'importe quelle date future
 - **CVC** : N'importe quel 3 chiffres
 
 ### Carte insuffisamment approvisionnée
+
 - **Numéro** : `4000 0000 0000 9995`
 - **Date d'expiration** : N'importe quelle date future
 - **CVC** : N'importe quel 3 chiffres
@@ -130,21 +135,25 @@ node scripts/verify-subscription.js votre-email@example.com
 ## Troubleshooting
 
 ### "Invalid API Key provided"
+
 - Vérifiez que vous avez bien copié la clé complète (commence par `sk_test_` ou `pk_test_`)
 - Vérifiez qu'il n'y a pas d'espaces avant/après la clé
 - Assurez-vous d'être en mode Test dans Stripe
 
 ### "No such price"
+
 - Vérifiez que les Price IDs correspondent bien à ceux dans votre dashboard Stripe
 - Assurez-vous que les produits sont actifs (non archivés)
 - Vérifiez que vous utilisez les Price IDs (commence par `price_`) et non les Product IDs (commence par `prod_`)
 
 ### Le webhook ne fonctionne pas
+
 - Assurez-vous que Stripe CLI est lancé (`stripe listen --forward-to localhost:3000/api/webhook/stripe`)
 - Vérifiez que le webhook secret est correct dans `.env.local`
 - Redémarrez le serveur Next.js après avoir modifié `.env.local`
 
 ### Le checkout échoue avec "Customer email not provided"
+
 - C'est normal en développement si l'email n'est pas configuré
 - Le checkout devrait quand même fonctionner
 

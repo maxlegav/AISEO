@@ -1,4 +1,4 @@
-# AISEO Scraping Service — API Server
+# ShowYourBrand Scraping Service — API Server
 
 FastAPI-based processing service for website scraping, AI analysis (GEO audits), and HTML scanning. Runs inside Docker with Chromium, vnu.jar (W3C validator), and Lychee (link checker).
 
@@ -33,18 +33,18 @@ CORS_ORIGINS="http://localhost:3000"
 
 ### Required variables
 
-| Variable | Description |
-|---|---|
-| `OPENAI_API_KEY` | OpenAI API key |
-| `ANTHROPIC_API_KEY` | Anthropic (Claude) API key |
-| `GEMINI_API_KEY` | Google Gemini API key |
-| `PERPLEXITY_API_KEY` | Perplexity API key |
-| `MONGODB_URI` | MongoDB connection string (database: `ShowYourBrand`) |
+| Variable                     | Description                                             |
+| ---------------------------- | ------------------------------------------------------- |
+| `OPENAI_API_KEY`             | OpenAI API key                                          |
+| `ANTHROPIC_API_KEY`          | Anthropic (Claude) API key                              |
+| `GEMINI_API_KEY`             | Google Gemini API key                                   |
+| `PERPLEXITY_API_KEY`         | Perplexity API key                                      |
+| `MONGODB_URI`                | MongoDB connection string (database: `ShowYourBrand`)   |
 | `PROCESSING_SERVICE_API_KEY` | Shared secret used as Bearer token for all API requests |
 
 ## Running with Docker Compose (recommended)
 
-From the **repo root** (`AISEO/`):
+From the **repo root** (`ShowYourBrand/`):
 
 ```bash
 # Build and start the service
@@ -63,6 +63,7 @@ docker compose down
 The API will be available at **http://localhost:8080**.
 
 Docker Compose provides:
+
 - Hot reload (source files mounted as volume)
 - 4 GB memory / 2 CPU limit
 - Health check every 30s
@@ -74,14 +75,14 @@ Docker Compose provides:
 cd server
 
 # Build the image
-docker build -t aiseo-scraper .
+docker build -t ShowYourBrand-scraper .
 
 # Run the container
 docker run -d \
-  --name aiseo-scraper \
+  --name ShowYourBrand-scraper \
   -p 8080:8080 \
   --env-file .env \
-  aiseo-scraper
+  ShowYourBrand-scraper
 ```
 
 ## Running locally (without Docker)
@@ -107,6 +108,7 @@ uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
 You will also need to manually install and configure:
+
 - **vnu.jar** — [W3C Nu HTML Checker](https://github.com/validator/validator)
 - **Chromium** + **ChromeDriver** — set `CHROME_BIN` and `CHROMEDRIVER_PATH` env vars
 - **Lychee** — [link checker](https://github.com/lycheeverse/lychee)
@@ -206,18 +208,22 @@ server/
 ## Troubleshooting
 
 **Container won't start / health check fails:**
+
 - Check logs: `docker compose logs scraper`
 - Verify all required env vars are set in `.env`
 - Ensure MongoDB URI is reachable from the container
 
 **Audit takes too long or times out:**
+
 - Default timeout is 10 minutes (`AUDIT_TIMEOUT_SECONDS=600`)
 - Ensure the container has enough memory (4 GB recommended)
 
 **Chromium errors:**
+
 - The Docker image includes Chromium. If running locally, install it and set `CHROME_BIN`/`CHROMEDRIVER_PATH`
 
 **MongoDB connection refused:**
+
 - If using Atlas, make sure your IP is whitelisted
 - Check the connection string format in `MONGODB_URI`
 

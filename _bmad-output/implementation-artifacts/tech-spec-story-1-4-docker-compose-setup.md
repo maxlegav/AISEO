@@ -1,8 +1,8 @@
 ---
-title: 'Configure Docker Compose for Local Scraping Service'
-slug: 'story-1-4-docker-compose-setup'
-created: '2026-01-29'
-status: 'ready-for-dev'
+title: "Configure Docker Compose for Local Scraping Service"
+slug: "story-1-4-docker-compose-setup"
+created: "2026-01-29"
+status: "ready-for-dev"
 stepsCompleted: [1, 2, 3, 4]
 tech_stack:
   - python@3.11
@@ -47,11 +47,12 @@ test_patterns:
 
 ### Problem Statement
 
-The AISEO scraping service needs containerization for local development. Currently it's just a Python script (`server/src/app.py`) with no REST API, no Docker setup, and no authentication. Developers cannot run the service in a consistent, isolated environment.
+The ShowYourBrand scraping service needs containerization for local development. Currently it's just a Python script (`server/src/app.py`) with no REST API, no Docker setup, and no authentication. Developers cannot run the service in a consistent, isolated environment.
 
 ### Solution
 
 Create a Docker Compose configuration with:
+
 - FastAPI REST server with Bearer token authentication
 - Selenium + Chrome/Chromium for website HTML scraping
 - AI API wrappers for prompt testing (existing code)
@@ -61,6 +62,7 @@ Create a Docker Compose configuration with:
 ### Scope
 
 **In Scope:**
+
 - `docker-compose.yml` with Python + Selenium + Chrome container
 - `server/Dockerfile` for the scraping service
 - Convert `server/src/app.py` to FastAPI with basic endpoints (`/health`, `/audit`)
@@ -71,6 +73,7 @@ Create a Docker Compose configuration with:
 - Update `server/.env.example` with all required variables
 
 **Out of Scope:**
+
 - Full audit processing logic (Epic 4 - Audit Engine)
 - AWS Lambda/ECS deployment configuration
 - Integration with Next.js API routes (Story 4.x)
@@ -82,6 +85,7 @@ Create a Docker Compose configuration with:
 ### Codebase Patterns
 
 **Existing Code Structure:**
+
 ```
 server/
 ├── src/
@@ -97,11 +101,13 @@ server/
 ```
 
 **AI API Wrapper Pattern** (`ai_api_wrapper.py`):
+
 - Standardized response: `{ success: bool, response: str, conversation_history: list, metadata: dict, error: str|None }`
 - 6 providers: OpenAI, Anthropic, Google Gemini, Perplexity, DeepSeek, xAI
 - Uses `openai` SDK for OpenAI-compatible APIs
 
 **Bearer Token Auth Pattern** (from project-context.md):
+
 ```python
 # Validate Bearer token on every request
 auth_header = request.headers.get("Authorization")
@@ -114,6 +120,7 @@ if token != os.getenv("PROCESSING_SERVICE_API_KEY"):
 ```
 
 **Standardized API Response Format:**
+
 ```python
 # Success
 {"success": True, "data": {...}}
@@ -124,12 +131,12 @@ if token != os.getenv("PROCESSING_SERVICE_API_KEY"):
 
 ### Files to Reference
 
-| File | Purpose |
-| ---- | ------- |
+| File                                    | Purpose                                        |
+| --------------------------------------- | ---------------------------------------------- |
 | server/src/utils/dbal/ai_api_wrapper.py | AI API wrappers - keep as-is, import in routes |
-| server/.env.example | Current env template - needs expansion |
-| _bmad-output/project-context.md | Bearer auth pattern, service communication |
-| WebSite/.env.local (if exists) | Reference for PROCESSING_SERVICE_API_KEY |
+| server/.env.example                     | Current env template - needs expansion         |
+| \_bmad-output/project-context.md        | Bearer auth pattern, service communication     |
+| WebSite/.env.local (if exists)          | Reference for PROCESSING_SERVICE_API_KEY       |
 
 ### Technical Decisions
 
@@ -164,14 +171,14 @@ if token != os.getenv("PROCESSING_SERVICE_API_KEY"):
   - Action: Implement `verify_bearer_token` dependency using `PROCESSING_SERVICE_API_KEY`
   - Notes: Return 401 for missing auth, 403 for invalid token. Use standardized error response format.
 
-- [x] Task 4: Create Python package __init__.py files
+- [x] Task 4: Create Python package **init**.py files
   - Files: `server/src/routes/__init__.py`, `server/src/utils/__init__.py`, `server/src/utils/dbal/__init__.py`
   - Action: Create empty `__init__.py` files for all packages
   - Notes: Required for Python package imports when running in Docker
 
 - [x] Task 5: Create health check endpoint
   - File: `server/src/routes/health.py`
-  - Action: Create `GET /health` endpoint returning `{ success: true, data: { status: "healthy", service: "aiseo-scraper" } }`
+  - Action: Create `GET /health` endpoint returning `{ success: true, data: { status: "healthy", service: "ShowYourBrand-scraper" } }`
   - Notes: Requires valid Bearer token, use `verify_bearer_token` dependency
 
 - [x] Task 6: Create audit placeholder endpoint
@@ -224,7 +231,7 @@ if token != os.getenv("PROCESSING_SERVICE_API_KEY"):
 
 **Given** the container is running
 **When** I call `GET /health` with valid Bearer token
-**Then** I receive `{ "success": true, "data": { "status": "healthy", "service": "aiseo-scraper" } }`
+**Then** I receive `{ "success": true, "data": { "status": "healthy", "service": "ShowYourBrand-scraper" } }`
 
 **Given** I call any endpoint without Bearer token
 **When** the request is processed
@@ -243,6 +250,7 @@ if token != os.getenv("PROCESSING_SERVICE_API_KEY"):
 ### Dependencies
 
 **Python packages (requirements.txt):**
+
 ```
 fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
@@ -256,6 +264,7 @@ httpx>=0.25.0
 ```
 
 **Docker:**
+
 - Base image: `python:3.11-slim`
 - Chromium + ChromeDriver installed via apt (system packages)
 - System libraries for headless Chrome: libnss3, libxss1, libasound2, etc.
@@ -265,23 +274,27 @@ httpx>=0.25.0
 **Manual Testing (no test framework in this story):**
 
 **Setup:** Set `PROCESSING_SERVICE_API_KEY` in `server/.env` before testing:
+
 ```bash
 echo "PROCESSING_SERVICE_API_KEY=test-key-for-local-dev" >> server/.env
 ```
 
 1. **Container startup:**
+
    ```bash
    docker-compose up --build
    # Verify: Container starts, no errors, port 8080 exposed, healthcheck passes
    ```
 
 2. **Health check:**
+
    ```bash
    curl -H "Authorization: Bearer test-key-for-local-dev" http://localhost:8080/health
-   # Verify: Returns { "success": true, "data": { "status": "healthy", "service": "aiseo-scraper" } }
+   # Verify: Returns { "success": true, "data": { "status": "healthy", "service": "ShowYourBrand-scraper" } }
    ```
 
 3. **Auth rejection:**
+
    ```bash
    curl http://localhost:8080/health
    # Verify: Returns 401 with { "success": false, "error": "UNAUTHORIZED", ... }
@@ -305,16 +318,19 @@ echo "PROCESSING_SERVICE_API_KEY=test-key-for-local-dev" >> server/.env
 - PROCESSING_SERVICE_API_KEY is required, others optional until Epic 4
 
 **Pre-mortem Risks:**
+
 1. **Chromium/Selenium compatibility**: Using apt-installed chromium ensures version consistency. Rebuild Docker image if Selenium updates require newer Chrome.
 2. **Memory usage**: Headless Chrome can consume significant memory. Container has 2GB limit configured; monitor for OOM errors.
 3. **macOS Docker networking**: If port 8080 is in use, check for conflicting services with `lsof -i :8080`.
 
 **Security Notes:**
+
 - Volume mounts (`./server/src:/app/src`) are for development only - DO NOT use in production
 - `/docs` endpoint exposes API structure without auth - disable in production via `docs_url=None` in FastAPI constructor
 - Container runs as non-root user for defense in depth
 
 **Future Considerations (Out of Scope):**
+
 - Health check could include Selenium/Chrome readiness check (not needed for MVP)
 - Structured logging with JSON format (nice-to-have for production)
 - Graceful shutdown handling for in-flight requests

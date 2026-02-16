@@ -1,20 +1,20 @@
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 inputDocuments:
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/product-brief-AISEO-2026-01-13.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/prd.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/project-context.md'
-  - 'Design inspiration: Dreelio, Almond, Base44'
-project_name: 'AISEO'
-user_name: 'Maxlemoinegavoille'
-date: '2026-01-19'
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/product-brief-ShowYourBrand-2026-01-13.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/prd.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/project-context.md"
+  - "Design inspiration: Dreelio, Almond, Base44"
+project_name: "ShowYourBrand"
+user_name: "Maxlemoinegavoille"
+date: "2026-01-19"
 designInspirationSources:
-  - 'Dreelio (https://dreelio.framer.website/) - Clean minimalism, soft backgrounds, generous spacing'
-  - 'Almond (https://almond.framer.website/) - Bright professional, refined typography, restrained color'
-  - 'Base44 (base44.com) - Modern minimalist professional aesthetic'
+  - "Dreelio (https://dreelio.framer.website/) - Clean minimalism, soft backgrounds, generous spacing"
+  - "Almond (https://almond.framer.website/) - Bright professional, refined typography, restrained color"
+  - "Base44 (base44.com) - Modern minimalist professional aesthetic"
 ---
 
-# UX Design Specification - AISEO
+# UX Design Specification - ShowYourBrand
 
 **Author:** Maxlemoinegavoille
 **Date:** 2026-01-19
@@ -25,11 +25,12 @@ designInspirationSources:
 
 ### Project Vision
 
-AISEO is a first-mover GEO (Generative Engine Optimization) audit platform addressing a critical emerging problem: businesses are becoming invisible in the AI search era. While companies rank well on Google, they don't appear in ChatGPT, Claude, or Perplexity recommendations - effectively becoming invisible to a growing segment of search traffic.
+ShowYourBrand is a first-mover GEO (Generative Engine Optimization) audit platform addressing a critical emerging problem: businesses are becoming invisible in the AI search era. While companies rank well on Google, they don't appear in ChatGPT, Claude, or Perplexity recommendations - effectively becoming invisible to a growing segment of search traffic.
 
 The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Claude, Perplexity, DeepSeek), identifies visibility gaps, and provides actionable, copy-paste ready recommendations to optimize for AI discovery.
 
 **Key Differentiators from UX Perspective:**
+
 - First comprehensive GEO audit tool (category creation opportunity)
 - Dual-level design: Non-technical visual dashboard + technical implementation guide
 - Immediate actionability: Copy-paste code snippets vs vague advice
@@ -43,6 +44,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Primary Personas:**
 
 **1. Sophie - Agency Director (Primary Distribution Channel)**
+
 - 38 years old, runs 12-person marketing agency
 - Tech comfort: Medium (understands SEO concepts, delegates technical implementation)
 - **Context of use:** Presenting reports to clients, selling GEO services
@@ -51,6 +53,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 - **UX needs:** Professional presentation-ready UI, clear non-technical explanations, competitive comparison charts
 
 **2. Marc - Business Owner (Secondary Direct User)**
+
 - 52 years old, owns 3 organic restaurants in Paris
 - Tech comfort: Low (can use basic tools, needs simple interfaces)
 - **Context of use:** Understanding why he's invisible despite good Google ranking
@@ -59,6 +62,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 - **UX needs:** Visual dashboard with color-coded scores, plain language, before/after tracking
 
 **3. Julien - Freelance SEO Consultant (Power User)**
+
 - 29 years old, independent SEO consultant
 - Tech comfort: High (technical SEO expert)
 - **Context of use:** Pitching to prospects, differentiating from low-cost competition
@@ -67,14 +71,16 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 - **UX needs:** Shareable reports, competitive data for sales pitches, LinkedIn-worthy visualizations
 
 **4. Emma - Full-Stack Developer (Technical Implementer)**
+
 - 26 years old, freelance full-stack developer
 - Tech comfort: Very high (technical implementer)
 - **Context of use:** Implementing GEO recommendations for clients
 - **Pain point:** Receives vague requests like "make us rank in ChatGPT"
-- **Success moment:** Receives AISEO report with exact code snippets, implements in 2 hours instead of 2 weeks research
+- **Success moment:** Receives ShowYourBrand report with exact code snippets, implements in 2 hours instead of 2 weeks research
 - **UX needs:** Technical precision, copy-paste ready code, exact file locations, prioritized tasks
 
 **Device Context:**
+
 - Primary: Desktop/laptop (dashboard work, report presentation)
 - Secondary: Tablet (client presentations on-the-go)
 - Minimal mobile usage (complex dashboards don't translate well to mobile)
@@ -86,6 +92,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Problem:** Same report must serve both non-technical business owners (Sophie, Marc) and technical implementers (Emma).
 
 **UX Strategy:**
+
 - Implement **two-view architecture**: Executive Summary (visual, plain-language, "why it matters") + Technical Details (code snippets, file locations, implementation steps)
 - Use progressive disclosure: Start with high-level dashboard, allow drill-down to technical depth
 - Clear visual separation: Executive section uses infographics/charts, Technical section uses code blocks/terminal-style
@@ -96,6 +103,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Problem:** AI invisibility is abstract - users can't "see" the problem like they can see Google rankings.
 
 **UX Strategy:**
+
 - **Prompt Gap Analysis visualization**: Show "18/100 prompts mention you" vs "72/100 for competitor" - makes invisible visible
 - Color psychology: Red (invisible/bad) → Orange (partial) → Green (visible/good)
 - Competitive comparison charts: Side-by-side bars create emotional impact
@@ -107,6 +115,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Problem:** Agencies won't adopt "ugly" tools - UI quality = credibility signal in their eyes.
 
 **UX Strategy:**
+
 - Adopt Dreelio/Almond/Base44 aesthetic: Soft backgrounds, generous spacing, refined typography
 - No compromises on visual polish: Professional from day 1 (not "MVP ugly then improve")
 - Micro-interactions and smooth transitions: Spring animations, hover states
@@ -120,6 +129,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Concept:** User opens dashboard → understands problem in < 10 seconds → feels urgency to act
 
 **Execution:**
+
 - Hero metric: GEO Health Score (0-100%) with color ring (red/orange/green)
 - Immediate comparison: "You: 34% | Competitor Average: 68%" - gap is shocking
 - Top 3 critical issues displayed as cards with red flags
@@ -131,6 +141,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Concept:** Differentiate from competitors by providing immediately usable solutions, not generic advice.
 
 **Execution:**
+
 - Code snippets with syntax highlighting and one-click copy button
 - Exact file locations: "Add to `/pages/about.tsx` line 42"
 - Before/after code diffs: Show what to change
@@ -155,6 +166,7 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 **Concept:** Seamless English/French switching without page reload
 
 **Execution:**
+
 - Language toggle in header (flag icons or EN/FR text)
 - Instant UI update (no page refresh)
 - PDF reports generated in user's preferred language
@@ -169,13 +181,14 @@ The platform systematically tests 100 AI prompts across 4 engines (ChatGPT, Clau
 
 **Primary User Action - The Critical Flow:**
 
-The most critical interaction in AISEO is the **"Insight to Action" flow** that happens in the first 2-3 minutes after opening an audit dashboard:
+The most critical interaction in ShowYourBrand is the **"Insight to Action" flow** that happens in the first 2-3 minutes after opening an audit dashboard:
 
 1. **Open Dashboard** (0-10 seconds): User sees GEO Health Score, competitive gap, and immediate problem understanding
 2. **Understand Problem** (10-60 seconds): User drills into top 3 critical issues with visual explanations
 3. **See Actions** (60-180 seconds): User identifies first actionable step with copy-paste ready code
 
 This flow must be **absolutely perfect** because:
+
 - Sophie (agency director) presents this to clients - must be instantly convincing
 - Marc (business owner) needs to understand without technical help - must be crystal clear
 - Julien (freelancer) uses this to differentiate and sell - must create urgency
@@ -213,6 +226,7 @@ Running a new audit must be **effortless**: Enter URL → Click "Run Audit" → 
 - **Compromise:** Once logged in, user directed to "Use desktop for best experience" message if on mobile
 
 **Platform Priorities:**
+
 1. Desktop/Laptop (1920x1080 and 1440x900 primary viewports)
 2. Tablet landscape (1024x768 and iPad Pro)
 3. Mobile (landing page only, 375x667 iPhone SE baseline)
@@ -222,6 +236,7 @@ Running a new audit must be **effortless**: Enter URL → Click "Run Audit" → 
 These interactions must require **zero cognitive load** - completely natural and seamless:
 
 **1. Launching New Audit (Simplest Possible)**
+
 - Single input field: "Enter website URL"
 - Smart URL validation: Auto-adds https://, detects format errors
 - One button: "Run GEO Audit"
@@ -230,12 +245,14 @@ These interactions must require **zero cognitive load** - completely natural and
 - **Inspiration:** Google Search simplicity (1 input, 1 button)
 
 **2. Downloading PDF Report (1-Click)**
+
 - Prominent "Download Report" button on dashboard
 - Instant download (pre-generated PDF, no wait time)
-- Filename auto-formatted: `AISEO_Report_{BusinessName}_{Date}.pdf`
+- Filename auto-formatted: `ShowYourBrand_Report_{BusinessName}_{Date}.pdf`
 - **Inspiration:** Stripe receipt downloads
 
 **3. Copying Code Snippets (Hover + Click)**
+
 - Syntax-highlighted code blocks
 - Hover reveals "Copy" button with clipboard icon
 - Click copies to clipboard with visual confirmation ("Copied!")
@@ -243,6 +260,7 @@ These interactions must require **zero cognitive load** - completely natural and
 - **Inspiration:** GitHub code blocks, Vercel documentation
 
 **4. Comparing with Competitors (Automatic)**
+
 - User enters competitor URL during audit setup (optional, up to 5 URLs)
 - System automatically fetches competitor GEO scores
 - Side-by-side bar chart visualization appears in dashboard
@@ -250,6 +268,7 @@ These interactions must require **zero cognitive load** - completely natural and
 - **Inspiration:** Sports stats comparisons, stock charts
 
 **5. Switching Language EN/FR (Instant)**
+
 - Toggle in header: Flag icons or "EN | FR" text
 - Click switches entire UI instantly (no page reload)
 - Preference saved to user account
@@ -257,6 +276,7 @@ These interactions must require **zero cognitive load** - completely natural and
 - **Inspiration:** Stripe language switcher, Linear i18n
 
 **6. Tracking Improvement (Automatic Timeline)**
+
 - Audit history shown as timeline on dashboard
 - Before/after score comparison with trend arrows (↑ +15% green, ↓ -5% red)
 - Click any past audit to see full historical dashboard
@@ -269,6 +289,7 @@ These interactions must require **zero cognitive load** - completely natural and
 **Context:** User has just received email "Your GEO Audit is Ready" and clicks to view dashboard.
 
 **What Happens:**
+
 - Dashboard loads with hero metric: **GEO Health Score 34%** in red circular progress ring
 - Immediate comparison below: **"You: 34% | Competitor Average: 68%"** with gap visualization
 - Visual prompt gap: **"You appear in 18/100 AI searches"** with 18 filled circles, 82 empty circles
@@ -276,11 +297,13 @@ These interactions must require **zero cognitive load** - completely natural and
 **Emotional Response:** "Oh merde, je suis vraiment invisible!" (shock, urgency, understanding)
 
 **Why Critical:**
+
 - If this moment fails (confusing, unclear, slow), user bounces
 - Sophie needs this to be presentation-ready - client must "get it" instantly
 - Marc needs to understand problem without technical explanation
 
 **Design Requirements:**
+
 - Load in < 2 seconds (no spinner on empty state)
 - Color psychology: Red = bad, Orange = medium, Green = good
 - Big numbers with visual comparison (not just text)
@@ -293,6 +316,7 @@ These interactions must require **zero cognitive load** - completely natural and
 **Context:** User understands the problem, now scrolling to see "What do I do about it?"
 
 **What Happens:**
+
 - Top 3 critical issues displayed as cards with red flag icons
 - Each card shows:
   - **Issue title:** "Missing FAQ Schema - AI can't understand your content"
@@ -307,11 +331,13 @@ These interactions must require **zero cognitive load** - completely natural and
 **Emotional Response:** "Je peux fix ça maintenant!" (empowerment, confidence)
 
 **Why Critical:**
+
 - If recommendations are vague ("improve your SEO"), user is stuck
 - Emma needs exact instructions to implement without 2 weeks of research
 - Sophie needs to explain to client's developer what to do
 
 **Design Requirements:**
+
 - Prioritization crystal clear (🔴 Critical, 🟠 Important, 🟢 Nice-to-have)
 - Code ready to copy-paste (not pseudo-code)
 - Visual separation: Executive view (why) + Technical view (how)
@@ -324,6 +350,7 @@ These interactions must require **zero cognitive load** - completely natural and
 **Context:** User has implemented top 3 recommendations, waiting to see if it actually works.
 
 **What Happens:**
+
 - User re-runs audit (same URL)
 - Dashboard shows before/after comparison:
   - **Old score:** 34% (red)
@@ -335,12 +362,14 @@ These interactions must require **zero cognitive load** - completely natural and
 **Emotional Response:** "Ça marche vraiment! C'est pas du bullshit!" (validation, ROI proof, advocacy)
 
 **Why Critical:**
+
 - If improvements aren't measurable, user churns
 - Marc needs to justify €100-200 audit cost to himself
 - Sophie needs proof to sell more GEO packages to other clients
 - Julien needs case study testimonial for LinkedIn
 
 **Design Requirements:**
+
 - Before/after comparison prominent and visual
 - Show absolute change (+33%) and relative improvement (+36 prompts)
 - Historical timeline to track continuous improvement
@@ -349,34 +378,40 @@ These interactions must require **zero cognitive load** - completely natural and
 
 ### Experience Principles
 
-These principles guide all UX decisions for AISEO:
+These principles guide all UX decisions for ShowYourBrand:
 
 **Principle 1: Instant Comprehension Over Explanation**
+
 - User should understand the problem in < 10 seconds without reading instructions
 - Visual > Text. Charts > Tables. Colors > Words.
 - If it needs explanation, the UX failed
 
 **Principle 2: Actionable Over Diagnostic**
+
 - Every problem shown must have immediate, copy-paste ready solution
 - No vague advice ("improve your content") - only specific instructions
 - Developer can implement without Googling anything
 
 **Principle 3: Evidence Over Claims**
+
 - Show competitive gap, not just score
 - Before/after comparison, not just current state
 - Prompt-by-prompt breakdown, not just aggregate number
 
 **Principle 4: Premium Polish, Not MVP Ugly**
+
 - Agencies won't adopt tools that look unprofessional
 - UI quality = credibility signal for B2B users
 - Dreelio/Almond aesthetic baseline, not "we'll improve UI later"
 
 **Principle 5: Desktop-First, Mobile-Friendly Landing**
+
 - Complex dashboards require screen space - no compromises
 - Mobile users directed to desktop for full experience
 - Only landing/marketing pages need mobile perfection
 
 **Principle 6: Quality Over Speed (Audits)**
+
 - 5-10 minute audit = thorough, valuable analysis
 - Too fast = perceived as superficial
 - Timeout is anti-hang protection, not performance requirement
@@ -389,27 +424,30 @@ These principles guide all UX decisions for AISEO:
 
 **Core Emotional Approach: Professional Clarity + Actionable Confidence**
 
-AISEO's emotional design philosophy is **pragmatic and business-mature**, not sensational or dramatic. The product creates a professional experience focused on clarity and actionability.
+ShowYourBrand's emotional design philosophy is **pragmatic and business-mature**, not sensational or dramatic. The product creates a professional experience focused on clarity and actionability.
 
 **Primary Emotion:** Professional Clarity + Opportunity Recognition
+
 - "Ah ok, voici le problème, voici les 3 actions, c'est clair, je peux agir"
 - NOT: "Oh mon dieu c'est terrible!" (dramatization)
 - BUT: "GEO est important maintenant, vous pouvez être dans la partie si vous faites ça, ça, ça"
 
 **Key Emotional Components:**
+
 1. **Clarity:** Problem presented clearly with evidence (scores, comparisons, data)
 2. **Opportunity:** GEO is becoming critical, you can be visible, here's how
 3. **Confidence:** You have exact actions to take - not overwhelmed, in control
 4. **Validation:** After implementation, confirmation that it works (ROI proof)
 
 **Differentiation from Competitors:**
-Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of data, vague recommendations. AISEO creates **"Actionable Confidence"** - clear problem, specific solutions, immediate implementability.
+Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of data, vague recommendations. ShowYourBrand creates **"Actionable Confidence"** - clear problem, specific solutions, immediate implementability.
 
 ### Emotional Journey Mapping
 
 **Stage 1: Landing Page (Discovery)**
 
 **Desired Emotion:** Awareness + Professional Opportunity
+
 - **Message:** "GEO is becoming critical. You can be visible. Here's how."
 - **NOT:** FOMO panic ("You're in danger! Act now!")
 - **BUT:** Professional opportunity to seize ("Be ahead of the curve")
@@ -418,6 +456,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Stage 2: Dashboard (Analysis)**
 
 **Desired Emotion:** Professional Clarity + Control
+
 - **Message:** "Here are your gaps (clear evidence), here are the solutions (precise actions)"
 - **NOT:** Overwhelm with too much data
 - **BUT:** Clear view of problem + clear path forward
@@ -426,6 +465,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Stage 3: Recommendations (Action Planning)**
 
 **Desired Emotion:** Actionable Confidence
+
 - **Message:** "To fix: do this, this, this (copy-paste code, clear steps)"
 - **NOT:** Confusion about what to do next
 - **BUT:** Confidence "I can implement this right now"
@@ -434,6 +474,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Stage 4: Implementation (Developer Experience)**
 
 **Desired Emotion:** Accomplishment + Efficiency
+
 - **Message:** "Implemented in 2 hours instead of 2 weeks of research"
 - **NOT:** Frustration with vague instructions
 - **BUT:** Satisfaction with clear, copy-paste ready solutions
@@ -442,6 +483,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Stage 5: Proof (3 Months After)**
 
 **Desired Emotion:** Validated Confidence + Advocacy
+
 - **Message:** "It works, score improved, I can recommend this"
 - **NOT:** Excessive surprise (implies initial skepticism)
 - **BUT:** Professional confirmation of ROI
@@ -454,6 +496,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Why Critical:** Agencies must trust tool to present to clients; business owners invest €100-200 based on credibility
 
 **Design Implications:**
+
 - Evidence-based visualizations (competitive comparisons, not just self-assessment)
 - Transparent methodology (show prompt-by-prompt breakdown)
 - Professional polish (Dreelio-level UI = credibility signal)
@@ -466,6 +509,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Why Critical:** Marc (non-technical business owner) must understand without technical help
 
 **Design Implications:**
+
 - Visual > Text (charts, color-coded scores, progress rings)
 - Plain language explanations (Grade 8 reading level)
 - Progressive disclosure (simple view first, technical details on demand)
@@ -478,6 +522,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Why Critical:** Users must feel in control, not drowning in data and recommendations
 
 **Design Implications:**
+
 - Top 3 critical issues prominently displayed
 - Remaining recommendations collapsible ("View all 12 recommendations")
 - Clear prioritization (🔴 Critical, 🟠 Important, 🟢 Nice-to-have)
@@ -490,6 +535,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Why Critical:** Emma (developer) must feel "this is doable" not "this is impossible"
 
 **Design Implications:**
+
 - Copy-paste ready code snippets with syntax highlighting
 - Exact file locations ("/pages/about.tsx line 42")
 - Before/after code diffs showing exactly what changes
@@ -569,31 +615,37 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 ### Emotional Design Principles
 
 **Principle 1: Clarity Trumps Everything**
+
 - If user doesn't understand in 10 seconds, design failed
 - Visual > Text > Explanation
 - Simplify until it can't be simpler, then simplify more
 
 **Principle 2: Show Evidence, Not Claims**
+
 - Don't say "You have problems" - show competitive gap
 - Don't claim "This works" - show before/after improvement
 - Data > Marketing copy
 
 **Principle 3: Actionable Over Impressive**
+
 - Don't show 50 metrics to impress - show 3 critical actions
 - Don't use technical jargon to sound smart - use plain language
 - Users care about "what do I do?" not "how smart is this tool?"
 
 **Principle 4: Professional, Not Sensational**
+
 - Tone: Business consultant, not used car salesman
 - Language: Direct and clear, not hyped and urgent
 - Visuals: Clean and organized, not flashy and overwhelming
 
 **Principle 5: Empower, Don't Overwhelm**
+
 - Give control through clear options, not paralysis through too many choices
 - Prioritize ruthlessly - most important first, rest hidden
 - Progressive disclosure - reveal complexity only when user asks
 
 **Principle 6: Trust Through Transparency**
+
 - Show methodology, don't hide it
 - Admit limitations (e.g., "Competitor data unavailable")
 - No marketing BS - users are professionals, treat them as such
@@ -607,6 +659,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **1. Dreelio (https://dreelio.framer.website/)**
 
 **What they do well:**
+
 - **Premium Visual Polish:** Soft gradient backgrounds (#F8F9FB → #FFFFFF), rounded corners (20-24px), generous white space creates immediate "this is professional" impression
 - **Progressive Disclosure:** Hero section with single clear value proposition, complexity revealed through scroll
 - **Visual Hierarchy:** Large typography for headlines (48-64px), clear size contrast guides eye naturally
@@ -618,6 +671,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **2. Almond (https://almond.framer.website/)**
 
 **What they do well:**
+
 - **Scannable Content:** Short paragraphs (2-3 lines max), bullet points, clear section breaks
 - **Action-Oriented Design:** CTAs use action verbs ("Start building", "See how it works"), not passive labels
 - **Consistent Spacing System:** 64px, 96px, 120px spacing creates rhythm and breathability
@@ -629,6 +683,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **3. Base44 (base44.com)**
 
 **What they do well:**
+
 - **Typography-Driven Design:** Font choices (likely Inter or similar) create modern, readable interface
 - **Grid-Based Layouts:** Strong alignment and consistent column structures feel organized
 - **Whitespace as Design Element:** Not afraid of empty space - lets content breathe
@@ -642,102 +697,118 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 **Navigation Patterns:**
 
 **Pattern 1: Sticky Header with Context**
+
 - **From:** All three sites use persistent navigation
-- **Adapt for AISEO:** Dashboard header shows: Logo + Current Project Name + Audit Status + CTA ("Run New Audit")
+- **Adapt for ShowYourBrand:** Dashboard header shows: Logo + Current Project Name + Audit Status + CTA ("Run New Audit")
 - **Why it works:** User never loses context of where they are or what action to take next
 
 **Pattern 2: Sidebar Navigation for Complex Apps**
+
 - **From:** Base44's structured navigation
-- **Adapt for AISEO:** Left sidebar for dashboard sections (Overview, Recommendations, Competitors, History)
+- **Adapt for ShowYourBrand:** Left sidebar for dashboard sections (Overview, Recommendations, Competitors, History)
 - **Why it works:** Desktop-first design benefits from persistent navigation vs hamburger menus
 
 **Interaction Patterns:**
 
 **Pattern 3: Card-Based Information Architecture**
+
 - **From:** Almond's card system
-- **Adapt for AISEO:** Top 3 critical issues as cards with: Icon + Title + Impact Score + CTA ("Fix This")
+- **Adapt for ShowYourBrand:** Top 3 critical issues as cards with: Icon + Title + Impact Score + CTA ("Fix This")
 - **Why it works:** Cards create visual separation, make content scannable, work across breakpoints
 
 **Pattern 4: Progressive Disclosure with "Show More"**
+
 - **From:** Dreelio's content layering
-- **Adapt for AISEO:** Show 3 critical issues prominently, "View 12 more recommendations" expands full list
+- **Adapt for ShowYourBrand:** Show 3 critical issues prominently, "View 12 more recommendations" expands full list
 - **Why it works:** Prevents overwhelm (Step 4 emotional goal: Control > Overwhelm)
 
 **Pattern 5: One-Click Actions with Immediate Feedback**
+
 - **From:** All three sites have responsive CTAs
-- **Adapt for AISEO:** "Copy Code" button → shows "✓ Copied!" for 2 seconds
+- **Adapt for ShowYourBrand:** "Copy Code" button → shows "✓ Copied!" for 2 seconds
 - **Why it works:** Confirmation reduces anxiety, feels polished
 
 **Visual Patterns:**
 
 **Pattern 6: Soft Gradient Backgrounds**
+
 - **From:** Dreelio's subtle gradients (#F8F9FB → #FFFFFF)
-- **Adapt for AISEO:** Dashboard background uses gentle gradient, not flat white
+- **Adapt for ShowYourBrand:** Dashboard background uses gentle gradient, not flat white
 - **Why it works:** Adds depth without distraction, feels premium
 
 **Pattern 7: Rounded Corners (20-24px)**
+
 - **From:** All three sites avoid sharp edges
-- **Adapt for AISEO:** Cards, buttons, modals use 20px border radius
+- **Adapt for ShowYourBrand:** Cards, buttons, modals use 20px border radius
 - **Why it works:** Feels modern and approachable (hard edges feel dated)
 
 **Pattern 8: Generous Spacing System**
+
 - **From:** Base44's breathing room
-- **Adapt for AISEO:** 64px section spacing, 32px card padding, 16px internal spacing
+- **Adapt for ShowYourBrand:** 64px section spacing, 32px card padding, 16px internal spacing
 - **Why it works:** Creates visual hierarchy, reduces cognitive load
 
 **Pattern 9: Typography Scale**
+
 - **From:** Dreelio's clear size contrast
-- **Adapt for AISEO:** H1: 48px, H2: 32px, H3: 24px, Body: 16px, Small: 14px
+- **Adapt for ShowYourBrand:** H1: 48px, H2: 32px, H3: 24px, Body: 16px, Small: 14px
 - **Why it works:** Clear hierarchy guides eye without user thinking about it
 
 **Pattern 10: Status Indicators with Color + Icon**
+
 - **From:** Common pattern across all three
-- **Adapt for AISEO:** GEO Health Score uses: Color ring (red/yellow/green) + Percentage + Icon + Label
+- **Adapt for ShowYourBrand:** GEO Health Score uses: Color ring (red/yellow/green) + Percentage + Icon + Label
 - **Why it works:** Redundant encoding (color + text + icon) ensures accessibility and instant understanding
 
 ### Anti-Patterns to Avoid
 
 **Anti-Pattern 1: Over-Animation**
+
 - **What to avoid:** Excessive motion, spinning loaders, bouncing elements
 - **Why it's bad:** Feels unprofessional for B2B, distracts from content
-- **AISEO approach:** Subtle transitions only (300ms fade-ins), no "playful" animations
+- **ShowYourBrand approach:** Subtle transitions only (300ms fade-ins), no "playful" animations
 
 **Anti-Pattern 2: Dashboard Overload**
+
 - **What to avoid:** Showing all 50 metrics at once in dashboard
 - **Why it's bad:** Creates overwhelm (conflicts with Step 4 emotional goal)
-- **AISEO approach:** Hero metric (GEO Score) + Top 3 issues + "View More" for rest
+- **ShowYourBrand approach:** Hero metric (GEO Score) + Top 3 issues + "View More" for rest
 
 **Anti-Pattern 3: Hidden Navigation**
+
 - **What to avoid:** Hamburger menus on desktop, mystery meat navigation
 - **Why it's bad:** Desktop users expect visible navigation (platform strategy from Step 3)
-- **AISEO approach:** Persistent sidebar navigation on desktop (1440px+)
+- **ShowYourBrand approach:** Persistent sidebar navigation on desktop (1440px+)
 
 **Anti-Pattern 4: Vague CTAs**
+
 - **What to avoid:** Buttons labeled "Learn More", "Click Here", "Submit"
 - **Why it's bad:** Doesn't communicate value or action outcome
-- **AISEO approach:** Action-specific CTAs ("Run GEO Audit", "Download PDF Report", "Copy Code")
+- **ShowYourBrand approach:** Action-specific CTAs ("Run GEO Audit", "Download PDF Report", "Copy Code")
 
 **Anti-Pattern 5: Technical Jargon in UI**
+
 - **What to avoid:** Labels like "API Response Time", "Schema Markup Coverage"
 - **Why it's bad:** Marc (non-tech user) won't understand
-- **AISEO approach:** Plain language ("Page Load Speed", "Search Engine Info") with tooltips for tech details
+- **ShowYourBrand approach:** Plain language ("Page Load Speed", "Search Engine Info") with tooltips for tech details
 
 **Anti-Pattern 6: Flat Design Taken Too Far**
+
 - **What to avoid:** No shadows, no depth, everything on same plane
 - **Why it's bad:** Feels sterile, makes buttons/cards blend together
-- **AISEO approach:** Subtle shadows (0px 2px 8px rgba(0,0,0,0.08)) create depth without being heavy
+- **ShowYourBrand approach:** Subtle shadows (0px 2px 8px rgba(0,0,0,0.08)) create depth without being heavy
 
 ### Design Inspiration Strategy
 
 **What to Adopt Directly:**
 
-1. **Dreelio's Gradient Backgrounds** → AISEO dashboard uses soft gradients for premium feel
-2. **Almond's Card System** → AISEO recommendations use card-based architecture
-3. **Base44's Typography Precision** → AISEO adopts similar font scale and spacing rhythm
-4. **All Three: 20-24px Border Radius** → AISEO uses 20px standard for modern aesthetic
-5. **All Three: 64px+ Section Spacing** → AISEO adopts generous whitespace system
+1. **Dreelio's Gradient Backgrounds** → ShowYourBrand dashboard uses soft gradients for premium feel
+2. **Almond's Card System** → ShowYourBrand recommendations use card-based architecture
+3. **Base44's Typography Precision** → ShowYourBrand adopts similar font scale and spacing rhythm
+4. **All Three: 20-24px Border Radius** → ShowYourBrand uses 20px standard for modern aesthetic
+5. **All Three: 64px+ Section Spacing** → ShowYourBrand adopts generous whitespace system
 
-**What to Adapt for AISEO Context:**
+**What to Adapt for ShowYourBrand Context:**
 
 1. **Sidebar Navigation (from Base44)** → Adapt for dashboard-specific sections (not general website nav)
 2. **Progressive Disclosure (from Dreelio)** → Adapt for dual-audience view (Executive vs Technical toggle)
@@ -746,14 +817,14 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 
 **What to Avoid:**
 
-1. **Consumer App Playfulness** → AISEO targets B2B agencies, needs professional restraint
-2. **Mobile-First Layouts** → AISEO is desktop-first (per Step 3 platform strategy)
-3. **Marketing-Heavy Language** → AISEO focuses on clarity and evidence (per Step 4 emotional goals)
+1. **Consumer App Playfulness** → ShowYourBrand targets B2B agencies, needs professional restraint
+2. **Mobile-First Layouts** → ShowYourBrand is desktop-first (per Step 3 platform strategy)
+3. **Marketing-Heavy Language** → ShowYourBrand focuses on clarity and evidence (per Step 4 emotional goals)
 4. **Overly Minimalist** → Can't hide complexity - need to show data, just organize it well
 
 **Implementation Philosophy:**
 
-"Copy the aesthetic system (spacing, typography, colors, shapes), but adapt the content architecture for AISEO's dual-audience needs and data-heavy dashboard requirements."
+"Copy the aesthetic system (spacing, typography, colors, shapes), but adapt the content architecture for ShowYourBrand's dual-audience needs and data-heavy dashboard requirements."
 
 ---
 
@@ -765,7 +836,7 @@ Traditional SEO tools (Ahrefs, SEMrush) create "analysis paralysis" - lots of da
 
 ### Rationale for Selection
 
-AISEO requires a design system that balances **premium visual polish** (Dreelio/Almond aesthetic) with **rapid MVP development** (solo founder, 12-18 month first-mover window).
+ShowYourBrand requires a design system that balances **premium visual polish** (Dreelio/Almond aesthetic) with **rapid MVP development** (solo founder, 12-18 month first-mover window).
 
 **Why Tailwind CSS + Shadcn/ui:**
 
@@ -782,11 +853,13 @@ AISEO requires a design system that balances **premium visual polish** (Dreelio/
 6. **Premium Polish Achievable:** Can achieve Dreelio-level aesthetic without months of custom design system work
 
 **Magic UI vs Shadcn/ui:**
+
 - **Shadcn/ui:** Core UI primitives (Button, Card, Dialog, Dropdown, Table)
 - **Magic UI:** Specialized components (advanced animations, data visualizations, interactive elements)
 - **Approach:** Use Shadcn for base components, Magic UI for specialized needs
 
 **Tradeoffs Accepted:**
+
 - More manual styling vs "magic" component library
 - Need to define design tokens upfront (colors, spacing, typography)
 - Less "out of box" look (good - we want unique aesthetic)
@@ -816,52 +889,52 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Define AISEO brand colors
+        // Define ShowYourBrand brand colors
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
+          50: "#eff6ff",
+          100: "#dbeafe",
           // ... full scale
-          600: '#3b82f6', // Main brand color
-          700: '#2563eb',
+          600: "#3b82f6", // Main brand color
+          700: "#2563eb",
         },
         success: {
-          500: '#10b981', // Green for high scores
-          600: '#059669',
+          500: "#10b981", // Green for high scores
+          600: "#059669",
         },
         warning: {
-          500: '#f59e0b', // Yellow for medium scores
-          600: '#d97706',
+          500: "#f59e0b", // Yellow for medium scores
+          600: "#d97706",
         },
         error: {
-          500: '#ef4444', // Red for low scores/critical issues
-          600: '#dc2626',
+          500: "#ef4444", // Red for low scores/critical issues
+          600: "#dc2626",
         },
         neutral: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
+          50: "#f9fafb",
+          100: "#f3f4f6",
           // ... gray scale for text hierarchy
-          900: '#111827',
-        }
+          900: "#111827",
+        },
       },
       spacing: {
         // Generous spacing system (Dreelio-inspired)
         // 16 = 64px, 20 = 80px, 24 = 96px, 30 = 120px
       },
       borderRadius: {
-        DEFAULT: '20px', // Standard AISEO radius
-        'xl': '12px', // Buttons
-        '2xl': '24px', // Large cards
+        DEFAULT: "20px", // Standard ShowYourBrand radius
+        xl: "12px", // Buttons
+        "2xl": "24px", // Large cards
       },
       boxShadow: {
-        'subtle': '0px 2px 8px rgba(0, 0, 0, 0.08)', // Card shadows
-        'elevated': '0px 4px 16px rgba(0, 0, 0, 0.12)', // Modal shadows
+        subtle: "0px 2px 8px rgba(0, 0, 0, 0.08)", // Card shadows
+        elevated: "0px 4px 16px rgba(0, 0, 0, 0.12)", // Modal shadows
       },
       typography: {
         // H1: 48px, H2: 32px, H3: 24px, Body: 16px, Small: 14px
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};
 ```
 
 **Phase 3: Component Strategy**
@@ -869,7 +942,7 @@ module.exports = {
 **From Shadcn/ui - Core Primitives:**
 
 ```bash
-# Essential components for AISEO
+# Essential components for ShowYourBrand
 npx shadcn-ui@latest add button
 npx shadcn-ui@latest add card
 npx shadcn-ui@latest add dialog
@@ -883,11 +956,13 @@ npx shadcn-ui@latest add select
 ```
 
 **From Magic UI - Specialized (if needed):**
+
 - Advanced animations for dashboard transitions
 - Interactive data visualization components
 - Copy only specific components needed
 
 **Build Custom Components:**
+
 1. **GEO Score Ring** (circular progress indicator with color gradient)
 2. **Prompt Gap Analysis Chart** (bar chart visualization with competitor comparison)
 3. **Code Block with Copy Button** (syntax highlighting + clipboard API)
@@ -895,12 +970,14 @@ npx shadcn-ui@latest add select
 5. **Audit Status Timeline** (progress visualization with stages)
 
 **Data Visualization Library:**
+
 - Use **Recharts** (React charts) with Tailwind color tokens
-- Custom styling to match AISEO aesthetic
+- Custom styling to match ShowYourBrand aesthetic
 
 **Phase 4: Pattern Library Documentation**
 
 Create reusable patterns in Storybook (or similar):
+
 - Card layouts (stat card, issue card, recommendation card)
 - Dashboard layouts (header, sidebar, main content grid)
 - Form patterns (input styles, validation states, error messages)
@@ -913,17 +990,20 @@ Create reusable patterns in Storybook (or similar):
 **Visual Aesthetic Alignment (Dreelio/Almond Patterns):**
 
 **1. Backgrounds:**
+
 - Soft gradients: `bg-gradient-to-br from-neutral-50 to-white`
 - Card backgrounds: `bg-white` with `shadow-subtle`
 - Dashboard background: `bg-neutral-50`
 
 **2. Spacing System:**
+
 - Section spacing: `space-y-16` (64px between major sections)
 - Card padding: `p-8` (32px internal padding)
 - Element spacing: `space-y-4` (16px between elements)
 - Grid gaps: `gap-6` (24px between cards)
 
 **3. Typography:**
+
 - Font: Inter or similar (`font-sans` in Tailwind)
 - Scale:
   - H1: `text-5xl font-semibold` (48px)
@@ -936,6 +1016,7 @@ Create reusable patterns in Storybook (or similar):
 - Line height: Relaxed (`leading-relaxed` for body text)
 
 **4. Borders & Shadows:**
+
 - Standard card radius: `rounded-[20px]` (20px)
 - Button radius: `rounded-xl` (12px)
 - Input radius: `rounded-lg` (8px)
@@ -944,6 +1025,7 @@ Create reusable patterns in Storybook (or similar):
 - Hover elevation: `hover:shadow-elevated transition-shadow`
 
 **5. Color Usage:**
+
 - **Primary Blue:** CTAs, links, brand elements
 - **Success Green:** High GEO scores (70%+), completed actions
 - **Warning Yellow:** Medium scores (40-69%), attention needed
@@ -1022,33 +1104,33 @@ Create reusable patterns in Storybook (or similar):
 // config/design-tokens.ts
 export const designTokens = {
   colors: {
-    primary: '#3b82f6',
-    success: '#10b981',
-    warning: '#f59e0b',
-    error: '#ef4444',
+    primary: "#3b82f6",
+    success: "#10b981",
+    warning: "#f59e0b",
+    error: "#ef4444",
   },
   spacing: {
-    sectionGap: '64px',
-    cardPadding: '32px',
-    elementGap: '16px',
+    sectionGap: "64px",
+    cardPadding: "32px",
+    elementGap: "16px",
   },
   borderRadius: {
-    card: '20px',
-    button: '12px',
-    input: '8px',
+    card: "20px",
+    button: "12px",
+    input: "8px",
   },
   shadows: {
-    card: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevated: '0px 4px 16px rgba(0, 0, 0, 0.12)',
+    card: "0px 2px 8px rgba(0, 0, 0, 0.08)",
+    elevated: "0px 4px 16px rgba(0, 0, 0, 0.12)",
   },
   typography: {
-    fontFamily: 'Inter, sans-serif',
+    fontFamily: "Inter, sans-serif",
     scale: {
-      h1: '48px',
-      h2: '32px',
-      h3: '24px',
-      body: '16px',
-      small: '14px',
+      h1: "48px",
+      h2: "32px",
+      h3: "24px",
+      body: "16px",
+      small: "14px",
     },
   },
 };
@@ -1062,7 +1144,7 @@ export const designTokens = {
 
 **"Open dashboard → Instantly understand your AI invisibility problem → Know exactly what to fix"**
 
-This is the interaction users will describe to others: *"I opened the dashboard and immediately saw I'm basically invisible in ChatGPT compared to competitors. It showed me exactly which 3 things to fix first."*
+This is the interaction users will describe to others: _"I opened the dashboard and immediately saw I'm basically invisible in ChatGPT compared to competitors. It showed me exactly which 3 things to fix first."_
 
 **Why This is THE Core Experience:**
 
@@ -1071,16 +1153,18 @@ This is the interaction users will describe to others: *"I opened the dashboard 
 3. **Actionable Clarity:** User immediately knows what to do next (Top 3 critical issues with fix buttons)
 
 **Famous Examples of Defining Experiences:**
+
 - **Tinder:** "Swipe to match with people"
 - **Spotify:** "Discover and play any song instantly"
 - **Google Search:** "Type question, get instant answer"
-- **AISEO:** "Open dashboard, see AI invisibility gap, know what to fix"
+- **ShowYourBrand:** "Open dashboard, see AI invisibility gap, know what to fix"
 
 ### User Mental Model
 
 **Current Problem-Solving Approach:**
 
 Business owners currently:
+
 - **Don't know they have an AI visibility problem** (emerging issue, not yet mainstream awareness)
 - When they discover it (client asks "Why doesn't ChatGPT recommend us?"), they have **no tools to diagnose**
 - Existing SEO tools (Ahrefs, SEMrush) only measure Google rankings, not AI engine visibility
@@ -1088,11 +1172,12 @@ Business owners currently:
 **Mental Model Users Bring:**
 
 Users expect tools that work like:
+
 - **Google Analytics:** Visual dashboards with charts, scores, metrics
 - **SEO Rank Trackers:** Competitive comparisons (where am I vs competitors?)
 - **PageSpeed Insights:** Actionable recommendations with specific fixes
 
-**User Expectations for How AISEO Should Work:**
+**User Expectations for How ShowYourBrand Should Work:**
 
 1. **Enter website URL** (or select from saved businesses)
 2. **System analyzes AI visibility** (processing takes 5-10 minutes)
@@ -1198,26 +1283,30 @@ Users expect tools that work like:
 
 ### Novel vs. Established UX Patterns
 
-**AISEO Uses Primarily ESTABLISHED Patterns (Smart Strategy):**
+**ShowYourBrand Uses Primarily ESTABLISHED Patterns (Smart Strategy):**
 
 **Established Pattern 1: Score Dashboard (Like PageSpeed Insights)**
+
 - **Why established:** Users universally understand score (0-100) + grade (A-F) + color coding (red/yellow/green)
-- **AISEO adoption:** GEO Health Score 0-100 with color ring
-- **AISEO innovation:** Dual score (absolute health + competitive gap)
+- **ShowYourBrand adoption:** GEO Health Score 0-100 with color ring
+- **ShowYourBrand innovation:** Dual score (absolute health + competitive gap)
 
 **Established Pattern 2: Prioritized Issue List (Like Lighthouse)**
+
 - **Why established:** Users expect "Critical/Warning/Info" severity levels
-- **AISEO adoption:** Top 3 critical issues with severity indicators
-- **AISEO innovation:** Impact × Effort matrix (fix high-impact, low-effort first + show time estimates)
+- **ShowYourBrand adoption:** Top 3 critical issues with severity indicators
+- **ShowYourBrand innovation:** Impact × Effort matrix (fix high-impact, low-effort first + show time estimates)
 
 **Established Pattern 3: Competitive Comparison (Like Ahrefs)**
+
 - **Why established:** Users understand side-by-side bar charts
-- **AISEO adoption:** "You vs Competitor Average vs Top Competitor"
-- **AISEO innovation:** Comparison across 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)
+- **ShowYourBrand adoption:** "You vs Competitor Average vs Top Competitor"
+- **ShowYourBrand innovation:** Comparison across 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)
 
 **One Novel UX Element (Requires Minimal Education):**
 
 **Prompt Gap Visualization:**
+
 - **What's novel:** "18 out of 100 prompts mention your business"
 - **Why it's different:** Most users don't think in terms of "prompts tested"
 - **Education strategy:** Tooltip on hover explaining: "We test 100 real-world prompts people ask AI engines (e.g., 'best Italian restaurants in Paris'). 18 of these prompts mentioned your business."
@@ -1230,7 +1319,7 @@ Users expect tools that work like:
 3. **Focus innovation on content** → Novel insights, not novel UI
 4. **Reduces support burden** → Fewer "how do I use this?" questions
 
-**Where AISEO Innovates Within Familiar Patterns:**
+**Where ShowYourBrand Innovates Within Familiar Patterns:**
 
 - **Copy-paste code snippets** (most tools just describe what to do)
 - **Prompt-level detail** (which specific prompts competitors win)
@@ -1259,10 +1348,12 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
 **Action:** User clicks "View Dashboard" link → lands directly on audit dashboard
 
 **Alternative Entry Points:**
+
 - User logs in → dashboard lists recent audits → clicks specific audit
 - User bookmarks audit URL → returns directly
 
 **No Friction:**
+
 - URL directly opens to audit dashboard (no login wall if accessed via secure token)
 - Mobile users see message: "Best viewed on desktop for full dashboard experience"
 
@@ -1272,7 +1363,7 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  AISEO Dashboard                                   [Download PDF]│
+│  ShowYourBrand Dashboard                                   [Download PDF]│
 │  Restaurant Le Jardin | Audit: Aug 15, 2024                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
@@ -1321,11 +1412,13 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
 **Controls/Inputs - Progressive Disclosure:**
 
 **Level 1 - Overview (Current View):**
+
 - **Scroll** to see more issues (12 more below fold)
 - **Hover on GEO Score** → tooltip: "How we calculate this score"
 - **Hover on competitor bar** → tooltip: "Competitor: [Name] | Score: 82%"
 
 **Level 2 - Issue Detail:**
+
 - **Click issue card** → expands to show:
   - Problem explanation (plain language + technical)
   - Why it matters (impact on AI visibility)
@@ -1334,6 +1427,7 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
   - Before/After example
 
 **Level 3 - Deep Dive:**
+
 - **Click "Technical Details" tab** → switch to technical view with API responses, raw data
 - **Click "Methodology"** → page explaining how audit works
 - **Click "Download PDF"** → full report for client presentation
@@ -1341,11 +1435,13 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
 **System Response (Interaction Feedback):**
 
 **On Hover:**
+
 - **Issue card:** Subtle shadow elevation (0px 2px 8px → 0px 4px 16px)
 - **Button:** Color darkens (primary-600 → primary-700)
 - **Tooltip:** Appears after 300ms delay, disappears on mouse out
 
 **On Click (Issue Card):**
+
 - **Animation:** Smooth expansion (400ms ease-out)
 - **Focus:** Scroll to center expanded card
 - **Layout:** Other cards push down (no overlap)
@@ -1397,11 +1493,13 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
 ```
 
 **On Click ("Copy Code" Button):**
+
 - **Immediate feedback:** Button text changes to "✓ Copied!" (green)
 - **Duration:** 2 seconds, then reverts to "Copy Code"
 - **Clipboard:** Code copied, ready to paste
 
 **On Click ("Mark as Fixed"):**
+
 - **Visual:** Checkmark appears on card, card turns light green tint
 - **Score update:** "If you fix this, your estimated score: 34% → 49% (+15%)"
 - **Status tracked:** User can toggle back if needed
@@ -1445,6 +1543,7 @@ Processing took 7 minutes | 4 AI engines tested | 100 prompts analyzed
 **Error/Mistake Handling:**
 
 **If Audit Fails:**
+
 ```
 ❌ Audit Processing Failed
 We encountered an error processing your audit.
@@ -1455,6 +1554,7 @@ Error: Website timeout (10 minutes exceeded)
 ```
 
 **If Competitor Data Unavailable:**
+
 ```
 ⚠️ Competitor Analysis Limited
 We couldn't analyze [Competitor Name] (website blocking our scanner).
@@ -1465,7 +1565,8 @@ Showing your GEO score only. Add different competitor?
 ```
 
 **If User Pastes Code Incorrectly:**
-- AISEO can't detect this automatically
+
+- ShowYourBrand can't detect this automatically
 - But: Implementation guide includes "How to verify it worked"
 - Example: "Use Google's Rich Results Test to verify schema is valid"
 
@@ -1474,6 +1575,7 @@ Showing your GEO score only. Add different competitor?
 **Immediate Completion (< 3 Minutes):**
 
 **Success:** User understands problem and has action plan
+
 - Seen: GEO Health Score (34%, red, bad)
 - Understood: Competitive gap (behind by 34%)
 - Identified: Top 3 actions to take
@@ -1484,6 +1586,7 @@ Showing your GEO score only. Add different competitor?
 **Short-Term Completion (Days to Weeks):**
 
 **Success:** User implements fixes
+
 - Fixed: Issue #1 (schema markup added) → marked as complete
 - Fixed: Issue #2 (content depth improved)
 - Fixed: Issue #3 (internal linking improved)
@@ -1494,6 +1597,7 @@ Showing your GEO score only. Add different competitor?
 **Long-Term Completion (3-4 Weeks Later):**
 
 **Success:** User sees score improvement in next audit
+
 - Score increased: 34% → 67% (+33%)
 - Competitive gap closed: Now at competitor average
 - Prompt gap closed: 18/100 → 65/100 prompts
@@ -1546,6 +1650,7 @@ Showing your GEO score only. Add different competitor?
 **Semantic Color Palette (Aligned with GEO Scoring):**
 
 **Primary Blue (Brand & Actions):**
+
 - `primary-50`: `#eff6ff` (very light backgrounds)
 - `primary-100`: `#dbeafe` (hover states)
 - `primary-500`: `#3b82f6` (links, badges)
@@ -1555,21 +1660,25 @@ Showing your GEO score only. Add different competitor?
 **Rationale:** Professional blue conveys trust and technology (common in SaaS tools like Stripe, Ahrefs)
 
 **Success Green (High GEO Scores, 70%+):**
+
 - `success-50`: `#f0fdf4` (light backgrounds for positive indicators)
 - `success-500`: `#10b981` (main success color)
 - `success-600`: `#059669` (hover, emphasis)
 
 **Warning Yellow (Medium Scores, 40-69%):**
+
 - `warning-50`: `#fffbeb`
 - `warning-500`: `#f59e0b` (attention needed)
 - `warning-600`: `#d97706`
 
 **Error Red (Critical Issues, Low Scores <40%):**
+
 - `error-50`: `#fef2f2`
 - `error-500`: `#ef4444` (critical issues, urgent)
 - `error-600`: `#dc2626` (emphasis)
 
 **Neutral Grays (Text, Borders, Backgrounds):**
+
 - `neutral-50`: `#f9fafb` (page background, soft gradients)
 - `neutral-100`: `#f3f4f6` (card backgrounds alt)
 - `neutral-200`: `#e5e7eb` (borders, dividers)
@@ -1579,6 +1688,7 @@ Showing your GEO score only. Add different competitor?
 - `neutral-900`: `#111827` (headings, emphasis)
 
 **Gradient Backgrounds (Dreelio-inspired):**
+
 - Dashboard: `linear-gradient(to bottom right, #f9fafb, #ffffff)`
 - Cards: `#ffffff` with `shadow-subtle`
 - Hero sections: `linear-gradient(to bottom right, #eff6ff, #ffffff)` (light blue tint)
@@ -1603,6 +1713,7 @@ Showing your GEO score only. Add different competitor?
 **Accessibility Compliance:**
 
 All text colors meet WCAG AA contrast ratios (4.5:1 minimum for normal text, 3:1 for large text):
+
 - Error-500 (#ef4444) on white: 5.2:1 ✓
 - Primary-600 (#2563eb) on white: 7.1:1 ✓
 - Neutral-700 (#374151) on white: 9.4:1 ✓
@@ -1612,34 +1723,44 @@ All text colors meet WCAG AA contrast ratios (4.5:1 minimum for normal text, 3:1
 **Font Family:**
 
 **Primary: Inter** (sans-serif)
+
 - Clean, modern, excellent readability at all sizes
 - Variable font for optimal loading (single file, all weights)
 - Wide browser support
 - Used by: GitHub, Stripe, Vercel (professional SaaS aesthetic)
 
 **Fallback Stack:**
+
 ```css
-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+font-family:
+  "Inter",
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  "Roboto",
+  "Helvetica Neue",
+  sans-serif;
 ```
 
 **Code/Monospace: Fira Code** (for code snippets)
+
 - Clear distinction between characters (0 vs O, 1 vs l)
 - Programming ligatures (optional)
 - Excellent for copy-paste code blocks
 
 **Type Scale (Based on Major Third - 1.25 ratio):**
 
-| Element       | Size     | Weight          | Line Height | Usage                    |
-|---------------|----------|-----------------|-------------|--------------------------|
-| H1 (Hero)     | 48px/3rem| semibold (600)  | 1.2         | Page titles             |
-| H2 (Section)  | 32px/2rem| semibold (600)  | 1.3         | Section headers         |
-| H3 (Card)     | 24px/1.5rem| medium (500)  | 1.4         | Card titles             |
-| H4 (Label)    | 20px/1.25rem| medium (500) | 1.5         | Form labels             |
-| Body (Large)  | 18px/1.125rem| normal (400) | 1.6         | Intro paragraphs        |
-| Body (Base)   | 16px/1rem| normal (400)    | 1.6         | Main body text          |
-| Body (Small)  | 14px/0.875rem| normal (400)| 1.5         | Metadata, captions      |
-| Caption       | 12px/0.75rem| normal (400) | 1.5         | Timestamps, footnotes   |
-| Code          | 14px/0.875rem| mono (Fira) | 1.6         | Code snippets           |
+| Element      | Size          | Weight         | Line Height | Usage                 |
+| ------------ | ------------- | -------------- | ----------- | --------------------- |
+| H1 (Hero)    | 48px/3rem     | semibold (600) | 1.2         | Page titles           |
+| H2 (Section) | 32px/2rem     | semibold (600) | 1.3         | Section headers       |
+| H3 (Card)    | 24px/1.5rem   | medium (500)   | 1.4         | Card titles           |
+| H4 (Label)   | 20px/1.25rem  | medium (500)   | 1.5         | Form labels           |
+| Body (Large) | 18px/1.125rem | normal (400)   | 1.6         | Intro paragraphs      |
+| Body (Base)  | 16px/1rem     | normal (400)   | 1.6         | Main body text        |
+| Body (Small) | 14px/0.875rem | normal (400)   | 1.5         | Metadata, captions    |
+| Caption      | 12px/0.75rem  | normal (400)   | 1.5         | Timestamps, footnotes |
+| Code         | 14px/0.875rem | mono (Fira)    | 1.6         | Code snippets         |
 
 **Typography Usage Strategy:**
 
@@ -1672,22 +1793,23 @@ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', '
 
 Tailwind scale aligned with Dreelio generous spacing:
 
-| Name     | Size      | Usage                          |
-|----------|-----------|--------------------------------|
-| space-1  | 4px       | Tight internal spacing         |
-| space-2  | 8px       | Small gaps                     |
-| space-4  | 16px      | Element spacing                |
-| space-6  | 24px      | Card internal gaps             |
-| space-8  | 32px      | Card padding                   |
-| space-12 | 48px      | Section spacing (small)        |
-| space-16 | 64px      | Section spacing (standard)     |
-| space-20 | 80px      | Section spacing (large)        |
-| space-24 | 96px      | Page section gaps              |
-| space-30 | 120px     | Hero section spacing           |
+| Name     | Size  | Usage                      |
+| -------- | ----- | -------------------------- |
+| space-1  | 4px   | Tight internal spacing     |
+| space-2  | 8px   | Small gaps                 |
+| space-4  | 16px  | Element spacing            |
+| space-6  | 24px  | Card internal gaps         |
+| space-8  | 32px  | Card padding               |
+| space-12 | 48px  | Section spacing (small)    |
+| space-16 | 64px  | Section spacing (standard) |
+| space-20 | 80px  | Section spacing (large)    |
+| space-24 | 96px  | Page section gaps          |
+| space-30 | 120px | Hero section spacing       |
 
 **Layout Principles:**
 
 **1. Generous White Space (Dreelio/Almond Aesthetic):**
+
 - Section gaps: 64-96px (space-16 to space-24)
 - Card padding: 32px (space-8)
 - Between elements in cards: 16px (space-4)
@@ -1696,26 +1818,31 @@ Tailwind scale aligned with Dreelio generous spacing:
 **2. Desktop-First Grid:**
 
 **Desktop (1920px):**
+
 - Max content width: 1440px centered
 - Sidebar: 256px fixed width
 - Main content: Fluid (remaining space)
 - Gutter: 24px
 
 **Laptop (1440px):**
+
 - Max content width: 1200px
 - Sidebar: 240px
 - Main content: Fluid
 
 **Tablet (1024px):**
+
 - Sidebar collapses to icons-only (80px)
 - Content expands to use space
 
 **Mobile (375px):**
+
 - Single column
 - Sidebar hidden (hamburger menu)
 - Reduced padding (16px instead of 32px)
 
 **3. Card-Based Layout:**
+
 - Cards use consistent padding: 32px (desktop), 24px (tablet), 16px (mobile)
 - Card gaps in grid: 24px (space-6)
 - Cards have 20px border radius (`rounded-[20px]`)
@@ -1755,6 +1882,7 @@ Tailwind scale aligned with Dreelio generous spacing:
 **Color Contrast (WCAG AA Compliant):**
 
 ✅ All text colors tested:
+
 - Headings (neutral-900 #111827 on white): 16.1:1 (AAA)
 - Body text (neutral-700 #374151 on white): 9.4:1 (AAA)
 - Secondary text (neutral-600 #4b5563 on white): 7.5:1 (AAA)
@@ -1763,27 +1891,32 @@ Tailwind scale aligned with Dreelio generous spacing:
 - Success green (#10b981): 3.8:1 (AA Large Text only - use 18px+ or bold)
 
 **Focus States:**
+
 - All interactive elements have visible focus ring
 - Focus ring: 2px solid primary-500 with 2px offset
 - `focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2`
 
 **Keyboard Navigation:**
+
 - Tab order follows visual hierarchy (top to bottom, left to right)
 - Skip to content link for dashboard (bypasses sidebar nav)
 - All actions accessible via keyboard (Enter, Space, Escape)
 
 **Screen Reader Support:**
+
 - Semantic HTML (headings, landmarks, lists)
 - ARIA labels for icon-only buttons
 - ARIA live regions for dynamic content (score updates)
 - Alt text for all images and icons
 
 **Responsive Typography:**
+
 - Font sizes scale down on mobile (H1: 48px → 36px)
 - Maintain readability at all viewport sizes
 - Minimum touch target: 44x44px (mobile buttons)
 
 **Motion & Animations:**
+
 - Respect `prefers-reduced-motion` media query
 - Disable animations for users who prefer reduced motion
 - All transitions < 500ms (avoid long waits)
@@ -1795,6 +1928,7 @@ Tailwind scale aligned with Dreelio generous spacing:
 ### Chosen Direction: "Professional Clarity Dashboard"
 
 This direction synthesizes all our design decisions into a cohesive visual approach that combines:
+
 - **Dreelio's premium visual polish** (soft gradients, generous spacing, rounded corners)
 - **PageSpeed Insights' actionable clarity** (score + issues + fixes)
 - **Ahrefs' competitive urgency** (side-by-side comparisons)
@@ -1804,6 +1938,7 @@ This direction synthesizes all our design decisions into a cohesive visual appro
 **1. Layout Approach: Dashboard-Centric with Progressive Disclosure**
 
 **Hero Area (Above Fold):**
+
 ```
 ┌────────────────────────────────────────────┐
 │ GEO Score Ring (Left) + Competitive Gap    │
@@ -1812,6 +1947,7 @@ This direction synthesizes all our design decisions into a cohesive visual appro
 ```
 
 **Primary Content (Below Fold):**
+
 ```
 ┌────────────────────────────────────────────┐
 │ Top 3 Critical Issues (Card Grid)          │
@@ -1820,6 +1956,7 @@ This direction synthesizes all our design decisions into a cohesive visual appro
 ```
 
 **Secondary Content (Expandable):**
+
 ```
 ┌────────────────────────────────────────────┐
 │ "View 12 More Recommendations" (Collapsed) │
@@ -1869,37 +2006,43 @@ This direction synthesizes all our design decisions into a cohesive visual appro
 
 ### Design Rationale
 
-**Why "Professional Clarity Dashboard" Works for AISEO:**
+**Why "Professional Clarity Dashboard" Works for ShowYourBrand:**
 
 **1. Matches User Mental Model:**
+
 - Users expect dashboards to look like familiar tools (Google Analytics, Ahrefs, PageSpeed Insights)
 - Card-based layout is established pattern in modern SaaS tools
 - Score + issues + solutions follows proven PageSpeed Insights pattern
 - Side-by-side competitive comparison is familiar from SEO rank trackers
 
 **2. Supports Core Experience ("Aha Moment in < 10 Seconds"):**
+
 - Hero area (GEO Score + Competitive Gap) delivers instant problem comprehension
 - Visual hierarchy guides eye: Score → Gap → Top Issue
 - Progressive disclosure prevents overwhelm (top 3 prominent, rest collapsible)
 - Copy-paste code blocks enable immediate action without friction
 
 **3. Achieves Premium Polish Requirement:**
+
 - Dreelio aesthetic (gradients, generous spacing, rounded corners) creates "this is professional" first impression
 - Agencies will confidently present this to clients without apology
 - No "MVP ugly" compromises - polished from day 1 for agency credibility
 
 **4. Aligns with Desktop-First Platform Strategy:**
+
 - Sidebar navigation leverages desktop screen real estate efficiently
 - Data visualizations (charts, graphs, comparison bars) are readable at desktop sizes
 - Mobile responsiveness prioritized only for landing page (dashboard is desktop/tablet-focused per requirements)
 
 **5. Enables Future Scalability:**
+
 - Card-based layout adapts to variable content (3 issues → 15 issues)
 - Grid system can expand for new features (competitor cards, trend charts, audit history)
 - Component library (cards, badges, buttons) is reusable across all pages
 - Design system supports both user dashboard AND admin interface with same foundations
 
 **6. Balances Professional & Actionable:**
+
 - Not "playful" or consumer-app aesthetic (B2B professional tone)
 - Not "sterile" or overly minimal (shows necessary data richness)
 - Emotional goal alignment: Professional Clarity + Actionable Confidence (per Step 4)
@@ -1909,6 +2052,7 @@ This direction synthesizes all our design decisions into a cohesive visual appro
 **Phase 1: Core Dashboard (MVP Launch)**
 
 Priority components for initial launch:
+
 1. **Header:** Logo, project selector dropdown, "Run New Audit" CTA, user menu
 2. **Sidebar:** 4-5 main navigation items (Dashboard, Audits, Projects, Settings)
 3. **Hero Area:** GEO Score ring + Competitive Gap bar chart (side-by-side)
@@ -1918,6 +2062,7 @@ Priority components for initial launch:
 **Phase 2: Expanded Dashboard Features**
 
 After MVP validation:
+
 1. **Full Issue List:** Expand "View More" to show all 12+ recommendations
 2. **Prompt Gap Visualization:** Interactive bar chart showing which prompts passed/failed
 3. **Before/After Comparison:** Timeline showing score improvement across audits
@@ -1927,6 +2072,7 @@ After MVP validation:
 **Phase 3: Additional Pages**
 
 Supporting pages beyond main dashboard:
+
 1. **Audit History:** List view of all past audits with filters (date, business, score range)
 2. **Project Management:** Add/edit businesses, configure competitors, set audit frequency
 3. **Team Settings:** Invite members, manage permissions (for Pro/Premium plans)
@@ -1935,6 +2081,7 @@ Supporting pages beyond main dashboard:
 **Tailwind Implementation Examples:**
 
 **Hero Area - GEO Score Card:**
+
 ```jsx
 <div className="bg-white rounded-[20px] shadow-subtle p-8">
   <div className="text-center">
@@ -1958,6 +2105,7 @@ Supporting pages beyond main dashboard:
 ```
 
 **Competitive Gap Card:**
+
 ```jsx
 <div className="bg-white rounded-[20px] shadow-subtle p-8">
   <h3 className="text-xl font-medium text-neutral-900 mb-6">Competitive Gap</h3>
@@ -1967,27 +2115,33 @@ Supporting pages beyond main dashboard:
     <div className="flex items-center">
       <div className="w-24 text-sm text-neutral-600">You</div>
       <div className="flex-1 h-8 bg-neutral-100 rounded-lg overflow-hidden">
-        <div className="h-full bg-error-500" style={{ width: '34%' }}></div>
+        <div className="h-full bg-error-500" style={{ width: "34%" }}></div>
       </div>
-      <div className="w-12 text-right text-sm font-medium text-neutral-900">34%</div>
+      <div className="w-12 text-right text-sm font-medium text-neutral-900">
+        34%
+      </div>
     </div>
 
     {/* Competitor Average */}
     <div className="flex items-center">
       <div className="w-24 text-sm text-neutral-600">Avg</div>
       <div className="flex-1 h-8 bg-neutral-100 rounded-lg overflow-hidden">
-        <div className="h-full bg-neutral-400" style={{ width: '68%' }}></div>
+        <div className="h-full bg-neutral-400" style={{ width: "68%" }}></div>
       </div>
-      <div className="w-12 text-right text-sm font-medium text-neutral-900">68%</div>
+      <div className="w-12 text-right text-sm font-medium text-neutral-900">
+        68%
+      </div>
     </div>
 
     {/* Top Competitor */}
     <div className="flex items-center">
       <div className="w-24 text-sm text-neutral-600">Top</div>
       <div className="flex-1 h-8 bg-neutral-100 rounded-lg overflow-hidden">
-        <div className="h-full bg-success-500" style={{ width: '82%' }}></div>
+        <div className="h-full bg-success-500" style={{ width: "82%" }}></div>
       </div>
-      <div className="w-12 text-right text-sm font-medium text-neutral-900">82%</div>
+      <div className="w-12 text-right text-sm font-medium text-neutral-900">
+        82%
+      </div>
     </div>
   </div>
 
@@ -1997,6 +2151,7 @@ Supporting pages beyond main dashboard:
 ```
 
 **Issue Card (Collapsed State):**
+
 ```jsx
 <div
   className="bg-white rounded-[20px] shadow-subtle p-8 hover:shadow-elevated transition-shadow cursor-pointer"
@@ -2010,7 +2165,9 @@ Supporting pages beyond main dashboard:
 
     {/* Issue Content */}
     <div className="flex-1">
-      <h3 className="text-xl font-medium text-neutral-900">Missing Schema Markup</h3>
+      <h3 className="text-xl font-medium text-neutral-900">
+        Missing Schema Markup
+      </h3>
 
       {/* Metadata */}
       <div className="flex items-center space-x-4 mt-2">
@@ -2034,6 +2191,7 @@ Supporting pages beyond main dashboard:
 ```
 
 **Issue Card (Expanded State with Code):**
+
 ```jsx
 <div className="bg-white rounded-[20px] shadow-elevated p-8">
   {/* ... header same as collapsed ... */}
@@ -2053,8 +2211,9 @@ Supporting pages beyond main dashboard:
     <div>
       <h4 className="text-sm font-medium text-neutral-900 mb-2">Problem:</h4>
       <p className="text-sm text-neutral-700 leading-relaxed">
-        Your website is missing structured data (Schema.org markup) that helps AI engines
-        understand your business information. Without it, AI can't confidently recommend you.
+        Your website is missing structured data (Schema.org markup) that helps
+        AI engines understand your business information. Without it, AI can't
+        confidently recommend you.
       </p>
     </div>
 
@@ -2088,9 +2247,13 @@ Supporting pages beyond main dashboard:
     </div>
 
     <div>
-      <h4 className="text-sm font-medium text-neutral-900 mb-2">Where to Add:</h4>
+      <h4 className="text-sm font-medium text-neutral-900 mb-2">
+        Where to Add:
+      </h4>
       <p className="text-sm text-neutral-700">
-        Paste this code in your homepage HTML, inside the <code className="bg-neutral-100 px-1 rounded">&lt;head&gt;</code> section.
+        Paste this code in your homepage HTML, inside the{" "}
+        <code className="bg-neutral-100 px-1 rounded">&lt;head&gt;</code>{" "}
+        section.
       </p>
     </div>
   </div>
@@ -2109,7 +2272,7 @@ Supporting pages beyond main dashboard:
 
 **Component Library Foundation:**
 
-Using Shadcn/ui as base, customize with AISEO design tokens:
+Using Shadcn/ui as base, customize with ShowYourBrand design tokens:
 
 ```bash
 # Install core components
@@ -2166,6 +2329,7 @@ flowchart TD
 5. **Email Notification:** Link directly to dashboard (no login friction)
 
 **Error Handling:**
+
 - Invalid URL → Show example: "https://example.com"
 - Website unreachable → Offer retry or support contact
 - Subscription limit reached → Clear upgrade path with pricing
@@ -2218,6 +2382,7 @@ flowchart TD
 5. **Persistent Context:** Breadcrumb shows "Dashboard > Audits > [Business Name]"
 
 **Micro-Moments:**
+
 - **0-3 seconds:** User sees red ring (34%) - "This looks bad"
 - **3-7 seconds:** User sees competitive gap bar - "I'm way behind"
 - **7-10 seconds:** User sees Issue #1 "Missing Schema | 15 min" - "I can fix this!"
@@ -2275,6 +2440,7 @@ flowchart TD
 5. **Progress Tracking:** "Mark as Fixed" updates dashboard immediately
 
 **Error Recovery:**
+
 - Can't find file → Alternative file paths provided
 - Code doesn't work → Link to support with context
 - Not applicable → "Not Applicable" button removes from list
@@ -2328,6 +2494,7 @@ flowchart TD
 5. **Proof Points:** Specific prompts that now mention business
 
 **Data Visualizations:**
+
 - **Score Timeline:** Line graph (Aug: 34% → Sept: 49% → Oct: 67%)
 - **Prompt Gap Progress:** Bar chart (before/after prompt success rate)
 - **Issue Resolution:** Checklist showing which issues were fixed
@@ -2336,29 +2503,34 @@ flowchart TD
 
 ---
 
-### Journey Patterns (Reusable Across AISEO)
+### Journey Patterns (Reusable Across ShowYourBrand)
 
 **Pattern 1: Progressive Disclosure**
+
 - **What:** Show 3 items initially, expand to show more
 - **Where:** Issue cards, audit history, recommendations
 - **Why:** Prevents overwhelm, maintains focus on priorities
 
 **Pattern 2: Immediate Feedback**
+
 - **What:** Instant visual confirmation of actions (< 200ms)
 - **Where:** Copy button (✓ Copied!), Mark as Fixed (checkmark)
 - **Why:** Reduces anxiety, confirms action succeeded
 
 **Pattern 3: Contextual Guidance**
+
 - **What:** Tooltips, inline help, example values
 - **Where:** Form fields, metrics, technical terms
 - **Why:** Reduces confusion, enables self-service
 
 **Pattern 4: Error Recovery Paths**
+
 - **What:** Always provide "What went wrong" + "How to fix"
 - **Where:** Form validation, audit failures, invalid URLs
 - **Why:** Users never feel stuck without recourse
 
 **Pattern 5: Multi-Audience Views**
+
 - **What:** Toggle between Executive Summary and Technical Details
 - **Where:** Issue cards, PDF reports, methodology pages
 - **Why:** Same tool serves non-tech and tech users
@@ -2366,27 +2538,32 @@ flowchart TD
 ### Flow Optimization Principles
 
 **Principle 1: Minimize Steps to Value**
+
 - Audit form: 3 required fields only (URL, Business Name, Industry)
 - Dashboard: Zero clicks to see "aha moment" (above fold)
 - Implement: One click to copy code (no multi-step workflows)
 
 **Principle 2: Eliminate Decision Paralysis**
+
 - Top 3 issues ranked by Impact × Effort (don't make user prioritize)
 - Competitor suggestions provided (don't make user research competitors)
 - Code snippets pre-generated (don't make user write code)
 
 **Principle 3: Create Micro-Wins**
+
 - ✓ Audit submitted → Confirmation message
 - ✓ Code copied → "Copied!" feedback
 - ✓ Issue marked fixed → Green checkmark + estimated impact
 - ✓ Score improved → Trend arrow + congratulations message
 
 **Principle 4: Surface Errors Early**
+
 - URL validation: Real-time (not on submit)
 - Schema validation: Link to external validator before deployment
 - Subscription limits: Show remaining audits in header always
 
 **Principle 5: Design for Re-entry**
+
 - Email links: Direct access to specific audit (no navigation required)
 - Breadcrumbs: Always show current location
 - Recent audits: Quick access to last 5 audits in sidebar
@@ -2400,13 +2577,14 @@ flowchart TD
 **Available from Shadcn/ui:**
 
 The following components are available from Shadcn/ui and cover ~80% of standard UI needs:
+
 - Button, Card, Dialog, Dropdown Menu, Tabs, Table, Tooltip, Badge
 - Input, Select, Form components
 - Navigation components (breadcrumb, menu)
 
-These will be customized with AISEO design tokens (20px border radius, primary-600 colors, shadow-subtle, generous spacing).
+These will be customized with ShowYourBrand design tokens (20px border radius, primary-600 colors, shadow-subtle, generous spacing).
 
-**Custom Components Needed for AISEO:**
+**Custom Components Needed for ShowYourBrand:**
 
 Based on user journeys and dashboard design requirements, we need to build:
 
@@ -2419,7 +2597,7 @@ Based on user journeys and dashboard design requirements, we need to build:
 
 **Gap Analysis:**
 
-Shadcn/ui provides foundation, but AISEO's data visualization and dashboard-specific needs require custom components built on top of Recharts and custom SVG implementations.
+Shadcn/ui provides foundation, but ShowYourBrand's data visualization and dashboard-specific needs require custom components built on top of Recharts and custom SVG implementations.
 
 ### Custom Component Specifications
 
@@ -2430,17 +2608,20 @@ Shadcn/ui provides foundation, but AISEO's data visualization and dashboard-spec
 **Usage:** Hero section of audit dashboard, project cards, audit history lists
 
 **Anatomy:**
+
 - SVG circle (progress ring with stroke-dasharray animation)
 - Center content area with score percentage (large text)
 - Status label below score (Critical/Warning/Good)
 - Optional icon or badge for additional context
 
 **States:**
+
 - **Default:** Shows current score with appropriate color
 - **Loading:** Animated skeleton with pulsing gray ring
 - **Error:** Gray ring with error icon and message
 
 **Variants:**
+
 - **Size:** Small (64px), Medium (128px - default), Large (192px)
 - **Color:** Dynamic based on score range
   - Red (0-40%): error-500
@@ -2448,10 +2629,11 @@ Shadcn/ui provides foundation, but AISEO's data visualization and dashboard-spec
   - Green (70-100%): success-500
 
 **Component Props:**
+
 ```typescript
 interface GeoScoreRingProps {
   score: number; // 0-100
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   label?: string;
   showStatus?: boolean;
   animated?: boolean;
@@ -2460,17 +2642,20 @@ interface GeoScoreRingProps {
 ```
 
 **Accessibility:**
+
 - ARIA role: "meter"
 - ARIA attributes: aria-valuenow={score}, aria-valuemin={0}, aria-valuemax={100}
 - ARIA label: "GEO Health Score: 34 percent, Critical status"
 - Keyboard: Not interactive (display only)
 
 **Content Guidelines:**
+
 - Always show percentage (not just number)
 - Include status label for context (Critical/Warning/Good)
 - Optionally show trend arrow for comparison
 
 **Interaction Behavior:**
+
 - Static display (no click interaction)
 - Optional tooltip on hover showing score breakdown
 
@@ -2483,6 +2668,7 @@ interface GeoScoreRingProps {
 **Usage:** Dashboard hero section (right side of GEO Score Ring)
 
 **Anatomy:**
+
 - Three horizontal bars representing: You, Average, Top Competitor
 - Labels on left side (text-sm, neutral-600)
 - Score values on right side (text-sm, font-medium)
@@ -2490,16 +2676,19 @@ interface GeoScoreRingProps {
 - Gap message below chart ("You're falling behind by 34%")
 
 **States:**
+
 - **Default:** Shows all three comparison bars
 - **Loading:** Skeleton bars (animated)
 - **No competitor data:** Single bar (user only) + "Add Competitors" CTA
 - **Partial data:** Show available bars, note missing data
 
 **Variants:**
+
 - **Compact:** Single line per score (mobile view)
 - **Expanded:** Additional metadata (competitor names, URLs)
 
 **Component Props:**
+
 ```typescript
 interface CompetitiveGapChartProps {
   userScore: number;
@@ -2512,16 +2701,19 @@ interface CompetitiveGapChartProps {
 ```
 
 **Accessibility:**
+
 - Screen reader announcement: "Your score: 34%. Average score: 68%. Top competitor: 82%. You are 34 percentage points below average."
 - Bar charts labeled with aria-label for each bar
 - Gap message uses aria-live="polite" for dynamic updates
 
 **Content Guidelines:**
+
 - Always show percentage values
 - Use relative language ("You're ahead/behind by X%")
 - Provide context (average of how many competitors)
 
 **Interaction Behavior:**
+
 - Bars are static (display only)
 - Hover on bar → Tooltip with competitor name/URL
 
@@ -2536,6 +2728,7 @@ interface CompetitiveGapChartProps {
 **Anatomy:**
 
 **Collapsed State:**
+
 - Severity icon (left side, 40px circle with emoji or icon)
 - Title (H3, 24px, font-medium)
 - Metadata row (Impact: High | Effort: Low | Est. Time: 15 minutes)
@@ -2543,6 +2736,7 @@ interface CompetitiveGapChartProps {
 - "View Solution →" CTA button
 
 **Expanded State:**
+
 - All collapsed content
 - Tab navigation (Executive Summary / Technical Details)
 - Problem section with detailed explanation
@@ -2552,6 +2746,7 @@ interface CompetitiveGapChartProps {
 - Action buttons ("Mark as Fixed", "Not Applicable")
 
 **States:**
+
 - **Collapsed** (default)
 - **Expanded** (after click)
 - **Hover** (shadow elevation: subtle → elevated)
@@ -2559,24 +2754,26 @@ interface CompetitiveGapChartProps {
 - **Not Applicable** (grayed out, lower opacity)
 
 **Variants:**
+
 - **Severity:** Critical (red icon/border), Warning (yellow), Info (blue)
 - **Layout:** Full-width or 2-column grid
 
 **Component Props:**
+
 ```typescript
 interface IssueCardProps {
   id: string;
   title: string;
-  severity: 'critical' | 'warning' | 'info';
-  impact: 'high' | 'medium' | 'low';
-  effort: 'high' | 'medium' | 'low';
+  severity: "critical" | "warning" | "info";
+  impact: "high" | "medium" | "low";
+  effort: "high" | "medium" | "low";
   estimatedTime: string;
   description: string;
   problemExplanation: string;
   solution: string;
   codeSnippet?: string;
   fileLocation?: string;
-  status?: 'open' | 'fixed' | 'not-applicable';
+  status?: "open" | "fixed" | "not-applicable";
   onExpand?: () => void;
   onMarkFixed?: () => void;
   onNotApplicable?: () => void;
@@ -2585,6 +2782,7 @@ interface IssueCardProps {
 ```
 
 **Accessibility:**
+
 - Collapsed card: role="button", aria-expanded="false"
 - Expanded card: aria-expanded="true"
 - Tab navigation between Executive/Technical views
@@ -2592,6 +2790,7 @@ interface IssueCardProps {
 - All action buttons have clear labels
 
 **Content Guidelines:**
+
 - Title: Clear, action-oriented (e.g., "Missing Schema Markup", not "Schema Issue")
 - Description: One sentence explaining impact
 - Problem: Plain language explanation for non-tech users
@@ -2599,6 +2798,7 @@ interface IssueCardProps {
 - Code: Ready to copy-paste with context
 
 **Interaction Behavior:**
+
 - Click anywhere on collapsed card → Expands with smooth animation (400ms)
 - Click "Mark as Fixed" → Checkmark appears, card gets green tint, estimated score impact shown
 - Click "Not Applicable" → Card grays out, moves to bottom of list
@@ -2613,6 +2813,7 @@ interface IssueCardProps {
 **Usage:** Inside expanded Issue Cards, Technical Details sections
 
 **Anatomy:**
+
 - Dark container (neutral-900 background)
 - Syntax-highlighted code using Prism.js or Shiki
 - Copy button (top-right corner, neutral-800 background)
@@ -2620,16 +2821,19 @@ interface IssueCardProps {
 - Optional: Language label (top-left badge)
 
 **States:**
+
 - **Default:** "📋 Copy Code" button visible
 - **Copied:** Button text changes to "✓ Copied!" (green) for 2 seconds
 - **Hover:** Copy button background changes (neutral-800 → neutral-700)
 - **Error:** Red message if clipboard API fails
 
 **Variants:**
+
 - **Languages:** HTML, JavaScript, JSON, CSS, TypeScript, etc.
 - **Size:** Inline (single line) or Block (multiple lines with scrolling)
 
 **Component Props:**
+
 ```typescript
 interface CodeBlockProps {
   code: string;
@@ -2643,26 +2847,30 @@ interface CodeBlockProps {
 ```
 
 **Accessibility:**
+
 - Copy button: aria-label="Copy code to clipboard"
 - Success announcement: aria-live="polite" announces "Code copied"
 - Code element: role="code", lang attribute set
 - Keyboard: Tab to button, Enter/Space to copy
 
 **Content Guidelines:**
+
 - Always provide context (what this code does)
 - Include comments in code explaining key parts
 - Format code with proper indentation (2 spaces)
 - Show before/after examples when helpful
 
 **Interaction Behavior:**
+
 - Click "Copy Code" → Code copied to clipboard → Button shows "✓ Copied!" (2 seconds)
 - Preserves formatting, line breaks, indentation
 - Falls back to manual selection if Clipboard API unavailable
 
 **Implementation:**
+
 ```jsx
 // Uses Prism.js for syntax highlighting
-import Prism from 'prismjs';
+import Prism from "prismjs";
 // Clipboard API for copy functionality
 navigator.clipboard.writeText(code);
 ```
@@ -2676,6 +2884,7 @@ navigator.clipboard.writeText(code);
 **Usage:** Dashboard "Improvement" tab, Audit History page
 
 **Anatomy:**
+
 - Line graph with data points connected
 - X-axis: Dates (formatted as "Aug 15", "Sept 10", etc.)
 - Y-axis: Score (0-100%)
@@ -2685,20 +2894,23 @@ navigator.clipboard.writeText(code);
 - Trend indicator (arrow + percentage change)
 
 **States:**
+
 - **Default:** Shows all data points connected with line
 - **Loading:** Skeleton chart with animated placeholder
 - **Single data point:** Message "Run another audit to see trend" + disabled chart
 - **Hover:** Highlight active data point, show tooltip
 
 **Variants:**
+
 - **Time Range:** 30 days, 90 days, 1 year (filter buttons)
 - **Comparison Mode:** Overlay competitor trend line (optional)
 
 **Component Props:**
+
 ```typescript
 interface ScoreTimelineChartProps {
   data: Array<{ date: string; score: number; auditId: string }>;
-  timeRange?: '30d' | '90d' | '1y';
+  timeRange?: "30d" | "90d" | "1y";
   showTrend?: boolean;
   compareWith?: Array<{ date: string; score: number }>; // competitor data
   onDataPointClick?: (auditId: string) => void;
@@ -2707,17 +2919,20 @@ interface ScoreTimelineChartProps {
 ```
 
 **Accessibility:**
+
 - Chart title: "GEO score timeline showing improvement from 34% to 67%"
 - Table fallback for screen readers (hidden visually)
 - Data points: aria-label="August 15th, 34 percent"
 - Keyboard navigation: Tab through data points, Enter to view details
 
 **Content Guidelines:**
+
 - Always show trend percentage ("+33%" or "-12%")
 - Date format: Short month + day ("Aug 15")
 - Minimum 2 data points required for trend line
 
 **Interaction Behavior:**
+
 - Hover over data point → Tooltip appears with date, score, change
 - Click data point → Navigate to that audit dashboard
 - Drag to zoom (optional enhancement)
@@ -2733,6 +2948,7 @@ interface ScoreTimelineChartProps {
 **Usage:** Dashboard "Details" tab, showing prompt-level analysis
 
 **Anatomy:**
+
 - Vertical bar chart
 - Each bar represents a prompt category or AI engine
 - Bar segments: Green (passed prompts), Red (failed prompts)
@@ -2741,16 +2957,19 @@ interface ScoreTimelineChartProps {
 - Click interaction to expand details
 
 **States:**
+
 - **Default:** Shows aggregate data as stacked bars
 - **Hover:** Highlight bar, show tooltip with count
 - **Clicked:** Opens modal with detailed prompt list
 - **Loading:** Skeleton bars
 
 **Variants:**
+
 - **Group By:** AI Engine (ChatGPT/Claude/Perplexity/DeepSeek) or Category (Location/Product/Service/etc.)
 - **Layout:** Vertical bars (default) or Horizontal bars (mobile)
 
 **Component Props:**
+
 ```typescript
 interface PromptGapVizProps {
   promptResults: Array<{
@@ -2760,24 +2979,27 @@ interface PromptGapVizProps {
     total: number;
     prompts: Array<{ text: string; result: boolean; engine: string }>;
   }>;
-  groupBy?: 'engine' | 'category';
+  groupBy?: "engine" | "category";
   onCategoryClick?: (category: string) => void;
   className?: string;
 }
 ```
 
 **Accessibility:**
+
 - Chart title: "Prompt test results by category"
 - Each bar: aria-label="Location prompts: 18 passed, 12 failed out of 30 total"
 - Keyboard: Tab through bars, Enter to open details
 - Modal with prompt list is keyboard-navigable
 
 **Content Guidelines:**
+
 - Show ratio (e.g., "18/30 prompts passed")
 - Use clear category names (not technical jargon)
 - Provide example prompts in tooltip
 
 **Interaction Behavior:**
+
 - Hover on bar → Tooltip shows category + counts + example prompt
 - Click bar → Opens modal with full list of prompts in that category
 - Modal shows each prompt text + pass/fail status + which AI engine
@@ -2790,7 +3012,8 @@ interface PromptGapVizProps {
 
 **Foundation Components (Shadcn/ui):**
 
-Use Shadcn/ui components as-is with AISEO design token customization:
+Use Shadcn/ui components as-is with ShowYourBrand design token customization:
+
 - **Button:** Customize with rounded-xl, primary-600 colors
 - **Card:** Customize with rounded-[20px], shadow-subtle
 - **Dialog:** Use for modals (prompt details, confirmations)
@@ -2802,6 +3025,7 @@ Use Shadcn/ui components as-is with AISEO design token customization:
 **Custom Components (Built from Scratch):**
 
 Build using combination of technologies:
+
 - **GEO Score Ring:** Custom SVG + CSS animations + React state
 - **Competitive Gap Chart:** Custom SVG horizontal bars + Tailwind
 - **Issue Card:** Compose Shadcn Card + Tabs + Custom Code Block
@@ -2810,6 +3034,7 @@ Build using combination of technologies:
 - **Prompt Gap Visualization:** Recharts BarChart + modal integration
 
 **Component File Organization:**
+
 ```
 components/
 ├── ui/                          # Shadcn components
@@ -2851,6 +3076,7 @@ components/
 ```
 
 **Development Standards:**
+
 - All custom components include TypeScript interfaces
 - Unit tests for logic (Jest + React Testing Library)
 - Storybook stories for visual testing
@@ -2900,7 +3126,7 @@ Priority: Add depth and tracking capabilities
 
 6. **Score Timeline Chart** (3 days)
    - Recharts integration
-   - Custom styling to match AISEO aesthetic
+   - Custom styling to match ShowYourBrand aesthetic
    - Hover interactions and tooltips
 
 7. **Prompt Gap Visualization** (3 days)
@@ -2965,6 +3191,7 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** The main action on a page or section (e.g., "Run New Audit", "Download PDF", "Mark as Fixed")
 
 **Visual Design:**
+
 - Background: `bg-primary-600`
 - Text: `text-white`
 - Border radius: `rounded-xl` (12px)
@@ -2973,20 +3200,24 @@ Priority: Production quality, error handling, accessibility
 - Hover: `bg-primary-700`, subtle shadow elevation
 
 **Behavior:**
+
 - Maximum one primary button per section
 - Always use action-oriented labels ("Run Audit", "Download PDF" - not "Click Here", "Submit")
 - Disabled state: `bg-neutral-300 text-neutral-500 cursor-not-allowed`
 
 **Accessibility:**
+
 - Focus ring: `focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2`
 - Minimum touch target: 44x44px (mobile)
 - ARIA label if icon-only button
 
 **Mobile Considerations:**
+
 - Full width on mobile (<640px): `w-full sm:w-auto`
 - Increase padding slightly: `py-4` instead of `py-3`
 
 **Example:**
+
 ```jsx
 <button className="px-6 py-3 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors">
   Run New Audit
@@ -3000,6 +3231,7 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Supporting actions that are less critical (e.g., "View Details", "Edit Business", "Add Competitors")
 
 **Visual Design:**
+
 - Background: `bg-white` or `bg-neutral-100`
 - Text: `text-neutral-700`
 - Border: `border border-neutral-300`
@@ -3007,6 +3239,7 @@ Priority: Production quality, error handling, accessibility
 - Hover: `bg-neutral-50`, `border-neutral-400`
 
 **Example:**
+
 ```jsx
 <button className="px-6 py-3 bg-white text-neutral-700 border border-neutral-300 rounded-xl text-sm font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors">
   View Details
@@ -3020,6 +3253,7 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Low-priority actions (e.g., "Cancel", "Not Applicable", "Skip")
 
 **Visual Design:**
+
 - Background: Transparent
 - Text: `text-neutral-600`
 - No border
@@ -3027,6 +3261,7 @@ Priority: Production quality, error handling, accessibility
 - Less padding: `px-4 py-2`
 
 **Example:**
+
 ```jsx
 <button className="px-4 py-2 text-neutral-600 rounded-xl text-sm font-medium hover:bg-neutral-100 transition-colors">
   Cancel
@@ -3040,18 +3275,21 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Delete, remove, cancel subscription, irreversible actions
 
 **Visual Design:**
+
 - Background: `bg-error-600`
 - Text: `text-white`
 - Hover: `bg-error-700`
 - Always require confirmation dialog before executing
 
 **Pattern:**
+
 1. User clicks destructive button
 2. Confirmation modal appears: "Are you sure you want to delete this audit?"
 3. User must confirm with explicit action (click "Delete" button or type confirmation)
 4. Show success/error feedback after action
 
 **Example:**
+
 ```jsx
 <button className="px-6 py-3 bg-error-600 text-white rounded-xl text-sm font-medium hover:bg-error-700 focus-visible:ring-2 focus-visible:ring-error-500 transition-colors">
   Delete Audit
@@ -3067,6 +3305,7 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Action completed successfully (audit submitted, code copied, issue marked fixed, settings saved)
 
 **Visual Design:**
+
 - Background: `bg-success-50`
 - Border: `border-l-4 border-success-500` (left accent border)
 - Icon: Green checkmark (✓)
@@ -3076,25 +3315,39 @@ Priority: Production quality, error handling, accessibility
 - Auto-dismiss after 5 seconds (with manual close option)
 
 **Behavior:**
+
 - Appear at top of viewport or inline near the action
 - Slide in animation (300ms from top or side)
 - Include: Icon + Clear message + Optional action link
 - Dismiss: Click X button or wait for auto-dismiss
 
 **Accessibility:**
+
 - ARIA role: "alert"
 - ARIA live: "polite"
 - Focus management: Don't steal focus unless user needs to interact
 
 **Example:**
+
 ```jsx
-<div className="bg-success-50 border-l-4 border-success-500 p-4 rounded-r-lg shadow-subtle" role="alert">
+<div
+  className="bg-success-50 border-l-4 border-success-500 p-4 rounded-r-lg shadow-subtle"
+  role="alert"
+>
   <div className="flex items-center justify-between">
     <div className="flex items-center">
       <span className="text-success-500 text-xl mr-3">✓</span>
-      <p className="text-sm font-medium text-success-700">Audit submitted successfully! We'll email you when it's ready (5-10 minutes).</p>
+      <p className="text-sm font-medium text-success-700">
+        Audit submitted successfully! We'll email you when it's ready (5-10
+        minutes).
+      </p>
     </div>
-    <button className="text-success-500 hover:text-success-700" aria-label="Close">✕</button>
+    <button
+      className="text-success-500 hover:text-success-700"
+      aria-label="Close"
+    >
+      ✕
+    </button>
   </div>
 </div>
 ```
@@ -3106,6 +3359,7 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Action failed, validation error, system error, network failure
 
 **Visual Design:**
+
 - Background: `bg-error-50`
 - Border: `border-l-4 border-error-500`
 - Icon: Red X (✕) or warning triangle (⚠)
@@ -3113,6 +3367,7 @@ Priority: Production quality, error handling, accessibility
 - Persist until user dismisses (don't auto-dismiss)
 
 **Behavior:**
+
 - Must include three components:
   1. **What went wrong:** Clear, non-technical description
   2. **Why it happened:** Context if helpful
@@ -3121,26 +3376,44 @@ Priority: Production quality, error handling, accessibility
 - Never use technical jargon or error codes without explanation
 
 **Accessibility:**
+
 - ARIA role: "alert"
 - ARIA live: "assertive" (more urgent than success)
 - Error messages for form fields also read by screen readers
 
 **Example:**
+
 ```jsx
-<div className="bg-error-50 border-l-4 border-error-500 p-4 rounded-r-lg shadow-subtle" role="alert" aria-live="assertive">
+<div
+  className="bg-error-50 border-l-4 border-error-500 p-4 rounded-r-lg shadow-subtle"
+  role="alert"
+  aria-live="assertive"
+>
   <div className="flex items-start">
     <span className="text-error-500 text-xl mr-3 mt-0.5">⚠</span>
     <div className="flex-1">
-      <p className="text-sm font-medium text-error-700">Audit failed to process</p>
+      <p className="text-sm font-medium text-error-700">
+        Audit failed to process
+      </p>
       <p className="text-sm text-error-600 mt-1">
-        The website URL is unreachable. Please check that the URL is correct and the website is online.
+        The website URL is unreachable. Please check that the URL is correct and
+        the website is online.
       </p>
       <div className="mt-3 flex space-x-3">
-        <button className="text-sm text-error-700 underline hover:text-error-800">Retry Audit</button>
-        <a href="/support" className="text-sm text-error-600 underline hover:text-error-700">Contact Support</a>
+        <button className="text-sm text-error-700 underline hover:text-error-800">
+          Retry Audit
+        </button>
+        <a
+          href="/support"
+          className="text-sm text-error-600 underline hover:text-error-700"
+        >
+          Contact Support
+        </a>
       </div>
     </div>
-    <button className="text-error-400 hover:text-error-600" aria-label="Close">✕</button>
+    <button className="text-error-400 hover:text-error-600" aria-label="Close">
+      ✕
+    </button>
   </div>
 </div>
 ```
@@ -3152,18 +3425,24 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Non-blocking issues (subscription limit approaching, incomplete data, deprecated feature)
 
 **Visual Design:**
+
 - Background: `bg-warning-50`
 - Border: `border-l-4 border-warning-500`
 - Icon: Yellow warning (⚠️)
 - Text: `text-warning-700`
 
 **Example:**
+
 ```jsx
 <div className="bg-warning-50 border-l-4 border-warning-500 p-4 rounded-r-lg">
   <div className="flex items-center">
     <span className="text-warning-500 text-xl mr-3">⚠️</span>
     <p className="text-sm text-warning-700">
-      You have 2 of 5 audits remaining this month. <a href="/subscription" className="underline font-medium">Upgrade to Pro</a> for unlimited audits.
+      You have 2 of 5 audits remaining this month.{" "}
+      <a href="/subscription" className="underline font-medium">
+        Upgrade to Pro
+      </a>{" "}
+      for unlimited audits.
     </p>
   </div>
 </div>
@@ -3176,12 +3455,14 @@ Priority: Production quality, error handling, accessibility
 **When to Use:** Helpful context, tips, system status updates, feature announcements
 
 **Visual Design:**
+
 - Background: `bg-primary-50`
 - Border: `border-l-4 border-primary-500`
 - Icon: Blue info icon (ℹ️)
 - Text: `text-primary-700`
 
 **Example:**
+
 ```jsx
 <div className="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-r-lg">
   <div className="flex items-center">
@@ -3202,11 +3483,13 @@ Priority: Production quality, error handling, accessibility
 **Pattern:** Button text/icon changes temporarily to confirm action
 
 **Examples:**
+
 - "Copy Code" → "✓ Copied!" (changes for 2 seconds, then reverts)
 - "Mark as Fixed" → Checkmark badge appears permanently on card
 - Toggle switch → Immediate state change with optional toast message
 
 **Implementation:**
+
 ```jsx
 const [copied, setCopied] = useState(false);
 
@@ -3216,9 +3499,12 @@ const handleCopy = () => {
   setTimeout(() => setCopied(false), 2000);
 };
 
-<button onClick={handleCopy} className="px-3 py-1 bg-neutral-800 text-white text-xs rounded hover:bg-neutral-700">
-  {copied ? '✓ Copied!' : '📋 Copy Code'}
-</button>
+<button
+  onClick={handleCopy}
+  className="px-3 py-1 bg-neutral-800 text-white text-xs rounded hover:bg-neutral-700"
+>
+  {copied ? "✓ Copied!" : "📋 Copy Code"}
+</button>;
 ```
 
 ---
@@ -3228,17 +3514,20 @@ const handleCopy = () => {
 **Form Field Validation:**
 
 **Real-time Validation Strategy:**
+
 - **URL fields:** Validate format on blur (when user leaves field), not on every keystroke
 - **Email fields:** Validate format on blur
 - **Required fields:** Only validate on blur or form submit (don't show errors while typing)
 - **Show success state:** Green checkmark icon when valid (positive reinforcement)
 
 **Valid State:**
+
 - Border: `border-success-500`
 - Icon: Green checkmark (✓) positioned right side of input
 - Optional: Helper text in green confirming validity
 
 **Error State:**
+
 - Border: `border-error-500`
 - Error message below field: `text-sm text-error-600`
 - Icon: Red X (✕) or warning icon
@@ -3246,8 +3535,11 @@ const handleCopy = () => {
 - Keep user's input (don't clear the field)
 
 **Example:**
+
 ```jsx
-{/* Valid state */}
+{
+  /* Valid state */
+}
 <div className="space-y-2">
   <label className="block text-sm font-medium text-neutral-700">
     Website URL <span className="text-error-500">*</span>
@@ -3262,9 +3554,11 @@ const handleCopy = () => {
     <span className="absolute right-3 top-2.5 text-success-500 text-xl">✓</span>
   </div>
   <p className="text-sm text-success-600">Valid URL format</p>
-</div>
+</div>;
 
-{/* Error state */}
+{
+  /* Error state */
+}
 <div className="space-y-2">
   <label className="block text-sm font-medium text-neutral-700">
     Website URL <span className="text-error-500">*</span>
@@ -3280,7 +3574,7 @@ const handleCopy = () => {
   <p id="url-error" className="text-sm text-error-600">
     Please enter a valid URL starting with https:// (e.g., https://example.com)
   </p>
-</div>
+</div>;
 ```
 
 ---
@@ -3288,26 +3582,31 @@ const handleCopy = () => {
 **Form Submission States:**
 
 **1. Default State:**
+
 - Primary button enabled
 - All fields editable
 - No messages shown
 
 **2. Validating State (client-side):**
+
 - Brief moment while checking all fields
 - Button may show brief loading state
 
 **3. Submitting State:**
+
 - Button shows spinner icon + "Submitting..." text
 - Button disabled (`disabled` attribute + `cursor-not-allowed`)
 - All form fields disabled to prevent changes
 - Prevent double-submission
 
 **4. Success State:**
+
 - Success message appears at top of form
 - Either: Clear form for new entry, OR redirect to next page
 - Button returns to enabled state (if staying on page)
 
 **5. Error State:**
+
 - Error message appears at top of form (not just inline)
 - Fields remain populated (don't lose user data!)
 - Field-specific errors shown inline
@@ -3315,22 +3614,46 @@ const handleCopy = () => {
 - Focus moves to first error field
 
 **Example Submit Button States:**
-```jsx
-{/* Default */}
-<button type="submit" className="px-6 py-3 bg-primary-600 text-white rounded-xl">
-  Run Audit
-</button>
 
-{/* Submitting */}
-<button type="submit" disabled className="px-6 py-3 bg-primary-600 text-white rounded-xl cursor-not-allowed opacity-75">
+```jsx
+{
+  /* Default */
+}
+<button
+  type="submit"
+  className="px-6 py-3 bg-primary-600 text-white rounded-xl"
+>
+  Run Audit
+</button>;
+
+{
+  /* Submitting */
+}
+<button
+  type="submit"
+  disabled
+  className="px-6 py-3 bg-primary-600 text-white rounded-xl cursor-not-allowed opacity-75"
+>
   <span className="inline-flex items-center">
     <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
     </svg>
     Submitting...
   </span>
-</button>
+</button>;
 ```
 
 ---
@@ -3338,11 +3661,13 @@ const handleCopy = () => {
 **Required Field Indicators:**
 
 **Visual Treatment:**
-- Asterisk (*) next to label: `<span className="text-error-500">*</span>`
+
+- Asterisk (_) next to label: `<span className="text-error-500">_</span>`
 - Optional fields labeled "(optional)" instead of marking all required fields
-- Show "* Required field" legend at top or bottom of form
+- Show "\* Required field" legend at top or bottom of form
 
 **Validation Timing:**
+
 - Don't show "This field is required" error until user tries to submit or leaves the field
 - Never show errors while user is typing in an empty required field
 
@@ -3353,6 +3678,7 @@ const handleCopy = () => {
 **Sidebar Navigation (Desktop/Tablet):**
 
 **Desktop Layout (1440px+):**
+
 - Fixed left sidebar, 256px width
 - Logo at top (40px height)
 - Navigation items: Icon (24px) + Label
@@ -3362,24 +3688,35 @@ const handleCopy = () => {
 - Bottom section: User profile menu
 
 **Tablet Layout (1024px - 1439px):**
+
 - Collapse to icon-only, 80px width
 - Show labels in tooltip on hover
 - Active state: Same visual treatment
 - Logo becomes icon-only
 
 **Mobile Layout (<1024px):**
+
 - Sidebar hidden by default
 - Hamburger menu icon (☰) in header
 - Sidebar slides in from left as overlay
 - Click outside or X button to close
 
 **Example:**
+
 ```jsx
 <nav className="w-64 bg-white border-r border-neutral-200 fixed h-screen lg:w-64 md:w-20">
   {/* Logo */}
   <div className="p-6 border-b border-neutral-200">
-    <img src="/logo.svg" alt="AISEO" className="h-8 lg:block md:hidden" />
-    <img src="/logo-icon.svg" alt="AISEO" className="h-8 lg:hidden md:block" />
+    <img
+      src="/logo.svg"
+      alt="ShowYourBrand"
+      className="h-8 lg:block md:hidden"
+    />
+    <img
+      src="/logo-icon.svg"
+      alt="ShowYourBrand"
+      className="h-8 lg:hidden md:block"
+    />
   </div>
 
   {/* Navigation Items */}
@@ -3391,7 +3728,9 @@ const handleCopy = () => {
         aria-current="page"
       >
         <span className="text-xl mr-3">📊</span>
-        <span className="text-sm font-medium lg:block md:hidden">Dashboard</span>
+        <span className="text-sm font-medium lg:block md:hidden">
+          Dashboard
+        </span>
       </a>
     </li>
     <li>
@@ -3423,6 +3762,7 @@ const handleCopy = () => {
 **When to Use:** Deep hierarchies (3+ levels): Dashboard > Audits > Restaurant Le Jardin > Edit
 
 **Visual Design:**
+
 - Position: Top of page content area, below header
 - Separator: "/" or ">"
 - Current page: Bold weight, not clickable
@@ -3430,17 +3770,28 @@ const handleCopy = () => {
 - Color: `text-neutral-600`, current page `text-neutral-900`
 
 **Accessibility:**
+
 - ARIA label: `aria-label="Breadcrumb"`
 - Current page: `aria-current="page"`
 
 **Example:**
+
 ```jsx
-<nav className="flex items-center text-sm text-neutral-600 mb-6" aria-label="Breadcrumb">
-  <a href="/dashboard" className="hover:underline hover:text-neutral-900">Dashboard</a>
+<nav
+  className="flex items-center text-sm text-neutral-600 mb-6"
+  aria-label="Breadcrumb"
+>
+  <a href="/dashboard" className="hover:underline hover:text-neutral-900">
+    Dashboard
+  </a>
   <span className="mx-2">/</span>
-  <a href="/audits" className="hover:underline hover:text-neutral-900">Audits</a>
+  <a href="/audits" className="hover:underline hover:text-neutral-900">
+    Audits
+  </a>
   <span className="mx-2">/</span>
-  <span className="font-medium text-neutral-900" aria-current="page">Restaurant Le Jardin</span>
+  <span className="font-medium text-neutral-900" aria-current="page">
+    Restaurant Le Jardin
+  </span>
 </nav>
 ```
 
@@ -3451,13 +3802,18 @@ const handleCopy = () => {
 **When to Use:** Modal flows, multi-step forms, detail views
 
 **Pattern:**
+
 - "← Back" link in top-left of content area
 - Browser back button must work (don't break history)
 - Keyboard: Escape key closes modals/overlays
 
 **Example:**
+
 ```jsx
-<button onClick={() => router.back()} className="flex items-center text-sm text-neutral-600 hover:text-neutral-900 mb-4">
+<button
+  onClick={() => router.back()}
+  className="flex items-center text-sm text-neutral-600 hover:text-neutral-900 mb-4"
+>
   <span className="mr-2">←</span>
   Back to Audits
 </button>
@@ -3472,6 +3828,7 @@ const handleCopy = () => {
 **When to Use:** Confirmations, detailed information, forms that don't fit inline
 
 **Visual Design:**
+
 - Dark overlay: `bg-black/50` (50% opacity black)
 - Modal container: White background, `rounded-[20px]`, `shadow-elevated`
 - Max width: 600px (readable content)
@@ -3480,6 +3837,7 @@ const handleCopy = () => {
 - Vertical centering on screen
 
 **Behavior:**
+
 - **Opening:** Fade in overlay + scale in modal (300ms)
 - **Closing:** Clicking overlay closes modal (unless destructive action pending)
 - **Escape key:** Closes modal
@@ -3488,6 +3846,7 @@ const handleCopy = () => {
 - **Scroll:** If content overflows, modal body scrolls (not page behind it)
 
 **Accessibility:**
+
 - ARIA role: "dialog"
 - ARIA label: Modal title
 - ARIA modal: "true" (prevents interaction with page behind)
@@ -3495,8 +3854,12 @@ const handleCopy = () => {
 - Escape key: Closes modal
 
 **Example:**
+
 ```jsx
-<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={handleOverlayClick}>
+<div
+  className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+  onClick={handleOverlayClick}
+>
   <div
     className="bg-white rounded-[20px] shadow-elevated p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
     role="dialog"
@@ -3519,14 +3882,16 @@ const handleCopy = () => {
     </div>
 
     {/* Content */}
-    <div className="space-y-4">
-      {/* Modal content here */}
-    </div>
+    <div className="space-y-4">{/* Modal content here */}</div>
 
     {/* Actions (optional) */}
     <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-neutral-200">
-      <button className="px-4 py-2 text-neutral-600 rounded-xl hover:bg-neutral-100">Cancel</button>
-      <button className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700">Confirm</button>
+      <button className="px-4 py-2 text-neutral-600 rounded-xl hover:bg-neutral-100">
+        Cancel
+      </button>
+      <button className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700">
+        Confirm
+      </button>
     </div>
   </div>
 </div>
@@ -3539,6 +3904,7 @@ const handleCopy = () => {
 **When to Use:** Destructive actions (delete audit, cancel subscription, remove data)
 
 **Pattern:**
+
 1. User clicks destructive button
 2. Modal appears with:
    - Title: "Are you sure?"
@@ -3549,12 +3915,19 @@ const handleCopy = () => {
 4. Require explicit click on destructive button
 
 **Example:**
+
 ```jsx
 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-  <div className="bg-white rounded-[20px] shadow-elevated p-8 max-w-md w-full mx-4" role="alertdialog">
-    <h2 className="text-xl font-semibold text-neutral-900 mb-2">Delete this audit?</h2>
+  <div
+    className="bg-white rounded-[20px] shadow-elevated p-8 max-w-md w-full mx-4"
+    role="alertdialog"
+  >
+    <h2 className="text-xl font-semibold text-neutral-900 mb-2">
+      Delete this audit?
+    </h2>
     <p className="text-sm text-neutral-600 mb-6">
-      This will permanently delete the audit for "Restaurant Le Jardin" from August 15, 2024. This action cannot be undone.
+      This will permanently delete the audit for "Restaurant Le Jardin" from
+      August 15, 2024. This action cannot be undone.
     </p>
     <div className="flex justify-end space-x-3">
       <button
@@ -3580,23 +3953,29 @@ const handleCopy = () => {
 **When to Use:** Initial page/component load, especially dashboard data
 
 **Pattern:**
+
 - Show content structure with gray animated placeholders
 - Preserve exact layout (no content shift when real data loads)
 - Animate with subtle pulse: `animate-pulse` (Tailwind utility)
 - Use same dimensions as actual content
 
 **Example:**
+
 ```jsx
-{/* Skeleton for GEO Score Ring */}
+{
+  /* Skeleton for GEO Score Ring */
+}
 <div className="bg-white rounded-[20px] shadow-subtle p-8">
   <div className="animate-pulse flex flex-col items-center">
     <div className="w-32 h-32 bg-neutral-200 rounded-full" />
     <div className="h-4 bg-neutral-200 rounded w-24 mt-4" />
     <div className="h-3 bg-neutral-200 rounded w-16 mt-2" />
   </div>
-</div>
+</div>;
 
-{/* Skeleton for Issue Card */}
+{
+  /* Skeleton for Issue Card */
+}
 <div className="bg-white rounded-[20px] shadow-subtle p-8">
   <div className="animate-pulse flex items-start space-x-4">
     <div className="w-10 h-10 bg-neutral-200 rounded-full flex-shrink-0" />
@@ -3606,7 +3985,7 @@ const handleCopy = () => {
       <div className="h-4 bg-neutral-200 rounded w-2/3" />
     </div>
   </div>
-</div>
+</div>;
 ```
 
 ---
@@ -3616,16 +3995,33 @@ const handleCopy = () => {
 **When to Use:** Button actions, quick operations (< 5 seconds)
 
 **Pattern:**
+
 - Small spinner (16-20px) inside or next to button text
 - Use `animate-spin` utility
 - Color matches button text color
 
 **Example:**
+
 ```jsx
-<button disabled className="px-6 py-3 bg-primary-600 text-white rounded-xl cursor-not-allowed opacity-75">
+<button
+  disabled
+  className="px-6 py-3 bg-primary-600 text-white rounded-xl cursor-not-allowed opacity-75"
+>
   <svg className="animate-spin h-5 w-5 inline-block mr-2" viewBox="0 0 24 24">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+      fill="none"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
   </svg>
   Processing...
 </button>
@@ -3638,12 +4034,14 @@ const handleCopy = () => {
 **When to Use:** Multi-step processes (audit processing, PDF generation)
 
 **Pattern:**
+
 - Show current step: "Processing (2/3): Analyzing competitors..."
 - Progress bar if duration is known
 - Time estimate if available: "~5 minutes remaining"
 - Don't show progress bar if you can't accurately estimate
 
 **Example:**
+
 ```jsx
 <div className="space-y-3">
   <div className="flex justify-between text-sm text-neutral-600">
@@ -3651,9 +4049,14 @@ const handleCopy = () => {
     <span>Step 2 of 3</span>
   </div>
   <div className="w-full bg-neutral-200 rounded-full h-2">
-    <div className="bg-primary-600 h-2 rounded-full transition-all duration-500" style={{ width: '66%' }} />
+    <div
+      className="bg-primary-600 h-2 rounded-full transition-all duration-500"
+      style={{ width: "66%" }}
+    />
   </div>
-  <p className="text-sm text-neutral-600">Analyzing competitors (~3 minutes remaining)</p>
+  <p className="text-sm text-neutral-600">
+    Analyzing competitors (~3 minutes remaining)
+  </p>
 </div>
 ```
 
@@ -3666,6 +4069,7 @@ const handleCopy = () => {
 **When to Use:** User has no audits, no projects, no data yet
 
 **Content:**
+
 - Icon or illustration (64-80px, friendly not intimidating)
 - Headline: Welcoming, encouraging tone
 - Description: Brief explanation (1-2 sentences)
@@ -3673,12 +4077,16 @@ const handleCopy = () => {
 - Optional: 2-3 bullet points of benefits
 
 **Example:**
+
 ```jsx
 <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
   <div className="text-6xl mb-6">🔍</div>
-  <h2 className="text-2xl font-semibold text-neutral-900 mb-2">Welcome to AISEO!</h2>
+  <h2 className="text-2xl font-semibold text-neutral-900 mb-2">
+    Welcome to ShowYourBrand!
+  </h2>
   <p className="text-neutral-600 mb-6 max-w-md">
-    Run your first GEO audit to see how AI engines like ChatGPT and Claude see your business.
+    Run your first GEO audit to see how AI engines like ChatGPT and Claude see
+    your business.
   </p>
   <button className="px-6 py-3 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 mb-6">
     Run Your First Audit
@@ -3698,11 +4106,13 @@ const handleCopy = () => {
 **When to Use:** User searches or filters but finds nothing
 
 **Content:**
+
 - Show what they searched for: "No audits matching 'restaurant'"
 - Suggestion: "Try different keywords" or "Clear all filters"
 - Alternative: Show related results or suggest action
 
 **Example:**
+
 ```jsx
 <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
   <div className="text-5xl mb-4">🔍</div>
@@ -3728,19 +4138,24 @@ const handleCopy = () => {
 **When to Use:** User hasn't added competitors or competitor analysis failed
 
 **Content:**
+
 - Show user's score only (partial success)
 - Message: "Add competitors to see how you compare"
 - CTA: "Add Competitors" button
 
 **Example:**
+
 ```jsx
 <div className="bg-warning-50 border border-warning-200 rounded-[20px] p-6">
   <div className="flex items-start">
     <span className="text-2xl mr-3">📊</span>
     <div>
-      <h3 className="text-base font-medium text-warning-900 mb-1">No competitor data available</h3>
+      <h3 className="text-base font-medium text-warning-900 mb-1">
+        No competitor data available
+      </h3>
       <p className="text-sm text-warning-700 mb-3">
-        Add competitor URLs to see how your GEO score compares to others in your industry.
+        Add competitor URLs to see how your GEO score compares to others in your
+        industry.
       </p>
       <button className="px-4 py-2 bg-warning-600 text-white rounded-xl text-sm hover:bg-warning-700">
         Add Competitors
@@ -3755,20 +4170,15 @@ const handleCopy = () => {
 ### Pattern Implementation Priority
 
 **Phase 1 - MVP Critical Patterns:**
+
 1. **Feedback Patterns** (success/error messages for audit submission, code copy)
 2. **Loading States** (skeleton loaders for dashboard, inline spinners for buttons)
 3. **Button Hierarchy** (primary/secondary for all actions)
 4. **Form Patterns** (audit submission form with validation)
 
-**Phase 2 - Enhanced Experience:**
-5. **Modal Patterns** (prompt details, confirmations)
-6. **Empty States** (first-time user experience, no data states)
-7. **Navigation Patterns** (sidebar behavior already defined in design direction)
+**Phase 2 - Enhanced Experience:** 5. **Modal Patterns** (prompt details, confirmations) 6. **Empty States** (first-time user experience, no data states) 7. **Navigation Patterns** (sidebar behavior already defined in design direction)
 
-**Phase 3 - Polish:**
-8. Consistent animation timings
-9. Micro-interactions polish
-10. Advanced loading states
+**Phase 3 - Polish:** 8. Consistent animation timings 9. Micro-interactions polish 10. Advanced loading states
 
 ---
 
@@ -3776,15 +4186,17 @@ const handleCopy = () => {
 
 ### Platform Priority Clarification
 
-AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs:
+ShowYourBrand's responsive strategy reflects its B2B SaaS nature and dual-audience needs:
 
 **Landing Page (Marketing Site):**
+
 - **Mobile-First Design** - Conversion-optimized for all devices
 - Start with 375px mobile baseline, enhance for tablet (768px+) and desktop (1024px+)
 - Critical for SEO and lead capture across all device types
 - Full responsive implementation required
 
 **Dashboard (Audit Interface):**
+
 - **Desktop-First Design** - Complex data requires screen real estate
 - Optimized for 1440px+ desktop screens (primary use case)
 - Tablet support (1024px+) with collapsed sidebar (80px wide)
@@ -3799,16 +4211,19 @@ AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs
 #### Desktop (1440px+) - Optimal Experience
 
 **Layout:**
+
 - Sidebar: 256px width, fully expanded with labels
 - Main content area: Remaining width (typically 1184px on 1440px screens)
 - 3-column grids for dashboard cards
 - Generous spacing maintained (64-96px section gaps)
 
 **Navigation:**
+
 - Full sidebar navigation always visible
 - Quick actions prominent in header
 
 **Data Visualization:**
+
 - Full-width charts with detailed legends
 - Side-by-side competitive comparison tables
 - Code blocks with full syntax highlighting
@@ -3818,16 +4233,19 @@ AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs
 #### Small Desktop / Large Tablet (1024px - 1439px)
 
 **Layout:**
+
 - Sidebar: 256px width (same as desktop) OR collapsed to 80px (icon-only)
 - Main content area: Adjusted for narrower viewport
 - 2-column grids for dashboard cards
 - Maintain 32-64px section spacing
 
 **Navigation:**
+
 - Toggle button to collapse/expand sidebar
 - Collapsed sidebar shows icons only with tooltips on hover
 
 **Data Visualization:**
+
 - Slightly narrower charts, maintain readability
 - Competitive comparison may stack vertically
 
@@ -3836,22 +4254,26 @@ AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs
 #### Tablet (640px - 1023px)
 
 **Layout:**
+
 - Sidebar: Collapsed to 80px by default (icon-only), expandable as overlay
 - Main content area: Full width minus collapsed sidebar
 - Single-column layout for most cards
 - Reduce section spacing to 24-32px
 
 **Navigation:**
+
 - Collapsed sidebar with icons
 - Tap icon to expand sidebar as temporary overlay (covers content)
 - Overlay sidebar closes on selection or tap outside
 
 **Data Visualization:**
+
 - Charts scale to container width
 - Competitive comparison stacks vertically
 - Tables may require horizontal scroll for wide data
 
 **Interactions:**
+
 - Touch-optimized targets (minimum 44x44px)
 - Swipe gestures for closing overlays
 - Tap instead of hover interactions
@@ -3861,6 +4283,7 @@ AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs
 #### Mobile (< 640px) - Limited Dashboard Support
 
 **Landing Page:**
+
 - Fully responsive, mobile-optimized design
 - Hero section with centered content
 - Stacked single-column layout
@@ -3868,6 +4291,7 @@ AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs
 - Simplified navigation (hamburger menu)
 
 **Dashboard:**
+
 - Show prominent message: "For the best audit experience, please use a desktop or tablet device. Complex data visualization and code implementation require larger screens."
 - Optional: Show only GEO Score and basic status
 - Redirect to landing page with "Learn More" CTA
@@ -3877,16 +4301,16 @@ AISEO's responsive strategy reflects its B2B SaaS nature and dual-audience needs
 
 ### Tailwind Breakpoint Strategy
 
-AISEO uses Tailwind CSS default breakpoints with strategic application:
+ShowYourBrand uses Tailwind CSS default breakpoints with strategic application:
 
-| Breakpoint | Range | Tailwind Prefix | AISEO Usage |
-|------------|-------|-----------------|-------------|
-| `xs` (default) | < 640px | (none) | Mobile landing page styles, dashboard limitation message |
-| `sm` | 640px+ | `sm:` | Tablet optimizations, collapsible sidebar triggers |
-| `md` | 768px+ | `md:` | Tablet full support, 2-column grids |
-| `lg` | 1024px+ | `lg:` | Small desktop, sidebar expansion, full dashboard functionality |
-| `xl` | 1280px+ | `xl:` | Desktop enhancements, 3-column grids |
-| `2xl` | 1536px+ | `2xl:` | Large desktop optimizations, maximum spacing |
+| Breakpoint     | Range   | Tailwind Prefix | ShowYourBrand Usage                                            |
+| -------------- | ------- | --------------- | -------------------------------------------------------------- |
+| `xs` (default) | < 640px | (none)          | Mobile landing page styles, dashboard limitation message       |
+| `sm`           | 640px+  | `sm:`           | Tablet optimizations, collapsible sidebar triggers             |
+| `md`           | 768px+  | `md:`           | Tablet full support, 2-column grids                            |
+| `lg`           | 1024px+ | `lg:`           | Small desktop, sidebar expansion, full dashboard functionality |
+| `xl`           | 1280px+ | `xl:`           | Desktop enhancements, 3-column grids                           |
+| `2xl`          | 1536px+ | `2xl:`          | Large desktop optimizations, maximum spacing                   |
 
 **Implementation Examples:**
 
@@ -3920,9 +4344,10 @@ AISEO uses Tailwind CSS default breakpoints with strategic application:
 
 ### WCAG 2.1 AA Accessibility Compliance
 
-AISEO targets **WCAG 2.1 Level AA** compliance - the industry standard for B2B SaaS applications.
+ShowYourBrand targets **WCAG 2.1 Level AA** compliance - the industry standard for B2B SaaS applications.
 
 **Rationale:**
+
 - Legal compliance for EU/US markets (ADA, EAA requirements)
 - Agency clients may serve accessibility-conscious businesses
 - Professional credibility - AA is expected baseline
@@ -3933,22 +4358,24 @@ AISEO targets **WCAG 2.1 Level AA** compliance - the industry standard for B2B S
 #### Color Contrast Requirements
 
 **Text Contrast (WCAG 2.1 AA Success Criterion 1.4.3):**
+
 - Normal text (< 18px or < 14px bold): **4.5:1 minimum contrast ratio**
 - Large text (≥ 18px or ≥ 14px bold): **3:1 minimum contrast ratio**
 
-**AISEO Color Contrast Validation:**
+**ShowYourBrand Color Contrast Validation:**
 
-| Text Color | Background | Contrast Ratio | Passes AA? | Usage |
-|------------|------------|----------------|------------|-------|
-| `neutral-900` (#171717) | White (#FFFFFF) | 17.6:1 | ✅ Yes | Primary text |
-| `neutral-700` (#404040) | White (#FFFFFF) | 10.4:1 | ✅ Yes | Secondary text |
-| `neutral-600` (#525252) | White (#FFFFFF) | 8.1:1 | ✅ Yes | Tertiary text |
-| `primary-600` (#2563eb) | White (#FFFFFF) | 6.8:1 | ✅ Yes | Links, CTAs |
-| `success-700` (#047857) | White (#FFFFFF) | 5.2:1 | ✅ Yes | Success text |
-| `error-700` (#b91c1c) | White (#FFFFFF) | 7.9:1 | ✅ Yes | Error text |
-| White (#FFFFFF) | `primary-600` (#2563eb) | 6.8:1 | ✅ Yes | Button text |
+| Text Color              | Background              | Contrast Ratio | Passes AA? | Usage          |
+| ----------------------- | ----------------------- | -------------- | ---------- | -------------- |
+| `neutral-900` (#171717) | White (#FFFFFF)         | 17.6:1         | ✅ Yes     | Primary text   |
+| `neutral-700` (#404040) | White (#FFFFFF)         | 10.4:1         | ✅ Yes     | Secondary text |
+| `neutral-600` (#525252) | White (#FFFFFF)         | 8.1:1          | ✅ Yes     | Tertiary text  |
+| `primary-600` (#2563eb) | White (#FFFFFF)         | 6.8:1          | ✅ Yes     | Links, CTAs    |
+| `success-700` (#047857) | White (#FFFFFF)         | 5.2:1          | ✅ Yes     | Success text   |
+| `error-700` (#b91c1c)   | White (#FFFFFF)         | 7.9:1          | ✅ Yes     | Error text     |
+| White (#FFFFFF)         | `primary-600` (#2563eb) | 6.8:1          | ✅ Yes     | Button text    |
 
 **Testing Tools:**
+
 - Chrome DevTools Lighthouse (automated scan)
 - WebAIM Contrast Checker (manual validation)
 - axe DevTools extension (real-time feedback)
@@ -3960,12 +4387,14 @@ AISEO targets **WCAG 2.1 Level AA** compliance - the industry standard for B2B S
 **All interactive elements must be keyboard-accessible:**
 
 **Navigation Patterns:**
+
 - **Tab / Shift+Tab** - Move between focusable elements (buttons, links, form inputs)
 - **Enter / Space** - Activate buttons and links
 - **Escape** - Close modals, dropdowns, overlays
 - **Arrow Keys** - Navigate within dropdown menus, tabs, radio groups
 
 **Focus Indicators:**
+
 ```jsx
 // Tailwind focus-visible utility provides accessible focus ring
 <button className="focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
@@ -3974,11 +4403,13 @@ AISEO targets **WCAG 2.1 Level AA** compliance - the industry standard for B2B S
 ```
 
 **Focus Management:**
+
 - When modal opens: Focus moves to first interactive element in modal
 - When modal closes: Focus returns to trigger button
 - Skip links for main content: `<a href="#main-content" className="sr-only focus:not-sr-only">Skip to main content</a>`
 
 **Keyboard Shortcuts (Optional Enhancement):**
+
 - `Cmd/Ctrl + K` - Open quick search
 - `Cmd/Ctrl + N` - New audit (from dashboard)
 - `Escape` - Close any overlay
@@ -4041,7 +4472,7 @@ AISEO targets **WCAG 2.1 Level AA** compliance - the industry standard for B2B S
 // Announce success/error messages without moving focus
 <div aria-live="polite" aria-atomic="true" className="sr-only">
   {statusMessage}
-</div>
+</div>;
 
 // Example: After copying code
 setStatusMessage("Code copied to clipboard");
@@ -4049,6 +4480,7 @@ setStatusMessage("Code copied to clipboard");
 ```
 
 **Screen Reader Testing:**
+
 - macOS: VoiceOver (Cmd + F5)
 - Windows: NVDA (free) or JAWS (paid)
 - Test all critical user flows with screen reader only
@@ -4058,10 +4490,11 @@ setStatusMessage("Code copied to clipboard");
 #### Touch Target Requirements
 
 **Minimum Touch Target Size (WCAG 2.5.5 Level AAA, but adopt as best practice):**
+
 - **44x44 CSS pixels minimum** for all interactive elements on mobile/tablet
 - Desktop may use slightly smaller targets (40x40px acceptable)
 
-**AISEO Touch Target Implementation:**
+**ShowYourBrand Touch Target Implementation:**
 
 ```jsx
 // Mobile/tablet buttons
@@ -4081,6 +4514,7 @@ setStatusMessage("Code copied to clipboard");
 ```
 
 **Touch Interaction Optimization:**
+
 ```css
 /* CSS touch-action property for better touch responsiveness */
 .touch-manipulation {
@@ -4093,6 +4527,7 @@ setStatusMessage("Code copied to clipboard");
 #### Accessibility Implementation Checklist
 
 **Phase 1 - Foundation (MVP):**
+
 - [ ] Semantic HTML structure for all pages
 - [ ] Sufficient color contrast (4.5:1 for text)
 - [ ] Keyboard navigation works for all interactive elements
@@ -4102,6 +4537,7 @@ setStatusMessage("Code copied to clipboard");
 - [ ] Error messages linked to form fields (`aria-describedby`)
 
 **Phase 2 - Enhanced (Post-MVP):**
+
 - [ ] Skip links for main content
 - [ ] Screen reader announcements for dynamic content (live regions)
 - [ ] Expandable sections use `aria-expanded`
@@ -4110,6 +4546,7 @@ setStatusMessage("Code copied to clipboard");
 - [ ] Touch targets meet 44x44px minimum on mobile
 
 **Phase 3 - Polish (Continuous Improvement):**
+
 - [ ] Keyboard shortcuts for power users
 - [ ] High contrast mode support (Windows)
 - [ ] Reduced motion support (`prefers-reduced-motion` media query)
@@ -4123,23 +4560,27 @@ setStatusMessage("Code copied to clipboard");
 #### Automated Accessibility Testing
 
 **Lighthouse (Chrome DevTools):**
+
 - Run Lighthouse audit on every page
 - Target score: **95+ for Accessibility category**
 - Fix all critical issues (contrast, ARIA, keyboard navigation)
 
 **Command:**
+
 ```bash
 # Run Lighthouse CLI for CI/CD integration
 npm install -g lighthouse
-lighthouse https://aiseo.com --only-categories=accessibility --output=json --output-path=./lighthouse-report.json
+lighthouse https://ShowYourBrand.com --only-categories=accessibility --output=json --output-path=./lighthouse-report.json
 ```
 
 **axe DevTools Extension:**
+
 - Install axe DevTools browser extension (free)
 - Run real-time accessibility scans during development
 - Identifies WCAG violations with fix recommendations
 
 **Integration:**
+
 ```bash
 # Automated axe testing with Playwright/Cypress
 npm install --save-dev @axe-core/playwright
@@ -4147,14 +4588,14 @@ npm install --save-dev @axe-core/playwright
 
 ```javascript
 // Example Playwright test with axe
-import { injectAxe, checkA11y } from '@axe-core/playwright';
+import { injectAxe, checkA11y } from "@axe-core/playwright";
 
-test('Dashboard accessibility', async ({ page }) => {
-  await page.goto('/dashboard');
+test("Dashboard accessibility", async ({ page }) => {
+  await page.goto("/dashboard");
   await injectAxe(page);
   await checkA11y(page, null, {
     detailedReport: true,
-    detailedReportOptions: { html: true }
+    detailedReportOptions: { html: true },
   });
 });
 ```
@@ -4164,6 +4605,7 @@ test('Dashboard accessibility', async ({ page }) => {
 #### Manual Testing Procedures
 
 **Keyboard Navigation Test:**
+
 1. **Tab through entire page** - Ensure all interactive elements are reachable
 2. **Visual focus indicator** - Confirm focus ring is visible on all elements
 3. **Activate with Enter/Space** - Verify buttons and links work with keyboard
@@ -4171,6 +4613,7 @@ test('Dashboard accessibility', async ({ page }) => {
 5. **No keyboard traps** - Ensure users can always tab out of components
 
 **Screen Reader Test:**
+
 1. **Navigate by headings** - Use VoiceOver rotor to jump between H1/H2/H3 headings
 2. **Form labels** - Verify all inputs announce their labels correctly
 3. **Button purpose** - Ensure icon-only buttons have descriptive labels
@@ -4178,11 +4621,13 @@ test('Dashboard accessibility', async ({ page }) => {
 5. **Modals** - Test focus management when opening/closing dialogs
 
 **Color Contrast Test:**
+
 1. Use WebAIM Contrast Checker for all text/background combinations
 2. Test in grayscale mode to ensure information isn't conveyed by color alone
 3. Verify success (green) vs. error (red) states have additional indicators (icons, text)
 
 **Touch Target Test (Mobile/Tablet):**
+
 1. Use real devices (iPhone, iPad, Android tablet)
 2. Attempt to tap all buttons, links, form inputs
 3. Verify no accidental taps on adjacent elements
@@ -4193,27 +4638,32 @@ test('Dashboard accessibility', async ({ page }) => {
 #### Responsive Testing Devices & Browsers
 
 **Desktop Testing:**
+
 - **Chrome** (primary browser) - 1440px, 1920px
 - **Firefox** - 1440px
 - **Safari** - 1440px (macOS)
 - **Edge** - 1440px
 
 **Tablet Testing:**
+
 - **iPad Pro 12.9"** (1024x1366) - Safari
 - **iPad Air** (820x1180) - Safari
 - **Samsung Galaxy Tab S8** (800x1280) - Chrome
 
 **Mobile Testing (Landing Page Only):**
+
 - **iPhone 14 Pro** (393x852) - Safari
 - **Samsung Galaxy S23** (360x780) - Chrome
 - **Pixel 7** (412x915) - Chrome
 
 **Browser Testing Strategy:**
+
 - **Primary:** Chrome (90%+ of B2B SaaS traffic)
 - **Secondary:** Safari (macOS/iOS users)
 - **Tertiary:** Firefox, Edge (validate compatibility, not primary focus)
 
 **Responsive Testing Tools:**
+
 - Chrome DevTools Device Emulation
 - BrowserStack (cross-browser/device testing)
 - Real device testing for critical flows
@@ -4225,11 +4675,13 @@ test('Dashboard accessibility', async ({ page }) => {
 **Responsive Development Best Practices:**
 
 1. **Use Tailwind's responsive utilities** - Apply breakpoint prefixes to adjust layouts
+
    ```jsx
    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
    ```
 
 2. **Mobile-first CSS** - Define base styles for mobile, enhance for larger screens
+
    ```jsx
    <h1 className="text-2xl sm:text-3xl lg:text-4xl">
    ```
@@ -4262,17 +4714,25 @@ test('Dashboard accessibility', async ({ page }) => {
 4. **Test with keyboard only** - Before every commit, tab through your changes
 
 5. **Use focus-visible, not focus** - Avoids ugly focus rings on mouse clicks
+
    ```jsx
-   className="focus-visible:ring-2 focus-visible:ring-primary-500"
+   className = "focus-visible:ring-2 focus-visible:ring-primary-500";
    ```
 
 6. **Form validation must be accessible**
+
    ```jsx
    <input
      aria-invalid={hasError}
      aria-describedby={hasError ? "email-error" : undefined}
-   />
-   {hasError && <p id="email-error" role="alert">Invalid email format</p>}
+   />;
+   {
+     hasError && (
+       <p id="email-error" role="alert">
+         Invalid email format
+       </p>
+     );
+   }
    ```
 
 7. **Loading states need announcements**
@@ -4287,19 +4747,23 @@ test('Dashboard accessibility', async ({ page }) => {
 ### Accessibility Resources for Team
 
 **Official Guidelines:**
+
 - [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
 - [MDN Web Accessibility Guide](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
 
 **Testing Tools:**
+
 - [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
 - [axe DevTools Browser Extension](https://www.deque.com/axe/devtools/)
 - [WAVE Web Accessibility Evaluation Tool](https://wave.webaim.org/)
 
 **ARIA Reference:**
+
 - [ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/)
 - [ARIA in HTML Spec](https://www.w3.org/TR/html-aria/)
 
 **Learning Resources:**
+
 - [A11y Project Checklist](https://www.a11yproject.com/checklist/)
 - [Inclusive Components by Heydon Pickering](https://inclusive-components.design/)
 

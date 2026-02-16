@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Mail, CheckCircle, Loader2 } from 'lucide-react';
+import React, { useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Mail, CheckCircle, Loader2 } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,22 +18,22 @@ export default function ForgotPasswordPage() {
     setError(null);
 
     if (!email) {
-      setError('Please enter your email address.');
+      setError("Please enter your email address.");
       return;
     }
 
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address.');
+      setError("Please enter a valid email address.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
       });
@@ -41,15 +41,15 @@ export default function ForgotPasswordPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'An error occurred. Please try again.');
+        setError(data.message || "An error occurred. Please try again.");
         setIsLoading(false);
         return;
       }
 
       setIsSubmitted(true);
     } catch (err) {
-      console.error('Forgot password error:', err);
-      setError('An error occurred. Please try again.');
+      console.error("Forgot password error:", err);
+      setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -73,15 +73,16 @@ export default function ForgotPasswordPage() {
             </h1>
 
             <p className="text-gray-600 mb-6">
-              If an account exists with <strong>{email}</strong>, you will receive a password reset link shortly.
+              If an account exists with <strong>{email}</strong>, you will
+              receive a password reset link shortly.
             </p>
 
             <p className="text-sm text-gray-500 mb-6">
-              Did not receive the email? Check your spam folder or{' '}
+              Did not receive the email? Check your spam folder or{" "}
               <button
                 onClick={() => {
                   setIsSubmitted(false);
-                  setEmail('');
+                  setEmail("");
                 }}
                 className="text-purple-600 hover:underline"
               >
@@ -90,7 +91,7 @@ export default function ForgotPasswordPage() {
             </p>
 
             <Button
-              onClick={() => router.push('/login')}
+              onClick={() => router.push("/login")}
               className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-semibold rounded-xl"
             >
               Back to Login
@@ -122,7 +123,9 @@ export default function ForgotPasswordPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-xl flex items-center justify-center">
               <span className="text-white text-sm font-bold">AI</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">AISEO</span>
+            <span className="text-2xl font-bold text-gray-900">
+              ShowYourBrand
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Forgot Password?
@@ -166,15 +169,18 @@ export default function ForgotPasswordPage() {
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                'Send Reset Link'
+                "Send Reset Link"
               )}
             </Button>
           </form>
         </div>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          Remember your password?{' '}
-          <Link href="/login" className="font-semibold text-[#1E293B] hover:text-slate-700">
+          Remember your password?{" "}
+          <Link
+            href="/login"
+            className="font-semibold text-[#1E293B] hover:text-slate-700"
+          >
             Sign in
           </Link>
         </p>

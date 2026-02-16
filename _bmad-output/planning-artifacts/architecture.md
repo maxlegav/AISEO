@@ -1,21 +1,21 @@
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 inputDocuments:
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/product-brief-AISEO-2026-01-13.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/prd.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/prd-validation-report.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/ux-design-specification.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/project-context.md'
-workflowType: 'architecture'
-project_name: 'AISEO'
-user_name: 'Maxlemoinegavoille'
-date: '2026-01-20'
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/product-brief-ShowYourBrand-2026-01-13.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/prd.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/prd-validation-report.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/ux-design-specification.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/project-context.md"
+workflowType: "architecture"
+project_name: "ShowYourBrand"
+user_name: "Maxlemoinegavoille"
+date: "2026-01-20"
 lastStep: 8
-status: 'complete'
-completedAt: '2026-01-21'
+status: "complete"
+completedAt: "2026-01-21"
 ---
 
-# Architecture Decision Document - AISEO
+# Architecture Decision Document - ShowYourBrand
 
 **Author:** Maxlemoinegavoille
 **Date:** 2026-01-20
@@ -31,6 +31,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 **Functional Requirements (88 total):**
 
 **Core Platform Capabilities:**
+
 - **User Management (FR1-FR7):** Account creation (email/password + Google OAuth), profile management, language preference (EN/FR), secure sessions (30-day JWT)
 - **Project Management (FR8-FR14):** Project/audit management, competitor URL tracking (Basic=1, Pro=5, Premium=unlimited), CRUD operations
 - **Audit Engine (FR15-FR22):** 100-prompt battery testing across 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek), GEO Health Score calculation (0-100%), competitive visibility comparison, prompt category analysis, audit history tracking
@@ -41,12 +42,13 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - **Payments & Subscription (FR54-FR61):** One-shot audits (Basic €100, Pro €200), Premium subscription (€500/month with 20 audits included, +€20/extra), feature restrictions by tier (AI engines, competitors, history, white-label), Stripe Customer Portal, webhook handling
 - **Email Notifications (FR63-FR66):** Welcome emails, audit completion notifications, subscription confirmations, payment receipts (via Resend)
 - **Integration Capabilities (FR67-FR71, conditional):** Google Search Console OAuth, Google Analytics OAuth, SEO/traffic metric correlation (if APIs are free and easy to implement)
-- **Data Management & Compliance (FR72-FR77):** MongoDB Atlas encryption at rest, GDPR data export, account deletion, robots.txt compliance, rate-limited scraping, descriptive user-agent ("AISEO-Bot/1.0")
+- **Data Management & Compliance (FR72-FR77):** MongoDB Atlas encryption at rest, GDPR data export, account deletion, robots.txt compliance, rate-limited scraping, descriptive user-agent ("ShowYourBrand-Bot/1.0")
 - **Admin Interface (FR78-FR88):** Dedicated admin dashboard, all-audits list view with filters, detailed audit inspection, user dashboard preview, manual data editing with audit trail, manual PDF regeneration, platform statistics (total audits, success rate, MRR), search/filter capabilities, error log viewing, manual audit retry, raw API response debugging
 
 **Non-Functional Requirements (21 total):**
 
 **Performance (NFR-P1-P5):**
+
 - NFR-P1: Quality-first audit completion with 10-minute timeout (anti-hang protection only, not performance target)
 - NFR-P2: Dashboard loads < 2 seconds (P95), Lighthouse > 85
 - NFR-P3: API responses < 1 second (P95)
@@ -54,6 +56,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - NFR-P5: PDF generation < 2 minutes (async with email notification)
 
 **Security (NFR-S1-S6):**
+
 - NFR-S1: MongoDB Atlas encryption at rest (AES-256)
 - NFR-S2: Bcrypt password hashing (10 rounds - OWASP minimum)
 - NFR-S3: HTTPS everywhere (TLS 1.2+), SSL Labs A+ rating
@@ -62,6 +65,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - NFR-S6: User data isolation (no cross-user data leakage)
 
 **Reliability (NFR-R1-R5):**
+
 - NFR-R1: 95%+ audit success rate for paid audits
 - NFR-R2: 99%+ platform uptime (Vercel SLA baseline)
 - NFR-R3: Graceful AI API degradation (minimum 2 of 4 APIs required, clear warnings if APIs fail)
@@ -69,23 +73,27 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - NFR-R5: Critical error alerts within 5 minutes (email founders)
 
 **Scalability (NFR-SC1-SC4):**
+
 - NFR-SC1: 100 concurrent users without degradation
 - NFR-SC2: 500 audits/month capacity (Month 12 North Star metric)
 - NFR-SC3: 10,000 audits + 1,000 users database capacity
 - NFR-SC4: Horizontal scaling for processing service (add instances as load increases)
 
 **Integration (NFR-I1-I4):**
+
 - NFR-I1: Idempotent Stripe webhooks with signature validation
 - NFR-I2: AI API rate limit compliance (exponential backoff: 1s → 2s → 4s → 8s, max 4 retries, 15s timeout)
 - NFR-I3: 95%+ email deliverability (Resend with SPF/DKIM)
 - NFR-I4: Optional Google API failures don't block audits (conditional integration)
 
 **Accessibility (NFR-A1-A3):**
+
 - NFR-A1: WCAG 2.1 Level A compliance, Lighthouse accessibility > 90
 - NFR-A2: Full keyboard navigation (no mouse-only interactions)
 - NFR-A3: Screen reader compatible (NVDA, JAWS, VoiceOver)
 
 **Internationalization (NFR-I18N1-I18N3):**
+
 - NFR-I18N1: Instant language switching (EN/FR) without page reload
 - NFR-I18N2: Localized PDF reports in user's preferred language
 - NFR-I18N3: New language addition < 2 days (translation only, no code changes)
@@ -109,6 +117,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 ### Technical Constraints & Dependencies
 
 **Mandatory Technology Stack (from project-context.md):**
+
 - Next.js 15.x with Pages Router (NOT App Router)
 - React 18.2.0+, TypeScript 5.8.3+ (strict mode enabled)
 - MongoDB 5.9.2+ with Mongoose 7.4.4+
@@ -119,12 +128,14 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - Tailwind CSS + Shadcn/ui (single UI framework - learned from Auto-Invoice mistake of mixing 3 frameworks)
 
 **UI Framework Decision:**
+
 - Must use Tailwind CSS + Shadcn/ui (established in UX specification)
 - Copy-paste component model (no npm dependency lock-in)
 - Selective component installation (download only needed components)
 - Achieves Dreelio-level premium polish
 
 **Processing Service Constraints:**
+
 - Must be separate from Next.js (avoid serverless function timeouts)
 - Docker containerization required
 - Runs locally in development, AWS Lambda/ECS in production
@@ -132,18 +143,21 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - Must support horizontal scaling (multiple instances for parallel audit processing)
 
 **AI API Integration Constraints:**
+
 - Must respect rate limits with exponential backoff (NFR-I2)
 - Minimum 2 of 4 APIs must succeed for report generation (NFR-R3)
 - Parallel processing required (NFR-P4) - sequential would take 4x longer
 - Must handle API failures gracefully with clear user warnings
 
 **Data Integrity Constraints:**
+
 - Snapshot pattern mandatory for historical data (audits must capture business state at audit time)
 - Never use populated references for historical data
 - Field-level encryption required for sensitive data (AES-256-GCM)
 - Fail-closed on decryption errors (throw error, don't return original value)
 
 **Development Constraints:**
+
 - 2 developers, 8-10 weeks, €18-28K budget
 - MVP-first approach: "Premium Walking Skeleton" (impeccable frontend, lean backend processes acceptable)
 - Target users are agencies demanding polished, professional tools (UI quality = credibility signal)
@@ -151,6 +165,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 ### Cross-Cutting Concerns Identified
 
 **Authentication & Authorization:**
+
 - NextAuth with JWT strategy (30-day sessions)
 - Google OAuth + Credentials (email/password) providers
 - Session validation on every API route
@@ -158,6 +173,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - Admin-only routes protected separately
 
 **Security:**
+
 - Field-level encryption plugin for Mongoose (encrypt/decrypt on save/load hooks)
 - API route security pattern (sanitizeInput → getServerSession → requireAuth → business logic)
 - Input sanitization against MongoDB injection (block all $ operators by default)
@@ -165,12 +181,14 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - Security headers (X-Frame-Options, CSP, X-Content-Type-Options)
 
 **Error Handling:**
+
 - Custom ApiError class with ErrorType enum
 - Centralized handleApiError function (never expose sensitive data in production)
 - Structured logging with Pino (replaces console.log from Auto-Invoice)
 - Error monitoring with Sentry (missing from Auto-Invoice)
 
 **Internationalization:**
+
 - next-i18next for translation framework
 - Translation files: /locales/en.json, /locales/fr.json
 - User language preference stored in database
@@ -179,18 +197,21 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - Adding new language = 1-2 days translation effort only
 
 **Subscription Management:**
+
 - Stripe webhooks for all lifecycle events (checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.payment_succeeded, invoice.payment_failed)
 - Idempotent webhook handling (verify signature, use idempotency keys)
 - Subscription status checked in NextAuth JWT callback (refreshed on every request)
 - Feature restriction based on tier (project count limits enforced)
 
 **Data Consistency:**
+
 - Snapshot pattern for audits (capture complete business state at audit time)
 - Mongoose pre-save hooks for encryption and password hashing
 - Timestamps on all models (createdAt, updatedAt automatic)
 - Soft deletes for user data (deletedAt field, query helper for .active())
 
 **Performance & Scalability:**
+
 - MongoDB indexes on foreign keys and query fields
 - Lean queries (return plain JS objects, not Mongoose documents)
 - Next.js Image component for all images (automatic optimization)
@@ -222,23 +243,27 @@ The project context document defines a comprehensive technical stack based on pr
 ### Starter Options Considered
 
 **Option 1: create-next-app (Latest Next.js Starter)**
+
 - Official Next.js starter with TypeScript and Tailwind
 - Clean slate for new project
 - Requires manual setup of authentication, database, payment processing
 - **Alignment:** Provides foundation but requires significant setup
 
 **Option 2: T3 Stack (create-t3-app)**
+
 - Opinionated full-stack: Next.js + TypeScript + tRPC + Prisma + NextAuth + Tailwind
 - Includes authentication out of the box
 - **Misalignment:** Uses Prisma (need Mongoose), tRPC (need REST), App Router default (need Pages Router)
 - **Not suitable for this project**
 
 **Option 3: Reuse Auto-Invoice Foundation**
+
 - Fork existing Auto-Invoice codebase
 - Proven security patterns, working subscription system, field encryption
 - **Concerns:** Invoice-specific code throughout, potential technical debt, migration complexity
 
 **Option 4: Hybrid Approach (Fresh Start + Pattern Reuse)**
+
 - Start with create-next-app for clean foundation
 - Copy proven utility patterns from Auto-Invoice (not entire codebase)
 - Build new domain models from scratch
@@ -259,10 +284,10 @@ The project context document defines a comprehensive technical stack based on pr
 
 ```bash
 # Initialize Next.js application
-npx create-next-app@latest aiseo-platform --typescript --tailwind --eslint --src-dir=false --app=false --import-alias="@/*"
+npx create-next-app@latest ShowYourBrand-platform --typescript --tailwind --eslint --src-dir=false --app=false --import-alias="@/*"
 
 # Navigate to project
-cd aiseo-platform
+cd ShowYourBrand-platform
 
 # Install core dependencies
 npm install mongoose@7.4.4 next-auth@4.24.11 stripe@13.2.0 @vercel/blob resend bcrypt@5.1.1
@@ -278,24 +303,28 @@ npx shadcn-ui@latest add button card dialog dropdown-menu tabs table tooltip bad
 **Architectural Decisions Provided by Starter:**
 
 **Language & Runtime:**
+
 - TypeScript 5.x with strict mode enabled
 - Node.js runtime (Vercel serverless functions)
 - ESLint configuration with Next.js recommended rules
 - Path aliases configured (`@/` for imports)
 
 **Styling Solution:**
+
 - Tailwind CSS configured with default theme
 - PostCSS for CSS processing
 - Shadcn/ui component library (copy-paste model)
 - CSS modules support for custom styles
 
 **Build Tooling:**
+
 - Next.js built-in bundler (Turbopack in dev, Webpack in production)
 - Automatic code splitting and lazy loading
 - Image optimization with next/image
 - Font optimization with next/font
 
 **Testing Framework:**
+
 - Vitest for unit and integration tests
 - React Testing Library for component tests
 - Coverage reporting configured
@@ -304,7 +333,7 @@ npx shadcn-ui@latest add button card dialog dropdown-menu tabs table tooltip bad
 **Code Organization:**
 
 ```
-/aiseo-platform/
+/ShowYourBrand-platform/
 ├── /pages/                    # Next.js Pages Router
 │   ├── /api/                  # Backend API routes
 │   │   ├── /auth/             # NextAuth endpoints
@@ -357,6 +386,7 @@ npx shadcn-ui@latest add button card dialog dropdown-menu tabs table tooltip bad
 ```
 
 **Development Experience:**
+
 - Hot module replacement (HMR) for instant updates
 - TypeScript IntelliSense and autocomplete
 - ESLint integration for code quality
@@ -366,6 +396,7 @@ npx shadcn-ui@latest add button card dialog dropdown-menu tabs table tooltip bad
 **Pattern Reuse from Auto-Invoice:**
 
 Copy these proven patterns as standalone utilities (not entire codebase):
+
 1. `/lib/crypto.ts` - AES-256-GCM field encryption (improved to fail-closed)
 2. `/lib/security-middleware.ts` - API route security HOCs (withAuth, withSubscription, withResourceOwnership)
 3. `/lib/error-handler.ts` - ApiError class and centralized error handling
@@ -383,6 +414,7 @@ Copy these proven patterns as standalone utilities (not entire codebase):
 ### Decision Priority Analysis
 
 **Critical Decisions (Block Implementation):**
+
 - Data validation strategy (Zod + Mongoose)
 - API error response format (standardized ApiError)
 - Next.js ↔ Docker service communication (REST + shared secret)
@@ -390,11 +422,13 @@ Copy these proven patterns as standalone utilities (not entire codebase):
 - Environment variable management (Vercel + .env.local)
 
 **Important Decisions (Shape Architecture):**
+
 - Caching strategy (Next.js unstable_cache for MVP)
 - Real-time updates (polling with 10-second interval)
 - CI/CD pipeline (Vercel auto-deploy + GitLab CI/CD)
 
 **Deferred Decisions (Post-MVP):**
+
 - Database migrations (migrate-mongo when needed)
 - Redis caching layer (when performance requires)
 - Server-Sent Events for real-time updates (if polling insufficient)
@@ -404,28 +438,33 @@ Copy these proven patterns as standalone utilities (not entire codebase):
 
 **Decision: Dual Validation Strategy (Zod + Mongoose)**
 
-**Rationale:** AISEO processes data from 4 external AI APIs and web scraping. Early validation at API layer prevents processing invalid data structures. Mongoose validation provides final safety net before database writes.
+**Rationale:** ShowYourBrand processes data from 4 external AI APIs and web scraping. Early validation at API layer prevents processing invalid data structures. Mongoose validation provides final safety net before database writes.
 
 **Implementation:**
+
 - **API Layer (Zod):** Validate all incoming requests, generate TypeScript types
 - **Database Layer (Mongoose):** Schema validation with required fields, enums, custom validators
 - **Version:** Zod 3.x (verify latest stable)
 
 **Pattern:**
+
 ```typescript
 // API validation with Zod
-import { z } from 'zod';
+import { z } from "zod";
 
 const CreateAuditSchema = z.object({
   businessId: z.string().min(1),
   competitorUrls: z.array(z.string().url()).max(5),
-  language: z.enum(['en', 'fr']),
+  language: z.enum(["en", "fr"]),
 });
 
 type CreateAuditRequest = z.infer<typeof CreateAuditSchema>;
 
 // API route
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   try {
     const body = CreateAuditSchema.parse(req.body); // Throws ZodError if invalid
     // ... continue with validated data
@@ -433,8 +472,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: 'VALIDATION_ERROR',
-        message: 'Invalid request data',
+        error: "VALIDATION_ERROR",
+        message: "Invalid request data",
         details: error.errors,
       });
     }
@@ -443,12 +482,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 // Mongoose schema validation
 const AuditSchema = new Schema({
-  businessId: { type: Schema.Types.ObjectId, ref: 'Business', required: true },
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   status: {
     type: String,
-    enum: ['pending', 'processing', 'completed', 'failed'],
+    enum: ["pending", "processing", "completed", "failed"],
     required: true,
-    default: 'pending',
+    default: "pending",
   },
   geoScore: {
     type: Number,
@@ -456,7 +495,7 @@ const AuditSchema = new Schema({
     max: 100,
     validate: {
       validator: (v: number) => Number.isFinite(v),
-      message: 'GEO score must be a finite number',
+      message: "GEO score must be a finite number",
     },
   },
 });
@@ -471,6 +510,7 @@ const AuditSchema = new Schema({
 **MVP Approach:** No formal migrations. All new schema fields are optional. Application code handles undefined values gracefully.
 
 **Rationale:**
+
 - 8-10 week MVP timeline with 2 developers prioritizes speed
 - MongoDB flexible schema allows adding optional fields without breaking existing documents
 - Zero audits currently = no migration complexity
@@ -478,6 +518,7 @@ const AuditSchema = new Schema({
 **Post-MVP (Month 3+):** Implement migrate-mongo for production schema management when real users exist.
 
 **Pattern:**
+
 ```typescript
 // MVP: Handle optional fields in code
 const audit = await Audit.findById(auditId);
@@ -496,6 +537,7 @@ const competitors = audit.competitorData ?? []; // Default to empty array if und
 **MVP:** Next.js built-in caching (`unstable_cache`) for dashboard statistics
 
 **Rationale:**
+
 - Simple, no external dependencies
 - Dashboard statistics (total audits, average GEO score) are expensive aggregations
 - Time-based revalidation (1 hour) provides fresh-enough data
@@ -504,8 +546,9 @@ const competitors = audit.competitorData ?? []; // Default to empty array if und
 **Post-MVP:** Upgrade to Redis caching layer (Upstash) if dashboard performance < 2 seconds requirement not met
 
 **Pattern:**
+
 ```typescript
-import { unstable_cache } from 'next/cache';
+import { unstable_cache } from "next/cache";
 
 // Cache expensive aggregations
 export const getCachedAuditStats = unstable_cache(
@@ -516,16 +559,16 @@ export const getCachedAuditStats = unstable_cache(
         $group: {
           _id: null,
           total: { $sum: 1 },
-          avgScore: { $avg: '$geoScore' },
+          avgScore: { $avg: "$geoScore" },
           completedAudits: {
-            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] },
           },
-        }
+        },
       },
     ]);
   },
-  ['audit-stats'], // Cache key
-  { revalidate: 3600 } // 1 hour
+  ["audit-stats"], // Cache key
+  { revalidate: 3600 }, // 1 hour
 );
 
 // No caching for individual audits (need real-time status)
@@ -561,21 +604,23 @@ export async function getAuditById(auditId: string) {
 ```
 
 **Rationale:**
+
 - Consistent with Auto-Invoice ApiError pattern from project context
 - Client-side can handle all errors uniformly
 - Error types map to HTTP status codes (400, 401, 403, 404, 409, 429, 500)
 
 **Implementation:**
+
 ```typescript
 // lib/error-handler.ts (reuse from Auto-Invoice pattern)
 export enum ErrorType {
-  AUTHENTICATION = 'AUTHENTICATION_ERROR',
-  AUTHORIZATION = 'AUTHORIZATION_ERROR',
-  VALIDATION = 'VALIDATION_ERROR',
-  NOT_FOUND = 'NOT_FOUND',
-  CONFLICT = 'CONFLICT',
-  RATE_LIMIT = 'RATE_LIMIT_EXCEEDED',
-  INTERNAL = 'INTERNAL_SERVER_ERROR',
+  AUTHENTICATION = "AUTHENTICATION_ERROR",
+  AUTHORIZATION = "AUTHORIZATION_ERROR",
+  VALIDATION = "VALIDATION_ERROR",
+  NOT_FOUND = "NOT_FOUND",
+  CONFLICT = "CONFLICT",
+  RATE_LIMIT = "RATE_LIMIT_EXCEEDED",
+  INTERNAL = "INTERNAL_SERVER_ERROR",
 }
 
 export class ApiError extends Error {
@@ -592,7 +637,9 @@ export class ApiError extends Error {
 }
 
 // Usage
-throw new ApiError(ErrorType.VALIDATION, "Business ID is required", { field: 'businessId' });
+throw new ApiError(ErrorType.VALIDATION, "Business ID is required", {
+  field: "businessId",
+});
 ```
 
 **Affects:** All API routes, client-side error handling, internationalization (error messages)
@@ -606,6 +653,7 @@ throw new ApiError(ErrorType.VALIDATION, "Business ID is required", { field: 'bu
 **MVP:** Inline JSDoc comments for all API routes
 
 **Rationale:**
+
 - 8-10 week timeline, 2 developers = team knows the code
 - TypeScript provides type safety
 - No external consumers for MVP (internal dashboard only)
@@ -613,6 +661,7 @@ throw new ApiError(ErrorType.VALIDATION, "Business ID is required", { field: 'bu
 **Post-MVP:** Add Swagger/OpenAPI if external API access required (FR67-71: conditional Google API integration)
 
 **Pattern:**
+
 ```typescript
 /**
  * POST /api/audits/create
@@ -644,7 +693,10 @@ throw new ApiError(ErrorType.VALIDATION, "Business ID is required", { field: 'bu
  *   SUBSCRIPTION_REQUIRED - No active subscription or project limit reached
  * }
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   // ...
 }
 ```
@@ -658,6 +710,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 **Pattern:** Authenticated REST API with shared secret
 
 **Architecture:**
+
 ```
 Next.js API Route
   ↓ HTTP POST (with Bearer token)
@@ -669,18 +722,20 @@ Next.js Webhook Endpoint
 ```
 
 **Authentication:**
+
 - Shared API key stored in environment variables
 - `Authorization: Bearer ${PROCESSING_SERVICE_API_KEY}`
 - Both services validate token on every request
 
 **Implementation:**
+
 ```typescript
 // Next.js calls Docker service to start audit
 const response = await fetch(`${process.env.PROCESSING_SERVICE_URL}/audit`, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Authorization': `Bearer ${process.env.PROCESSING_SERVICE_API_KEY}`,
-    'Content-Type': 'application/json',
+    Authorization: `Bearer ${process.env.PROCESSING_SERVICE_API_KEY}`,
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
     auditId: audit._id.toString(),
@@ -696,25 +751,29 @@ const response = await fetch(`${process.env.PROCESSING_SERVICE_URL}/audit`, {
 
 // Docker service calls back to Next.js when complete
 await fetch(callbackUrl, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Authorization': `Bearer ${process.env.PROCESSING_SERVICE_API_KEY}`,
-    'Content-Type': 'application/json',
+    Authorization: `Bearer ${process.env.PROCESSING_SERVICE_API_KEY}`,
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
     auditId,
-    status: 'completed',
-    results: { /* audit data */ },
+    status: "completed",
+    results: {
+      /* audit data */
+    },
   }),
 });
 ```
 
 **Security:**
+
 - HTTPS in production (HTTP in local development)
 - Shared secret rotated quarterly
 - Rate limiting on webhook endpoint (prevent abuse)
 
 **Error Handling:**
+
 - Next.js retries if Docker service unavailable (3 retries with exponential backoff)
 - Docker service retries callback if Next.js unavailable (5 retries over 30 minutes)
 - Audit marked as 'failed' if all retries exhausted
@@ -728,6 +787,7 @@ await fetch(callbackUrl, {
 **Decision: State Management with Zustand**
 
 **Rationale:**
+
 - Real-time audit status updates require shared state across components
 - 6 custom components (GEO Score Ring, charts, etc.) need access to audit data
 - Zustand is lightweight (1.2kb), TypeScript-first, minimal boilerplate
@@ -736,6 +796,7 @@ await fetch(callbackUrl, {
 **Version:** Zustand 4.x (verify latest stable)
 
 **Implementation:**
+
 ```typescript
 // stores/auditStore.ts
 import { create } from 'zustand';
@@ -778,6 +839,7 @@ function GeoScoreRing() {
 ```
 
 **Stores to create:**
+
 - `auditStore` - Current audit state, progress tracking
 - `userStore` - User preferences (language, theme)
 - `dashboardStore` - Dashboard filters, view state
@@ -791,6 +853,7 @@ function GeoScoreRing() {
 **MVP:** Polling with 10-second interval for in-progress audits
 
 **Rationale:**
+
 - Audits take 5-10 minutes (not real-time chat)
 - 10-second updates provide good UX (users see progress)
 - Vercel serverless architecture makes WebSockets difficult
@@ -799,6 +862,7 @@ function GeoScoreRing() {
 **Post-MVP:** Upgrade to Server-Sent Events (SSE) if sub-second updates needed
 
 **Implementation:**
+
 ```typescript
 // hooks/useAuditPolling.ts
 import { useEffect, useRef } from 'react';
@@ -862,6 +926,7 @@ function AuditDashboard({ auditId }: { auditId: string }) {
 ```
 
 **Performance impact:**
+
 - Max 6 requests/minute per active audit
 - For 10 concurrent audits = 60 requests/minute (well within limits)
 
@@ -876,10 +941,12 @@ function AuditDashboard({ auditId }: { auditId: string }) {
 **Strategy:** Vercel automatic deployments + GitLab CI/CD for testing
 
 **Components:**
+
 1. **GitLab CI/CD:** Run tests and linting on every push/merge request
 2. **Vercel:** Automatic deployment on merge to main
 
 **GitLab CI/CD configuration:**
+
 ```yaml
 # .gitlab-ci.yml
 image: node:20
@@ -921,6 +988,7 @@ coverage:
 ```
 
 **Deployment flow:**
+
 1. Developer creates merge request (MR)
 2. GitLab CI/CD runs tests automatically
 3. Tests must pass before merge allowed
@@ -928,6 +996,7 @@ coverage:
 5. Vercel runs build, generates preview URL, promotes to production
 
 **Environment-specific deployments:**
+
 - `main` branch → Production
 - Merge requests → Preview deployments (unique URL per MR)
 - Local development → `npm run dev`
@@ -941,9 +1010,10 @@ coverage:
 **Strategy:** Vercel dashboard for production, .env.local for development
 
 **Pattern:**
+
 ```bash
 # .env.local (NOT committed to git)
-MONGODB_URI=mongodb://localhost:27017/aiseo-dev
+MONGODB_URI=mongodb://localhost:27017/ShowYourBrand-dev
 MONGODB_ENCRYPTION_KEY=<32-byte base64 key>
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<dev secret>
@@ -968,18 +1038,19 @@ PROCESSING_SERVICE_API_KEY=
 **Production:** All variables set in Vercel dashboard → Settings → Environment Variables
 
 **Validation on startup:**
+
 ```typescript
 // lib/env.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
   MONGODB_URI: z.string().url(),
   MONGODB_ENCRYPTION_KEY: z.string().length(44), // base64 of 32 bytes
   NEXTAUTH_SECRET: z.string().min(32),
   NEXTAUTH_URL: z.string().url(),
-  STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
-  STRIPE_PUBLIC_KEY: z.string().startsWith('pk_'),
-  RESEND_API_KEY: z.string().startsWith('re_'),
+  STRIPE_SECRET_KEY: z.string().startsWith("sk_"),
+  STRIPE_PUBLIC_KEY: z.string().startsWith("pk_"),
+  RESEND_API_KEY: z.string().startsWith("re_"),
   MROCESSING_SERVICE_URL: z.string().url(),
   MROCESSING_SERVICE_API_KEY: z.string().min(32),
 });
@@ -988,8 +1059,8 @@ export function validateEnv() {
   try {
     envSchema.parse(process.env);
   } catch (error) {
-    console.error('❌ Invalid environment variables:', error);
-    throw new Error('Environment validation failed');
+    console.error("❌ Invalid environment variables:", error);
+    throw new Error("Environment validation failed");
   }
 }
 
@@ -998,6 +1069,7 @@ validateEnv();
 ```
 
 **Security:**
+
 - Never commit .env.local to git (.gitignore includes it)
 - Rotate secrets quarterly
 - Use different secrets for dev/staging/production
@@ -1011,14 +1083,16 @@ validateEnv();
 **MVP:** Local Docker container only (no cloud deployment)
 
 **Rationale:**
+
 - Zero audits currently, maybe 1 audit per week for MVP
 - Single local Docker container more than sufficient
 - No need for AWS ECS, SQS queue, horizontal scaling complexity
 
 **Local development:**
+
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 services:
   processing-service:
     build: ./processing-service
@@ -1034,6 +1108,7 @@ services:
 ```
 
 **Commands:**
+
 ```bash
 # Start processing service locally
 docker-compose up -d
@@ -1048,6 +1123,7 @@ docker-compose down
 **Post-MVP (Month 6+, when real user load):** Deploy to AWS ECS with SQS queue for horizontal scaling
 
 **Deferred infrastructure:**
+
 - AWS ECS cluster
 - SQS queue for audit requests
 - Auto-scaling based on queue depth
@@ -1136,6 +1212,7 @@ docker-compose down
 **Critical Conflict Points Identified:** 15+ areas where AI agents could make different choices that would cause incompatibilities.
 
 **Categories:**
+
 - Naming Patterns (Database, API, Code)
 - Structure Patterns (Project organization, file locations)
 - Format Patterns (API responses, data exchange)
@@ -1147,17 +1224,20 @@ docker-compose down
 **Database (Mongoose) Naming Conventions:**
 
 **Collections:**
+
 - **Rule:** PascalCase singular (matches model name)
 - **Examples:** `User`, `Business`, `Audit`, `Project`, `Subscription`
 - **Rationale:** Mongoose convention, already established in project context
 
 **Fields:**
+
 - **Rule:** camelCase for all fields
 - **Examples:** `userId`, `businessId`, `geoScore`, `createdAt`, `competitorUrls`
 - **Foreign keys:** `userId` (NOT `user_id` or `fk_user`)
 - **Rationale:** JavaScript standard, TypeScript-friendly
 
 **Indexes:**
+
 - **Rule:** Mongoose handles automatically, no custom naming
 - **Example:** `AuditSchema.index({ userId: 1, createdAt: -1 })`
 
@@ -1166,6 +1246,7 @@ docker-compose down
 **API Naming Conventions:**
 
 **Endpoints:**
+
 - **Rule:** Plural nouns, lowercase, no verbs in URL
 - **Examples:** `/api/audits`, `/api/businesses`, `/api/projects`, `/api/admin/audits`
 - **CRUD Pattern:**
@@ -1176,15 +1257,18 @@ docker-compose down
   - `DELETE /api/audits/:id` - delete
 
 **Route Parameters:**
+
 - **Rule:** `:id` format (Next.js convention)
 - **Example:** `/api/audits/:id` → access via `req.query.id`
 - **NOT:** `{id}` or `/api/audits/[id]` in route definition
 
 **Query Parameters:**
+
 - **Rule:** camelCase
 - **Examples:** `?userId=xxx`, `?startDate=2026-01-20`, `?includeDetails=true`
 
 **Custom Headers:**
+
 - **Rule:** X-Custom-Name format (capitalize after hyphen)
 - **Examples:** `X-Audit-ID`, `X-Request-ID`, `X-User-Language`
 
@@ -1193,23 +1277,27 @@ docker-compose down
 **Code Naming Conventions (TypeScript/React):**
 
 **Components:**
+
 - **Rule:** PascalCase for component names and files
 - **Examples:** `AuditCard.tsx`, `GeoScoreRing.tsx`, `DashboardLayout.tsx`, `AdminPanel.tsx`
 - **Exception:** Shadcn/ui primitives use kebab-case (`button.tsx`, `card.tsx`, `dialog.tsx`)
 
 **Functions:**
+
 - **Rule:** camelCase, descriptive verbs
 - **Examples:** `getUserById`, `createAudit`, `calculateGeoScore`, `sendEmail`
 - **Hooks:** `useCamelCase` format (`useAuditPolling`, `useAuth`, `useLanguage`)
 - **Event Handlers:** `handleCamelCase` format (`handleSubmit`, `handleAuditCreate`, `handleDelete`)
 
 **Variables:**
+
 - **Rule:** camelCase for all variables
 - **Examples:** `auditId`, `geoScore`, `currentAudit`, `userPreferences`
 - **Constants:** SCREAMING_SNAKE_CASE (`MAX_RETRIES`, `API_TIMEOUT`, `AUDIT_PROMPTS`)
 - **Booleans:** Prefix with `is`, `has`, `should` (`isLoading`, `hasError`, `shouldRetry`, `hasSubscription`)
 
 **Types/Interfaces:**
+
 - **Rule:** PascalCase
 - **Examples:** `Audit`, `Business`, `CreateAuditRequest`, `AuditResponse`
 - **Props Interfaces:** `ComponentNameProps` format (`AuditCardProps`, `GeoScoreRingProps`, `DashboardLayoutProps`)
@@ -1221,7 +1309,7 @@ docker-compose down
 **Project Organization:**
 
 ```
-/aiseo-platform/
+/ShowYourBrand-platform/
 ├── /pages/                    # Next.js Pages Router
 │   ├── /api/                  # Backend API routes
 │   │   ├── /auth/             # NextAuth endpoints
@@ -1262,6 +1350,7 @@ docker-compose down
 **File Structure Patterns:**
 
 **Test Files:**
+
 - **Rule:** Separate `__tests__/` directory (NOT co-located)
 - **Structure:** Mirrors source structure
   - `__tests__/unit/lib/crypto.test.ts` tests `lib/crypto.ts`
@@ -1269,6 +1358,7 @@ docker-compose down
 - **File Naming:** `*.test.ts` or `*.test.tsx` suffix
 
 **Component Organization:**
+
 - **Rule:** By domain/feature (NOT by type)
 - **Good:**
   - `/components/audit/AuditCard.tsx` ✅
@@ -1279,6 +1369,7 @@ docker-compose down
   - `/components/lists/AuditList.tsx` ❌ (organized by type)
 
 **Utilities:**
+
 - **Rule:** Single `/lib/` folder (NOT `/libs/` or `/utils/`)
 - Already established in project context
 
@@ -1289,6 +1380,7 @@ docker-compose down
 **API Response Formats:**
 
 **Success Response:**
+
 ```typescript
 {
   success: true,
@@ -1302,6 +1394,7 @@ docker-compose down
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false,
@@ -1318,6 +1411,7 @@ docker-compose down
 **Rule:** ALL API endpoints MUST use this format (no direct data return)
 
 **HTTP Status Codes:**
+
 - `200` - Success
 - `400` - Validation error
 - `401` - Authentication error
@@ -1332,6 +1426,7 @@ docker-compose down
 **Data Exchange Formats:**
 
 **Date/Time:**
+
 - **In MongoDB:** Native Date objects
   ```typescript
   createdAt: { type: Date, default: Date.now }
@@ -1345,20 +1440,24 @@ docker-compose down
   - FR: "20 janv. 2026 à 14h30"
 
 **JSON Field Naming:**
+
 - **Rule:** camelCase everywhere (API requests, responses, MongoDB)
 - **Examples:** `userId`, `geoScore`, `competitorUrls`, `createdAt`
 - **Rationale:** JavaScript ecosystem standard, TypeScript-friendly
 
 **Boolean Representations:**
+
 - **Rule:** `true`/`false` only (NEVER 1/0 or "yes"/"no")
 - Use in API, database, and UI consistently
 
 **Null Handling:**
+
 - **Rule:** Use `null` for missing data, avoid `undefined` in JSON
 - Optional fields return `null` in API responses (not `undefined`, which doesn't serialize)
 - TypeScript: Use `| null` for optional fields
 
 **Array vs Object:**
+
 - **Rule:** Always return arrays for collections, even if empty or single item
 - **Good:** `{ audits: [] }` or `{ audits: [audit] }`
 - **Bad:** `{ audits: null }` or `{ audit: audit }` (inconsistent structure)
@@ -1370,14 +1469,17 @@ docker-compose down
 **Zustand State Management Patterns:**
 
 **Store Naming:**
+
 - **Rule:** `use[Domain]Store` format
 - **Examples:** `useAuditStore`, `useUserStore`, `useDashboardStore`
 
 **State Field Naming:**
+
 - **Rule:** camelCase nouns
 - **Examples:** `currentAudit`, `auditProgress`, `isPolling`, `userPreferences`
 
 **Action Naming:**
+
 - **Rule:** Verb prefix (set, update, clear, toggle, add, remove)
 - **Patterns:**
   - `setCurrentAudit` - Replace entire object
@@ -1388,6 +1490,7 @@ docker-compose down
   - `removeAudit` - Remove from array
 
 **State Updates:**
+
 - **Rule:** Always immutable (Zustand handles this)
 - **Good:**
   ```typescript
@@ -1402,6 +1505,7 @@ docker-compose down
   ```
 
 **Store Organization:**
+
 - **Rule:** One store per domain
 - **Examples:**
   - `auditStore` - Current audit state, progress tracking
@@ -1411,6 +1515,7 @@ docker-compose down
 ---
 
 **Event Naming (if needed in future):**
+
 - **Rule:** past-tense verb, lowercase with hyphens
 - **Examples:** `audit-created`, `audit-completed`, `user-subscribed`
 - **Payload:** camelCase fields
@@ -1422,10 +1527,12 @@ docker-compose down
 **Loading State Patterns:**
 
 **Variable Naming:**
+
 - **Rule:** `isLoading` for booleans (NOT `loading` or `loadingState`)
 - **Examples:** `isLoading`, `isSubmitting`, `isPolling`, `isFetching`
 
 **Pattern:**
+
 ```typescript
 // React component
 const [isLoading, setIsLoading] = useState(false);
@@ -1438,6 +1545,7 @@ interface AuditStore {
 ```
 
 **Global Loading:**
+
 - Use Zustand store for cross-component loading states
 - Example: `useAuditStore` has `isPolling` for audit processing status
 
@@ -1446,13 +1554,22 @@ interface AuditStore {
 **Error Handling Patterns:**
 
 **API Routes:**
+
 - **Rule:** Use ApiError class (from project context) with try-catch
 - **Pattern:**
-```typescript
-import { sanitizeInput, requireAuth, handleApiError } from '@/lib/security-middleware';
-import { ApiError, ErrorType } from '@/lib/error-handler';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+```typescript
+import {
+  sanitizeInput,
+  requireAuth,
+  handleApiError,
+} from "@/lib/security-middleware";
+import { ApiError, ErrorType } from "@/lib/error-handler";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   try {
     // 1. Sanitize input
     req.body = sanitizeInput(req.body);
@@ -1477,16 +1594,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 ```
 
 **Client-Side:**
+
 - **Rule:** Try-catch for all async operations
 - **Pattern:**
+
 ```typescript
 async function handleCreateAudit() {
   try {
     setIsLoading(true);
 
-    const response = await fetch('/api/audits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/audits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(auditData),
     });
 
@@ -1498,10 +1617,10 @@ async function handleCreateAudit() {
 
     // Success handling
     setCurrentAudit(json.data);
-    toast.success(t('audit.created'));
+    toast.success(t("audit.created"));
   } catch (error) {
-    console.error('Create audit failed:', error);
-    toast.error(error.message || t('audit.error'));
+    console.error("Create audit failed:", error);
+    toast.error(error.message || t("audit.error"));
   } finally {
     setIsLoading(false);
   }
@@ -1513,18 +1632,21 @@ async function handleCreateAudit() {
 **Validation Patterns:**
 
 **API Routes:**
+
 - **Rule:** ALWAYS validate with Zod at API entry point
 - **Rule:** Mongoose schema validation as final safety check before save
 
 **Client-Side:**
+
 - **Rule:** React Hook Form with Zod resolver for forms
 - Provides instant feedback, server validates again for security
 
 **Pattern:**
+
 ```typescript
 // Client-side form validation
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const form = useForm<CreateAuditRequest>({
   resolver: zodResolver(CreateAuditSchema),
@@ -1581,6 +1703,7 @@ const body = CreateAuditSchema.parse(req.body);
     - Document authentication, parameters, returns, throws
 
 **Pattern Enforcement:**
+
 - **TypeScript strict mode** catches type violations
 - **ESLint rules** enforce naming conventions
 - **Code review checklist** includes pattern compliance
@@ -1588,11 +1711,13 @@ const body = CreateAuditSchema.parse(req.body);
 - **GitLab CI/CD** runs linting and tests on every MR
 
 **Pattern Violations:**
+
 - Document in MR comments
 - Fix before merge
 - Update this architecture document if pattern needs changing
 
 **Pattern Updates:**
+
 - Patterns documented in this architecture document
 - Changes require MR to this document + team notification
 - Backward compatibility considered for API changes
@@ -1774,7 +1899,7 @@ const error = false; // Use 'hasError' ❌
 **Main Next.js Application:**
 
 ```
-/aiseo-platform/
+/ShowYourBrand-platform/
 ├── README.md
 ├── package.json
 ├── package-lock.json
@@ -2069,12 +2194,14 @@ const error = false; // Use 'hasError' ❌
 **API Boundaries:**
 
 **External API Endpoints (Public):**
+
 - `POST /api/auth/signup` - User registration (no auth required)
 - `GET /api/auth/signin` - Sign in page (no auth required)
 - `POST /api/webhook/stripe` - Stripe webhooks (signature validation only)
 - `POST /api/webhook/audit-complete` - Docker service callback (Bearer token auth)
 
 **Protected API Endpoints (Authenticated Users):**
+
 - All `/api/audits/*` - Requires valid NextAuth session
 - All `/api/businesses/*` - Requires valid NextAuth session + resource ownership
 - All `/api/projects/*` - Requires valid NextAuth session + resource ownership
@@ -2082,9 +2209,11 @@ const error = false; // Use 'hasError' ❌
 - All `/api/user/*` - Requires valid NextAuth session
 
 **Admin API Endpoints (Admin Users Only):**
+
 - All `/api/admin/*` - Requires valid NextAuth session + admin role check
 
 **Service-to-Service Boundaries:**
+
 - Next.js → Docker Processing Service: REST API with Bearer token (`PROCESSING_SERVICE_API_KEY`)
 - Docker Processing Service → Next.js: REST callback with Bearer token (same key)
 
@@ -2093,12 +2222,14 @@ const error = false; // Use 'hasError' ❌
 **Component Boundaries:**
 
 **Frontend Component Communication:**
+
 - **Zustand Stores** - Global state shared across components (audit, user, dashboard stores)
 - **Props** - Parent-to-child data flow (React standard)
 - **Context** - NextAuth SessionProvider, LanguageProvider (i18n)
 - **No direct component-to-component communication** - Use stores for shared state
 
 **Component Isolation:**
+
 - `/components/ui/` - Primitive UI components (no business logic, only presentation)
 - `/components/audit/` - Audit domain components (may use `useAuditStore`, `useAuth`)
 - `/components/dashboard/` - Dashboard layout components (may use all stores)
@@ -2109,16 +2240,19 @@ const error = false; // Use 'hasError' ❌
 **Service Boundaries:**
 
 **Next.js Application:**
+
 - **Responsibilities:** Authentication, authorization, database CRUD, payment processing, API orchestration, UI rendering
 - **Does NOT:** Web scraping, AI API calls, PDF generation (delegated to Docker service)
 - **Communicates With:** MongoDB, Stripe API, Resend API, Vercel Blob, Docker Processing Service
 
 **Docker Processing Service:**
+
 - **Responsibilities:** Web scraping, parallel AI API calls, PDF generation, audit orchestration
 - **Does NOT:** Database access, user authentication, payment processing
 - **Communicates With:** OpenAI API, Anthropic API, Perplexity API, DeepSeek API, Vercel Blob (upload), Next.js (callback webhook)
 
 **Why Separation:**
+
 - Next.js serverless functions have 10-second timeout (Vercel free tier)
 - Audits take 5-10 minutes (parallel AI processing across 4 engines)
 - Docker service runs independently, can scale horizontally for high load
@@ -2128,16 +2262,19 @@ const error = false; // Use 'hasError' ❌
 **Data Boundaries:**
 
 **Database Access:**
+
 - **Only Next.js has direct MongoDB access** via Mongoose
 - Docker service NEVER touches database directly
 - All audit data flows: Docker → Next.js webhook → MongoDB
 
 **Data Ownership:**
+
 - Users own Businesses, Projects, Audits (enforced in API routes via `userId` check)
 - Admins can view all resources (role-based access control)
 - Snapshot pattern: Audits store complete businessSnapshot at creation time (historical integrity)
 
 **Encryption Boundaries:**
+
 - Sensitive fields encrypted at rest in MongoDB (AES-256-GCM)
 - Encrypted fields: `Business.taxId`, `Business.apiKeys`, `User.email`, `Audit.businessSnapshot.*`
 - Encryption/decryption automatic via Mongoose fieldEncryption plugin
@@ -2150,6 +2287,7 @@ const error = false; // Use 'hasError' ❌
 **Feature/Epic Mapping:**
 
 **User Management (FR1-FR7):**
+
 - API Routes: `/pages/api/auth/[...nextauth].ts`, `/pages/api/auth/signup.ts`, `/pages/api/user/`
 - Models: `/models/User.ts`
 - Components: `/components/auth/` (if any auth forms needed)
@@ -2157,6 +2295,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/integration/api/auth.test.ts`, `__tests__/unit/models/User.test.ts`
 
 **Project & Business Management (FR8-FR14):**
+
 - API Routes: `/pages/api/projects/`, `/pages/api/businesses/`
 - Models: `/models/Project.ts`, `/models/Business.ts`
 - Components: `/components/dashboard/` (project/business forms)
@@ -2164,6 +2303,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/integration/api/projects.test.ts`, `__tests__/integration/api/businesses.test.ts`
 
 **Audit Engine (FR15-FR22):**
+
 - API Routes: `/pages/api/audits/`, `/pages/api/webhook/audit-complete.ts`
 - Models: `/models/Audit.ts`
 - Components: `/components/audit/` (all 10 audit components)
@@ -2172,6 +2312,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/integration/api/audits.test.ts`, `__tests__/e2e/audit-flow.test.ts`
 
 **HTML Scanner (FR23-FR30):**
+
 - Docker Service: `/processing-service/src/scraper/`
   - `html-scanner.ts` - Main HTML parsing
   - `schema-analyzer.ts` - Schema.org detection
@@ -2180,6 +2321,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `/processing-service/tests/unit/scraper.test.ts`
 
 **AI-Powered Recommendations (FR31-FR37):**
+
 - Docker Service: `/processing-service/src/recommendations/`
   - `faq-generator.ts` - 10 FAQ Q&A generation
   - `schema-generator.ts` - Schema.org JSON-LD snippets
@@ -2188,6 +2330,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `/processing-service/tests/unit/recommendations.test.ts`
 
 **Dashboard & Visualization (FR38-FR45):**
+
 - Components: `/components/audit/` (6 custom components)
   - `GeoScoreRing.tsx` - Circular progress indicator
   - `CompetitiveGapChart.tsx` - Horizontal bar comparison
@@ -2202,6 +2345,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/unit/components/audit/*.test.tsx`
 
 **Report Generation (FR46-FR53):**
+
 - Docker Service: `/processing-service/src/pdf/`
   - `generator.ts` - jsPDF report generation
   - `templates/executive-summary.ts` - 1-page summary
@@ -2212,6 +2356,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `/processing-service/tests/unit/pdf.test.ts`
 
 **Subscription & Payment (FR54-FR62):**
+
 - API Routes: `/pages/api/checkout/`, `/pages/api/subscriptions/`, `/pages/api/webhook/stripe.ts`
 - Models: `/models/Subscription.ts`, `/models/User.ts` (embedded subscription)
 - Components: `/components/subscription/`
@@ -2220,16 +2365,19 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/integration/api/subscriptions.test.ts`, `__tests__/e2e/subscription-flow.test.ts`
 
 **Email Notifications (FR63-FR66):**
+
 - Lib: `/lib/email.ts`
 - Email Templates: Inline HTML or external library (React Email)
 - Used by: Audit completion, subscription confirmations, payment receipts
 - Tests: `__tests__/unit/lib/email.test.ts`
 
 **Integration Capabilities (FR67-FR71, Optional):**
+
 - API Routes: `/pages/api/integrations/google/`
 - Tests: `__tests__/integration/api/integrations.test.ts`
 
 **Data Management & Compliance (FR72-FR77):**
+
 - Lib: `/lib/crypto.ts` (AES-256-GCM encryption)
 - Models: `/models/plugins/fieldEncryption.ts` (Mongoose plugin)
 - Applied to: User, Business, Audit models (sensitive fields)
@@ -2237,6 +2385,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/unit/lib/crypto.test.ts`
 
 **Admin Interface (FR78-FR88):**
+
 - API Routes: `/pages/api/admin/`
 - Components: `/components/admin/`
 - Pages: `/pages/admin/`
@@ -2247,6 +2396,7 @@ const error = false; // Use 'hasError' ❌
 **Cross-Cutting Concerns:**
 
 **Authentication System:**
+
 - API Routes: `/pages/api/auth/[...nextauth].ts`
 - Lib: `/lib/security-middleware.ts` (requireAuth, withAuth HOCs)
 - Hooks: `/hooks/useAuth.ts`
@@ -2254,17 +2404,20 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/integration/api/auth.test.ts`
 
 **Security & Encryption:**
+
 - Lib: `/lib/crypto.ts`, `/lib/security-middleware.ts`
 - Models Plugin: `/models/plugins/fieldEncryption.ts`
 - Used by: All API routes (input sanitization), User/Business/Audit models (field encryption)
 - Tests: `__tests__/unit/lib/crypto.test.ts`, `__tests__/unit/lib/security-middleware.test.ts`
 
 **Error Handling:**
+
 - Lib: `/lib/error-handler.ts` (ApiError class, handleApiError function)
 - Used by: All API routes
 - Tests: `__tests__/unit/lib/error-handler.test.ts`
 
 **Internationalization (i18n):**
+
 - Locales: `/locales/en.json`, `/locales/fr.json`
 - Components: `/components/shared/LanguageSwitcher.tsx`
 - Hooks: `/hooks/useLanguage.ts`
@@ -2272,6 +2425,7 @@ const error = false; // Use 'hasError' ❌
 - Tests: `__tests__/unit/hooks/useLanguage.test.ts`
 
 **State Management:**
+
 - Stores: `/stores/auditStore.ts`, `/stores/userStore.ts`, `/stores/dashboardStore.ts`
 - Used by: Dashboard components, audit components
 - Tests: `__tests__/unit/stores/*.test.ts`
@@ -2283,23 +2437,27 @@ const error = false; // Use 'hasError' ❌
 **Internal Communication:**
 
 **Next.js → MongoDB:**
+
 - Connection: `/lib/mongoose.ts`
 - Models: `/models/*.ts`
 - Pattern: Mongoose ODM with automatic field encryption/decryption
 
 **Next.js → Docker Service:**
+
 - Request: `POST http://processing-service:8080/audit`
 - Headers: `Authorization: Bearer ${PROCESSING_SERVICE_API_KEY}`
 - Body: `{ auditId, businessUrl, prompts, competitorUrls, language, callbackUrl }`
 - Response: `{ success: true, message: "Audit queued" }`
 
 **Docker Service → Next.js:**
-- Request: `POST ${callbackUrl}` (e.g., `https://aiseo.com/api/webhook/audit-complete`)
+
+- Request: `POST ${callbackUrl}` (e.g., `https://ShowYourBrand.com/api/webhook/audit-complete`)
 - Headers: `Authorization: Bearer ${PROCESSING_SERVICE_API_KEY}`
 - Body: `{ auditId, status: 'completed', results: {...} }`
 - Response: `{ success: true }`
 
 **Frontend ↔ Backend:**
+
 - Pattern: Standard Next.js API routes via `fetch()`
 - Authentication: NextAuth session cookie
 - State: Zustand stores for client-side state, polling for real-time updates
@@ -2309,24 +2467,29 @@ const error = false; // Use 'hasError' ❌
 **External Integrations:**
 
 **Stripe (Payment Processing):**
+
 - SDK: `/lib/stripe.ts`
 - Webhooks: `/pages/api/webhook/stripe.ts`
 - Events: `checkout.session.completed`, `customer.subscription.updated`, `invoice.payment_succeeded`, etc.
 
 **Resend (Email Service):**
+
 - SDK: `/lib/email.ts`
 - Used by: Audit completion notifications, subscription emails, payment receipts
 
 **Vercel Blob (File Storage):**
+
 - SDK: `/lib/blob-storage.ts`
 - Used by: PDF report storage, download endpoint
 
 **OpenAI, Anthropic, Perplexity, DeepSeek (AI APIs):**
+
 - Clients: `/processing-service/src/ai/*.ts`
 - Pattern: Parallel processing with exponential backoff retry
 - Requirement: Minimum 2 of 4 APIs must succeed (NFR-R3)
 
 **Google APIs (Optional - FR67-FR71):**
+
 - OAuth: `/pages/api/integrations/google/`
 - APIs: Search Console, Analytics
 - Pattern: Conditional integration (failures don't block audits)
@@ -2336,6 +2499,7 @@ const error = false; // Use 'hasError' ❌
 **Data Flow:**
 
 **Audit Creation Flow:**
+
 ```
 1. User submits audit form → Frontend validates (React Hook Form + Zod)
 2. POST /api/audits/create → Zod validates, creates Audit document (status: 'pending')
@@ -2355,6 +2519,7 @@ const error = false; // Use 'hasError' ❌
 ```
 
 **Subscription Payment Flow:**
+
 ```
 1. User clicks "Subscribe" → POST /api/checkout (creates Stripe Checkout session)
 2. Redirect to Stripe hosted checkout page
@@ -2372,6 +2537,7 @@ const error = false; // Use 'hasError' ❌
 **Configuration Files:**
 
 **Root Level:**
+
 - `next.config.js` - Next.js configuration (security headers, rewrites, redirects)
 - `tailwind.config.ts` - Tailwind CSS configuration (theme, colors, spacing)
 - `tsconfig.json` - TypeScript configuration (strict mode, path aliases)
@@ -2382,6 +2548,7 @@ const error = false; // Use 'hasError' ❌
 - `docker-compose.yml` - Local Docker service setup
 
 **Environment Files:**
+
 - `.env.local` - Local development (NOT committed)
 - `.env.example` - Template with all required variables (committed)
 - Vercel Dashboard - Production environment variables
@@ -2391,22 +2558,26 @@ const error = false; // Use 'hasError' ❌
 **Source Organization:**
 
 **Pages Router Principle:**
+
 - Each file in `/pages/` maps to a route
 - `/pages/index.tsx` → `/`
 - `/pages/dashboard/index.tsx` → `/dashboard`
 - `/pages/dashboard/[auditId].tsx` → `/dashboard/:auditId`
 
 **API Routes Principle:**
+
 - Each file in `/pages/api/` maps to an API endpoint
 - `/pages/api/audits/index.ts` → `GET /api/audits`
 - `/pages/api/audits/create.ts` → `POST /api/audits`
 - `/pages/api/audits/[id].ts` → `GET/PUT/DELETE /api/audits/:id`
 
 **Component Organization:**
+
 - By domain/feature: `/components/audit/`, `/components/dashboard/`, `/components/admin/`
 - NOT by type: `/components/cards/`, `/components/forms/`, `/components/modals/` ❌
 
 **Utility Organization:**
+
 - Single `/lib/` folder (NOT `/libs/` or `/utils/`)
 - One file per utility domain (crypto, stripe, email, etc.)
 - Avoid generic names like `helpers.ts` or `utils.ts`
@@ -2416,11 +2587,13 @@ const error = false; // Use 'hasError' ❌
 **Test Organization:**
 
 **Test Structure Mirrors Source:**
+
 - Source: `/lib/crypto.ts` → Test: `/__tests__/unit/lib/crypto.test.ts`
 - Source: `/pages/api/audits/create.ts` → Test: `/__tests__/integration/api/audits.test.ts`
 - Source: `/components/audit/GeoScoreRing.tsx` → Test: `/__tests__/unit/components/audit/GeoScoreRing.test.tsx`
 
 **Test Categories:**
+
 - `/unit/` - Pure function tests, utility tests, model tests
 - `/integration/` - API route tests (with mocked database)
 - `/e2e/` - Full user flow tests (audit creation, subscription flow)
@@ -2430,11 +2603,13 @@ const error = false; // Use 'hasError' ❌
 **Asset Organization:**
 
 **Public Assets:**
+
 - `/public/images/` - Images (logo, hero, etc.)
 - `/public/icons/` - Icons, favicon
 - `/public/robots.txt` - SEO crawler instructions
 
 **Built Assets:**
+
 - `.next/` - Next.js build output (NOT committed)
 - `node_modules/` - Dependencies (NOT committed)
 
@@ -2445,6 +2620,7 @@ const error = false; // Use 'hasError' ❌
 **Development Server Structure:**
 
 **Commands:**
+
 ```bash
 # Next.js development server
 npm run dev  # Runs on http://localhost:3000
@@ -2463,6 +2639,7 @@ npm run type-check
 ```
 
 **Hot Reload:**
+
 - Next.js HMR (Hot Module Replacement) for instant updates
 - Docker service requires restart for code changes (development mode with volume mounting)
 
@@ -2471,18 +2648,21 @@ npm run type-check
 **Build Process Structure:**
 
 **Next.js Build:**
+
 ```bash
 npm run build  # Creates optimized production build in .next/
 npm run start  # Starts production server
 ```
 
 **Docker Service Build:**
+
 ```bash
-docker build -t aiseo-processing-service ./processing-service
-docker run -p 8080:8080 aiseo-processing-service
+docker build -t ShowYourBrand-processing-service ./processing-service
+docker run -p 8080:8080 ShowYourBrand-processing-service
 ```
 
 **Build Outputs:**
+
 - `.next/` - Next.js optimized build
 - `.next/static/` - Static assets with cache headers
 - `.next/server/` - Server-side code
@@ -2492,6 +2672,7 @@ docker run -p 8080:8080 aiseo-processing-service
 **Deployment Structure:**
 
 **Vercel Deployment (Next.js):**
+
 - Automatic deployment on `git push` to main branch
 - Preview deployments for merge requests
 - Environment variables managed in Vercel dashboard
@@ -2499,11 +2680,13 @@ docker run -p 8080:8080 aiseo-processing-service
 - Output directory: `.next`
 
 **Docker Service Deployment (MVP: Local Only):**
+
 - Development: `docker-compose up -d`
 - Production (future): AWS ECS or Lambda with Docker container
 - Environment variables: Pass via `-e` flags or `.env` file
 
 **CI/CD Pipeline:**
+
 - GitLab CI/CD runs on every push/merge request
 - Steps: Install → Lint → Type check → Test → Report coverage
 - Deployment: Vercel handles automatically after tests pass
@@ -2530,6 +2713,7 @@ All 11 architectural decisions work together without conflicts:
 - **Local Docker for MVP:** Matches user requirement of "maybe 1 audit per week," defers AWS complexity
 
 **Version Compatibility Verified:**
+
 - Next.js 15.x + React 18.2.0+ ✅ (official compatibility)
 - Mongoose 7.4.4+ + MongoDB 5.9.2+ ✅ (tested combination)
 - NextAuth 4.24.11+ + Next.js 15.x ✅ (Pages Router supported)
@@ -2566,6 +2750,7 @@ Project structure supports all architectural decisions:
 **Functional Requirements Coverage (88 total):**
 
 **User Management (FR1-FR7):** ✅ FULLY SUPPORTED
+
 - NextAuth configuration with Google OAuth + Credentials providers
 - User model with embedded subscription
 - API routes: `/api/auth/[...nextauth].ts`, `/api/auth/signup.ts`, `/api/user/profile.ts`
@@ -2573,12 +2758,14 @@ Project structure supports all architectural decisions:
 - Language preference (EN/FR) stored in User model
 
 **Project & Business Management (FR8-FR14):** ✅ FULLY SUPPORTED
+
 - Project and Business models with tier-based limits enforcement
 - API routes: `/api/projects/*`, `/api/businesses/*`
 - CRUD operations with resource ownership validation
 - Competitor URL tracking in Audit model
 
 **Audit Engine (FR15-FR22):** ✅ FULLY SUPPORTED
+
 - Docker service orchestrator with parallel AI processing (4 engines simultaneously)
 - Audit model with snapshot pattern (captures business state at audit time)
 - GEO Health Score calculation (0-100%)
@@ -2587,6 +2774,7 @@ Project structure supports all architectural decisions:
 - Audit history tracking in MongoDB
 
 **HTML Scanner (FR23-FR30):** ✅ FULLY SUPPORTED
+
 - Docker service `/scraper/` module:
   - `html-scanner.ts` - HTML parsing
   - `schema-analyzer.ts` - Schema.org detection
@@ -2595,6 +2783,7 @@ Project structure supports all architectural decisions:
 - Heading structure audit, image alt text quality assessment
 
 **AI-Powered Recommendations (FR31-FR37):** ✅ FULLY SUPPORTED
+
 - Docker service `/recommendations/` module:
   - `faq-generator.ts` - 10 Q&A based on business category
   - `schema-generator.ts` - Schema.org JSON-LD snippets
@@ -2603,6 +2792,7 @@ Project structure supports all architectural decisions:
 - Grade 8 reading level explanations in PDF templates
 
 **Dashboard & Visualization (FR38-FR45):** ✅ FULLY SUPPORTED
+
 - 6 custom components architecturally specified:
   - `GeoScoreRing.tsx` - Circular progress indicator
   - `CompetitiveGapChart.tsx` - Horizontal bar comparison
@@ -2615,6 +2805,7 @@ Project structure supports all architectural decisions:
 - Bilingual UI (EN/FR) via `/locales/` and `LanguageSwitcher` component
 
 **Report Generation (FR46-FR53):** ✅ FULLY SUPPORTED
+
 - Docker service `/pdf/` module with jsPDF generation
 - PDF templates: `executive-summary.ts` (1 page), `technical-details.ts` (5-10 pages)
 - Vercel Blob Storage for PDF storage (`/lib/blob-storage.ts`)
@@ -2623,6 +2814,7 @@ Project structure supports all architectural decisions:
 - Localized reports (EN/FR) based on user preference
 
 **Payments & Subscription (FR54-FR61):** ✅ FULLY SUPPORTED
+
 - Stripe integration (`/lib/stripe.ts`)
 - One-shot audits: Basic (€100, ChatGPT only, 1 competitor) and Pro (€200, all AI, 5 competitors, history)
 - Premium subscription (€500/month, 20 audits included, unlimited competitors, white-label, +€20/extra audit)
@@ -2632,25 +2824,29 @@ Project structure supports all architectural decisions:
 - Purchase model + embedded User.subscription for Premium
 
 **Email Notifications (FR63-FR66):** ✅ FULLY SUPPORTED
+
 - Resend integration (`/lib/email.ts`)
 - Email types: Welcome, audit completion, subscription confirmations, payment receipts
 - Email templates in i18n format (EN/FR)
 
 **Integration Capabilities (FR67-FR71, Conditional):** ✅ FULLY SUPPORTED
+
 - Google Search Console OAuth: `/api/integrations/google/search-console.ts`
 - Google Analytics OAuth: `/api/integrations/google/analytics.ts`
 - Conditional integration: Failures don't block audits (NFR-I4)
 - SEO/traffic metric correlation in admin dashboard
 
 **Data Management & Compliance (FR72-FR77):** ✅ FULLY SUPPORTED
+
 - MongoDB Atlas encryption at rest (AES-256-GCM via `/lib/crypto.ts`)
 - Field-level encryption plugin (`/models/plugins/fieldEncryption.ts`)
 - GDPR data export via `/api/user/export.ts`
 - Account deletion with soft delete pattern (`deletedAt` field)
 - Robots.txt compliance in Docker service scraper (respects `robots.txt` rules)
-- Rate-limited scraping with descriptive user-agent ("AISEO-Bot/1.0")
+- Rate-limited scraping with descriptive user-agent ("ShowYourBrand-Bot/1.0")
 
 **Admin Interface (FR78-FR88):** ✅ FULLY SUPPORTED
+
 - Admin API routes: `/api/admin/audits/*`, `/api/admin/users/*`, `/api/admin/stats.ts`, `/api/admin/logs.ts`
 - Admin components: `AdminLayout`, `AuditTable`, `UserTable`, `LogViewer`, `StatsPanel`
 - Admin pages: `/pages/admin/` (dashboard, audits, users, logs)
@@ -2667,6 +2863,7 @@ Project structure supports all architectural decisions:
 **Non-Functional Requirements Coverage (21 total):**
 
 **Performance (NFR-P1-P5):** ✅ FULLY SUPPORTED
+
 - NFR-P1: Quality-first audit completion with 10-minute timeout → Docker service design
 - NFR-P2: Dashboard < 2 seconds (P95), Lighthouse > 85 → Next.js `unstable_cache` for stats, lean queries, Next.js Image component
 - NFR-P3: API responses < 1 second (P95) → MongoDB indexes on foreign keys, lean queries
@@ -2674,6 +2871,7 @@ Project structure supports all architectural decisions:
 - NFR-P5: PDF generation < 2 minutes → Async with email notification via Resend
 
 **Security (NFR-S1-S6):** ✅ FULLY SUPPORTED
+
 - NFR-S1: MongoDB Atlas AES-256 encryption → `/lib/crypto.ts` with fail-closed approach
 - NFR-S2: Bcrypt password hashing (10 rounds) → User model pre-save hook
 - NFR-S3: HTTPS everywhere (TLS 1.2+), SSL Labs A+ → Vercel default, `next.config.js` security headers
@@ -2682,6 +2880,7 @@ Project structure supports all architectural decisions:
 - NFR-S6: User data isolation → Resource ownership checks in all API routes (`userId` validation)
 
 **Reliability (NFR-R1-R5):** ✅ FULLY SUPPORTED
+
 - NFR-R1: 95%+ audit success rate → Minimum 2 of 4 AI APIs required (NFR-R3), exponential backoff retry
 - NFR-R2: 99%+ platform uptime → Vercel SLA baseline
 - NFR-R3: Graceful AI API degradation → `/ai/parallel-processor.ts` with minimum 2 of 4 APIs, clear warnings
@@ -2689,23 +2888,27 @@ Project structure supports all architectural decisions:
 - NFR-R5: Critical error alerts within 5 minutes → Pino structured logging + Sentry error monitoring (email founders)
 
 **Scalability (NFR-SC1-SC4):** ✅ FULLY SUPPORTED
+
 - NFR-SC1: 100 concurrent users → Vercel auto-scaling for Next.js
 - NFR-SC2: 500 audits/month capacity (Month 12) → Horizontal scaling architecture (deferred to post-MVP)
 - NFR-SC3: 10,000 audits + 1,000 users database capacity → MongoDB Atlas with indexes
 - NFR-SC4: Horizontal scaling for processing service → Docker service design allows multiple instances (deferred to Month 6+)
 
 **Integration (NFR-I1-I4):** ✅ FULLY SUPPORTED
+
 - NFR-I1: Idempotent Stripe webhooks → Signature validation, idempotency keys in `/api/webhook/stripe.ts`
 - NFR-I2: AI API rate limit compliance → Exponential backoff (1s → 2s → 4s → 8s, max 4 retries, 15s timeout) in `/utils/retry.ts`
 - NFR-I3: 95%+ email deliverability → Resend with SPF/DKIM configuration
 - NFR-I4: Optional Google API failures don't block audits → Conditional integration pattern
 
 **Accessibility (NFR-A1-A3):** ✅ FULLY SUPPORTED
+
 - NFR-A1: WCAG 2.1 Level A compliance, Lighthouse > 90 → Shadcn/ui accessible primitives, semantic HTML
 - NFR-A2: Full keyboard navigation → All interactive elements keyboard accessible
 - NFR-A3: Screen reader compatible → ARIA labels, semantic HTML (NVDA, JAWS, VoiceOver tested)
 
 **Internationalization (NFR-I18N1-I18N3):** ✅ FULLY SUPPORTED
+
 - NFR-I18N1: Instant language switching (EN/FR) without reload → `LanguageSwitcher` component + `useLanguage` hook
 - NFR-I18N2: Localized PDF reports → Docker service generates PDFs in user's preferred language
 - NFR-I18N3: New language addition < 2 days → Translation files in `/locales/`, no code changes required
@@ -2731,6 +2934,7 @@ All 11 critical architectural decisions documented with specific versions and co
 11. **Docker Service Deployment** - ✅ MVP local Docker pattern defined, post-MVP AWS path documented
 
 **All decisions include:**
+
 - Rationale explaining why this choice was made
 - Version numbers where applicable
 - Complete code examples
@@ -2743,6 +2947,7 @@ All 11 critical architectural decisions documented with specific versions and co
 Project structure is **100% complete and specific** (not generic placeholders):
 
 **Next.js Application:**
+
 - 100+ files mapped across `/pages/`, `/components/`, `/lib/`, `/models/`, `/stores/`, `/hooks/`, `/types/`, `/locales/`
 - Every API route documented: 40+ endpoints across `/api/auth/`, `/api/audits/`, `/api/businesses/`, `/api/projects/`, `/api/subscriptions/`, `/api/checkout/`, `/api/webhook/`, `/api/integrations/`, `/api/admin/`, `/api/user/`
 - All 6 custom components architecturally specified: `GeoScoreRing`, `CompetitiveGapChart`, `IssueCard`, `CodeBlock`, `ScoreTimeline`, `PromptGapVisualization`
@@ -2752,6 +2957,7 @@ Project structure is **100% complete and specific** (not generic placeholders):
 - 3 custom hooks: `useAuditPolling`, `useAuth`, `useLanguage`
 
 **Docker Processing Service:**
+
 - 30+ files mapped across `/src/ai/`, `/src/scraper/`, `/src/recommendations/`, `/src/pdf/`, `/src/audit/`, `/src/utils/`, `/src/middleware/`
 - 4 AI engine clients: `chatgpt.ts`, `claude.ts`, `perplexity.ts`, `deepseek.ts`
 - 4 scraper modules: `html-scanner.ts`, `schema-analyzer.ts`, `meta-extractor.ts`, `keyword-extractor.ts`
@@ -2759,11 +2965,13 @@ Project structure is **100% complete and specific** (not generic placeholders):
 - 3 PDF modules: `generator.ts`, `templates/executive-summary.ts`, `templates/technical-details.ts`
 
 **Integration Points Clearly Specified:**
+
 - 7 external integrations documented: MongoDB, Stripe, Resend, Vercel Blob, OpenAI, Anthropic, Perplexity, DeepSeek
 - 2 service-to-service boundaries: Next.js → Docker (audit initiation), Docker → Next.js (audit completion callback)
 - 3 API boundary types: Public (webhooks), Protected (authenticated users), Admin (admin users only)
 
 **Component Boundaries Well-Defined:**
+
 - Frontend: Zustand stores (global state) vs Props (parent-child) vs Context (providers)
 - Backend: Next.js (auth/DB/UI) vs Docker (scraping/AI/PDF) - no overlap
 - Data: Only Next.js accesses MongoDB, Docker never touches database directly
@@ -2793,32 +3001,39 @@ All potential AI agent conflict points addressed with comprehensive patterns:
 15. **Error Handling Pattern** - ✅ ApiError class + handleApiError function
 
 **Naming Conventions (5 categories):**
+
 - Database: PascalCase collections, camelCase fields
 - API: Plural endpoints, camelCase query params, X-Custom-Name headers
 - Code: PascalCase components/types, camelCase functions/variables, kebab-case utilities, SCREAMING_SNAKE_CASE constants
 
 **Structure Patterns (3 categories):**
+
 - Project: By domain/feature organization
 - Files: Config at root, tests in `__tests__/`, utilities in `/lib/`
 
 **Format Patterns (2 categories):**
+
 - API: Standardized success/error response format
 - Data Exchange: ISO dates, camelCase JSON fields, `true/false` booleans
 
 **Communication Patterns (2 categories):**
+
 - Zustand: Store naming (`use[Domain]Store`), action naming (verb prefix)
 - Events: past-tense naming (if needed in future)
 
 **Process Patterns (3 categories):**
+
 - Loading States: `isLoading` pattern
 - Error Handling: ApiError class + try-catch everywhere
 - Validation: Zod at API boundary, Mongoose at database layer
 
 **Good Examples + Anti-Patterns:**
+
 - ✅ 10+ good examples provided with code snippets
 - ❌ 15+ anti-patterns documented (what to avoid)
 
 **Enforcement Mechanisms:**
+
 - TypeScript strict mode catches type violations
 - ESLint rules enforce naming conventions
 - Code review checklist includes pattern compliance
@@ -2835,7 +3050,7 @@ All potential AI agent conflict points addressed with comprehensive patterns:
 
 **Nice-to-Have Gaps (4 areas for future enhancement):**
 
-1. **Version Compatibility Matrix:** 
+1. **Version Compatibility Matrix:**
    - **Current:** Individual version numbers specified (Next.js 15.x, React 18.2.0+, etc.)
    - **Enhancement:** Explicit compatibility matrix verifying all versions work together
    - **Priority:** Low (standard versions known to be compatible)
@@ -2925,6 +3140,7 @@ All potential AI agent conflict points addressed with comprehensive patterns:
 **Confidence Level:** **HIGH** based on validation results
 
 **Rationale for High Confidence:**
+
 - All 88 functional requirements and 21 non-functional requirements architecturally supported
 - Zero critical gaps, zero important gaps
 - Complete project structure (100+ files mapped, not generic placeholders)
@@ -3042,8 +3258,8 @@ All potential AI agent conflict points addressed with comprehensive patterns:
 
 ```bash
 # Initialize Next.js project
-npx create-next-app@latest aiseo-platform --typescript --tailwind --eslint --src-dir=false --app=false --import-alias="@/*"
-cd aiseo-platform
+npx create-next-app@latest ShowYourBrand-platform --typescript --tailwind --eslint --src-dir=false --app=false --import-alias="@/*"
+cd ShowYourBrand-platform
 
 # Install core dependencies
 npm install mongoose@7.4.4 next-auth@4.24.11 stripe@13.2.0 @vercel/blob resend bcrypt@5.1.1
@@ -3061,6 +3277,7 @@ cp .env.example .env.local
 ```
 
 **Copy Proven Patterns from Auto-Invoice:**
+
 1. `/lib/crypto.ts` - Field encryption (improved to fail-closed)
 2. `/lib/security-middleware.ts` - API route security HOCs
 3. `/lib/error-handler.ts` - ApiError class and handleApiError
@@ -3069,6 +3286,7 @@ cp .env.example .env.local
 6. Stripe webhook handler pattern
 
 **Verify Foundation:**
+
 ```bash
 # Run development server
 npm run dev  # Should start on http://localhost:3000
@@ -3081,6 +3299,7 @@ npm run type-check  # Should pass with no errors
 ```
 
 **Next Steps After Foundation (Week 2+):**
+
 - Implement data models (User, Business, Project, Audit, Subscription)
 - Set up authentication (NextAuth with Google OAuth + Credentials)
 - Create API routes (audits, businesses, projects)
@@ -3093,7 +3312,6 @@ npm run type-check  # Should pass with no errors
 
 **Architecture Validation Complete ✅**
 
-
 ---
 
 ## Architecture Completion Summary
@@ -3103,7 +3321,7 @@ npm run type-check  # Should pass with no errors
 **Architecture Decision Workflow:** COMPLETED ✅
 **Total Steps Completed:** 8
 **Date Completed:** 2026-01-21
-**Document Location:** /Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/architecture.md
+**Document Location:** /Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/\_bmad-output/planning-artifacts/architecture.md
 
 ### Final Architecture Deliverables
 
@@ -3132,14 +3350,14 @@ npm run type-check  # Should pass with no errors
 ### Implementation Handoff
 
 **For AI Agents:**
-This architecture document is your complete guide for implementing AISEO. Follow all decisions, patterns, and structures exactly as documented.
+This architecture document is your complete guide for implementing ShowYourBrand. Follow all decisions, patterns, and structures exactly as documented.
 
 **First Implementation Priority:**
 
 ```bash
 # Initialize Next.js project
-npx create-next-app@latest aiseo-platform --typescript --tailwind --eslint --src-dir=false --app=false --import-alias="@/*"
-cd aiseo-platform
+npx create-next-app@latest ShowYourBrand-platform --typescript --tailwind --eslint --src-dir=false --app=false --import-alias="@/*"
+cd ShowYourBrand-platform
 
 # Install core dependencies
 npm install mongoose@7.4.4 next-auth@4.24.11 stripe@13.2.0 @vercel/blob resend bcrypt@5.1.1
@@ -3212,4 +3430,3 @@ User-driven speed prioritization: Local Docker (not AWS), deferred migrations, s
 **Next Phase:** Begin implementation using the architectural decisions and patterns documented herein.
 
 **Document Maintenance:** Update this architecture when major technical decisions are made during implementation.
-

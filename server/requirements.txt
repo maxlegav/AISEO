@@ -1,4 +1,4 @@
-# AISEO Scraping Service Dependencies
+# ShowYourBrand Scraping Service Dependencies
 # Python 3.11+
 
 # Web Framework

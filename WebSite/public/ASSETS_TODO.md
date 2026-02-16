@@ -1,27 +1,30 @@
-# AISEO Assets - To Be Replaced
+# ShowYourBrand Assets - To Be Replaced
 
-⚠️ **IMPORTANT:** All assets in this directory are placeholders from Auto-Invoice and must be replaced with AISEO branding.
+⚠️ **IMPORTANT:** All assets in this directory are placeholders from Auto-Invoice and must be replaced with ShowYourBrand branding.
 
 ## Assets Requiring Replacement
 
 ### Logos
-- [ ] `AutoLogo.png` → Replace with AISEO logo (high-res)
-- [ ] `logo.png` → Replace with AISEO logo (standard)
-- [ ] `logoAndName.png` → Replace with AISEO logo with text
+
+- [ ] `AutoLogo.png` → Replace with ShowYourBrand logo (high-res)
+- [ ] `logo.png` → Replace with ShowYourBrand logo (standard)
+- [ ] `logoAndName.png` → Replace with ShowYourBrand logo with text
 
 ### Favicons & Icons
-- [ ] `favicon.ico` → AISEO favicon (16x16, 32x32, 48x48)
-- [ ] `favicon-16x16.png` → AISEO 16x16
-- [ ] `favicon-32x32.png` → AISEO 32x32
-- [ ] `apple-touch-icon.png` → AISEO iOS icon (180x180)
-- [ ] `android-chrome-192x192.png` → AISEO Android icon (192x192)
-- [ ] `android-chrome-512x512.png` → AISEO Android icon (512x512)
-- [ ] `mstile-150x150.png` → AISEO Windows tile (150x150)
-- [ ] `safari-pinned-tab.svg` → AISEO Safari tab icon (SVG, monochrome)
+
+- [ ] `favicon.ico` → ShowYourBrand favicon (16x16, 32x32, 48x48)
+- [ ] `favicon-16x16.png` → ShowYourBrand 16x16
+- [ ] `favicon-32x32.png` → ShowYourBrand 32x32
+- [ ] `apple-touch-icon.png` → ShowYourBrand iOS icon (180x180)
+- [ ] `android-chrome-192x192.png` → ShowYourBrand Android icon (192x192)
+- [ ] `android-chrome-512x512.png` → ShowYourBrand Android icon (512x512)
+- [ ] `mstile-150x150.png` → ShowYourBrand Windows tile (150x150)
+- [ ] `safari-pinned-tab.svg` → ShowYourBrand Safari tab icon (SVG, monochrome)
 
 ## Design Guidelines
 
-### AISEO Brand Colors (from UX Design spec)
+### ShowYourBrand Brand Colors (from UX Design spec)
+
 - **Primary Blue:** #3B82F6
 - **Success Green:** #10B981
 - **Error Red:** #EF4444
@@ -29,27 +32,29 @@
 - **Neutral Gray:** #6B7280
 
 ### Logo Requirements
+
 - Must work on both light and dark backgrounds
 - SVG format preferred for scalability
 - PNG exports at 1x, 2x, 3x for Retina displays
 - Monochrome variant for favicons
 
 ### Favicon Requirements
+
 - Use Favicon Generator (e.g., realfavicongenerator.net)
-- Upload AISEO logo
+- Upload ShowYourBrand logo
 - Generate all sizes and formats
 - Test on multiple browsers and devices
 
 ## Quick Steps to Replace
 
-1. **Get AISEO Logo from Designer**
+1. **Get ShowYourBrand Logo from Designer**
    - Request SVG master file
    - Request PNG exports (multiple sizes)
    - Request monochrome variant
 
 2. **Generate Favicons**
    - Use https://realfavicongenerator.net/
-   - Upload AISEO logo (512x512 PNG recommended)
+   - Upload ShowYourBrand logo (512x512 PNG recommended)
    - Download favicon package
    - Replace all files in public/
 
@@ -65,12 +70,13 @@
 ## References in Code
 
 Search codebase for these references:
+
 - `AutoLogo.png`
 - `logo.png`
 - `logoAndName.png`
 
-Update all imports to point to new AISEO assets.
+Update all imports to point to new ShowYourBrand assets.
 
 ---
 
-**Note:** Configuration files (site.webmanifest, browserconfig.xml) have been pre-updated for AISEO. Only asset files need replacement.
+**Note:** Configuration files (site.webmanifest, browserconfig.xml) have been pre-updated for ShowYourBrand. Only asset files need replacement.

@@ -1,1 +1,1 @@
-"""AISEO audit engine services."""
+"""ShowYourBrand audit engine services."""

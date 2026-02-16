@@ -2,7 +2,7 @@
 
 **Date**: 2026-02-12
 **Endpoint tested**: `POST /html-scan`
-**Server**: AISEO Scraping Service v0.2.0 (Docker)
+**Server**: ShowYourBrand Scraping Service v0.2.0 (Docker)
 
 ---
 
@@ -10,18 +10,18 @@
 
 20 tests performed covering:
 
-| Category | Tests | Result |
-|---|---|---|
-| Authentication (no token, wrong token) | 2 | PASS |
-| Real-world scan (example.com) | 1 | PASS |
-| Real-world scan with sub-URLs (lemonde.fr) | 1 | PASS |
-| SSRF attacks (localhost, 127.0.0.1, ::1, 0.0.0.0, decimal IP, file://) | 6 | PASS |
-| Input validation (missing fields, XSS in URL, 10KB URL) | 4 | PASS |
-| Abuse / DoS (50 sub-URLs) | 1 | WARN |
-| Method enforcement (GET on POST route) | 1 | PASS |
-| Sub-URL SSRF injection | 1 | PARTIAL |
-| Health check (with auth) | 1 | PASS |
-| Docker healthcheck (without auth) | 1 | FAIL |
+| Category                                                               | Tests | Result  |
+| ---------------------------------------------------------------------- | ----- | ------- |
+| Authentication (no token, wrong token)                                 | 2     | PASS    |
+| Real-world scan (example.com)                                          | 1     | PASS    |
+| Real-world scan with sub-URLs (lemonde.fr)                             | 1     | PASS    |
+| SSRF attacks (localhost, 127.0.0.1, ::1, 0.0.0.0, decimal IP, file://) | 6     | PASS    |
+| Input validation (missing fields, XSS in URL, 10KB URL)                | 4     | PASS    |
+| Abuse / DoS (50 sub-URLs)                                              | 1     | WARN    |
+| Method enforcement (GET on POST route)                                 | 1     | PASS    |
+| Sub-URL SSRF injection                                                 | 1     | PARTIAL |
+| Health check (with auth)                                               | 1     | PASS    |
+| Docker healthcheck (without auth)                                      | 1     | FAIL    |
 
 ---
 
@@ -69,6 +69,7 @@ HEALTHCHECK ... CMD curl -f http://localhost:8080/health || exit 1
 ```
 
 The container will **never** report as healthy:
+
 ```
 INFO: 127.0.0.1:36918 - "GET /health HTTP/1.1" 401 Unauthorized
 ```
@@ -84,6 +85,7 @@ INFO: 127.0.0.1:36918 - "GET /health HTTP/1.1" 401 Unauthorized
 **Severity**: CRITICAL — Easy denial-of-service vector.
 
 Test results:
+
 - 50 sub-URLs were all accepted and processed sequentially (no cap).
 - A 10KB URL was accepted and attempted to fetch.
 - No request body size limit enforced.
@@ -92,6 +94,7 @@ Test results:
 A single request with 100 sub-URLs could keep the server busy for 30+ minutes (each URL has a 30s fetch timeout plus analysis time).
 
 **Fix**:
+
 - Add a `max_sub_urls` limit (5-10 is reasonable).
 - Add URL length validation (max 2048 chars).
 - Add request rate limiting (e.g., via `slowapi` or middleware).
@@ -125,11 +128,13 @@ An attacker using DNS rebinding (a domain that alternates between a public IP an
 **Severity**: MEDIUM — Information disclosure aids attackers.
 
 SSRF-blocked URLs return:
+
 ```json
-{"scanErrors": ["Failed to fetch website: ValueError"]}
+{ "scanErrors": ["Failed to fetch website: ValueError"] }
 ```
 
 Other failures leak error class names:
+
 - `ConnectError` — tells the attacker the host exists but refused connection
 - `HTTPStatusError` — tells the attacker the host responded
 - `ValueError` — tells the attacker the URL was blocked by validation
@@ -187,6 +192,7 @@ These are navigation/boilerplate terms, not content keywords. While `<nav>`, `<f
 ### 9. Schema.org scoring is unrealistically harsh
 
 The "recommended" set is hardcoded as:
+
 ```python
 {"Organization", "WebSite", "BreadcrumbList", "FAQPage", "Product", "LocalBusiness"}
 ```
@@ -240,19 +246,20 @@ w3c, links, schema, meta, headings, alt, keywords = await asyncio.gather(
 
 ## Minor Issues
 
-| Issue | Details |
-|---|---|
-| Docs disabled for no benefit | `docs_url=None, redoc_url=None` — the service is already behind auth, disabling Swagger just makes dev/testing harder |
-| `url` field is `str` not `HttpUrl` | Pydantic's `HttpUrl` type would reject obvious non-URLs at validation time instead of at fetch time |
-| No endpoint-level timeout | A single request scanning multiple slow sites could block for 10+ minutes |
-| `linkCheck` always returns zeros | Even if Lychee worked, it only scans the URL itself — it doesn't extract and check links from the HTML content |
-| `language` parameter underused | Only affects keyword extraction stopwords — meta analysis doesn't adjust by language (e.g., `og:locale` recommendation) |
+| Issue                              | Details                                                                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Docs disabled for no benefit       | `docs_url=None, redoc_url=None` — the service is already behind auth, disabling Swagger just makes dev/testing harder   |
+| `url` field is `str` not `HttpUrl` | Pydantic's `HttpUrl` type would reject obvious non-URLs at validation time instead of at fetch time                     |
+| No endpoint-level timeout          | A single request scanning multiple slow sites could block for 10+ minutes                                               |
+| `linkCheck` always returns zeros   | Even if Lychee worked, it only scans the URL itself — it doesn't extract and check links from the HTML content          |
+| `language` parameter underused     | Only affects keyword extraction stopwords — meta analysis doesn't adjust by language (e.g., `og:locale` recommendation) |
 
 ---
 
 ## Test Output Samples
 
 ### example.com scan result
+
 ```
 Score: 53.7
 W3C errors: 0
@@ -264,6 +271,7 @@ Keywords: 11 extracted
 ```
 
 ### lemonde.fr scan result (with /international/ sub-URL)
+
 ```
 Score: 56.9 (primary: ~60.4, sub-page: 53.4)
 W3C errors: 296

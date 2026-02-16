@@ -1,5 +1,5 @@
 """
-AISEO Scraping Service - FastAPI Application
+ShowYourBrand Scraping Service - FastAPI Application
 
 Main entry point for the Docker-based processing service.
 Provides REST API for website scraping and AI analysis.
@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
     Handles startup and shutdown events for the FastAPI application.
     """
     # Startup
-    logger.info("AISEO Scraping Service starting up...")
+    logger.info("ShowYourBrand Scraping Service starting up...")
 
     # Validate required environment variables
     missing = app_config.validate_env()
@@ -79,14 +79,14 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    logger.info("AISEO Scraping Service shutting down...")
+    logger.info("ShowYourBrand Scraping Service shutting down...")
     await app_config.close_db()
 
 
 # Create FastAPI application
 # Docs enabled — service is already behind bearer token auth
 app = FastAPI(
-    title="AISEO Scraping Service",
+    title="ShowYourBrand Scraping Service",
     description="Docker-based processing service for website scraping and AI analysis",
     version="0.2.0",
     lifespan=lifespan,
@@ -157,7 +157,7 @@ async def root(
     return {
         "success": True,
         "data": {
-            "service": "aiseo-scraper",
+            "service": "ShowYourBrand-scraper",
             "version": "0.2.0",
             "docs": "/docs",
         },

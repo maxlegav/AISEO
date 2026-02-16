@@ -148,6 +148,13 @@ export const translations: Translations = {
     "dashboard.viewAllAudits": "Voir tous les audits",
     "dashboard.noAuditsYet": "Aucun audit pour le moment",
 
+    // Display Name
+    "displayName.title": "Comment souhaitez-vous être appelé ?",
+    "displayName.subtitle": "Ce nom sera utilisé pour vous accueillir dans votre dashboard",
+    "displayName.label": "Votre prénom ou surnom",
+    "displayName.placeholder": "Ex: Marie, Max, JD...",
+    "displayName.confirm": "Confirmer",
+
     // Username
     "username.title": "Choisissez votre nom d'utilisateur",
     "username.subtitle": "Ce nom sera utilisé dans l'URL de votre profil",
@@ -423,6 +430,13 @@ export const translations: Translations = {
     "dashboard.recentAudits": "Recent Audits",
     "dashboard.viewAllAudits": "View All Audits",
     "dashboard.noAuditsYet": "No audits yet",
+
+    // Display Name
+    "displayName.title": "What should we call you?",
+    "displayName.subtitle": "This name will be used to greet you in your dashboard",
+    "displayName.label": "Your first name or nickname",
+    "displayName.placeholder": "E.g. Marie, Max, JD...",
+    "displayName.confirm": "Confirm",
 
     // Username
     "username.title": "Choose your username",

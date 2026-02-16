@@ -1,1 +1,1 @@
-# AISEO Scraping Service - Routes Package
+# ShowYourBrand Scraping Service - Routes Package

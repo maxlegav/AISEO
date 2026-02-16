@@ -19,7 +19,7 @@ type LayoutProps = {
 
 const Layout = ({
   children,
-  title = "AISEO - AI SEO Optimization Platform",
+  title = "ShowYourBrand - AI SEO Optimization Platform",
   description = "Optimize your website for AI search engines with advanced SEO analysis and recommendations.",
 }: LayoutProps) => {
   const [isMounted, setIsMounted] = useState(false);

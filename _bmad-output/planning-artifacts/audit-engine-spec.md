@@ -26,13 +26,14 @@
 
 ## 1. Vue d'ensemble
 
-L'Audit Engine est le cœur du produit AISEO. Il mesure la **visibilité réelle** d'un business dans les réponses des IA génératives (ChatGPT, Claude, Perplexity, Gemini/DeepSeek).
+L'Audit Engine est le cœur du produit ShowYourBrand. Il mesure la **visibilité réelle** d'un business dans les réponses des IA génératives (ChatGPT, Claude, Perplexity, Gemini/DeepSeek).
 
 **Principe :** On envoie 100 prompts sur-mesure à 4 moteurs IA, on analyse les 400 réponses pour détecter si le business est mentionné, et on calcule un score de visibilité GEO de 0 à 100%.
 
 **Cible principale :** Sites e-commerce et sites vitrine (pas uniquement des commerces physiques).
 
 **Score GEO final :**
+
 ```
 GEO Score = (Audit Engine Score × 0.70) + (HTML Scanner Score × 0.30)
 ```
@@ -103,66 +104,72 @@ Les prompts ne sont **PAS** fixes. Ils sont **générés dynamiquement** par un 
 
 ### Structure des 5 niveaux
 
-| Niveau | Nom | Prompts | Description | Objectif |
-|--------|-----|---------|-------------|----------|
-| **1** | **Large** | 20 | **5 ultra-larges** + **15 catégorie** | Mesurer la visibilité sur les requêtes où le trafic est maximal |
-| **2** | **Niche** | 20 | Requêtes très spécifiques au positionnement du business | Mesurer la visibilité dans sa niche exacte |
-| **3** | **Quasi-direct** | 20 | Décrit le business sans le nommer (caractéristiques, localisation, niche) | Mesurer si l'IA fait le lien entre description et business |
-| **4** | **Semi-direct** | 20 | Mentionne des détails identifiants partiels (ville, niche exacte, caractéristique unique) | Affiner le seuil entre "connu" et "recommandé" |
-| **5** | **Direct** | 20 | Nomme explicitement le business ou l'URL | Mesurer si l'IA connaît le business quand on le cite |
+| Niveau | Nom              | Prompts | Description                                                                               | Objectif                                                        |
+| ------ | ---------------- | ------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **1**  | **Large**        | 20      | **5 ultra-larges** + **15 catégorie**                                                     | Mesurer la visibilité sur les requêtes où le trafic est maximal |
+| **2**  | **Niche**        | 20      | Requêtes très spécifiques au positionnement du business                                   | Mesurer la visibilité dans sa niche exacte                      |
+| **3**  | **Quasi-direct** | 20      | Décrit le business sans le nommer (caractéristiques, localisation, niche)                 | Mesurer si l'IA fait le lien entre description et business      |
+| **4**  | **Semi-direct**  | 20      | Mentionne des détails identifiants partiels (ville, niche exacte, caractéristique unique) | Affiner le seuil entre "connu" et "recommandé"                  |
+| **5**  | **Direct**       | 20      | Nomme explicitement le business ou l'URL                                                  | Mesurer si l'IA connaît le business quand on le cite            |
 
 ### Détail par niveau
 
 #### Niveau 1 — Large (5 ultra-larges + 15 catégorie)
 
 **Ultra-larges (5 prompts) :** Requêtes très génériques que n'importe qui poserait.
+
 - "Quel site pour acheter des chaussures en ligne ?"
 - "Recommande-moi un bon e-commerce de mode"
-- *Attendu :* Les géants (Amazon, Zalando) dominent. Score quasi-nul pour la plupart des business. C'est normal — ça sert de baseline.*
+- _Attendu :_ Les géants (Amazon, Zalando) dominent. Score quasi-nul pour la plupart des business. C'est normal — ça sert de baseline.\*
 
 **Catégorie (15 prompts) :** Requêtes avec des filtres de catégorie (pays, style, gamme, type).
+
 - "Meilleur site français pour des chaussures en cuir ?"
 - "E-commerce de chaussures artisanales en Europe ?"
-- *Attendu :* Début de visibilité possible pour les business bien positionnés.*
+- _Attendu :_ Début de visibilité possible pour les business bien positionnés.\*
 
 **Pourquoi ce mélange :** Si on met 20 ultra-larges, on a 20 réponses "Nike, Adidas, Amazon" — zéro insight utile. Le mélange 5+15 donne une baseline réaliste sans gaspiller de prompts.
 
 #### Niveau 2 — Niche (20 prompts)
 
 Requêtes très ciblées sur le positionnement exact du business.
+
 - "Où acheter des chaussures en cuir artisanales fabriquées en France ?"
 - "Site e-commerce spécialisé en maroquinerie cuir végétal livraison France"
 - "Comparatif des marques de chaussures artisanales françaises en ligne"
 
-*Attendu : C'est ici que les business niche commencent à apparaître.*
+_Attendu : C'est ici que les business niche commencent à apparaître._
 
 #### Niveau 3 — Quasi-direct (20 prompts)
 
 Décrit le business par ses caractéristiques **sans le nommer**.
+
 - "Tu connais des marques françaises de chaussures artisanales vendues en ligne ?"
 - "Il existe des sites e-commerce qui fabriquent leurs chaussures en cuir eux-mêmes ?"
 - "Quelles sont les alternatives artisanales aux grandes marques de chaussures ?"
 
-*Attendu : Si l'IA fait le lien entre la description et le business, c'est un bon signe.*
+_Attendu : Si l'IA fait le lien entre la description et le business, c'est un bon signe._
 
 #### Niveau 4 — Semi-direct (20 prompts) ← NOUVEAU
 
 Mentionne des **détails identifiants partiels** : ville, caractéristique très spécifique, niche ultra-précise.
+
 - "Il y a un site artisanal de chaussures basé à Lyon qui fait tout en cuir, tu vois lequel ?"
 - "Je cherche une marque française de chaussures en cuir, je crois qu'ils sont à Lyon"
 - "Un ami m'a parlé d'un e-commerce de chaussures artisanales françaises, cuir pleine fleur, tu connais ?"
 
-*Attendu : L'IA devrait identifier le business si elle le connaît. C'est le palier critique.*
+_Attendu : L'IA devrait identifier le business si elle le connaît. C'est le palier critique._
 
 #### Niveau 5 — Direct (20 prompts)
 
 Nomme **explicitement** le business ou l'URL.
+
 - "Tu connais MaisonCuir.fr ?"
 - "Que penses-tu de MaisonCuir ?"
 - "MaisonCuir.fr est fiable pour acheter en ligne ?"
 - "Donne-moi des infos sur le site maisoncuir.fr"
 
-*Attendu : Si même en citant le nom l'IA ne connaît pas → le business est totalement invisible.*
+_Attendu : Si même en citant le nom l'IA ne connaît pas → le business est totalement invisible._
 
 ---
 
@@ -170,14 +177,14 @@ Nomme **explicitement** le business ou l'URL.
 
 Chaque prompt est **taggué** avec une catégorie d'intention (indépendante du niveau de spécificité). Ça permet une analyse croisée niveau × catégorie.
 
-| Catégorie | Ce que ça mesure | Exemple |
-|-----------|-----------------|---------|
-| **discovery** | L'IA recommande-t-elle le business ? | "Quel site pour acheter X ?" |
-| **comparison** | L'IA cite le business face aux concurrents ? | "C'est mieux X ou Y pour Z ?" |
-| **reputation** | L'IA connaît-elle la réputation du business ? | "X est fiable pour acheter en ligne ?" |
-| **product** | L'IA connaît-elle les produits/services ? | "Quels produits propose X ?" |
-| **alternative** | L'IA cite le business comme alternative ? | "Quelle alternative à [concurrent] ?" |
-| **trust** | L'IA inspire confiance envers le business ? | "Est-ce sûr d'acheter sur X ?" |
+| Catégorie       | Ce que ça mesure                              | Exemple                                |
+| --------------- | --------------------------------------------- | -------------------------------------- |
+| **discovery**   | L'IA recommande-t-elle le business ?          | "Quel site pour acheter X ?"           |
+| **comparison**  | L'IA cite le business face aux concurrents ?  | "C'est mieux X ou Y pour Z ?"          |
+| **reputation**  | L'IA connaît-elle la réputation du business ? | "X est fiable pour acheter en ligne ?" |
+| **product**     | L'IA connaît-elle les produits/services ?     | "Quels produits propose X ?"           |
+| **alternative** | L'IA cite le business comme alternative ?     | "Quelle alternative à [concurrent] ?"  |
+| **trust**       | L'IA inspire confiance envers le business ?   | "Est-ce sûr d'acheter sur X ?"         |
 
 ### Rendu dashboard (radar)
 
@@ -196,12 +203,12 @@ trust      ██████░░░░ 62%    → "Confiance correcte quand o
 
 ### Moteurs cibles
 
-| Moteur | API | Modèle | Coût estimé/prompt |
-|--------|-----|--------|-------------------|
-| ChatGPT | OpenAI API | gpt-4o-mini | ~$0.0003 |
-| Claude | Anthropic API | claude-3-haiku | ~$0.0003 |
-| Perplexity | Perplexity API | pplx-7b-online | ~$0.0005 |
-| Gemini | Google AI API | gemini-1.5-flash | ~$0.0001 |
+| Moteur     | API            | Modèle           | Coût estimé/prompt |
+| ---------- | -------------- | ---------------- | ------------------ |
+| ChatGPT    | OpenAI API     | gpt-4o-mini      | ~$0.0003           |
+| Claude     | Anthropic API  | claude-3-haiku   | ~$0.0003           |
+| Perplexity | Perplexity API | pplx-7b-online   | ~$0.0005           |
+| Gemini     | Google AI API  | gemini-1.5-flash | ~$0.0001           |
 
 **Coût total par audit :** ~400 requêtes × ~$0.0003 = **~$0.12/audit** (hors génération de prompts)
 
@@ -276,6 +283,7 @@ def detect_mention(response: str, business: BusinessSnapshot) -> MentionResult:
 ### Variantes d'URL générées
 
 Pour `https://www.maisoncuir.fr` :
+
 ```
 maisoncuir.fr
 www.maisoncuir.fr
@@ -286,16 +294,17 @@ maisoncuir (sans extension)
 
 ### Calcul de qualité (0-3)
 
-| Score | Signification | Détection |
-|-------|--------------|-----------|
-| **0** | Pas mentionné | Aucun match |
-| **1** | Mentionné en passant | Le nom apparaît 1 seule fois, pas dans une recommandation structurée |
-| **2** | Recommandé parmi d'autres | Le nom apparaît dans une liste de recommandations (détecté via patterns : "1.", "- ", "•", numérotation) |
-| **3** | Recommandé en premier / focus | Le nom est le premier élément d'une liste OU la réponse est centrée sur le business |
+| Score | Signification                 | Détection                                                                                                |
+| ----- | ----------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **0** | Pas mentionné                 | Aucun match                                                                                              |
+| **1** | Mentionné en passant          | Le nom apparaît 1 seule fois, pas dans une recommandation structurée                                     |
+| **2** | Recommandé parmi d'autres     | Le nom apparaît dans une liste de recommandations (détecté via patterns : "1.", "- ", "•", numérotation) |
+| **3** | Recommandé en premier / focus | Le nom est le premier élément d'une liste OU la réponse est centrée sur le business                      |
 
 ### Calcul de position
 
 La position est le **rang** du business dans la réponse :
+
 - Si le business est le 1er cité → position = 1
 - Si 2e → position = 2
 - etc.
@@ -314,12 +323,12 @@ responseScore = quality × positionMultiplier
 
 ### Multiplicateurs de position
 
-| Position | Multiplicateur | Justification |
-|----------|---------------|---------------|
-| Rang 1 | ×1.5 | Première recommandation = visibilité maximale |
-| Rang 2-3 | ×1.0 | Bien visible, mais pas en tête |
-| Rang 4+ | ×0.7 | Mentionné mais enterré dans la liste |
-| Non mentionné | ×0.0 | Invisible |
+| Position      | Multiplicateur | Justification                                 |
+| ------------- | -------------- | --------------------------------------------- |
+| Rang 1        | ×1.5           | Première recommandation = visibilité maximale |
+| Rang 2-3      | ×1.0           | Bien visible, mais pas en tête                |
+| Rang 4+       | ×0.7           | Mentionné mais enterré dans la liste          |
+| Non mentionné | ×0.0           | Invisible                                     |
 
 ### Score max par réponse
 
@@ -340,6 +349,7 @@ promptScore = Σ(responseScore pour chaque IA) / (nombre d'IA ayant répondu × 
 Résultat : un nombre entre 0.0 et 1.0.
 
 **Exemple :**
+
 ```
 Prompt "Meilleur site de chaussures artisanales ?" :
   ChatGPT  : qualité 3, rang 1 → 3 × 1.5 = 4.5
@@ -367,14 +377,14 @@ levelScore = moyenne(promptScore) pour tous les prompts de ce niveau
 
 Moyenne pondérée des scores par catégorie :
 
-| Catégorie | Poids | Justification |
-|-----------|-------|---------------|
-| **discovery** | ×2.0 | C'est le use case #1 : "recommande-moi un X" |
-| **comparison** | ×1.5 | Très stratégique : être cité face aux concurrents |
-| **reputation** | ×1.2 | Important pour la conversion |
-| **product** | ×1.0 | Connaissance des produits/services |
-| **alternative** | ×1.5 | Capturer le trafic des concurrents |
-| **trust** | ×1.0 | Confiance/fiabilité |
+| Catégorie       | Poids | Justification                                     |
+| --------------- | ----- | ------------------------------------------------- |
+| **discovery**   | ×2.0  | C'est le use case #1 : "recommande-moi un X"      |
+| **comparison**  | ×1.5  | Très stratégique : être cité face aux concurrents |
+| **reputation**  | ×1.2  | Important pour la conversion                      |
+| **product**     | ×1.0  | Connaissance des produits/services                |
+| **alternative** | ×1.5  | Capturer le trafic des concurrents                |
+| **trust**       | ×1.0  | Confiance/fiabilité                               |
 
 ```
 auditEngineScore = Σ(categoryScore × categoryWeight) / Σ(categoryWeight) × 100
@@ -397,17 +407,18 @@ GEO Score = (auditEngineScore × 0.70) + (htmlScannerScore × 0.30)
 
 ### Grille de couleur
 
-| Score GEO | Couleur | Label |
-|-----------|---------|-------|
-| 0-30% | 🔴 Rouge | Invisible |
-| 31-50% | 🟠 Orange | Faible visibilité |
-| 51-70% | 🟡 Jaune | Visibilité moyenne |
-| 71-85% | 🟢 Vert clair | Bonne visibilité |
-| 86-100% | 💚 Vert | Excellente visibilité |
+| Score GEO | Couleur       | Label                 |
+| --------- | ------------- | --------------------- |
+| 0-30%     | 🔴 Rouge      | Invisible             |
+| 31-50%    | 🟠 Orange     | Faible visibilité     |
+| 51-70%    | 🟡 Jaune      | Visibilité moyenne    |
+| 71-85%    | 🟢 Vert clair | Bonne visibilité      |
+| 86-100%   | 💚 Vert       | Excellente visibilité |
 
 ### Le HTML Scanner Score
 
 Le HTML Scanner produit son propre score (0-100) basé sur :
+
 - Schema.org markup détecté vs manquant
 - Qualité des meta tags (title, description, OG, Twitter)
 - Structure des headings (H1-H6)
@@ -429,18 +440,19 @@ pending → processing → review_pending → completed
           → failed (erreur technique)
 ```
 
-| Statut | Qui | Description |
-|--------|-----|-------------|
-| `pending` | Système | Audit créé, en attente de traitement |
-| `processing` | Server Python | Le serveur traite les 400 requêtes |
-| `review_pending` | Server Python → Admin | Traitement terminé, en attente de validation admin |
-| `completed` | Admin | Admin a validé → visible par l'utilisateur |
-| `rejected` | Admin | Admin a rejeté (résultats incohérents, erreur, etc.) |
-| `failed` | Server Python | Erreur technique (timeout, <2 IA disponibles, etc.) |
+| Statut           | Qui                   | Description                                          |
+| ---------------- | --------------------- | ---------------------------------------------------- |
+| `pending`        | Système               | Audit créé, en attente de traitement                 |
+| `processing`     | Server Python         | Le serveur traite les 400 requêtes                   |
+| `review_pending` | Server Python → Admin | Traitement terminé, en attente de validation admin   |
+| `completed`      | Admin                 | Admin a validé → visible par l'utilisateur           |
+| `rejected`       | Admin                 | Admin a rejeté (résultats incohérents, erreur, etc.) |
+| `failed`         | Server Python         | Erreur technique (timeout, <2 IA disponibles, etc.)  |
 
 ### Dashboard Admin — Vue "Audits en attente"
 
 L'admin voit :
+
 1. **Liste des audits `review_pending`** triés par date
 2. Pour chaque audit :
    - Business name + URL
@@ -457,6 +469,7 @@ L'admin voit :
 ### Validation automatique (future)
 
 Pour le MVP, validation manuelle. À terme, on pourra ajouter une **validation automatique** si :
+
 - 3/4+ IA ont répondu
 - Pas d'anomalie détectée (pas de score aberrant)
 - Le business a déjà eu un audit validé précédemment
@@ -468,167 +481,199 @@ Pour le MVP, validation manuelle. À terme, on pourra ajouter une **validation a
 ### Schema MongoDB
 
 ```typescript
-const AuditSchema = new Schema({
-  // Références
-  businessId: { type: Schema.Types.ObjectId, ref: 'Business', required: true },
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+const AuditSchema = new Schema(
+  {
+    // Références
+    businessId: {
+      type: Schema.Types.ObjectId,
+      ref: "Business",
+      required: true,
+    },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-  // Statut
-  status: {
-    type: String,
-    enum: ['pending', 'processing', 'review_pending', 'completed', 'rejected', 'failed'],
-    default: 'pending',
-    required: true,
-    index: true,
-  },
-
-  // Snapshot du business au moment de l'audit (pattern snapshot)
-  businessSnapshot: {
-    name: { type: String, required: true },
-    primaryUrl: { type: String, required: true },
-    subUrls: [String],
-    competitorUrls: [String],
-    category: String,
-    description: String,
-    targetKeywords: [String],
-  },
-
-  // Prompts générés pour cet audit
-  generatedPrompts: [{
-    id: { type: Number, required: true },          // 1-100
-    level: { type: Number, required: true },        // 1-5
-    category: { type: String, required: true },     // discovery, comparison, etc.
-    question: { type: String, required: true },     // Le prompt envoyé aux IA
-  }],
-
-  // Résultats bruts (400 réponses)
-  promptResults: [{
-    promptId: { type: Number, required: true },     // Réf vers generatedPrompts.id
-    level: Number,
-    category: String,
-    question: String,
-
-    // Réponses par IA
-    engines: {
-      chatgpt: {
-        mentioned: Boolean,
-        quality: { type: Number, min: 0, max: 3 },
-        position: Number,
-        rawResponse: String,
-        responseTime: Number,                       // ms
-        error: String,                              // null si OK
-      },
-      claude: {
-        mentioned: Boolean,
-        quality: { type: Number, min: 0, max: 3 },
-        position: Number,
-        rawResponse: String,
-        responseTime: Number,
-        error: String,
-      },
-      perplexity: {
-        mentioned: Boolean,
-        quality: { type: Number, min: 0, max: 3 },
-        position: Number,
-        rawResponse: String,
-        responseTime: Number,
-        error: String,
-      },
-      gemini: {
-        mentioned: Boolean,
-        quality: { type: Number, min: 0, max: 3 },
-        position: Number,
-        rawResponse: String,
-        responseTime: Number,
-        error: String,
-      },
+    // Statut
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "processing",
+        "review_pending",
+        "completed",
+        "rejected",
+        "failed",
+      ],
+      default: "pending",
+      required: true,
+      index: true,
     },
 
-    // Scores calculés pour ce prompt
-    promptScore: Number,          // 0.0-1.0
-    mentionRate: Number,          // 0.0-1.0 (ex: 3/4 = 0.75)
-  }],
+    // Snapshot du business au moment de l'audit (pattern snapshot)
+    businessSnapshot: {
+      name: { type: String, required: true },
+      primaryUrl: { type: String, required: true },
+      subUrls: [String],
+      competitorUrls: [String],
+      category: String,
+      description: String,
+      targetKeywords: [String],
+    },
 
-  // Scores agrégés par catégorie
-  categoryScores: {
-    discovery:   { score: Number, promptCount: Number, avgMentionRate: Number },
-    comparison:  { score: Number, promptCount: Number, avgMentionRate: Number },
-    reputation:  { score: Number, promptCount: Number, avgMentionRate: Number },
-    product:     { score: Number, promptCount: Number, avgMentionRate: Number },
-    alternative: { score: Number, promptCount: Number, avgMentionRate: Number },
-    trust:       { score: Number, promptCount: Number, avgMentionRate: Number },
-  },
+    // Prompts générés pour cet audit
+    generatedPrompts: [
+      {
+        id: { type: Number, required: true }, // 1-100
+        level: { type: Number, required: true }, // 1-5
+        category: { type: String, required: true }, // discovery, comparison, etc.
+        question: { type: String, required: true }, // Le prompt envoyé aux IA
+      },
+    ],
 
-  // Scores agrégés par niveau
-  levelScores: {
-    level1: { score: Number, promptCount: Number, avgMentionRate: Number },
-    level2: { score: Number, promptCount: Number, avgMentionRate: Number },
-    level3: { score: Number, promptCount: Number, avgMentionRate: Number },
-    level4: { score: Number, promptCount: Number, avgMentionRate: Number },
-    level5: { score: Number, promptCount: Number, avgMentionRate: Number },
-  },
+    // Résultats bruts (400 réponses)
+    promptResults: [
+      {
+        promptId: { type: Number, required: true }, // Réf vers generatedPrompts.id
+        level: Number,
+        category: String,
+        question: String,
 
-  // Score final Audit Engine
-  auditEngineScore: { type: Number, min: 0, max: 100 },
+        // Réponses par IA
+        engines: {
+          chatgpt: {
+            mentioned: Boolean,
+            quality: { type: Number, min: 0, max: 3 },
+            position: Number,
+            rawResponse: String,
+            responseTime: Number, // ms
+            error: String, // null si OK
+          },
+          claude: {
+            mentioned: Boolean,
+            quality: { type: Number, min: 0, max: 3 },
+            position: Number,
+            rawResponse: String,
+            responseTime: Number,
+            error: String,
+          },
+          perplexity: {
+            mentioned: Boolean,
+            quality: { type: Number, min: 0, max: 3 },
+            position: Number,
+            rawResponse: String,
+            responseTime: Number,
+            error: String,
+          },
+          gemini: {
+            mentioned: Boolean,
+            quality: { type: Number, min: 0, max: 3 },
+            position: Number,
+            rawResponse: String,
+            responseTime: Number,
+            error: String,
+          },
+        },
 
-  // Score HTML Scanner (rempli séparément)
-  htmlScannerScore: { type: Number, min: 0, max: 100 },
+        // Scores calculés pour ce prompt
+        promptScore: Number, // 0.0-1.0
+        mentionRate: Number, // 0.0-1.0 (ex: 3/4 = 0.75)
+      },
+    ],
 
-  // Score GEO final (calculé : engine×0.7 + html×0.3)
-  geoScore: { type: Number, min: 0, max: 100 },
-
-  // Seuil de découvrabilité (voir section 13)
-  discoverabilityThreshold: {
-    level: { type: Number, min: 1, max: 5 },       // À partir de quel niveau le business est trouvé
-    description: String,                             // "Visible à partir du niveau 3 (Niche)"
-  },
-
-  // Données concurrents (même 100 prompts testés)
-  competitorResults: [{
-    competitorUrl: String,
-    competitorName: String,
-    auditEngineScore: Number,
-    mentionRate: Number,
+    // Scores agrégés par catégorie
     categoryScores: {
-      discovery: Number,
-      comparison: Number,
-      reputation: Number,
-      product: Number,
-      alternative: Number,
-      trust: Number,
+      discovery: { score: Number, promptCount: Number, avgMentionRate: Number },
+      comparison: {
+        score: Number,
+        promptCount: Number,
+        avgMentionRate: Number,
+      },
+      reputation: {
+        score: Number,
+        promptCount: Number,
+        avgMentionRate: Number,
+      },
+      product: { score: Number, promptCount: Number, avgMentionRate: Number },
+      alternative: {
+        score: Number,
+        promptCount: Number,
+        avgMentionRate: Number,
+      },
+      trust: { score: Number, promptCount: Number, avgMentionRate: Number },
     },
+
+    // Scores agrégés par niveau
     levelScores: {
-      level1: Number,
-      level2: Number,
-      level3: Number,
-      level4: Number,
-      level5: Number,
+      level1: { score: Number, promptCount: Number, avgMentionRate: Number },
+      level2: { score: Number, promptCount: Number, avgMentionRate: Number },
+      level3: { score: Number, promptCount: Number, avgMentionRate: Number },
+      level4: { score: Number, promptCount: Number, avgMentionRate: Number },
+      level5: { score: Number, promptCount: Number, avgMentionRate: Number },
     },
-  }],
 
-  // Métadonnées
-  enginesUsed: [String],                            // ["chatgpt", "claude", "perplexity", "gemini"]
-  enginesSucceeded: [String],                       // ["chatgpt", "claude", "gemini"] (si perplexity a fail)
-  totalPromptsProcessed: Number,
-  totalResponsesReceived: Number,
-  processingTimeMs: Number,
+    // Score final Audit Engine
+    auditEngineScore: { type: Number, min: 0, max: 100 },
 
-  // Admin
-  reviewedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  reviewedAt: Date,
-  reviewNotes: String,
+    // Score HTML Scanner (rempli séparément)
+    htmlScannerScore: { type: Number, min: 0, max: 100 },
 
-  // Timestamps
-  createdAt: { type: Date, default: Date.now },
-  completedAt: Date,
-}, {
-  timestamps: true,
-});
+    // Score GEO final (calculé : engine×0.7 + html×0.3)
+    geoScore: { type: Number, min: 0, max: 100 },
+
+    // Seuil de découvrabilité (voir section 13)
+    discoverabilityThreshold: {
+      level: { type: Number, min: 1, max: 5 }, // À partir de quel niveau le business est trouvé
+      description: String, // "Visible à partir du niveau 3 (Niche)"
+    },
+
+    // Données concurrents (même 100 prompts testés)
+    competitorResults: [
+      {
+        competitorUrl: String,
+        competitorName: String,
+        auditEngineScore: Number,
+        mentionRate: Number,
+        categoryScores: {
+          discovery: Number,
+          comparison: Number,
+          reputation: Number,
+          product: Number,
+          alternative: Number,
+          trust: Number,
+        },
+        levelScores: {
+          level1: Number,
+          level2: Number,
+          level3: Number,
+          level4: Number,
+          level5: Number,
+        },
+      },
+    ],
+
+    // Métadonnées
+    enginesUsed: [String], // ["chatgpt", "claude", "perplexity", "gemini"]
+    enginesSucceeded: [String], // ["chatgpt", "claude", "gemini"] (si perplexity a fail)
+    totalPromptsProcessed: Number,
+    totalResponsesReceived: Number,
+    processingTimeMs: Number,
+
+    // Admin
+    reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    reviewedAt: Date,
+    reviewNotes: String,
+
+    // Timestamps
+    createdAt: { type: Date, default: Date.now },
+    completedAt: Date,
+  },
+  {
+    timestamps: true,
+  },
+);
 
 // Index
 AuditSchema.index({ businessId: 1, createdAt: -1 });
 AuditSchema.index({ userId: 1, status: 1 });
-AuditSchema.index({ status: 1, createdAt: -1 });  // Pour le dashboard admin
+AuditSchema.index({ status: 1, createdAt: -1 }); // Pour le dashboard admin
 ```
 
 ### Taille estimée d'un document Audit
@@ -646,7 +691,7 @@ C'est acceptable pour MongoDB (limite par document = 16MB).
 
 ### Le prompt système envoyé au LLM générateur
 
-```
+````
 Tu es un expert en GEO (Generative Engine Optimization). Tu dois générer
 exactement 100 prompts de test pour mesurer la visibilité d'un business
 dans les réponses des IA génératives.
@@ -736,7 +781,7 @@ VÉRIFIE :
 - Les catégories sont bien réparties (min 10 par catégorie)
 - Niveau 1 : 5 ultra-larges (id 1-5) + 15 catégorie (id 6-20)
 - Le JSON est valide et parsable
-```
+````
 
 ### Coût de génération
 
@@ -840,6 +885,7 @@ Le HTML Scanner est **implémenté séparément** et produit un score de 0-100.
 ### Quand le HTML Scanner intervient
 
 Le HTML Scanner peut être exécuté :
+
 - **En parallèle** de l'Audit Engine (scan HTML pendant que les 400 requêtes IA tournent)
 - **Avant** l'Audit Engine (si on veut que les résultats HTML informent la génération de prompts — future amélioration)
 
@@ -866,23 +912,23 @@ def calculate_geo_score(audit_engine_score: float, html_scanner_score: float) ->
 
 ### A. Coût par audit (estimation)
 
-| Composant | Coût |
-|-----------|------|
-| Génération des 100 prompts (LLM) | ~$0.01 |
-| 400 requêtes IA (4 engines × 100) | ~$0.12 |
-| HTML Scanner (pas de coût API) | $0.00 |
-| **Total** | **~$0.13/audit** |
+| Composant                         | Coût             |
+| --------------------------------- | ---------------- |
+| Génération des 100 prompts (LLM)  | ~$0.01           |
+| 400 requêtes IA (4 engines × 100) | ~$0.12           |
+| HTML Scanner (pas de coût API)    | $0.00            |
+| **Total**                         | **~$0.13/audit** |
 
 ### B. Temps d'exécution estimé
 
-| Phase | Durée |
-|-------|-------|
-| Génération prompts | 5-10s |
-| 400 requêtes IA (parallèle) | 5-8 min |
-| Analyse des réponses | 2-5s |
-| Calcul des scores | <1s |
-| Écriture MongoDB | <1s |
-| **Total** | **~5-9 minutes** |
+| Phase                       | Durée            |
+| --------------------------- | ---------------- |
+| Génération prompts          | 5-10s            |
+| 400 requêtes IA (parallèle) | 5-8 min          |
+| Analyse des réponses        | 2-5s             |
+| Calcul des scores           | <1s              |
+| Écriture MongoDB            | <1s              |
+| **Total**                   | **~5-9 minutes** |
 
 ### C. Dépendances techniques
 
