@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**AISEO** is a GEO (Generative Engine Optimization) audit platform that helps businesses become visible in AI search engines (ChatGPT, Claude, Perplexity, DeepSeek).
+**ShowYourBrand** is a GEO (Generative Engine Optimization) audit platform that helps businesses become visible in AI search engines (ChatGPT, Claude, Perplexity, DeepSeek).
 
 **Core Value Proposition:** Test visibility across 100 AI prompts, calculate GEO Health Score (0-100%), and provide actionable recommendations to improve AI citations.
 
@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Structure
 
 This is a Next.js monorepo with two services:
+
 - **`WebSite/`**: Next.js 16 application (this directory)
 - **`server/`**: Docker processing service (Python + Selenium - to be built in Epic 1)
 
@@ -47,6 +48,7 @@ npm run lint         # Run ESLint
 ### Data Models
 
 **User Model:**
+
 ```typescript
 {
   name: string,
@@ -63,6 +65,7 @@ npm run lint         # Run ESLint
 ```
 
 **Business Model** (user's website to audit):
+
 ```typescript
 {
   userId: ObjectId,
@@ -77,6 +80,7 @@ npm run lint         # Run ESLint
 ```
 
 **Audit Model** (uses snapshot pattern):
+
 ```typescript
 {
   businessId: ObjectId,
@@ -107,26 +111,37 @@ npm run lint         # Run ESLint
 ### Security Patterns
 
 **API Security Middleware** (`lib/security-middleware.ts`):
+
 ```typescript
 // Authentication + user validation
-export function withSecurity(handler) { /* ... */ }
+export function withSecurity(handler) {
+  /* ... */
+}
 
 // Check user owns resource
-export function withResourceOwnership(resourceIdExtractor, resourceModel) { /* ... */ }
+export function withResourceOwnership(resourceIdExtractor, resourceModel) {
+  /* ... */
+}
 
 // Input sanitization (remove MongoDB operators, XSS chars)
-export function sanitizeInput(input) { /* ... */ }
+export function sanitizeInput(input) {
+  /* ... */
+}
 
 // Rate limiting (Upstash Redis in production)
-export function withRateLimit(maxRequests, windowMs) { /* ... */ }
+export function withRateLimit(maxRequests, windowMs) {
+  /* ... */
+}
 ```
 
 **Field Encryption** (`models/plugins/fieldEncryption.ts`):
+
 - Uses AES-256-GCM
 - Encrypts specified fields on save, decrypts on load
 - Fail-closed on decryption errors
 
 **Error Handling** (`lib/error-handler.ts`):
+
 ```typescript
 export class ApiError extends Error {
   constructor(errorType, message, statusCode, details?) {}
@@ -140,6 +155,7 @@ export function handleApiError(error, res) {
 ### API Response Format
 
 **Standard format for all API responses:**
+
 ```typescript
 // Success
 {
@@ -159,13 +175,14 @@ export function handleApiError(error, res) {
 ### Dual Validation Strategy
 
 **1. API Layer (Zod):**
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const CreateAuditSchema = z.object({
   businessId: z.string().min(1),
   competitorUrls: z.array(z.string().url()).max(5),
-  language: z.enum(['en', 'fr']),
+  language: z.enum(["en", "fr"]),
 });
 
 // In API route
@@ -173,11 +190,12 @@ const body = CreateAuditSchema.parse(req.body);
 ```
 
 **2. Database Layer (Mongoose):**
+
 ```typescript
 const AuditSchema = new Schema({
   status: {
     type: String,
-    enum: ['pending', 'processing', 'completed', 'failed'],
+    enum: ["pending", "processing", "completed", "failed"],
     required: true,
   },
   geoScore: {
@@ -191,9 +209,10 @@ const AuditSchema = new Schema({
 ### State Management (Zustand - To Be Configured)
 
 **Convention:** Verb-first action naming
+
 ```typescript
 // Store actions
-setUser, updateAudit, clearFilters, toggleSidebar
+(setUser, updateAudit, clearFilters, toggleSidebar);
 ```
 
 ### Naming Conventions
@@ -220,6 +239,7 @@ setUser, updateAudit, clearFilters, toggleSidebar
 ### Parallel AI API Processing
 
 **CRITICAL:** Query 4 AI engines in parallel (NOT sequentially)
+
 - Exponential backoff on rate limits (1s → 2s → 4s → 8s, max 4 retries)
 - Minimum 2/4 APIs must succeed to generate report
 - 10-minute timeout (quality-first, not performance target)
@@ -313,7 +333,7 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 ## File Structure
 
 ```
-/aiseo-platform/
+/ShowYourBrand-platform/
 ├── /pages/                    # Next.js Pages Router
 │   ├── /api/                  # Backend API routes
 │   │   ├── /auth/             # NextAuth endpoints
@@ -321,7 +341,7 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 │   │   ├── /businesses/       # Business management (to be built)
 │   │   └── /webhook/          # Stripe webhooks (to be built)
 │   ├── /dashboard/            # Protected dashboard pages (to be built)
-│   ├── index.tsx              # Landing page (AISEO branded)
+│   ├── index.tsx              # Landing page (ShowYourBrand branded)
 │   ├── login.tsx, signup.tsx  # Auth pages
 │   └── dashboard.tsx          # Main dashboard entry
 ├── /components/               # React components
@@ -340,7 +360,7 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 │   │   └── fieldEncryption.ts # Encryption plugin
 │   └── User.ts                # User model (auth only, no subscription field yet)
 ├── /types/                    # TypeScript types
-├── config.ts                  # Centralized config (AISEO pricing, colors, etc.)
+├── config.ts                  # Centralized config (ShowYourBrand pricing, colors, etc.)
 ├── next.config.js             # Next.js configuration
 ├── tailwind.config.ts         # Tailwind + Shadcn/ui
 └── vercel.json                # Vercel deployment config
@@ -349,18 +369,21 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 ## Current Project Status
 
 **Story 1.1 (Complete):** ✅
+
 - Next.js upgraded to 16.1.4
 - TypeScript strict mode enabled
 - All Auto-Invoice code removed
 - Dependencies cleaned
 
 **Story 1.2 (Complete):** ✅
-- AISEO branding applied
+
+- ShowYourBrand branding applied
 - Translations updated (EN/FR)
 - Config files updated
 - Assets documented for replacement
 
 **Next Steps (Epic 1):**
+
 - Story 1.3: Setup Zustand + Zod
 - Story 1.4: Configure Docker Compose for scraping service
 - Story 1.5: Setup GitLab CI/CD
@@ -370,20 +393,24 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 ## Common Issues & Solutions
 
 ### Build Fails with Peer Dependency Errors
+
 - Use `npm install --legacy-peer-deps`
 - NextAuth 4 + Next.js 16 have peer dependency conflicts (acceptable for MVP)
 
 ### MongoDB Connection Issues
+
 - Verify `MONGODB_URI` is set correctly
 - Ensure IP whitelist in MongoDB Atlas includes your IP
 - Check `MONGODB_ENCRYPTION_KEY` is exactly 32 bytes base64
 
 ### Authentication Not Working
+
 - Verify `NEXTAUTH_URL` matches your current URL (http://localhost:3000 in dev)
 - Verify `NEXTAUTH_SECRET` is set
 - Check Google OAuth credentials if using Google Sign-In
 
 ### TypeScript Errors After Upgrade
+
 - Run `npm run build` to see all errors
 - Most common: unused variables (prefix with `_`), missing null checks (add `?` or `??`)
 
@@ -398,12 +425,14 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 **Current Phase:** Foundation complete, ready to build core features (Epics 2-13)
 
 **Success Metrics:**
+
 - Month 3: 10-15 active agencies, 100+ audits delivered, €10K MRR
 - Month 12: 30+ agencies, 500+ audits/month (North Star), €50K MRR
 
 ---
 
 For detailed architecture decisions and epic breakdown, see:
+
 - `/_bmad-output/planning-artifacts/architecture.md` (125K detailed architecture)
 - `/_bmad-output/planning-artifacts/epics.md` (71 stories across 13 epics)
 - `/_bmad-output/planning-artifacts/prd.md` (complete product requirements)

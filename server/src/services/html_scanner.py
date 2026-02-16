@@ -38,7 +38,7 @@ from models.audit import HtmlScanResult
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = "AISEO-Bot/1.0 (+https://aiseo.com)"
+USER_AGENT = "ShowYourBrand-Bot/1.0 (+https://ShowYourBrand.com)"
 FETCH_TIMEOUT = 30
 RENDER_WAIT = 10  # seconds to wait for JS rendering after page load
 VNU_JAR_PATH = "/app/vnu.jar"

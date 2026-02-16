@@ -174,10 +174,10 @@ export default function DashboardLayout({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {session?.user?.name?.[0] || "U"}
+                  {(session?.user?.displayName || session?.user?.name)?.[0] || "U"}
                 </div>
                 <span className="font-medium text-gray-900">
-                  {session?.user?.name || "User"}
+                  {session?.user?.displayName || session?.user?.name || "User"}
                 </span>
               </div>
             </div>

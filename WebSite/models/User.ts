@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 
 export interface UserDocument extends mongoose.Document {
   name: string;
+  displayName?: string;
   username?: string;
   company?: string;
   email: string;
@@ -53,6 +54,7 @@ export interface UserDocument extends mongoose.Document {
 const UserSchema = new Schema<UserDocument>(
   {
     name: { type: String, required: true },
+    displayName: { type: String, trim: true, maxlength: 50 },
     username: {
       type: String,
       unique: true,

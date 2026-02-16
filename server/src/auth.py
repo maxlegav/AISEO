@@ -1,5 +1,5 @@
 """
-Bearer token authentication module for AISEO scraping service.
+Bearer token authentication module for ShowYourBrand scraping service.
 
 Validates PROCESSING_SERVICE_API_KEY for secure communication
 between Next.js and the Docker processing service.

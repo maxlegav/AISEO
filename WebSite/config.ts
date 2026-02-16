@@ -1,19 +1,20 @@
 /**
- * AISEO Platform Configuration
+ * ShowYourBrand Platform Configuration
  *
  * This file contains application-wide configuration.
- * Values marked with "TODO: Story 1.2" will be filled during the AISEO rebrand phase.
+ * Values marked with "TODO: Story 1.2" will be filled during the ShowYourBrand rebrand phase.
  */
 
 const config = {
   // Application Info
-  appName: "AISEO",
-  appDescription: "GEO (Generative Engine Optimization) audit platform - Make businesses visible in AI search engines",
+  appName: "ShowYourBrand",
+  appDescription:
+    "GEO (Generative Engine Optimization) audit platform - Make businesses visible in AI search engines",
 
   // Domain (TODO: Story 1.2 - set actual domain)
-  domainName: "aiseo.com",
+  domainName: "ShowYourBrand.com",
 
-  // Stripe Configuration - AISEO Pricing (per BMAD specs)
+  // Stripe Configuration - ShowYourBrand Pricing (per BMAD specs)
   stripe: {
     // Basic One-Shot: €100 (ChatGPT only, 1 competitor, no history)
     basic: {
@@ -73,18 +74,18 @@ const config = {
 
   // Email Configuration (using Resend)
   email: {
-    fromNoReply: process.env.RESEND_FROM_EMAIL || "noreply@aiseo.com",
-    fromSupport: process.env.RESEND_FROM_EMAIL || "support@aiseo.com",
-    supportEmail: "support@aiseo.com",
+    fromNoReply: process.env.RESEND_FROM_EMAIL || "noreply@ShowYourBrand.com",
+    fromSupport: process.env.RESEND_FROM_EMAIL || "support@ShowYourBrand.com",
+    supportEmail: "support@ShowYourBrand.com",
   },
 
   // Theme & Colors (based on UX Design specification)
   colors: {
-    primary: "#3B82F6",    // Blue (Primary)
-    success: "#10B981",     // Green (Success)
-    error: "#EF4444",       // Red (Error)
-    warning: "#F59E0B",     // Orange (Warning)
-    neutral: "#6B7280",     // Gray (Neutral)
+    primary: "#3B82F6", // Blue (Primary)
+    success: "#10B981", // Green (Success)
+    error: "#EF4444", // Red (Error)
+    warning: "#F59E0B", // Orange (Warning)
+    neutral: "#6B7280", // Gray (Neutral)
   },
 
   // Callback URL after authentication

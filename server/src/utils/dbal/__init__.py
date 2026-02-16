@@ -1,1 +1,1 @@
-# AISEO Scraping Service - Database Abstraction Layer Package
+# ShowYourBrand Scraping Service - Database Abstraction Layer Package

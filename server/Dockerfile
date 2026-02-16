@@ -1,4 +1,4 @@
-# AISEO Scraping Service Dockerfile
+# ShowYourBrand Scraping Service Dockerfile
 # Multi-stage build: Python 3.11 + vnu.jar (W3C validator) + Lychee (link checker)
 
 # Stage 1: Download vnu.jar (W3C Nu Html Checker)

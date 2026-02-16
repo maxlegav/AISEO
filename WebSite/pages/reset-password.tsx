@@ -1,17 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Lock, CheckCircle, Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  ArrowLeft,
+  Lock,
+  CheckCircle,
+  Loader2,
+  Eye,
+  EyeOff,
+  AlertCircle,
+} from "lucide-react";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const { token } = router.query;
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,16 +36,16 @@ export default function ResetPasswordPage() {
 
     const errors: string[] = [];
     if (password.length < 12) {
-      errors.push('At least 12 characters');
+      errors.push("At least 12 characters");
     }
     if (!/[A-Z]/.test(password)) {
-      errors.push('At least one uppercase letter');
+      errors.push("At least one uppercase letter");
     }
     if (!/[a-z]/.test(password)) {
-      errors.push('At least one lowercase letter');
+      errors.push("At least one lowercase letter");
     }
     if (!/[0-9]/.test(password)) {
-      errors.push('At least one digit');
+      errors.push("At least one digit");
     }
     setValidationErrors(errors);
   }, [password]);
@@ -47,27 +55,27 @@ export default function ResetPasswordPage() {
     setError(null);
 
     if (!token) {
-      setError('Invalid reset link. Please request a new password reset.');
+      setError("Invalid reset link. Please request a new password reset.");
       return;
     }
 
     if (validationErrors.length > 0) {
-      setError('Please fix the password requirements below.');
+      setError("Please fix the password requirements below.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           token,
@@ -78,15 +86,15 @@ export default function ResetPasswordPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'An error occurred. Please try again.');
+        setError(data.message || "An error occurred. Please try again.");
         setIsLoading(false);
         return;
       }
 
       setIsSuccess(true);
     } catch (err) {
-      console.error('Reset password error:', err);
-      setError('An error occurred. Please try again.');
+      console.error("Reset password error:", err);
+      setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -110,12 +118,12 @@ export default function ResetPasswordPage() {
             </h1>
 
             <p className="text-gray-600 mb-6">
-              This password reset link is invalid or has expired.
-              Please request a new password reset.
+              This password reset link is invalid or has expired. Please request
+              a new password reset.
             </p>
 
             <Button
-              onClick={() => router.push('/forgot-password')}
+              onClick={() => router.push("/forgot-password")}
               className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-semibold rounded-xl"
             >
               Request New Reset Link
@@ -144,12 +152,12 @@ export default function ResetPasswordPage() {
             </h1>
 
             <p className="text-gray-600 mb-6">
-              Your password has been successfully reset.
-              You can now log in with your new password.
+              Your password has been successfully reset. You can now log in with
+              your new password.
             </p>
 
             <Button
-              onClick={() => router.push('/login')}
+              onClick={() => router.push("/login")}
               className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-semibold rounded-xl"
             >
               Go to Login
@@ -181,7 +189,9 @@ export default function ResetPasswordPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-xl flex items-center justify-center">
               <span className="text-white text-sm font-bold">AI</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">AISEO</span>
+            <span className="text-2xl font-bold text-gray-900">
+              ShowYourBrand
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Set New Password
@@ -207,7 +217,7 @@ export default function ResetPasswordPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -219,18 +229,29 @@ export default function ResetPasswordPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
 
               {/* Password requirements */}
               {password && (
                 <div className="mt-2 space-y-1">
-                  {['At least 12 characters', 'At least one uppercase letter', 'At least one lowercase letter', 'At least one digit'].map((req) => (
+                  {[
+                    "At least 12 characters",
+                    "At least one uppercase letter",
+                    "At least one lowercase letter",
+                    "At least one digit",
+                  ].map((req) => (
                     <div
                       key={req}
                       className={`flex items-center gap-2 text-xs ${
-                        validationErrors.includes(req) ? 'text-red-500' : 'text-green-500'
+                        validationErrors.includes(req)
+                          ? "text-red-500"
+                          : "text-green-500"
                       }`}
                     >
                       {validationErrors.includes(req) ? (
@@ -246,21 +267,24 @@ export default function ResetPasswordPage() {
             </div>
 
             <div>
-              <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-gray-700 font-medium"
+              >
                 Confirm Password
               </Label>
               <div className="relative mt-1.5">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm new password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className={`pl-10 pr-10 h-12 rounded-xl ${
                     confirmPassword && password !== confirmPassword
-                      ? 'border-red-500'
-                      : 'border-gray-200'
+                      ? "border-red-500"
+                      : "border-gray-200"
                   }`}
                   disabled={isLoading}
                 />
@@ -269,23 +293,33 @@ export default function ResetPasswordPage() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+                <p className="text-red-500 text-xs mt-1">
+                  Passwords do not match
+                </p>
               )}
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading || validationErrors.length > 0 || password !== confirmPassword}
+              disabled={
+                isLoading ||
+                validationErrors.length > 0 ||
+                password !== confirmPassword
+              }
               className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-semibold rounded-xl disabled:opacity-50"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                'Reset Password'
+                "Reset Password"
               )}
             </Button>
           </form>

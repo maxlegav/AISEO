@@ -1,10 +1,31 @@
 ---
-title: 'User Authentication, Stripe Payments & Email Notifications'
-slug: 'epic-2-3-auth-stripe'
-created: '2026-02-03'
-status: 'ready-for-dev'
+title: "User Authentication, Stripe Payments & Email Notifications"
+slug: "epic-2-3-auth-stripe"
+created: "2026-02-03"
+status: "ready-for-dev"
 epics: [2, 3, 10]
-frs_covered: [FR1, FR2, FR3, FR4, FR5, FR6, FR7, FR54, FR55, FR56, FR57, FR58, FR59, FR60, FR61, FR62, FR63, FR65, FR66]
+frs_covered:
+  [
+    FR1,
+    FR2,
+    FR3,
+    FR4,
+    FR5,
+    FR6,
+    FR7,
+    FR54,
+    FR55,
+    FR56,
+    FR57,
+    FR58,
+    FR59,
+    FR60,
+    FR61,
+    FR62,
+    FR63,
+    FR65,
+    FR66,
+  ]
 tech_stack:
   - next@16.1.4
   - react@19.x
@@ -52,7 +73,8 @@ files_to_modify:
 
 ### Problem Statement
 
-AISEO needs a complete authentication system with subscription-based access to the dashboard. Users must be able to:
+ShowYourBrand needs a complete authentication system with subscription-based access to the dashboard. Users must be able to:
+
 - Register and login (already working)
 - Reset forgotten passwords (missing)
 - Delete their accounts (missing)
@@ -62,6 +84,7 @@ AISEO needs a complete authentication system with subscription-based access to t
 ### Solution
 
 Implement the full auth + payment flow:
+
 1. Update User model with subscription fields
 2. Create Subscription model for payment history
 3. Implement Stripe Checkout + Webhooks
@@ -72,11 +95,13 @@ Implement the full auth + payment flow:
 ### Business Logic
 
 **Pricing Model:**
+
 - **Basic One-Shot (€100)**: 1 audit, ChatGPT only, 1 competitor, dashboard resets
 - **Pro One-Shot (€200)**: 1 audit, all 4 AI engines, 5 competitors, persistent dashboard with history
 - **Premium Subscription (€500/month)**: 20 audits included, all AI engines, unlimited competitors, white-label PDFs, +€20/extra audit
 
 **Access Rules:**
+
 - Dashboard requires at least one purchased audit OR active Premium subscription
 - Basic purchases: new dashboard each time, no history
 - Pro purchases: persistent dashboard with historical tracking
@@ -135,17 +160,20 @@ Add these fields to the existing schema:
 ```
 
 Add index for stripeCustomerId:
+
 ```typescript
 UserSchema.index({ stripeCustomerId: 1 }, { sparse: true });
 UserSchema.index({ email: 1 }, { unique: true });
 ```
 
 Add virtual for hasActiveSubscription:
+
 ```typescript
-UserSchema.virtual('hasActiveSubscription').get(function() {
+UserSchema.virtual("hasActiveSubscription").get(function () {
   if (this.auditCredits > 0) return true;
-  if (this.subscriptionStatus !== 'active') return false;
-  if (this.subscriptionEndDate && new Date() > this.subscriptionEndDate) return false;
+  if (this.subscriptionStatus !== "active") return false;
+  if (this.subscriptionEndDate && new Date() > this.subscriptionEndDate)
+    return false;
   return true;
 });
 ```
@@ -155,15 +183,21 @@ UserSchema.virtual('hasActiveSubscription').get(function() {
 **File:** `WebSite/models/Subscription.ts`
 
 ```typescript
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface ISubscription extends Document {
   userId: mongoose.Types.ObjectId;
   stripeSubscriptionId: string;
   stripeCustomerId: string;
   stripePriceId: string;
-  tier: 'basic' | 'pro' | 'premium' | 'one_shot';
-  status: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'incomplete' | 'incomplete_expired';
+  tier: "basic" | "pro" | "premium" | "one_shot";
+  status:
+    | "active"
+    | "cancelled"
+    | "past_due"
+    | "trialing"
+    | "incomplete"
+    | "incomplete_expired";
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
   cancelAtPeriodEnd: boolean;
@@ -174,44 +208,55 @@ export interface ISubscription extends Document {
   updatedAt: Date;
 }
 
-const SubscriptionSchema = new Schema<ISubscription>({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true
+const SubscriptionSchema = new Schema<ISubscription>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    stripeSubscriptionId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    stripeCustomerId: { type: String, required: true },
+    stripePriceId: { type: String, required: true },
+    tier: {
+      type: String,
+      enum: ["basic", "pro", "premium", "one_shot"],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: [
+        "active",
+        "cancelled",
+        "past_due",
+        "trialing",
+        "incomplete",
+        "incomplete_expired",
+      ],
+      required: true,
+    },
+    currentPeriodStart: { type: Date, required: true },
+    currentPeriodEnd: { type: Date, required: true },
+    cancelAtPeriodEnd: { type: Boolean, default: false },
+    cancelledAt: { type: Date },
+    amount: { type: Number, required: true },
+    currency: { type: String, default: "eur" },
   },
-  stripeSubscriptionId: {
-    type: String,
-    required: true,
-    unique: true
+  {
+    timestamps: true,
   },
-  stripeCustomerId: { type: String, required: true },
-  stripePriceId: { type: String, required: true },
-  tier: {
-    type: String,
-    enum: ['basic', 'pro', 'premium', 'one_shot'],
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['active', 'cancelled', 'past_due', 'trialing', 'incomplete', 'incomplete_expired'],
-    required: true
-  },
-  currentPeriodStart: { type: Date, required: true },
-  currentPeriodEnd: { type: Date, required: true },
-  cancelAtPeriodEnd: { type: Boolean, default: false },
-  cancelledAt: { type: Date },
-  amount: { type: Number, required: true },
-  currency: { type: String, default: 'eur' },
-}, {
-  timestamps: true
-});
+);
 
 // Compound index for user's active subscription
 SubscriptionSchema.index({ userId: 1, status: 1 });
 
-export default mongoose.models.Subscription || mongoose.model<ISubscription>('Subscription', SubscriptionSchema);
+export default mongoose.models.Subscription ||
+  mongoose.model<ISubscription>("Subscription", SubscriptionSchema);
 ```
 
 ---
@@ -367,6 +412,7 @@ export default mongoose.models.Subscription || mongoose.model<ISubscription>('Su
 #### 4.2 Checkout Success/Cancel Pages
 
 **Files:**
+
 - `WebSite/pages/checkout/success.tsx`
 - `WebSite/pages/checkout/cancel.tsx`
 
@@ -384,6 +430,7 @@ export default mongoose.models.Subscription || mongoose.model<ISubscription>('Su
 #### 4.3 Password Reset Pages
 
 **Files:**
+
 - `WebSite/pages/forgot-password.tsx`
 - `WebSite/pages/reset-password.tsx`
 
@@ -405,6 +452,7 @@ export default mongoose.models.Subscription || mongoose.model<ISubscription>('Su
 **File:** `WebSite/pages/dashboard.tsx`
 
 Update the existing dashboard to:
+
 1. Check subscription status before rendering
 2. Redirect to /subscription-plans if no active subscription
 3. Show subscription info in sidebar/header
@@ -419,7 +467,7 @@ Update the existing dashboard to:
 **File:** `WebSite/lib/email.ts`
 
 ```typescript
-import { Resend } from 'resend';
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -440,26 +488,36 @@ export async function sendEmail({ to, subject, html, from }: SendEmailParams) {
     });
 
     if (error) {
-      console.error('Email error:', error);
+      console.error("Email error:", error);
       return { success: false, error: error.message };
     }
 
     return { success: true, id: data?.id };
   } catch (error: any) {
-    console.error('Email exception:', error);
+    console.error("Email exception:", error);
     return { success: false, error: error.message };
   }
 }
 
 // Convenience functions
-export async function sendWelcomeEmail(email: string, name: string) { /* ... */ }
-export async function sendPasswordResetEmail(email: string, resetUrl: string) { /* ... */ }
-export async function sendSubscriptionConfirmationEmail(email: string, tier: string) { /* ... */ }
+export async function sendWelcomeEmail(email: string, name: string) {
+  /* ... */
+}
+export async function sendPasswordResetEmail(email: string, resetUrl: string) {
+  /* ... */
+}
+export async function sendSubscriptionConfirmationEmail(
+  email: string,
+  tier: string,
+) {
+  /* ... */
+}
 ```
 
 #### 5.2 Email Templates
 
 Create simple HTML templates in `WebSite/emails/`:
+
 - `WelcomeEmail.tsx` - Welcome message, getting started
 - `PasswordResetEmail.tsx` - Reset link, 1 hour expiry
 - `SubscriptionConfirmationEmail.tsx` - Plan details, receipt
@@ -473,30 +531,31 @@ Keep templates simple for MVP - inline styles, no complex React Email setup.
 **File:** `WebSite/lib/validation/subscription.ts`
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 export const CheckoutSchema = z.object({
-  priceId: z.string().min(1, 'Price ID is required'),
-  mode: z.enum(['subscription', 'payment']),
+  priceId: z.string().min(1, "Price ID is required"),
+  mode: z.enum(["subscription", "payment"]),
 });
 
 export const ForgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email("Invalid email address"),
 });
 
 export const ResetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token is required'),
-  password: z.string()
-    .min(12, 'Password must be at least 12 characters')
-    .regex(/[A-Z]/, 'Must contain uppercase')
-    .regex(/[a-z]/, 'Must contain lowercase')
-    .regex(/[0-9]/, 'Must contain digit'),
+  token: z.string().min(1, "Token is required"),
+  password: z
+    .string()
+    .min(12, "Password must be at least 12 characters")
+    .regex(/[A-Z]/, "Must contain uppercase")
+    .regex(/[a-z]/, "Must contain lowercase")
+    .regex(/[0-9]/, "Must contain digit"),
 });
 
 export const DeleteAccountSchema = z.object({
-  password: z.string().min(1, 'Password is required'),
-  confirmation: z.literal('DELETE', {
-    errorMap: () => ({ message: 'Type DELETE to confirm' }),
+  password: z.string().min(1, "Password is required"),
+  confirmation: z.literal("DELETE", {
+    errorMap: () => ({ message: "Type DELETE to confirm" }),
   }),
 });
 
@@ -513,6 +572,7 @@ export type DeleteAccountInput = z.infer<typeof DeleteAccountSchema>;
 Update `WebSite/.env.example` - already has all needed vars.
 
 User needs to create `WebSite/.env.local` with:
+
 ```bash
 # Copy from .env.example and fill in:
 MONGODB_URI=mongodb+srv://... # Already have this
@@ -605,6 +665,7 @@ RESEND_FROM_EMAIL=noreply@yourdomain.com
 ## Notes for Developer
 
 1. **Stripe Webhook Local Testing**
+
    ```bash
    # Install Stripe CLI
    brew install stripe/stripe-cli/stripe
@@ -620,6 +681,7 @@ RESEND_FROM_EMAIL=noreply@yourdomain.com
    - Copy price IDs to .env.local
 
 3. **Next.js Config for Webhook**
+
    ```javascript
    // next.config.js
    // Already configured, but verify:
@@ -641,6 +703,7 @@ RESEND_FROM_EMAIL=noreply@yourdomain.com
 ## File Checklist
 
 ### Create New Files
+
 - [ ] `WebSite/models/Subscription.ts`
 - [ ] `WebSite/pages/api/checkout.ts`
 - [ ] `WebSite/pages/api/webhook/stripe.ts`
@@ -660,6 +723,7 @@ RESEND_FROM_EMAIL=noreply@yourdomain.com
 - [ ] `WebSite/lib/validation/subscription.ts`
 
 ### Modify Existing Files
+
 - [ ] `WebSite/models/User.ts` - Add subscription fields
 - [ ] `WebSite/pages/api/auth/[...nextauth].ts` - Add subscription check
 - [ ] `WebSite/pages/api/auth/signup.ts` - Send welcome email

@@ -1,26 +1,27 @@
 ---
 stepsCompleted: [1, 2, 3]
 inputDocuments:
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/prd.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/architecture.md'
-  - '/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/planning-artifacts/ux-design-specification.md'
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/prd.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/architecture.md"
+  - "/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/planning-artifacts/ux-design-specification.md"
 totalEpics: 13
 totalFRs: 88
 totalStories: 75
-status: 'stories_complete'
+status: "stories_complete"
 ---
 
-# AISEO - Epic Breakdown
+# ShowYourBrand - Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for AISEO, decomposing the requirements from the PRD, UX Design, and Architecture into implementable stories.
+This document provides the complete epic and story breakdown for ShowYourBrand, decomposing the requirements from the PRD, UX Design, and Architecture into implementable stories.
 
 ## Requirements Inventory
 
 ### Functional Requirements
 
 **1. User Management & Authentication**
+
 - FR1: Users can create an account using email/password
 - FR2: Users can authenticate using Google OAuth
 - FR3: Users can reset their password via email
@@ -30,6 +31,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR7: System can maintain secure user sessions for 30 days
 
 **2. Project Management**
+
 - FR8: Users can create a new project by providing brand name and primary URL
 - FR9: Users can add optional sub-URLs to a project (e.g., /blog, /shop)
 - FR10: Users can add up to 5 competitor URLs for comparison analysis
@@ -39,6 +41,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR14: Users can manage multiple projects based on their subscription tier (1 for Basic, 5 for Pro, 10+ for Premium)
 
 **3. Audit Engine & Analysis**
+
 - FR15: Users can initiate a GEO audit for any project
 - FR16: System can test project visibility across 100 AI prompts (consistent across all subscription tiers)
 - FR17: System can query multiple AI engines (ChatGPT, Claude, Perplexity, DeepSeek) in parallel
@@ -49,6 +52,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR22: Users can view detailed prompt test results (which prompts mentioned the business, which didn't)
 
 **4. HTML Scanner & Technical Analysis**
+
 - FR23: System can scan website HTML structure (homepage + key pages)
 - FR24: System can detect existing schema.org markup (Organization, Person, Product, FAQPage, etc.)
 - FR25: System can analyze meta tags (title, description, Open Graph, Twitter Cards)
@@ -59,6 +63,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR30: System can assess AI-friendliness of existing content structure
 
 **5. AI-Powered Recommendations**
+
 - FR31: System can generate 10 FAQ questions and answers based on user-provided business category
 - FR32: System can provide copy-paste ready schema.org code snippets (JSON-LD format)
 - FR33: System can suggest optimized alt text for images without descriptions
@@ -68,6 +73,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR37: System can generate implementation instructions specifying exact code locations
 
 **6. Dashboard & Visualization**
+
 - FR38: Users can view GEO Health Score prominently displayed with color-coding (red/orange/green)
 - FR39: Users can view Prompt Gap Analysis visualization showing percentage visibility
 - FR40: Users can view competitor comparison charts (user vs 3-5 competitors)
@@ -78,6 +84,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR45: Users can switch dashboard language between English and French
 
 **7. Report Generation & Distribution**
+
 - FR46: System can generate professional PDF reports from audit results
 - FR47: Reports can include executive summary (1 page, visual, for business owners)
 - FR48: Reports can include technical details (5-10 pages, code snippets, for developers)
@@ -88,6 +95,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR53: Users can share report download links with team members or clients
 
 **8. Payments & Subscription Management**
+
 - FR54: Users can purchase Basic one-shot audit (€100, ChatGPT only, 1 competitor, no history)
 - FR55: Users can purchase Pro one-shot audit (€200, all 4 AI engines, 5 competitors, with history)
 - FR56: Users can subscribe to Premium tier (€500/month, 20 audits included, unlimited competitors, white-label)
@@ -98,12 +106,14 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR61: System can restrict features based on purchase type (AI engines, competitors, history, white-label)
 
 **9. Email Notifications**
+
 - FR63: Users can receive welcome email upon account creation
 - FR64: Users can receive audit completion notification with download link
 - FR65: Users can receive subscription confirmation emails
 - FR66: Users can receive payment receipts via email
 
 **10. Integration Capabilities (Conditional MVP)**
+
 - FR67: Users can connect their Google Search Console account (OAuth)
 - FR68: System can retrieve traditional SEO performance metrics from Google Search Console
 - FR69: Users can connect their Google Analytics account (OAuth)
@@ -111,6 +121,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR71: Dashboard can display correlation between GEO visibility and traditional SEO/traffic metrics
 
 **11. Data Management & Compliance**
+
 - FR72: System can encrypt sensitive data at rest (MongoDB Atlas encryption)
 - FR73: System can export all user data in machine-readable format (GDPR compliance)
 - FR74: System can permanently delete all user data upon account closure
@@ -119,6 +130,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR77: System can identify itself with descriptive user-agent string when making web requests
 
 **12. Admin Interface & Operations**
+
 - FR78: Admins can access dedicated admin dashboard (protected route)
 - FR79: Admins can view list of all audits across all users with filters
 - FR80: Admins can view detailed audit information (user, business, status, results, logs)
@@ -134,6 +146,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ### Non-Functional Requirements
 
 **Performance Requirements**
+
 - NFR-P1: GEO audits must complete successfully with 10-minute timeout (5-8 minute target)
 - NFR-P2: Dashboard pages must load in under 2 seconds for 95th percentile users
 - NFR-P3: API endpoints must respond in under 1 second for 95th percentile
@@ -141,6 +154,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - NFR-P5: PDF generation must complete within 2 minutes (async with email notification)
 
 **Security Requirements**
+
 - NFR-S1: All sensitive user data must be encrypted at rest (MongoDB Atlas encryption)
 - NFR-S2: Passwords hashed with bcrypt (10 rounds), session tokens as JWT with secure flags
 - NFR-S3: All traffic served over HTTPS (TLS 1.2+), no mixed content
@@ -149,6 +163,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - NFR-S6: Users must only access their own data (no cross-user data leakage)
 
 **Reliability Requirements**
+
 - NFR-R1: 95%+ of paid audits must complete successfully and deliver a report
 - NFR-R2: Dashboard and authentication must maintain 99%+ uptime
 - NFR-R3: If 1+ AI APIs fail, audit must complete with remaining APIs (min 2 required)
@@ -156,23 +171,27 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - NFR-R5: Critical errors must be logged and alert founders within 5 minutes
 
 **Scalability Requirements**
+
 - NFR-SC1: Platform must support 100 concurrent users without degradation
 - NFR-SC2: System must handle 500 audits/month (North Star at Month 12)
 - NFR-SC3: MongoDB must scale to 10,000 audits + 1,000 users without performance degradation
 - NFR-SC4: Audit processing service must scale horizontally
 
 **Integration Requirements**
+
 - NFR-I1: Stripe webhooks must be idempotent and handle retries gracefully
 - NFR-I2: System must respect AI API rate limits with exponential backoff (1s → 2s → 4s → 8s)
 - NFR-I3: Transactional emails must have 95%+ delivery rate
 - NFR-I4: Google API failures must not block audit completion (if integrated)
 
 **Accessibility Requirements**
+
 - NFR-A1: Dashboard must meet WCAG 2.1 Level A standards
 - NFR-A2: All interactive elements accessible via keyboard
 - NFR-A3: Dashboard must be navigable with screen readers
 
 **Internationalization Requirements**
+
 - NFR-I18N1: Users can switch UI language between English and French without page reload
 - NFR-I18N2: PDF reports generated in user's preferred language
 - NFR-I18N3: Adding a new language must require < 2 days (translation only, no code changes)
@@ -180,6 +199,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ### Additional Requirements
 
 **From Architecture Document:**
+
 - **Starter Template**: Use create-next-app (Next.js 15.x) with TypeScript and Tailwind CSS
 - **Pattern Reuse**: Reuse proven security patterns from Auto-Invoice codebase (crypto.ts, security-middleware.ts, blob-storage.ts, Mongoose plugins)
 - **Tech Stack**: Next.js 15.x, TypeScript strict mode, Tailwind CSS + Shadcn/ui, Zustand 4.x, Zod 3.x, Mongoose 7.4.4+
@@ -196,6 +216,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - **PDF Storage**: Vercel Blob Storage (NOT filesystem)
 
 **From UX Design Document:**
+
 - **Design Inspiration**: Dreelio, Almond, Base44 aesthetic (clean minimalism, soft backgrounds, generous spacing)
 - **Color Palette**: Soft neutrals with vibrant accent (Blue #3B82F6, Green #10B981, Red #EF4444, Orange #F59E0B)
 - **Typography**: Inter font family (modern, professional, excellent readability)
@@ -210,9 +231,11 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ### FR Coverage Map
 
 **Epic 1: Project Foundation & Infrastructure**
+
 - Architecture requirements (Next.js 15.x setup, TypeScript strict, Shadcn/ui, Docker, GitLab CI/CD)
 
 **Epic 2: User Authentication & Account Management**
+
 - FR1: Email/password account creation
 - FR2: Google OAuth authentication
 - FR3: Password reset via email
@@ -222,6 +245,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR7: Secure session management (30 days)
 
 **Epic 3: Payments & Subscription System**
+
 - FR54: Basic one-shot audit purchase (€100)
 - FR55: Pro one-shot audit purchase (€200)
 - FR56: Premium subscription (€500/month, 20 audits)
@@ -232,6 +256,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR61: Feature restrictions by purchase type
 
 **Epic 4: Project Management**
+
 - FR8: Project creation (brand name, primary URL)
 - FR9: Sub-URL addition (e.g., /blog, /shop)
 - FR10: Competitor URL addition (up to 5)
@@ -241,6 +266,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR14: Multiple project management by tier
 
 **Epic 5: Audit Engine Core**
+
 - FR15: GEO audit initiation
 - FR16: 100 AI prompt testing (all tiers)
 - FR17: Parallel AI engine querying (ChatGPT, Claude, Perplexity, DeepSeek)
@@ -251,6 +277,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR22: Detailed prompt test result viewing
 
 **Epic 6: HTML Scanner & Technical Analysis**
+
 - FR23: Website HTML structure scanning
 - FR24: Schema.org markup detection
 - FR25: Meta tag analysis (title, description, Open Graph, Twitter Cards)
@@ -261,6 +288,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR30: AI-friendliness assessment
 
 **Epic 7: AI-Powered Recommendations**
+
 - FR31: FAQ generation (10 Q&As based on business category)
 - FR32: Schema.org code snippets (JSON-LD, copy-paste ready)
 - FR33: Optimized alt text suggestions
@@ -270,6 +298,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR37: Implementation instructions with code locations
 
 **Epic 8: Dashboard & Visualizations**
+
 - FR38: GEO Health Score display (color-coded)
 - FR39: Prompt Gap Analysis visualization
 - FR40: Competitor comparison charts
@@ -280,6 +309,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR45: Dashboard language switching (English/French)
 
 **Epic 9: Report Generation & Distribution**
+
 - FR46: Professional PDF report generation
 - FR47: Executive summary inclusion (1 page, visual)
 - FR48: Technical details inclusion (5-10 pages, code snippets)
@@ -290,12 +320,14 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR53: Report download link sharing
 
 **Epic 10: Email Notifications**
+
 - FR63: Welcome email on account creation
 - FR64: Audit completion notification with download link
 - FR65: Subscription confirmation emails
 - FR66: Payment receipt emails
 
 **Epic 11: Admin Interface & Operations**
+
 - FR78: Admin dashboard access (protected route)
 - FR79: All-user audit list with filters
 - FR80: Detailed audit information viewing
@@ -309,6 +341,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR88: Raw AI API response viewing for debugging
 
 **Epic 12: Data Management & Compliance**
+
 - FR72: Sensitive data encryption at rest (MongoDB Atlas)
 - FR73: User data export (GDPR-compliant, machine-readable)
 - FR74: Permanent user data deletion on account closure
@@ -317,6 +350,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 - FR77: Descriptive user-agent string for web requests
 
 **Epic 13: Google Integrations (Conditional MVP)**
+
 - FR67: Google Search Console connection (OAuth)
 - FR68: Traditional SEO metrics retrieval
 - FR69: Google Analytics connection (OAuth)
@@ -326,6 +360,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ## Epic List
 
 ### Epic 1: Project Foundation & Infrastructure
+
 **Goal:** Set up complete development environment, CI/CD pipeline, Docker services, and foundational tech stack to enable all future development.
 
 **User Outcome:** Development team has a fully configured Next.js 15.x project with TypeScript strict mode, Shadcn/ui components, GitLab CI/CD pipeline, local Docker services for scraping, and all architectural patterns in place.
@@ -337,6 +372,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 2: User Authentication & Account Management
+
 **Goal:** Users can register, authenticate, manage their profiles, and delete their accounts securely.
 
 **User Outcome:** Users can create accounts via email/password or Google OAuth, reset passwords, edit profiles, select language preferences (English/French), and delete accounts with complete data removal.
@@ -348,6 +384,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 3: Payments & Subscription System
+
 **Goal:** Users can purchase one-shot audits (Basic/Pro) or subscribe to Premium for volume usage, manage payments, and process transactions securely.
 
 **User Outcome:** Users can purchase Basic one-shot audits (€100, ChatGPT only, 1 competitor) or Pro one-shot audits (€200, all AI engines, 5 competitors, history). Agencies/enterprises can subscribe to Premium (€500/month, 20 audits included, unlimited competitors, white-label). Premium subscribers can purchase extra audits at €20 each beyond their 20 included. All users can manage payments via Stripe Customer Portal.
@@ -359,6 +396,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 4: Project Management
+
 **Goal:** Users can create, edit, delete, and manage multiple projects (websites to audit) with competitor tracking.
 
 **User Outcome:** Users can create projects with brand name and primary URL, add sub-URLs (e.g., /blog, /shop), add up to 5 competitor URLs, view project lists, edit project details, delete projects with audit history, and manage multiple projects based on subscription tier limits.
@@ -370,6 +408,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 5: Audit Engine Core
+
 **Goal:** Users can launch comprehensive GEO audits that test 100 AI prompts across 4 engines, calculate health scores, and compare against competitors.
 
 **User Outcome:** Users can initiate GEO audits for any project, system tests visibility across 100 AI prompts on ChatGPT/Claude/Perplexity/DeepSeek in parallel, calculates GEO Health Score (0-100%), compares against competitors, identifies prompt category strengths/weaknesses, tracks audit history, and displays detailed prompt test results.
@@ -381,6 +420,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 6: HTML Scanner & Technical Analysis
+
 **Goal:** System scans website HTML structure, detects schema markup, analyzes meta tags, headings, images, and extracts keywords.
 
 **User Outcome:** System automatically scans website HTML (homepage + key pages), detects existing schema.org markup, analyzes meta tags (title, description, Open Graph, Twitter Cards), evaluates heading structure (H1-H6), audits image alt text, extracts top 30 keywords with TF-IDF scoring, identifies missing schema opportunities, and assesses AI-friendliness.
@@ -392,6 +432,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 7: AI-Powered Recommendations
+
 **Goal:** System generates actionable, copy-paste ready recommendations to improve GEO visibility.
 
 **User Outcome:** System generates 10 FAQ Q&As based on business category, provides copy-paste ready schema.org JSON-LD snippets, suggests optimized alt text for images, recommends additional keywords, prioritizes recommendations with 3-level system (🔴 Critical / 🟠 Important / 🟢 Nice-to-have), provides Grade 8 reading level explanations, and specifies exact code implementation locations.
@@ -403,6 +444,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 8: Dashboard & Visualizations
+
 **Goal:** Users view comprehensive GEO audit results through professional, agency-grade dashboard with visualizations and insights.
 
 **User Outcome:** Users see GEO Health Score prominently displayed with color-coding (red/orange/green), view Prompt Gap Analysis visualizations, see competitor comparison charts, view top 3-5 priority issues with plain-language descriptions, drill down into detailed audit results, view audit history timeline, compare multiple audits for trend tracking, and switch dashboard language between English and French.
@@ -414,6 +456,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 9: Report Generation & Distribution
+
 **Goal:** Users receive professional PDF reports with executive summaries and technical details for client presentations.
 
 **User Outcome:** System generates professional PDF reports with brand logo header, includes 1-page visual executive summary for business owners, includes 5-10 page technical details with code snippets for developers, localizes reports in user's preferred language (English/French), users can download PDFs from dashboard, system stores PDFs securely in MongoDB GridFS, users receive email notification when report ready, and users can share report download links with team/clients.
@@ -425,6 +468,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 10: Email Notifications
+
 **Goal:** Users receive timely email notifications for key account and audit events.
 
 **User Outcome:** Users receive welcome email upon account creation, audit completion notification with download link, subscription confirmation emails, and payment receipt emails via Resend.
@@ -436,6 +480,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 11: Admin Interface & Operations
+
 **Goal:** Admins can monitor platform operations, debug issues, view statistics, and manage audits across all users.
 
 **User Outcome:** Admins access dedicated admin dashboard (protected route), view list of all audits across all users with filters (status, date, user, business name), view detailed audit information (user details, business details, status, GEO score, prompt results, recommendations, logs), view complete user dashboard for any audit, manually edit audit data with audit trail logging, manually regenerate PDF reports, view platform-wide statistics (total audits, success rate, processing time, subscription distribution, revenue metrics), search/filter audits by email/business/date/status/score, view error logs and debug information for failed audits, manually trigger audit retry, and view raw AI API responses for debugging.
@@ -447,9 +492,10 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 12: Data Management & Compliance
+
 **Goal:** Platform ensures data security, GDPR compliance, and ethical web scraping practices.
 
-**User Outcome:** All sensitive user data encrypted at rest using MongoDB Atlas encryption, users can export all their data in machine-readable format (GDPR compliance), users can permanently delete all their data upon account closure, system respects robots.txt when scraping websites, system rate-limits web scraping requests to avoid overwhelming target servers, and system identifies itself with descriptive user-agent string "AISEO-Bot/1.0 (+https://aiseo.com/bot)" when making web requests.
+**User Outcome:** All sensitive user data encrypted at rest using MongoDB Atlas encryption, users can export all their data in machine-readable format (GDPR compliance), users can permanently delete all their data upon account closure, system respects robots.txt when scraping websites, system rate-limits web scraping requests to avoid overwhelming target servers, and system identifies itself with descriptive user-agent string "ShowYourBrand-Bot/1.0 (+https://ShowYourBrand.com/bot)" when making web requests.
 
 **FRs Covered:** FR72, FR73, FR74, FR75, FR76, FR77
 
@@ -458,6 +504,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 ---
 
 ### Epic 13: Google Integrations (Conditional MVP)
+
 **Goal:** Users can connect Google Search Console and Analytics to view correlation between GEO visibility and traditional SEO/traffic metrics.
 
 **User Outcome:** Users connect Google Search Console account via OAuth, system retrieves traditional SEO performance metrics from Search Console, users connect Google Analytics account via OAuth, system retrieves traffic and user behavior data from Analytics, and dashboard displays correlation between GEO visibility and traditional SEO/traffic metrics.
@@ -476,7 +523,7 @@ This document provides the complete epic and story breakdown for AISEO, decompos
 
 As a developer,
 I want to remove all Auto-Invoice specific code and upgrade to Next.js 15.x with TypeScript strict mode,
-So that I have a clean foundation ready for AISEO development with no legacy invoice code interfering.
+So that I have a clean foundation ready for ShowYourBrand development with no legacy invoice code interfering.
 
 **Acceptance Criteria:**
 
@@ -498,6 +545,7 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 **Given** the models/ directory exists
 **When** I clean up the models
 **Then** The following 6 models are DELETED:
+
 - `models/Client.ts`
 - `models/Enterprise.ts`
 - `models/Invoice.ts`
@@ -506,6 +554,7 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 - `models/Subscription.ts`
 
 **And** The following files are KEPT:
+
 - `models/User.ts` (MODIFIED: remove subscription field, keep auth logic)
 - `models/plugins/fieldEncryption.ts` (encryption plugin - reusable)
 - `models/plugins/toJSON.ts` (JSON plugin - reusable)
@@ -517,6 +566,7 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 **Given** the pages/api/ directory exists
 **When** I clean up API routes
 **Then** The following directories are DELETED entirely:
+
 - `pages/api/invoices/` (12 files)
 - `pages/api/clients/` (5 files)
 - `pages/api/enterprise/` (2 files)
@@ -529,6 +579,7 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 - `pages/api/dev/` (1 file)
 
 **And** The following files are DELETED:
+
 - `pages/api/test-invoice-numbering.ts`
 - `pages/api/trigger-n8n.ts`
 - `pages/api/submit-email.ts`
@@ -540,32 +591,37 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 - `pages/api/webhook/mailgun.ts`
 
 **And** The following auth routes are KEPT and MODIFIED:
+
 - `pages/api/auth/[...nextauth].ts` (MODIFY: remove subscription validation)
-- `pages/api/auth/signup.ts` (MODIFY: adjust for AISEO)
+- `pages/api/auth/signup.ts` (MODIFY: adjust for ShowYourBrand)
 - `pages/api/auth/refresh-session.ts` (KEEP as-is)
 - `pages/api/auth/session-redirect.ts` (KEEP as-is)
 - `pages/api/auth/signout-redirect.ts` (KEEP as-is)
 
 **And** The following user routes are KEPT and MODIFIED:
-- `pages/api/user/data.ts` (MODIFY: adjust for AISEO needs)
-- `pages/api/user/company.ts` (EVALUATE: may keep for AISEO business info)
+
+- `pages/api/user/data.ts` (MODIFY: adjust for ShowYourBrand needs)
+- `pages/api/user/company.ts` (EVALUATE: may keep for ShowYourBrand business info)
 
 **Part D: Delete Auto-Invoice Frontend Pages**
 
 **Given** the pages/ directory exists
 **When** I clean up pages
 **Then** The following directories are DELETED entirely:
+
 - `pages/dashboard-view/` (entire directory with agenda, clients, invoices, reminders, settings)
 
 **And** The following pages are DELETED:
+
 - `pages/subscription-plans.tsx`
 - `pages/payment-success.tsx`
 
 **And** The following pages are KEPT for modification:
-- `pages/index.tsx` (landing page - will be replaced with AISEO content)
-- `pages/login.tsx` (rebrand for AISEO)
-- `pages/signup.tsx` (rebrand for AISEO)
-- `pages/dashboard.tsx` (will be replaced with AISEO dashboard)
+
+- `pages/index.tsx` (landing page - will be replaced with ShowYourBrand content)
+- `pages/login.tsx` (rebrand for ShowYourBrand)
+- `pages/signup.tsx` (rebrand for ShowYourBrand)
+- `pages/dashboard.tsx` (will be replaced with ShowYourBrand dashboard)
 - `pages/privacy-policy.tsx` (update content)
 - `pages/tos.tsx` (update content)
 - `pages/404.tsx` (keep as-is)
@@ -578,11 +634,13 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 **Given** security files exist with subscription checks
 **When** I update security logic
 **Then** `lib/security-middleware.ts` is modified to:
+
 - KEEP: `withSecurity()`, `sanitizeInput()`, `withRateLimit()`, `withResourceOwnership()`
 - REMOVE: All subscription validation logic
 - KEEP: Authentication and ownership validation
 
 **And** `pages/api/auth/[...nextauth].ts` is modified to:
+
 - KEEP: Google OAuth + Credentials provider
 - KEEP: Password comparison with bcrypt
 - KEEP: MongoDB adapter
@@ -593,16 +651,18 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 **Given** configuration files exist
 **When** I update configs
 **Then** `next.config.js` is updated:
+
 - KEEP: Security headers (X-Frame-Options, etc.)
 - REMOVE: autoinvoice.pro from image domains
 - UPDATE: For Next.js 15 compatibility
 
 **And** `vercel.json` is updated or deleted:
+
 - REMOVE: Cron job for check-overdue
 - REMOVE: Function configs for invoice routes
-- KEEP: Only if AISEO-specific configs needed
+- KEEP: Only if ShowYourBrand-specific configs needed
 
-**And** `next-sitemap.config.js` is updated for AISEO domain and routes
+**And** `next-sitemap.config.js` is updated for ShowYourBrand domain and routes
 
 **Part G: Validation and Testing**
 
@@ -617,11 +677,11 @@ So that I have a clean foundation ready for AISEO development with no legacy inv
 **And** TypeScript compilation shows 0 errors
 **And** All deleted files are confirmed removed from git
 
-### Story 1.2: Remove Auto-Invoice UI Components, Clean Dependencies, and Rebrand for AISEO
+### Story 1.2: Remove Auto-Invoice UI Components, Clean Dependencies, and Rebrand for ShowYourBrand
 
 As a developer,
-I want to remove all Auto-Invoice UI components, clean up unnecessary dependencies, remove DaisyUI, and rebrand the application for AISEO,
-So that the application is fully cleaned of legacy UI code and ready for AISEO development.
+I want to remove all Auto-Invoice UI components, clean up unnecessary dependencies, remove DaisyUI, and rebrand the application for ShowYourBrand,
+So that the application is fully cleaned of legacy UI code and ready for ShowYourBrand development.
 
 **Acceptance Criteria:**
 
@@ -630,6 +690,7 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** Shadcn/ui components exist in the codebase
 **When** I verify the installation
 **Then** The following components exist in `components/ui/`:
+
 - button.tsx, input.tsx, label.tsx, tooltip.tsx
 - DatePicker.tsx, ConfirmationModal.tsx, OptionsMenu.tsx
 - circle-dollar-sign.tsx, file-check.tsx, rotate-cw.tsx
@@ -643,11 +704,13 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** DaisyUI is referenced in config files
 **When** I remove DaisyUI
 **Then** `tailwind.config.js` is updated:
+
 - REMOVE: `require("daisyui")` from plugins array
 - KEEP: `require("tailwindcss-animate")`
 - REMOVE: daisyui theme configuration (lines 119-125)
 
 **And** `config.ts` is updated:
+
 - REMOVE: `import themes from "daisyui/src/theming/themes.js";`
 - REPLACE: `main: themes[\`[data-theme=light]\`]["primary"]` with hardcoded color value
 - UPDATE: All AutoInvoice branding removed
@@ -660,19 +723,21 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** the components/ directory exists
 **When** I clean up components
 **Then** The following directories are DELETED entirely:
+
 - `components/invoices/` (7 step components)
 - `components/clients/` (ClientModal.tsx)
 - `components/emails/` (EmailPreviewModal.tsx)
 
 **And** The following components are DELETED:
+
 - `components/AutomationShowcase.tsx`
 - `components/DemoVideo.tsx`
-- `components/FAQ.tsx` (or MODIFY for AISEO)
-- `components/Features.tsx` (or MODIFY for AISEO)
-- `components/FinalCta.tsx` (or MODIFY for AISEO)
-- `components/Footer.tsx` (or MODIFY for AISEO)
-- `components/Header.tsx` (or MODIFY for AISEO)
-- `components/Hero.tsx` (or MODIFY for AISEO)
+- `components/FAQ.tsx` (or MODIFY for ShowYourBrand)
+- `components/Features.tsx` (or MODIFY for ShowYourBrand)
+- `components/FinalCta.tsx` (or MODIFY for ShowYourBrand)
+- `components/Footer.tsx` (or MODIFY for ShowYourBrand)
+- `components/Header.tsx` (or MODIFY for ShowYourBrand)
+- `components/Hero.tsx` (or MODIFY for ShowYourBrand)
 - `components/MultipleTestimonials.tsx`
 - `components/Pricing.tsx`
 - `components/Roadmap.tsx`
@@ -680,18 +745,20 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 - `components/TestimonialSmall.tsx`
 
 **And** The following dashboard components are EVALUATED:
+
 - `components/dashboard/DashboardLayout.tsx` (MODIFY: remove invoice logic, keep structure)
-- `components/dashboard/Sidebar.tsx` (MODIFY: update for AISEO navigation)
+- `components/dashboard/Sidebar.tsx` (MODIFY: update for ShowYourBrand navigation)
 - `components/dashboard/StatsCard.tsx` (KEEP: generic component)
 - DELETE: InvoicePreview, RecentInvoices, RevenueChart, UpcomingPayments
 
 **And** The following utility components are KEPT:
+
 - All components in `components/ui/` (Shadcn)
 - `components/magicui/` (1 component)
 - `BetterIcon.tsx`, `ButtonGradient.tsx`, `ButtonPopover.tsx`
 - `ErrorBoundary.tsx`, `Layout.tsx`, `Modal.tsx`, `Modals.tsx`
 - `NotificationSystem.tsx`, `TagSEO.tsx`, `TagSchema.tsx`
-- `LanguageContext.tsx` (will be updated with AISEO translations)
+- `LanguageContext.tsx` (will be updated with ShowYourBrand translations)
 - `EmailPopup.tsx` (if needed)
 - `TestButton.tsx` (dev only)
 
@@ -700,6 +767,7 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** package.json contains Auto-Invoice dependencies
 **When** I remove unnecessary packages
 **Then** The following PDF generation packages are REMOVED:
+
 - `@sparticuz/chromium`
 - `puppeteer-core`
 - `playwright-core`
@@ -707,28 +775,34 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 - `html2pdf.js`
 
 **And** Stripe is removed (if no payment in MVP):
+
 - `stripe`
 
 **And** Email services are evaluated:
+
 - REMOVE: `mailgun.js` (if using Resend)
 - REMOVE: `nodemailer` (if using Resend)
 - KEEP: `resend` (if using for emails)
 - KEEP: `@react-email/components` and `@react-email/render` (if using)
 
 **And** Vercel Blob is removed (if not storing files):
+
 - REMOVE: `@vercel/blob` (if no file storage needed)
 
 **And** 3D/Animation libraries are evaluated:
+
 - EVALUATE: `@react-three/drei`, `@react-three/fiber`, `three`, `three-globe`, `cobe`
 - EVALUATE: `@tsparticles/engine`, `@tsparticles/react`, `@tsparticles/slim`
-- DECISION: Remove if not needed for AISEO landing page
+- DECISION: Remove if not needed for ShowYourBrand landing page
 
 **And** Other dependencies evaluated:
+
 - EVALUATE: `react-dropzone` (file upload - might need)
-- EVALUATE: `recharts` (charts - might need for AISEO dashboards)
+- EVALUATE: `recharts` (charts - might need for ShowYourBrand dashboards)
 - EVALUATE: `crisp-sdk-web` (chat - needs rebrand if kept)
 
 **And** Core dependencies are KEPT:
+
 - All `@radix-ui/*` packages (Shadcn base)
 - `next-auth`, `@next-auth/mongodb-adapter`
 - `mongodb`, `mongoose`
@@ -744,16 +818,19 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** libs/ and lib/ directories exist
 **When** I clean up libraries
 **Then** The following files are DELETED from `libs/`:
+
 - `InvoicePdfDocument.tsx`
 - `invoice-generator.ts`
-- `gpt.ts` (if not needed for AISEO)
+- `gpt.ts` (if not needed for ShowYourBrand)
 - `mailgun.ts` (if not using Mailgun)
 - `stripe.ts` (if no payment)
 
 **And** Core libraries in `libs/` are KEPT:
+
 - `api.ts`, `mongo.ts`, `mongoose.ts`
 
 **And** The following files are DELETED from `lib/`:
+
 - `blob-storage.ts` (if not needed)
 - `invoice-automation.ts`
 - `invoice-service.ts`
@@ -762,38 +839,43 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 - `stripe.ts`
 
 **And** Core utilities in `lib/` are KEPT:
+
 - `crypto.ts` (AES-256-GCM encryption)
 - `error-handler.ts`
 - `security-middleware.ts`
 - `utils.ts` (cn helper)
 
-**Part F: Replace Assets and Rebrand for AISEO**
+**Part F: Replace Assets and Rebrand for ShowYourBrand**
 
 **Given** public/ directory contains AutoInvoice assets
-**When** I rebrand for AISEO
+**When** I rebrand for ShowYourBrand
 **Then** The following assets are REPLACED:
-- `AutoLogo.png` → AISEO logo
-- `logo.png` → AISEO logo
-- `logoAndName.png` → AISEO logo
-- `favicon.ico` → AISEO favicon
-- `favicon-16x16.png`, `favicon-32x32.png` → AISEO favicons
-- `apple-touch-icon.png` → AISEO icon
-- `android-chrome-192x192.png`, `android-chrome-512x512.png` → AISEO icons
-- `safari-pinned-tab.svg` → AISEO icon
-- `mstile-150x150.png` → AISEO icon
+
+- `AutoLogo.png` → ShowYourBrand logo
+- `logo.png` → ShowYourBrand logo
+- `logoAndName.png` → ShowYourBrand logo
+- `favicon.ico` → ShowYourBrand favicon
+- `favicon-16x16.png`, `favicon-32x32.png` → ShowYourBrand favicons
+- `apple-touch-icon.png` → ShowYourBrand icon
+- `android-chrome-192x192.png`, `android-chrome-512x512.png` → ShowYourBrand icons
+- `safari-pinned-tab.svg` → ShowYourBrand icon
+- `mstile-150x150.png` → ShowYourBrand icon
 
 **And** The following config files are UPDATED:
-- `site.webmanifest` (update name, short_name, description for AISEO)
+
+- `site.webmanifest` (update name, short_name, description for ShowYourBrand)
 - `browserconfig.xml` (update tile color)
-- `robots.txt` (update domain to AISEO)
+- `robots.txt` (update domain to ShowYourBrand)
 
 **And** Old sitemap files are REMOVED (will regenerate after development):
+
 - DELETE: `sitemap.xml`, `sitemap-0.xml`
 
 **And** `config.ts` is fully updated:
-- `appName: "AISEO"`
-- `domainName: "your-aiseo-domain.com"` (placeholder)
-- `appDescription:` Updated for AISEO
+
+- `appName: "ShowYourBrand"`
+- `domainName: "your-ShowYourBrand-domain.com"` (placeholder)
+- `appDescription:` Updated for ShowYourBrand
 - Color theme updated (remove DaisyUI reference)
 - Contact info updated
 
@@ -801,14 +883,15 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 
 **Given** `components/LanguageContext.tsx` contains AutoInvoice translations
 **When** I update translations
-**Then** All translation strings are rewritten for AISEO:
+**Then** All translation strings are rewritten for ShowYourBrand:
+
 - Remove: All invoice-related translations (facturation, paiement, clients, etc.)
-- Add: Placeholder translations for AISEO features (audits, GEO score, recommendations, etc.)
+- Add: Placeholder translations for ShowYourBrand features (audits, GEO score, recommendations, etc.)
 - Keep: Common UI strings (login, signup, dashboard, settings, profile, logout)
 - Keep: Form validation messages
 - Keep: Error messages structure
 
-**And** Translation keys are organized for AISEO feature areas
+**And** Translation keys are organized for ShowYourBrand feature areas
 **And** Both English and French translations are updated
 
 **Part H: Clean Up Documentation and Scripts**
@@ -816,22 +899,25 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** documentation and scripts exist
 **When** I clean up documentation
 **Then** The following docs are DELETED:
+
 - `CHROMIUM_SETUP.md`
 - `VERCEL_BLOB_SETUP.md`
 - `CRON_SETUP.md`
 - `MIGRATION_CLEANUP_SUMMARY.md`
-- `TESTING_COMPLETE_GUIDE.md` (or update for AISEO)
+- `TESTING_COMPLETE_GUIDE.md` (or update for ShowYourBrand)
 
 **And** The following docs are KEPT and UPDATED:
-- `README.md` (rewrite for AISEO)
+
+- `README.md` (rewrite for ShowYourBrand)
 - `ENV_SETUP.md` (update environment variables)
 - `SECURITY_AUDIT.md` (keep security practices)
-- `DEPLOYMENT_GUIDE.md` (update for AISEO)
-- `CLAUDE.md` (replace with AISEO architecture)
+- `DEPLOYMENT_GUIDE.md` (update for ShowYourBrand)
+- `CLAUDE.md` (replace with ShowYourBrand architecture)
 
 **And** The following scripts are DELETED from `scripts/`:
+
 - `verify-subscription.js`
-- `check-config.js` (or update for AISEO)
+- `check-config.js` (or update for ShowYourBrand)
 - `verify-blob-config.js`
 - `clean-recurring-duplicates.js`
 - `test-subscription-flow.md`
@@ -841,6 +927,7 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 - `TEST_SUMMARY.md`
 
 **And** The following misc files are DELETED:
+
 - `security-fixes.js`
 - `security-tests.js`
 - `security-report.json`
@@ -852,6 +939,7 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** `.env.example` or ENV_SETUP.md exists
 **When** I update environment variable documentation
 **Then** The following variables are REMOVED from documentation:
+
 - Stripe variables (if no payment): `STRIPE_*`
 - Vercel Blob: `BLOB_READ_WRITE_TOKEN` (if not storing files)
 - Mailgun: `MAILGUN_*` (if using Resend)
@@ -859,16 +947,18 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 - Google OAuth: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (if not using)
 
 **And** The following variables are KEPT:
+
 - MongoDB: `MONGODB_URI`, `MONGODB_ENCRYPTION_KEY`
 - NextAuth: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`
 - Email: `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (if using Resend)
 
-**And** Placeholders are added for AISEO-specific variables:
+**And** Placeholders are added for ShowYourBrand-specific variables:
+
 - `OPENAI_API_KEY` (placeholder - for AI analysis)
 - `ANTHROPIC_API_KEY` (placeholder - for AI analysis)
 - `PERPLEXITY_API_KEY` (placeholder)
 - `DEEPSEEK_API_KEY` (placeholder)
-- Other AISEO-specific keys as needed
+- Other ShowYourBrand-specific keys as needed
 
 **And** `.env.example` is updated with the new variable list
 
@@ -877,19 +967,22 @@ So that the application is fully cleaned of legacy UI code and ready for AISEO d
 **Given** all cleanup and rebrand is complete
 **When** I validate the final state
 **Then** The project structure is clean:
+
 - No invoice/client/enterprise code remains
 - No DaisyUI references remain
 - All AutoInvoice branding is removed
-- AISEO branding is in place (even if placeholder)
+- ShowYourBrand branding is in place (even if placeholder)
 
 **And** The application builds and runs:
+
 - `npm install` completes successfully
 - `npm run dev` starts without errors
 - `npm run build` completes successfully
 - `npm run lint` passes (or shows only expected warnings)
 
 **And** Basic functionality works:
-- Landing page loads (with AISEO branding)
+
+- Landing page loads (with ShowYourBrand branding)
 - Login page loads and works
 - Signup page loads and works
 - Dashboard page loads (even if empty)
@@ -985,7 +1078,7 @@ So that API endpoints are protected from abuse.
 
 As a user,
 I want to create an account using my email and password,
-So that I can access the AISEO platform.
+So that I can access the ShowYourBrand platform.
 
 **Acceptance Criteria:**
 
@@ -1001,7 +1094,7 @@ So that I can access the AISEO platform.
 
 As a user,
 I want to sign up and log in using my Google account,
-So that I can access AISEO without creating a new password.
+So that I can access ShowYourBrand without creating a new password.
 
 **Acceptance Criteria:**
 
@@ -1201,9 +1294,10 @@ So that I can audit a website for GEO visibility.
 **And** Project is associated with my user account
 **And** I am redirected to the project details page
 **And** Competitor limits are enforced based on purchase type:
-  - Basic one-shot: 1 competitor maximum
-  - Pro one-shot: 5 competitors maximum
-  - Premium subscription: Unlimited competitors
+
+- Basic one-shot: 1 competitor maximum
+- Pro one-shot: 5 competitors maximum
+- Premium subscription: Unlimited competitors
 
 ### Story 4.2: Implement Sub-URL and Competitor URL Addition
 
@@ -1286,15 +1380,17 @@ So that I can start analyzing my website's AI visibility.
 **Given** I have a project (Business) with primary URL, category, description, and targetKeywords
 **When** I click "Run Audit"
 **Then** An Audit document is created in MongoDB with:
-  - status: "pending"
-  - businessSnapshot captured (name, primaryUrl, subUrls, competitorUrls, category, description, targetKeywords)
-  - enginesUsed: ["chatgpt", "claude", "perplexity", "gemini"]
-**And** WebSite calls Server Python via REST API + Bearer token with business metadata
-**And** I see a loading state with "Audit in progress" message
-**And** 10-second polling starts to check audit status
-**And** I cannot start another audit for the same project while one is in progress (status pending/processing)
+
+- status: "pending"
+- businessSnapshot captured (name, primaryUrl, subUrls, competitorUrls, category, description, targetKeywords)
+- enginesUsed: ["chatgpt", "claude", "perplexity", "gemini"]
+  **And** WebSite calls Server Python via REST API + Bearer token with business metadata
+  **And** I see a loading state with "Audit in progress" message
+  **And** 10-second polling starts to check audit status
+  **And** I cannot start another audit for the same project while one is in progress (status pending/processing)
 
 **Technical Notes:**
+
 - Audit model schema as defined in `audit-engine-spec.md` section 11
 - Status flow: pending → processing → review_pending → completed | rejected | failed
 - Server Python writes directly to MongoDB (no callback HTTP)
@@ -1312,18 +1408,20 @@ So that each audit has prompts tailored to the business's niche, not generic tem
 **Then** It calls a cheap LLM (GPT-4o-mini or Haiku) with the prompt generator template
 **And** The LLM returns exactly 100 prompts in strict JSON format (no markdown, no comments)
 **And** Prompts are structured in 5 levels × 20 prompts:
-  - Niveau 1 (Large): 5 ultra-larges + 15 catégorie — business name NOT in question
-  - Niveau 2 (Niche): 20 niche-specific — business name NOT in question
-  - Niveau 3 (Quasi-direct): 20 describing business without naming it
-  - Niveau 4 (Semi-direct): 20 with partial identifying details (city, unique trait)
-  - Niveau 5 (Direct): 20 explicitly naming the business or URL
-**And** Each prompt has: id (1-100), level (1-5), category (discovery|comparison|reputation|product|alternative|trust), question
-**And** Categories are balanced (min 10 prompts per category)
-**And** Validation checks: 100 prompts, 20 per level, valid categories, valid JSON
-**And** Generated prompts are stored in Audit.generatedPrompts
-**And** If LLM fails or returns invalid JSON: retry once, then fail the audit
+
+- Niveau 1 (Large): 5 ultra-larges + 15 catégorie — business name NOT in question
+- Niveau 2 (Niche): 20 niche-specific — business name NOT in question
+- Niveau 3 (Quasi-direct): 20 describing business without naming it
+- Niveau 4 (Semi-direct): 20 with partial identifying details (city, unique trait)
+- Niveau 5 (Direct): 20 explicitly naming the business or URL
+  **And** Each prompt has: id (1-100), level (1-5), category (discovery|comparison|reputation|product|alternative|trust), question
+  **And** Categories are balanced (min 10 prompts per category)
+  **And** Validation checks: 100 prompts, 20 per level, valid categories, valid JSON
+  **And** Generated prompts are stored in Audit.generatedPrompts
+  **And** If LLM fails or returns invalid JSON: retry once, then fail the audit
 
 **Technical Notes:**
+
 - Prompt template in `audit-engine-spec.md` section 12
 - Cost: ~$0.01 per generation
 - JSON-only response enforced in system prompt
@@ -1349,6 +1447,7 @@ So that audits complete in 5-8 minutes.
 **And** All raw responses are stored in Audit.promptResults
 
 **Technical Notes:**
+
 - Parallel strategy: 4 async workers, each handling 100 prompts for their engine
 - Target engines: ChatGPT (gpt-4o-mini), Claude (haiku), Perplexity (pplx-7b-online), Gemini (gemini-1.5-flash)
 - Estimated cost: ~$0.12 per audit (400 requests)
@@ -1364,21 +1463,23 @@ So that we can determine visibility without expensive LLM-as-judge calls.
 **Given** 400 raw responses have been collected
 **When** The mention detection runs
 **Then** For each response, detect if business is mentioned via:
-  - Exact name match (case-insensitive)
-  - URL variants match (with/without www, http, trailing slash)
-  - Fuzzy name match (fuzzywuzzy partial_ratio > 85%)
-**And** For each mention, calculate quality score (0-3):
-  - 0: Not mentioned
-  - 1: Mentioned in passing (1 occurrence, not in structured recommendation)
-  - 2: Recommended among others (appears in numbered/bulleted list)
-  - 3: Recommended first / response focused on the business
-**And** For each mention, calculate position (rank in response):
-  - Rank 1 → position multiplier ×1.5
-  - Rank 2-3 → ×1.0
-  - Rank 4+ → ×0.7
-**And** Results stored per prompt per engine: { mentioned, quality, position, rawResponse, responseTime, error }
+
+- Exact name match (case-insensitive)
+- URL variants match (with/without www, http, trailing slash)
+- Fuzzy name match (fuzzywuzzy partial_ratio > 85%)
+  **And** For each mention, calculate quality score (0-3):
+- 0: Not mentioned
+- 1: Mentioned in passing (1 occurrence, not in structured recommendation)
+- 2: Recommended among others (appears in numbered/bulleted list)
+- 3: Recommended first / response focused on the business
+  **And** For each mention, calculate position (rank in response):
+- Rank 1 → position multiplier ×1.5
+- Rank 2-3 → ×1.0
+- Rank 4+ → ×0.7
+  **And** Results stored per prompt per engine: { mentioned, quality, position, rawResponse, responseTime, error }
 
 **Technical Notes:**
+
 - E-commerce context: if an AI recommends a site, it cites the name or URL — no implicit mentions
 - See `audit-engine-spec.md` section 6 for full algorithm
 
@@ -1393,17 +1494,19 @@ So that users get actionable insights, not just raw numbers.
 **Given** Mention detection is complete for all 400 responses
 **When** The scoring engine runs
 **Then** It calculates:
-  1. **Per-prompt score** = Σ(quality × positionMultiplier) / (enginesResponded × 4.5) → 0.0-1.0
-  2. **Per-prompt mentionRate** = mentionedCount / enginesResponded → 0.0-1.0
-  3. **Per-category scores** (discovery, comparison, reputation, product, alternative, trust) = avg(promptScore)
-  4. **Per-level scores** (level 1-5) = avg(promptScore)
-  5. **Audit Engine Score** = weighted average of category scores × 100:
-     - discovery ×2.0, comparison ×1.5, reputation ×1.2, product ×1.0, alternative ×1.5, trust ×1.0
-  6. **Discoverability threshold** = lowest level where avgMentionRate ≥ 25%
-**And** All scores are saved to Audit document (categoryScores, levelScores, auditEngineScore, discoverabilityThreshold)
-**And** Status is updated to "review_pending"
+
+1. **Per-prompt score** = Σ(quality × positionMultiplier) / (enginesResponded × 4.5) → 0.0-1.0
+2. **Per-prompt mentionRate** = mentionedCount / enginesResponded → 0.0-1.0
+3. **Per-category scores** (discovery, comparison, reputation, product, alternative, trust) = avg(promptScore)
+4. **Per-level scores** (level 1-5) = avg(promptScore)
+5. **Audit Engine Score** = weighted average of category scores × 100:
+   - discovery ×2.0, comparison ×1.5, reputation ×1.2, product ×1.0, alternative ×1.5, trust ×1.0
+6. **Discoverability threshold** = lowest level where avgMentionRate ≥ 25%
+   **And** All scores are saved to Audit document (categoryScores, levelScores, auditEngineScore, discoverabilityThreshold)
+   **And** Status is updated to "review_pending"
 
 **Technical Notes:**
+
 - GEO Score final (70/30 with HTML Scanner) is calculated separately on WebSite side
 - Color coding: 0-30% red, 31-50% orange, 51-70% yellow, 71-85% green, 86-100% dark green
 - See `audit-engine-spec.md` sections 7-9 for full formulas
@@ -1426,6 +1529,7 @@ So that I can identify where I'm losing ground.
 **And** I can see which prompts competitors were mentioned in but I wasn't
 
 **Technical Notes:**
+
 - Competitors are analyzed from the SAME 400 responses (no extra API calls)
 - The raw responses are already collected — we just run mention detection for each competitor name/URL
 
@@ -1512,7 +1616,7 @@ So that technical issues affecting AI visibility are identified.
 **Then** Homepage and key sub-URLs are fetched and parsed
 **And** HTML structure is analyzed (DOM tree depth, element counts)
 **And** Scan respects robots.txt directives
-**And** User-agent string is set to "AISEO-Bot/1.0 (+https://aiseo.com/bot)"
+**And** User-agent string is set to "ShowYourBrand-Bot/1.0 (+https://ShowYourBrand.com/bot)"
 **And** Rate limiting prevents overwhelming target server (max 5 requests per second)
 
 ### Story 6.2: Implement Schema.org Markup Detection
@@ -1803,7 +1907,7 @@ So that I can see the impact of my optimizations.
 
 As a user,
 I want to switch dashboard language between English and French without page reload,
-So that I can use AISEO in my preferred language.
+So that I can use ShowYourBrand in my preferred language.
 
 **Acceptance Criteria:**
 
@@ -1946,7 +2050,7 @@ So that I feel acknowledged and know next steps.
 **Given** I successfully create an account
 **When** Registration is complete
 **Then** A welcome email is sent via Resend within 1 minute
-**And** Email includes my name and a brief introduction to AISEO
+**And** Email includes my name and a brief introduction to ShowYourBrand
 **And** Email includes CTA to create my first project
 **And** Email is localized in my selected language preference
 **And** Email has 95%+ deliverability
@@ -2217,22 +2321,22 @@ So that my GDPR right to erasure is respected.
 
 As a developer,
 I want the scraping service to respect robots.txt,
-So that AISEO follows ethical web scraping practices.
+So that ShowYourBrand follows ethical web scraping practices.
 
 **Acceptance Criteria:**
 
 **Given** A website is being scanned
 **When** The scraping service fetches robots.txt
 **Then** Disallowed paths in robots.txt are not scraped
-**And** User-agent "AISEO-Bot" is used to identify the scraper
-**And** If robots.txt blocks AISEO-Bot, scanning is skipped with a warning to the user
+**And** User-agent "ShowYourBrand-Bot" is used to identify the scraper
+**And** If robots.txt blocks ShowYourBrand-Bot, scanning is skipped with a warning to the user
 **And** Compliance is logged for auditing
 
 ### Story 12.5: Implement Web Scraping Rate Limiting
 
 As a developer,
 I want web scraping rate-limited to avoid overwhelming target servers,
-So that AISEO is a good web citizen.
+So that ShowYourBrand is a good web citizen.
 
 **Acceptance Criteria:**
 
@@ -2247,13 +2351,13 @@ So that AISEO is a good web citizen.
 
 As a developer,
 I want a descriptive user-agent string used for all web requests,
-So that website owners can identify and whitelist AISEO-Bot.
+So that website owners can identify and whitelist ShowYourBrand-Bot.
 
 **Acceptance Criteria:**
 
 **Given** The scraping service makes HTTP requests
 **When** Requests are sent
-**Then** User-agent header is set to "AISEO-Bot/1.0 (+https://aiseo.com/bot)"
+**Then** User-agent header is set to "ShowYourBrand-Bot/1.0 (+https://ShowYourBrand.com/bot)"
 **And** User-agent includes a URL where website owners can learn more about the bot
 **And** User-agent is compliant with RFC 7231 standards
 **And** Requests include a contact email in case of issues
@@ -2338,4 +2442,3 @@ So that I can validate the business impact of GEO improvements.
 **And** Chart shows if GEO improvements correlate with traffic increases
 **And** I can filter chart by date range (last 30 days, 90 days, 12 months)
 **And** If no correlation is found, insights suggest possible reasons ("Traffic lag: 2-4 weeks typical")
-

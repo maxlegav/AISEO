@@ -93,6 +93,7 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         const dbUser = await User.findById(token.id);
         if (dbUser) {
+          token.displayName = dbUser.displayName;
           token.username = dbUser.username;
           token.subscriptionTier = dbUser.subscriptionTier;
           token.subscriptionStatus = dbUser.subscriptionStatus;
@@ -106,6 +107,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
+        session.user.displayName = token.displayName;
         session.user.username = token.username;
         session.user.subscriptionTier = token.subscriptionTier;
         session.user.subscriptionStatus = token.subscriptionStatus;
@@ -134,15 +136,45 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await User.findOne({ email: user.email });
 
         if (!existingUser) {
-          // Créer un nouvel utilisateur
+          // Auto-generate username from name
+          const baseName = (user.name || user.email?.split("@")[0] || "user")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "")
+            .slice(0, 25);
+          let generatedUsername = baseName.length >= 3 ? baseName : baseName + "-user";
+          let suffix = 0;
+          while (await User.findOne({ username: generatedUsername })) {
+            suffix++;
+            generatedUsername = `${baseName}-${suffix}`;
+          }
+
           const newUser = new User({
             name: user.name,
+            username: generatedUsername,
             email: user.email,
             image: user.image,
             emailVerified: new Date(),
           });
 
           await newUser.save();
+        } else if (!existingUser.username) {
+          // Auto-generate username for existing users without one
+          const baseName = (existingUser.name || existingUser.email?.split("@")[0] || "user")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "")
+            .slice(0, 25);
+          let generatedUsername = baseName.length >= 3 ? baseName : baseName + "-user";
+          let suffix = 0;
+          while (await User.findOne({ username: generatedUsername })) {
+            suffix++;
+            generatedUsername = `${baseName}-${suffix}`;
+          }
+          existingUser.username = generatedUsername;
+          await existingUser.save();
         }
 
         return true;

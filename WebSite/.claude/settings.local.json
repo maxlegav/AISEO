@@ -1,0 +1,11 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "agentvibes"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)"
+    ]
+  }
+}

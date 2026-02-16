@@ -36,7 +36,9 @@ export default function UsernameSetupPage() {
 
     setChecking(true);
     try {
-      const res = await fetch(`/api/user/check-username?username=${encodeURIComponent(value)}`);
+      const res = await fetch(
+        `/api/user/check-username?username=${encodeURIComponent(value)}`,
+      );
       const data = await res.json();
       if (data.success) {
         setAvailable(data.data.available);
@@ -107,14 +109,14 @@ export default function UsernameSetupPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">AI</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">AISEO</span>
+            <span className="text-xl font-bold text-gray-900">
+              ShowYourBrand
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {String(t("username.title"))}
           </h1>
-          <p className="text-gray-600">
-            {String(t("username.subtitle"))}
-          </p>
+          <p className="text-gray-600">{String(t("username.subtitle"))}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
@@ -128,22 +130,32 @@ export default function UsernameSetupPage() {
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-                  aiseo.com/
+                  ShowYourBrand.com/
                 </span>
                 <input
                   id="username"
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+                  onChange={(e) =>
+                    setUsername(
+                      e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                    )
+                  }
                   className="w-full pl-24 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-gray-900"
                   placeholder="your-username"
                   maxLength={30}
                   autoFocus
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  {checking && <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />}
-                  {!checking && available === true && <Check className="w-5 h-5 text-green-500" />}
-                  {!checking && available === false && <X className="w-5 h-5 text-red-500" />}
+                  {checking && (
+                    <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                  )}
+                  {!checking && available === true && (
+                    <Check className="w-5 h-5 text-green-500" />
+                  )}
+                  {!checking && available === false && (
+                    <X className="w-5 h-5 text-red-500" />
+                  )}
                 </div>
               </div>
               {username.length > 0 && username.length < 3 && (

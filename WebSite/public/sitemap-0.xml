@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://aiseo.com</loc><lastmod>2026-02-11T16:28:18.138Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/checkout/cancel</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/checkout/success</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/dashboard</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/forgot-password</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/login</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/privacy</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/privacy-policy</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/projects/create</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/reset-password</loc><lastmod>2026-02-11T16:28:18.139Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/settings</loc><lastmod>2026-02-11T16:28:18.140Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/signup</loc><lastmod>2026-02-11T16:28:18.140Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/terms</loc><lastmod>2026-02-11T16:28:18.140Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/tos</loc><lastmod>2026-02-11T16:28:18.140Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aiseo.com/username-setup</loc><lastmod>2026-02-11T16:28:18.140Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com</loc><lastmod>2026-02-16T16:16:43.598Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/checkout/cancel</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/checkout/success</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/dashboard</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/forgot-password</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/login</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/privacy</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/privacy-policy</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/projects/create</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/reset-password</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/settings</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/signup</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/terms</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/tos</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/username-setup</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://ShowYourBrand.com/waitlist</loc><lastmod>2026-02-16T16:16:43.599Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

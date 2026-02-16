@@ -1,11 +1,10 @@
 import TagSEO from "@/components/TagSEO";
 import TagSchema from "@/components/TagSchema";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   ChevronDown,
   ChevronUp,
@@ -20,12 +19,6 @@ import {
   Twitter,
   Linkedin,
   X,
-  ArrowRight,
-  ArrowLeft,
-  Building2,
-  Globe,
-  Users,
-  Sparkles,
 } from "lucide-react";
 
 // AI Models with their actual logo files
@@ -326,286 +319,6 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
-// Business categories for onboarding
-const BUSINESS_CATEGORIES = [
-  "E-commerce / Retail",
-  "SaaS / Technology",
-  "Marketing Agency",
-  "Finance / Insurance",
-  "Healthcare",
-  "Real Estate",
-  "Education",
-  "Travel / Hospitality",
-  "Food & Restaurant",
-  "Professional Services",
-  "Other",
-];
-
-// Onboarding Modal Component
-const OnboardingModal = ({
-  isOpen,
-  onClose,
-  initialUrl,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  initialUrl: string;
-}) => {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    url: initialUrl,
-    businessName: "",
-    category: "",
-    competitors: ["", "", ""],
-  });
-
-  // Update URL when initialUrl changes
-  useEffect(() => {
-    setFormData((prev) => ({ ...prev, url: initialUrl }));
-  }, [initialUrl]);
-
-  if (!isOpen) return null;
-
-  const totalSteps = 4;
-
-  const handleNext = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
-    } else {
-      // Final step - redirect to signup wizard with URL pre-filled
-      window.location.href = `/signup?url=${encodeURIComponent(formData.url)}`;
-    }
-  };
-
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
-  };
-
-  const canProceed = () => {
-    switch (step) {
-      case 1:
-        return formData.url && formData.url.includes(".");
-      case 2:
-        return formData.businessName.trim().length > 0;
-      case 3:
-        return formData.category.length > 0;
-      case 4:
-        return true; // Competitors are optional
-      default:
-        return false;
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-        {/* Progress bar */}
-        <div className="h-1 bg-gray-100">
-          <div
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-            style={{ width: `${(step / totalSteps) * 100}%` }}
-          />
-        </div>
-
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Content */}
-        <div className="p-8">
-          {/* Step 1: URL Confirmation */}
-          {step === 1 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Globe className="w-8 h-8 text-purple-600" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Let&apos;s audit your website
-                </h3>
-                <p className="text-gray-600">
-                  Confirm the URL you want to analyze for AI visibility
-                </p>
-              </div>
-              <div>
-                <Label
-                  htmlFor="url"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Website URL
-                </Label>
-                <Input
-                  id="url"
-                  type="url"
-                  value={formData.url}
-                  onChange={(e) =>
-                    setFormData({ ...formData, url: e.target.value })
-                  }
-                  placeholder="https://example.com"
-                  className="mt-2 h-12 rounded-xl"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Business Name */}
-          {step === 2 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Building2 className="w-8 h-8 text-pink-600" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  What&apos;s your brand name?
-                </h3>
-                <p className="text-gray-600">
-                  We&apos;ll search for this name across AI models
-                </p>
-              </div>
-              <div>
-                <Label
-                  htmlFor="businessName"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Brand / Business Name
-                </Label>
-                <Input
-                  id="businessName"
-                  type="text"
-                  value={formData.businessName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, businessName: e.target.value })
-                  }
-                  placeholder="Acme Inc."
-                  className="mt-2 h-12 rounded-xl"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Category */}
-          {step === 3 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  What&apos;s your industry?
-                </h3>
-                <p className="text-gray-600">
-                  This helps us generate relevant prompts and FAQs
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {BUSINESS_CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setFormData({ ...formData, category })}
-                    className={`p-3 text-sm rounded-xl border-2 transition-all text-left ${
-                      formData.category === category
-                        ? "border-purple-500 bg-purple-50 text-purple-700"
-                        : "border-gray-200 hover:border-gray-300 text-gray-700"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Competitors */}
-          {step === 4 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-orange-600" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Who are your competitors?
-                </h3>
-                <p className="text-gray-600">
-                  Optional: Add up to 3 competitor URLs to compare
-                </p>
-              </div>
-              <div className="space-y-3">
-                {formData.competitors.map((competitor, index) => (
-                  <Input
-                    key={index}
-                    type="url"
-                    value={competitor}
-                    onChange={(e) => {
-                      const newCompetitors = [...formData.competitors];
-                      newCompetitors[index] = e.target.value;
-                      setFormData({ ...formData, competitors: newCompetitors });
-                    }}
-                    placeholder={`Competitor ${index + 1} URL (optional)`}
-                    className="h-12 rounded-xl"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-8">
-            {step > 1 ? (
-              <Button
-                variant="ghost"
-                onClick={handleBack}
-                className="text-gray-600"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-            ) : (
-              <div />
-            )}
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-xl px-6"
-            >
-              {step === totalSteps ? "Start Audit" : "Continue"}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-
-          {/* Step indicator */}
-          <div className="flex justify-center gap-2 mt-6">
-            {[1, 2, 3, 4].map((s) => (
-              <div
-                key={s}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  s === step
-                    ? "bg-purple-500 w-6"
-                    : s < step
-                      ? "bg-purple-300"
-                      : "bg-gray-200"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Cal.com Embed Modal Component
 const CalComModal = ({
   isOpen,
@@ -652,12 +365,11 @@ const CalComModal = ({
 export default function Home() {
   const [url, setUrl] = useState("");
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showCalModal, setShowCalModal] = useState(false);
 
   const handleStartAudit = () => {
     if (url && url.includes(".")) {
-      setShowOnboarding(true);
+      window.location.href = `/signup?url=${encodeURIComponent(url)}`;
     }
   };
 
@@ -703,7 +415,7 @@ export default function Home() {
     <>
       <TagSEO
         canonicalSlug=""
-        title="AISEO - Stop Being Invisible to AI | GEO Optimization Platform"
+        title="ShowYourBrand - Stop Being Invisible to AI | GEO Optimization Platform"
         description="The first Generative Engine Optimization (GEO) platform. Audit, analyze, and optimize your brand's presence across all major AI models."
       />
       <TagSchema />
@@ -780,12 +492,19 @@ export default function Home() {
                 </a>
               </nav>
 
-              {/* Login - Right */}
-              <Link href="/login" className="ml-auto">
-                <Button variant="ghost" className="text-sm font-medium">
-                  Login
-                </Button>
-              </Link>
+              {/* Right - Waitlist + Login */}
+              <div className="ml-auto flex items-center gap-2">
+                <Link href="/waitlist">
+                  <Button variant="ghost" className="text-sm font-medium">
+                    Join Waitlist
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-sm font-medium">
+                    Login
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </header>
@@ -1267,19 +986,19 @@ export default function Home() {
             <div className="grid md:grid-cols-4 gap-12 mb-12">
               {/* Brand */}
               <div className="md:col-span-2">
-              <Link href="/" className="flex items-center gap-2 mb-6">
-                <div className="w-16 h-16  rounded-lg flex items-center justify-center">
-                  <Image
-                    src={"/syb_logo_transparent.png"}
-                    alt="logo"
-                    width={120}
-                    height={120}
-                  ></Image>
-                </div>
-                <span className="font-heading text-xl font-bold text-gray-900 tracking-tight">
-                  ShowYourBrand
-                </span>
-              </Link>
+                <Link href="/" className="flex items-center gap-2 mb-6">
+                  <div className="w-16 h-16  rounded-lg flex items-center justify-center">
+                    <Image
+                      src={"/syb_logo_transparent.png"}
+                      alt="logo"
+                      width={120}
+                      height={120}
+                    ></Image>
+                  </div>
+                  <span className="font-heading text-xl font-bold text-gray-900 tracking-tight">
+                    ShowYourBrand
+                  </span>
+                </Link>
                 <p className="text-gray-400 mb-6 max-w-sm">
                   The first Generative Engine Optimization platform. Make your
                   brand visible to AI.
@@ -1373,18 +1092,12 @@ export default function Home() {
               <p className="text-gray-500 text-sm">
                 © 2026 ShowYourBrand.ai. All rights reserved.
               </p>
-              
             </div>
           </div>
         </footer>
       </main>
 
       {/* Modals */}
-      <OnboardingModal
-        isOpen={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-        initialUrl={url}
-      />
       <CalComModal
         isOpen={showCalModal}
         onClose={() => setShowCalModal(false)}

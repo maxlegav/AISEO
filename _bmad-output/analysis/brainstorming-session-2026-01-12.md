@@ -1,15 +1,15 @@
 ---
 stepsCompleted: [1, 2, 3]
 inputDocuments: []
-session_topic: 'SaaS d''Audit SEO + GEO (Generative Engine Optimization) - Mesurer et améliorer la visibilité des entreprises dans les moteurs de recherche traditionnels ET dans les réponses des IA (ChatGPT, Claude, Perplexity, DeepSeek)'
-session_goals: 'Explorer les fonctionnalités d''audit (scraping, analyse SEO/GEO, mots-clés, concurrence, balises HTML, backlinks, avis Google), l''architecture technique (backend AWS + frontend Next.js/Vercel), l''UX (landing page + dashboard + booking calls), le business model (abonnements vs one-shot), et la stratégie de différenciation via le GEO'
-selected_approach: 'AI-Recommended Techniques'
-techniques_used: ['Question Storming', 'Cross-Pollination', 'What If Scenarios']
+session_topic: "SaaS d'Audit SEO + GEO (Generative Engine Optimization) - Mesurer et améliorer la visibilité des entreprises dans les moteurs de recherche traditionnels ET dans les réponses des IA (ChatGPT, Claude, Perplexity, DeepSeek)"
+session_goals: "Explorer les fonctionnalités d'audit (scraping, analyse SEO/GEO, mots-clés, concurrence, balises HTML, backlinks, avis Google), l'architecture technique (backend AWS + frontend Next.js/Vercel), l'UX (landing page + dashboard + booking calls), le business model (abonnements vs one-shot), et la stratégie de différenciation via le GEO"
+selected_approach: "AI-Recommended Techniques"
+techniques_used: ["Question Storming", "Cross-Pollination", "What If Scenarios"]
 ideas_generated: [32, 20, 15]
 total_ideas: 67
-context_file: '_bmad/bmm/data/project-context-template.md'
+context_file: "_bmad/bmm/data/project-context-template.md"
 technique_execution_complete: true
-session_status: 'completed'
+session_status: "completed"
 ---
 
 # Brainstorming Session Results
@@ -22,6 +22,7 @@ session_status: 'completed'
 **Topic:** SaaS d'Audit SEO + GEO (Generative Engine Optimization) - Un outil révolutionnaire qui mesure et améliore la visibilité des entreprises non seulement dans les moteurs de recherche traditionnels (Google), mais aussi et SURTOUT dans les réponses des IA (ChatGPT, Claude, Perplexity, DeepSeek)
 
 **Goals:**
+
 1. **Fonctionnalités d'Audit Complètes** - Scraping web, analyse SEO/GEO, recherche de mots-clés inexploités, analyse concurrentielle, scraping de code (balises HTML), backlinks, maillage interne, génération de FAQ optimisées, analyse des avis Google
 2. **Architecture Technique Séparée** - Backend sur serveur AWS (containerisé, toutes les requêtes IA et analyses) + Frontend Next.js sur Vercel (landing page, dashboard, MongoDB, Stripe)
 3. **User Experience Simple** - Landing page synthétique + 2 parcours (paiement direct → dashboard OU booking call 20-30min)
@@ -31,6 +32,7 @@ session_status: 'completed'
 ### Context Guidance
 
 Notre session est guidée par le contexte de développement produit software avec focus sur:
+
 - Les problèmes utilisateurs et points de douleur
 - Les capacités et fonctionnalités du produit
 - Les approches techniques et architecture
@@ -52,13 +54,16 @@ Maxlemoinegavoille a une vision claire et ambitieuse: créer LE SaaS de référe
 **Recommended Techniques (Séquence en 3 Phases):**
 
 **Phase 1 - Foundation Setting:**
+
 - **Question Storming (Deep):** Générer exhaustivement les questions stratégiques pour définir le problème sous tous les angles avant de sauter aux solutions. Essentiel pour un territoire nouveau comme le GEO - nous force à explorer ce qu'on ne sait pas encore.
 
 **Phase 2 - Idea Generation:**
+
 - **Cross-Pollination (Creative):** Transférer les meilleures solutions d'autres industries (outils SEO, security scanning, A/B testing) pour créer des innovations de rupture adaptées au GEO.
 - **SCAMPER (Structured):** Exploration systématique via 7 lentilles (Substitute, Combine, Adapt, Modify, Put to other uses, Eliminate, Reverse) pour générer des features concrètes et exploitables.
 
 **Phase 3 - Strategic Vision:**
+
 - **What If Scenarios (Creative):** Explorer des scénarios audacieux qui positionnent le SaaS comme leader incontesté du GEO en brisant toutes les contraintes et imaginant le futur du marché.
 
 **AI Rationale:** Cette séquence balance structure et créativité, couvre tous les objectifs (features, tech, business, différenciation), et maximise la génération d'idées (objectif: 100-160 idées) en définissant d'abord le problème, puis en générant massivement des solutions, et enfin en explorant le potentiel stratégique révolutionnaire du GEO.
@@ -74,6 +79,7 @@ Maxlemoinegavoille a une vision claire et ambitieuse: créer LE SaaS de référe
 **32 Questions Stratégiques Générées:**
 
 **Domaine 1 - Mystères du GEO (12 questions):**
+
 1. Comment ChatGPT, Claude, Perplexity, DeepSeek crawlent-ils les sites web?
 2. Fréquence de mise à jour de leurs index?
 3. Comment les IA pondèrent-elles les contenus (fraîcheur, autorité)?
@@ -87,43 +93,25 @@ Maxlemoinegavoille a une vision claire et ambitieuse: créer LE SaaS de référe
 11. Schema.org markup - privilégié par les IA? Quels types?
 12. Structure des URLs - impact sur compréhension IA?
 
-**Domaine 2 - Structuration Technique (5 questions):**
-13. Breadcrumbs et navigation interne - influence sur mapping IA?
-14. SPA vs sites multi-pages - meilleure compréhension?
-15. Comment bien structurer un site pour les IA?
+**Domaine 2 - Structuration Technique (5 questions):** 13. Breadcrumbs et navigation interne - influence sur mapping IA? 14. SPA vs sites multi-pages - meilleure compréhension? 15. Comment bien structurer un site pour les IA?
 
-**Domaine 3 - Mesure & Analytics (5 questions):**
-16. Peut-on mesurer à quel point on est mieux ranké sur les IA?
-17. Quels KPIs pour le "GEO score"?
-18. Automatiser des tests de prompts pour tracking apparition?
-19. Comment mesurer la "position" dans une réponse d'IA?
-20. Stocker et tracker l'évolution du ranking GEO dans le temps?
+**Domaine 3 - Mesure & Analytics (5 questions):** 16. Peut-on mesurer à quel point on est mieux ranké sur les IA? 17. Quels KPIs pour le "GEO score"? 18. Automatiser des tests de prompts pour tracking apparition? 19. Comment mesurer la "position" dans une réponse d'IA? 20. Stocker et tracker l'évolution du ranking GEO dans le temps?
 
-**Domaine 4 - Référencement Local (4 questions):**
-21. Avoir une fiche Google avec infos - impact important?
-22. Les IA utilisent-elles Google My Business?
-23. Avis Google - influence sur recommandations IA?
-24. Cohérence NAP et citations locales - impact GEO?
+**Domaine 4 - Référencement Local (4 questions):** 21. Avoir une fiche Google avec infos - impact important? 22. Les IA utilisent-elles Google My Business? 23. Avis Google - influence sur recommandations IA? 24. Cohérence NAP et citations locales - impact GEO?
 
-**Domaine 5 - Content Marketing (4 questions):**
-25. Créer des articles parlant du site à monter en SEO - utile?
-26. Format optimal d'articles pour crawl IA?
-27. Publier sur Medium, LinkedIn - boost visibilité IA?
-28. Guest posts avec backlinks - renforcement autorité IA?
+**Domaine 5 - Content Marketing (4 questions):** 25. Créer des articles parlant du site à monter en SEO - utile? 26. Format optimal d'articles pour crawl IA? 27. Publier sur Medium, LinkedIn - boost visibilité IA? 28. Guest posts avec backlinks - renforcement autorité IA?
 
-**Domaine 6 - Rédaction Optimisée (2 questions):**
-29. Comment bien rédiger des articles optimisés pour les IA?
-30. Longueur de contenu optimale pour les IA?
-31. Listes à puces et contenu structuré - mieux digéré?
-32. Définitions claires en début d'article - plus de citations?
+**Domaine 6 - Rédaction Optimisée (2 questions):** 29. Comment bien rédiger des articles optimisés pour les IA? 30. Longueur de contenu optimale pour les IA? 31. Listes à puces et contenu structuré - mieux digéré? 32. Définitions claires en début d'article - plus de citations?
 
 **Key Breakthroughs:**
+
 - 🎯 **Problème Central Identifié:** Comment mesurer le GEO quand aucun standard n'existe encore? C'est notre opportunité de DÉFINIR les métriques!
 - 🌍 **Connexion Innovante:** Lien entre Google My Business (local SEO) et visibilité IA - territoire inexploré!
 - 💡 **Dilemme Stratégique:** Créer du contenu spécifiquement AI-friendly ou universel? Cette question va influencer tout le produit!
 - 🏗️ **Vision Holistique:** Questions couvrant technique (crawling, structure), business (mesure, ROI), et contenu (rédaction, format)
 
 **User Creative Strengths:**
+
 - Vision multi-dimensionnelle exceptionnelle (technique + business + contenu)
 - Questions pragmatiques et immédiatement actionnables
 - Focus laser sur la mesurabilité - essentiel pour un SaaS
@@ -246,6 +234,7 @@ _Novelty_: Zéro friction - même un non-dev peut appliquer les fixes!
 8. **Focus GEO:** Aider les entreprises à être mentionnées par les IA (ChatGPT, Claude, etc.)
 
 **Positionnement Concurrentiel:**
+
 - ❌ PAS Ahrefs (trop complexe, pour experts)
 - ❌ PAS outil de pen-testing (trop technique)
 - ✅ Dashboard visuel et accessible
@@ -254,12 +243,14 @@ _Novelty_: Zéro friction - même un non-dev peut appliquer les fixes!
 - ✅ Priorisation simple (3 niveaux max)
 
 **Key Breakthroughs:**
+
 - 🎯 **Positionnement Unique Défini:** Premier outil GEO pour non-techniques - gap énorme sur le marché!
 - 🎨 **UX/UI = Différenciateur Clé:** L'esthétique et simplicité seront l'arme secrète vs outils complexes
 - 🌉 **Communication Bridge:** Outil qui facilite conversation business owner ↔ développeur
 - 📊 **Simplicité ≠ Simpliste:** Features puissantes mais présentées simplement (3-level priority, visual dashboard)
 
 **User Creative Strengths:**
+
 - Clarté de vision exceptionnelle sur le positionnement produit
 - Compréhension du vrai utilisateur final (business owners, pas tech experts)
 - Capacité à raffiner et simplifier sans perdre la puissance
@@ -354,6 +345,7 @@ _Action_: Créer backlog "Phase 2" pour features futures. Résister à la tentat
 ---
 
 **Key Breakthroughs - Phase 3:**
+
 - 🎯 **Recadrage Pragmatique:** Passage d'une vision trop ambitieuse à stratégie MVP lançable - maturité entrepreneuriale exceptionnelle!
 - 💼 **Go-to-Market Clair:** White label avec agences marketing = distribution scalable sans sales team massive
 - 💰 **Pricing Stratégique:** Premium pricing = signal de qualité + marges saines pour délivrer vraie valeur
@@ -362,6 +354,7 @@ _Action_: Créer backlog "Phase 2" pour features futures. Résister à la tentat
 - ✂️ **Priorisation Ruthless:** Savoir dire "pas maintenant" aux features non-essentielles
 
 **User Creative Strengths - Phase 3:**
+
 - Pragmatisme exceptionnel - capacité à recadrer les visions trop ambitieuses
 - Sens aigu du timing et des priorités (MVP d'abord!)
 - Compréhension profonde du go-to-market réaliste (agences)
@@ -407,35 +400,33 @@ Un **SaaS d'audit SEO + GEO** (Generative Engine Optimization) accessible et vis
 ### **🚀 TOP 10 FEATURES MVP PRIORITAIRES**
 
 **Audit & Analysis:**
+
 1. **Simple HTML Health Scanner (3-Level)** - Scan accessible avec explications claires, pas de jargon
 2. **Visual Site Health Dashboard** - Vue 3 couleurs + pourcentage GEO Health + 3-5 recommandations max
 3. **Crawler Accessibility Analyzer** - Vue cartographique de ce que les crawlers "voient"
 4. **Prompt Gap Analysis** - Identifier quels prompts font apparaître concurrents mais pas client
 
-**Quick Wins:**
-5. **Alt Text Opportunity Finder** - Générer automatiquement alt texts optimisés avec AI vision
-6. **FAQ Generator from Common Prompts** - FAQ prête à copier-coller basée sur vraies questions IA
-7. **One-Click Schema Injector** - Générer schema.org parfait avec instructions simples
-8. **Auto-Generate Code Snippets** - Code exact à copier-coller pour chaque recommandation
+**Quick Wins:** 5. **Alt Text Opportunity Finder** - Générer automatiquement alt texts optimisés avec AI vision 6. **FAQ Generator from Common Prompts** - FAQ prête à copier-coller basée sur vraies questions IA 7. **One-Click Schema Injector** - Générer schema.org parfait avec instructions simples 8. **Auto-Generate Code Snippets** - Code exact à copier-coller pour chaque recommandation
 
-**Content & Growth:**
-9. **Platform-Specific Content Generator** - Générer contenu adapté par plateforme (Reddit, LinkedIn, Medium)
-10. **Weekly GEO Health Email** - Email simple avec 1 action/semaine, gamification
+**Content & Growth:** 9. **Platform-Specific Content Generator** - Générer contenu adapté par plateforme (Reddit, LinkedIn, Medium) 10. **Weekly GEO Health Email** - Email simple avec 1 action/semaine, gamification
 
 ---
 
 ### **💼 STRATÉGIE GO-TO-MARKET**
 
 **Canal Principal:** White Label avec Agences Marketing
+
 - Agences ramènent clients
 - On traite les audits
 - Distribution scalable sans sales team massive
 - Win-win: agences offrent nouveau service, on scale rapidement
 
 **Message Marketing Killer:**
+
 > "Sur Google, en descendant on finit par trouver votre site. Mais une IA peut ne **JAMAIS** parler de vous. C'est pire que d'être en page 10!"
 
 **Positionnement:**
+
 - Premier outil GEO pour non-techniques
 - Dashboard visuel vs outils complexes (Ahrefs, SEMrush)
 - Focus accessibilité et simplicité
@@ -448,6 +439,7 @@ Un **SaaS d'audit SEO + GEO** (Generative Engine Optimization) accessible et vis
 **Principe:** Premium pricing = signal de qualité
 
 **Tiers Proposés:**
+
 - **Basic:** Audit simple, rapport standard
 - **Pro:** Audit complet, recommandations détaillées
 - **Premium:** Garantie d'amélioration + batteries de 100-500 prompts tests
@@ -459,12 +451,14 @@ Un **SaaS d'audit SEO + GEO** (Generative Engine Optimization) accessible et vis
 ### **🏗️ ARCHITECTURE TECHNIQUE**
 
 **Backend (Serveur AWS/similaire):**
+
 - Toutes les requêtes IA (ChatGPT, Claude, Perplexity, DeepSeek)
 - Tout le scraping et l'analyse
 - Recherche de mots-clés et batteries de tests
 - Containerisé (Docker) pour faciliter déploiement
 
 **Frontend (Next.js sur Vercel):**
+
 - Landing page synthétique
 - Dashboard utilisateur (visualisation, pas traitement)
 - Connexions base de données (MongoDB)
@@ -479,6 +473,7 @@ User sur site → Envoie infos au serveur → Serveur traite tout → Renvoie r�
 ### **❌ CE QU'ON NE FAIT PAS (Pas Maintenant)**
 
 **Features "Nice-to-Have" pour Plus Tard:**
+
 - Prédiction de prompts futurs (ML avancé)
 - Partenariats officiels OpenAI/Anthropic
 - API access officielles
@@ -492,16 +487,19 @@ User sur site → Envoie infos au serveur → Serveur traite tout → Renvoie r�
 ### **🎯 LES 3 QUESTIONS STRATÉGIQUES MAJEURES À RÉPONDRE**
 
 **Question #1 (Mesure):**
+
 > Comment mesurer le GEO quand aucun standard n'existe encore?
 
 **Réponse:** Batteries de tests (100-500 prompts), méthodologie rigoureuse, transparence sur les limites, tracking évolution temporelle
 
 **Question #2 (Contenu):**
+
 > Créer du contenu spécifiquement AI-friendly ou universel?
 
 **À Explorer:** Tests A/B, analyse de ce que les IA citent actuellement, équilibre lisibilité humaine vs crawlabilité IA
 
 **Question #3 (Local SEO + GEO):**
+
 > Les IA utilisent-elles Google My Business et avis Google?
 
 **Opportunité:** Lien entre référencement local et visibilité IA - territoire inexploré! Potentiellement gros différenciateur.
@@ -511,18 +509,21 @@ User sur site → Envoie infos au serveur → Serveur traite tout → Renvoie r�
 ### **🔥 PROCHAINES ÉTAPES RECOMMANDÉES**
 
 **Phase 1 - Validation (2-4 semaines):**
+
 1. Créer landing page simple avec message "L'IA peut ne jamais parler de vous"
 2. Tester message avec 20-30 business owners (validation problème)
 3. Contacter 5-10 agences marketing pour valider intérêt white-label
 4. Prototyper dashboard visuel (mockups Figma)
 
 **Phase 2 - MVP (2-3 mois):**
+
 1. Architecture backend (containerisé, APIs IA, scraping)
 2. Top 5 features prioritaires (HTML Scanner, Visual Dashboard, Alt Text Finder, FAQ Generator, Schema Injector)
 3. Frontend Next.js + intégration Stripe
 4. Batteries de tests (100+ prompts) - méthodologie standardisée
 
 **Phase 3 - Launch (1 mois):**
+
 1. Beta avec 3-5 agences partenaires
 2. Itération basée sur feedback
 3. Pricing finalisé (Basic/Pro/Premium)
@@ -533,6 +534,7 @@ User sur site → Envoie infos au serveur → Serveur traite tout → Renvoie r�
 ### **🏆 FORCES EXCEPTIONNELLES DÉMONTRÉES**
 
 **Maxlemoinegavoille a démontré:**
+
 - ✅ Vision produit claire et différenciée (anti-Ahrefs, pour non-techniques)
 - ✅ Pragmatisme stratégique rare (MVP d'abord, pas over-engineering)
 - ✅ Capacité à recadrer et simplifier (dire NON à la complexité)
@@ -555,6 +557,7 @@ Cet insight transforme le positionnement de "nouvel outil SEO" à "protection bu
 ### **📁 ASSETS CRÉÉS**
 
 **Documentation:**
+
 - ✅ 32 Questions stratégiques couvrant 6 domaines
 - ✅ 20 Features concrètes catégorisées
 - ✅ 8 Principes de design fondamentaux
@@ -566,7 +569,7 @@ Cet insight transforme le positionnement de "nouvel outil SEO" à "protection bu
 - ✅ Roadmap de lancement (Phases 1-2-3)
 
 **Fichier Sauvegardé:**
-`/Users/maxlemoinegavoille/Desktop/Projets/AISEO/_bmad-output/analysis/brainstorming-session-2026-01-12.md`
+`/Users/maxlemoinegavoille/Desktop/Projets/ShowYourBrand/_bmad-output/analysis/brainstorming-session-2026-01-12.md`
 
 ---
 

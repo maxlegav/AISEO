@@ -1,4 +1,4 @@
-"""Pydantic models for AISEO audit engine."""
+"""Pydantic models for ShowYourBrand audit engine."""
 
 from models.business import AuditRequest, HtmlScanRequest, LocalityTier
 from models.audit import (

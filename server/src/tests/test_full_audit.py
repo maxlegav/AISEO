@@ -101,7 +101,7 @@ BUSINESSES = [
 
 async def main():
     print("=" * 80)
-    print("AISEO FULL AUDIT TEST")
+    print("ShowYourBrand FULL AUDIT TEST")
     print(f"Testing {len(BUSINESSES)} businesses with local Ollama (gemma3:4b)")
     print(f"Server: {SERVER_URL}")
     print("=" * 80)
