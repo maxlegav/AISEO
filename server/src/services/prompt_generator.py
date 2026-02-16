@@ -1,7 +1,7 @@
 """
 Dynamic Prompt Generator — LLM-based prompt generation.
 
-Uses a high-end LLM (GPT-4o) to generate prompts tailored to any business.
+Uses a high-end LLM (GPT-4o, or Ollama in local mode) to generate prompts tailored to any business.
 Count is controlled by config.PROMPT_COUNT (default 100, env-overridable).
 Prompts follow 5 specificity levels x 6 intent categories as defined in audit-engine-spec.md.
 
@@ -18,7 +18,7 @@ from collections import Counter
 import config as app_config
 from models.audit import GeneratedPrompt
 from models.business import AuditRequest, LocalityTier
-from utils.dbal.ai_api_wrapper import call_openai_api
+from utils.dbal.ai_api_wrapper import call_openai_api, call_ollama_api
 
 logger = logging.getLogger(__name__)
 
@@ -321,6 +321,38 @@ def _validate_prompts(prompts: list[dict]) -> list[str]:
     return errors
 
 
+def _generate_mock_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
+    """Generate deterministic fake prompts without any AI calls."""
+    total = app_config.PROMPT_COUNT
+    per_level = total // 5
+    categories = list(app_config.VALID_CATEGORIES)
+
+    templates = {
+        "discovery": "What is the best {category_label} for {name}?",
+        "comparison": "How does {name} compare to other options in {btype}?",
+        "reputation": "Is {name} a good choice for {btype} services?",
+        "product": "What products does {name} offer in {btype}?",
+        "alternative": "What are some alternatives to {name} in {btype}?",
+        "trust": "Can I trust {name} for {btype} services?",
+    }
+
+    prompts = []
+    for i in range(1, total + 1):
+        level = (i - 1) // per_level + 1
+        level = min(level, 5)
+        cat = categories[(i - 1) % len(categories)]
+        template = templates[cat]
+        question = template.format(
+            name=business.businessName,
+            btype=business.businessType or "business",
+            category_label=business.category or "services",
+        )
+        prompts.append(GeneratedPrompt(id=i, level=level, category=cat, question=question))
+
+    logger.info(f"[MOCK] Generated {len(prompts)} fake prompts (no AI calls)")
+    return prompts
+
+
 async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
     """
     Generate tailored prompts for the business using a high-end LLM.
@@ -330,11 +362,24 @@ async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
     """
     import asyncio
 
-    system_prompt = _build_system_prompt(business)
-    api_key = os.getenv("OPENAI_API_KEY")
+    if app_config.MOCK_AI:
+        return _generate_mock_prompts(business)
 
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY not set — cannot generate prompts")
+    system_prompt = _build_system_prompt(business)
+
+    if app_config.LOCAL_AI_MODE:
+        api_key = "ollama-local"
+        caller = call_ollama_api
+        model = app_config.OLLAMA_MODEL
+        caller_kwargs = {"base_url": app_config.OLLAMA_BASE_URL, "max_tokens": 8000, "temperature": 0.7}
+        logger.info(f"Prompt generation using local Ollama model: {model}")
+    else:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("OPENAI_API_KEY not set — cannot generate prompts")
+        caller = call_openai_api
+        model = "gpt-4o"
+        caller_kwargs = {"max_tokens": 8000, "temperature": 0.7}
 
     last_error = ""
 
@@ -346,12 +391,11 @@ async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
         logger.info(f"Generating prompts (attempt {attempt + 1}/{MAX_ATTEMPTS})...")
 
         result = await asyncio.to_thread(
-            call_openai_api,
+            caller,
             api_key,
             message,
-            "gpt-4o",  # High-end model for prompt quality
-            max_tokens=8000,
-            temperature=0.7,
+            model,
+            **caller_kwargs,
         )
 
         if not result["success"]:

@@ -80,9 +80,9 @@ USER appuser
 # Expose port
 EXPOSE 8080
 
-# Health check — hits /health endpoint (no auth required)
+# Health check — passes Bearer token from env (silent-drop middleware requires it)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+    CMD curl -sf -H "Authorization: Bearer $PROCESSING_SERVICE_API_KEY" http://localhost:8080/health || exit 1
 
 # Run the application
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -24,6 +24,7 @@ from config import (
     MIN_ENGINES_REQUIRED,
     AUDIT_TIMEOUT_SECONDS,
     LOCAL_AI_MODE,
+    MOCK_AI,
     OLLAMA_MODEL,
     OLLAMA_BASE_URL,
 )
@@ -31,7 +32,41 @@ from config import (
 logger = logging.getLogger(__name__)
 
 # Engine configurations
-if LOCAL_AI_MODE:
+if MOCK_AI:
+    import random
+
+    def _mock_caller(api_key, message, model, **kwargs):
+        """Return a fake AI response with random mention of the query content."""
+        import time as _time
+        # Simulate 100-500ms response time
+        delay = random.uniform(0.05, 0.15)
+        _time.sleep(delay)
+
+        # 50% chance to mention common business-related words from the prompt
+        if random.random() < 0.5:
+            # Echo back some words from the prompt to simulate a mention
+            words = message.split()
+            snippet = " ".join(words[:10]) if len(words) > 10 else message
+            response = (
+                f"Based on my research, I'd recommend looking into {snippet}. "
+                f"They have great reviews and solid reputation in their field. "
+                f"Many users find their services reliable and trustworthy."
+            )
+        else:
+            response = (
+                "There are several good options in this space. "
+                "I'd suggest checking online reviews and comparing features. "
+                "The market has many competitive offerings worth exploring."
+            )
+        return {"success": True, "response": response}
+
+    ENGINES = [
+        {"name": "mock_engine", "caller": _mock_caller, "model": "mock-v1", "key_env": "_MOCK_AI_DUMMY_KEY"}
+    ]
+    os.environ.setdefault("_MOCK_AI_DUMMY_KEY", "mock-local")
+    logger.info("MOCK AI MODE — using fake engine, no real API calls")
+
+elif LOCAL_AI_MODE:
     # All engines keep their original names but route through Ollama
     def _ollama_caller(api_key, message, model, **kwargs):
         return call_ollama_api(api_key, message, model, base_url=OLLAMA_BASE_URL, **kwargs)
@@ -223,7 +258,10 @@ async def execute_all_engines(
         - engines_used: list of engine names attempted
         - engines_succeeded: list of engine names with sufficient responses
     """
-    active_engines = [e for e in ENGINES if e["name"] in AI_ENGINES]
+    if MOCK_AI:
+        active_engines = list(ENGINES)  # Use all mock engines directly
+    else:
+        active_engines = [e for e in ENGINES if e["name"] in AI_ENGINES]
     engines_used = [e["name"] for e in active_engines]
     tasks = [execute_engine(engine, prompts, location_context) for engine in active_engines]
 

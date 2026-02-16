@@ -108,7 +108,10 @@
       "WebFetch(domain:www.instagram.com)",
       "Bash(PROMPT_COUNT=20 docker compose up:*)",
       "Bash(ollama list:*)",
-      "Bash(python -m tests.test_full_audit:*)"
+      "Bash(python -m tests.test_full_audit:*)",
+      "Bash(/Users/chocomushrooms/AISEO/.claude/hooks/play-tts.sh:*)",
+      "Bash(docker build:*)",
+      "Bash(docker rm:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

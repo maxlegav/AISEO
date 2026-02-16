@@ -27,7 +27,12 @@ LOCAL_AI_MODE = os.getenv("USE_LOCAL_AI", "false").lower() in ("true", "1", "yes
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:4b")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 
-if LOCAL_AI_MODE:
+MOCK_AI = os.getenv("MOCK_AI", "false").lower() in ("true", "1", "yes")
+
+if MOCK_AI:
+    MIN_ENGINES_REQUIRED = 1
+    logger.info("MOCK AI MODE — no real AI calls, deterministic fake responses")
+elif LOCAL_AI_MODE:
     MIN_ENGINES_REQUIRED = 1
     logger.info(
         f"LOCAL AI MODE — all engines routed to Ollama ({OLLAMA_MODEL})"
@@ -61,7 +66,7 @@ DISCOVERABILITY_THRESHOLD = 0.25
 # Required environment variables
 # ---------------------------------------------------------------------------
 
-if LOCAL_AI_MODE:
+if MOCK_AI or LOCAL_AI_MODE:
     REQUIRED_ENV_VARS = [
         "MONGODB_URI",
         "PROCESSING_SERVICE_API_KEY",

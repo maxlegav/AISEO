@@ -10,15 +10,16 @@ import os
 from contextlib import asynccontextmanager
 
 from typing import Annotated, Any
-from auth import verify_bearer_token
+from auth import verify_bearer_token, get_api_key
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from routes.health import router as health_router
 from routes.audit import router as audit_router
@@ -92,6 +93,32 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# ---------------------------------------------------------------------------
+# Silent-drop middleware: reject all requests without valid Bearer token.
+# No response body, no headers, no status hint — just an empty 444 close.
+# ---------------------------------------------------------------------------
+class SilentAuthMiddleware(BaseHTTPMiddleware):
+    """Drop any request that does not carry a valid Bearer token."""
+
+    async def dispatch(self, request: Request, call_next):
+        auth_header = request.headers.get("authorization", "")
+        if not auth_header.lower().startswith("bearer "):
+            return Response(status_code=444)
+
+        token = auth_header.split(" ", 1)[1]
+        try:
+            expected = get_api_key()
+        except RuntimeError:
+            return Response(status_code=444)
+
+        if token != expected:
+            return Response(status_code=444)
+
+        return await call_next(request)
+
+
+app.add_middleware(SilentAuthMiddleware)
 
 # Rate limiter setup
 app.state.limiter = limiter
