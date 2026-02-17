@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import AdminLayout from "@/components/AdminLayout";
+import AuditStepper, {
+  statusLabel,
+  statusColor,
+  type AuditStatus,
+} from "@/components/AuditStepper";
+import QuestionsReview from "@/components/QuestionsReview";
+import AuditReview from "@/components/AuditReview";
 import toast from "react-hot-toast";
 
 interface AuditDetail {
@@ -34,6 +41,7 @@ interface AuditDetail {
       level: number;
       category: string;
       question: string;
+      enabled?: boolean;
     }>;
     promptResults?: Array<{
       promptId: string;
@@ -118,24 +126,36 @@ export default function AuditDetailPage() {
     "overview" | "prompts" | "html" | "competitors" | "raw"
   >("overview");
 
-  useEffect(() => {
+  const fetchAudit = async () => {
     if (!id) return;
-    fetch(`/api/audits/${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setAudit(data.audit);
-        setUser(data.user);
-        setBusiness(data.business);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    try {
+      const r = await fetch(`/api/audits/${id}`);
+      const data = await r.json();
+      setAudit(data.audit);
+      setUser(data.user);
+      setBusiness(data.business);
+    } catch {
+      console.error("Failed to fetch audit");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAudit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleAction = async (action: "approve" | "reject") => {
-    const confirmMsg =
-      action === "approve"
-        ? "Approve this audit and make it visible to the client?"
-        : "Reject this audit?";
+    const status = audit?.status;
+    let confirmMsg = "";
+    if (action === "approve" && (status === "questions_review")) {
+      confirmMsg = "Approve these questions and start the full audit?";
+    } else if (action === "approve") {
+      confirmMsg = "Approve this audit and deliver it to the client?";
+    } else {
+      confirmMsg = "Reject this audit?";
+    }
     if (!confirm(confirmMsg)) return;
 
     try {
@@ -146,11 +166,12 @@ export default function AuditDetailPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(action === "approve" ? "Audit approved" : "Audit rejected");
-        // Refresh
-        const refreshRes = await fetch(`/api/audits/${id}`);
-        const refreshData = await refreshRes.json();
-        setAudit(refreshData.audit);
+        toast.success(
+          action === "approve"
+            ? `Approved — moved to "${data.newStatus}"`
+            : "Audit rejected"
+        );
+        fetchAudit();
       } else {
         toast.error(data.error || "Action failed");
       }
@@ -185,11 +206,12 @@ export default function AuditDetailPage() {
   }
 
   const results = audit.results;
+  const status = audit.status as AuditStatus;
 
   return (
     <AdminLayout>
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-4">
         <div>
           <Link
             href="/audits"
@@ -204,147 +226,16 @@ export default function AuditDetailPage() {
             ID: {audit._id}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <StatusBadge status={audit.status} />
-          {audit.status === "review_pending" && (
-            <>
-              <button
-                onClick={() => handleAction("approve")}
-                className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded font-medium transition-colors"
-              >
-                Approve
-              </button>
-              <button
-                onClick={() => handleAction("reject")}
-                className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded font-medium transition-colors"
-              >
-                Reject
-              </button>
-            </>
-          )}
-        </div>
+        <span
+          className={`px-3 py-1 rounded text-sm font-medium text-white ${statusColor(status)}`}
+        >
+          {statusLabel(status)}
+        </span>
       </div>
 
-      {/* Meta info */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {/* Scores */}
-        <div className="bg-gray-800 rounded-lg p-4">
-          <h3 className="text-sm text-gray-400 mb-3">Scores</h3>
-          <div className="space-y-2">
-            <ScoreRow
-              label="GEO Score"
-              value={audit.geoScore}
-              suffix="%"
-              bold
-            />
-            <ScoreRow
-              label="AI Engine Score"
-              value={results?.auditEngineScore}
-              suffix="%"
-            />
-            <ScoreRow
-              label="HTML Scanner Score"
-              value={results?.htmlScannerScore}
-              suffix="%"
-            />
-          </div>
-          {results?.discoverabilityThreshold && (
-            <div className="mt-3 pt-3 border-t border-gray-700">
-              <p className="text-xs text-gray-400">Discoverability</p>
-              <p className="text-sm text-white">
-                Level {results.discoverabilityThreshold.level} —{" "}
-                {results.discoverabilityThreshold.label}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Business Info */}
-        <div className="bg-gray-800 rounded-lg p-4">
-          <h3 className="text-sm text-gray-400 mb-3">Business</h3>
-          <div className="space-y-1 text-sm">
-            <p>
-              <span className="text-gray-400">Name:</span>{" "}
-              {results?.businessSnapshot?.name || business?.name || "N/A"}
-            </p>
-            <p>
-              <span className="text-gray-400">URL:</span>{" "}
-              <a
-                href={results?.businessSnapshot?.primaryUrl || business?.primaryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:underline"
-              >
-                {results?.businessSnapshot?.primaryUrl ||
-                  business?.primaryUrl ||
-                  "N/A"}
-              </a>
-            </p>
-            <p>
-              <span className="text-gray-400">Category:</span>{" "}
-              {results?.businessSnapshot?.category || business?.category || "N/A"}
-            </p>
-            <p>
-              <span className="text-gray-400">Locality:</span>{" "}
-              {results?.localityTier || "N/A"}
-            </p>
-          </div>
-        </div>
-
-        {/* User & Timing */}
-        <div className="bg-gray-800 rounded-lg p-4">
-          <h3 className="text-sm text-gray-400 mb-3">Context</h3>
-          <div className="space-y-1 text-sm">
-            <p>
-              <span className="text-gray-400">User:</span>{" "}
-              {user ? `${user.name || ""} (${user.email})` : audit.userId || "N/A"}
-            </p>
-            <p>
-              <span className="text-gray-400">Tier:</span>{" "}
-              {user?.subscriptionTier || "N/A"}
-            </p>
-            <p>
-              <span className="text-gray-400">Created:</span>{" "}
-              {audit.createdAt
-                ? new Date(audit.createdAt).toLocaleString("fr-FR")
-                : "N/A"}
-            </p>
-            <p>
-              <span className="text-gray-400">Completed:</span>{" "}
-              {audit.completedAt
-                ? new Date(audit.completedAt).toLocaleString("fr-FR")
-                : "N/A"}
-            </p>
-            {results?.processingTimeMs && (
-              <p>
-                <span className="text-gray-400">Processing time:</span>{" "}
-                {(results.processingTimeMs / 1000).toFixed(1)}s
-              </p>
-            )}
-            {results?.enginesUsed && (
-              <p>
-                <span className="text-gray-400">Engines:</span>{" "}
-                {results.enginesSucceeded?.join(", ") || "N/A"} (
-                {results.enginesSucceeded?.length || 0}/
-                {results.enginesUsed?.length || 0} succeeded)
-              </p>
-            )}
-            {results?.totalPromptsProcessed != null && (
-              <p>
-                <span className="text-gray-400">Prompts/Responses:</span>{" "}
-                {results.totalPromptsProcessed} / {results.totalResponsesReceived}
-              </p>
-            )}
-          </div>
-          {audit.reviewedAt && (
-            <div className="mt-3 pt-3 border-t border-gray-700 text-sm">
-              <p className="text-gray-400">
-                Reviewed by {audit.reviewedBy} on{" "}
-                {new Date(audit.reviewedAt).toLocaleString("fr-FR")}
-              </p>
-            </div>
-          )}
-        </div>
+      {/* Stepper */}
+      <div className="bg-gray-800 rounded-lg p-6 mb-6">
+        <AuditStepper status={status} />
       </div>
 
       {/* Error display */}
@@ -357,70 +248,399 @@ export default function AuditDetailPage() {
         </div>
       )}
 
-      {/* Tabs */}
-      {results && (
-        <>
-          <div className="flex gap-1 mb-4 border-b border-gray-700">
-            {(
-              ["overview", "prompts", "html", "competitors", "raw"] as const
-            ).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                  activeTab === tab
-                    ? "border-blue-500 text-white"
-                    : "border-transparent text-gray-400 hover:text-white"
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
+      {/* Stage-specific content */}
+      {status === "pending" && <PendingContent audit={audit} user={user} business={business} />}
 
-          {/* Tab Content */}
-          {activeTab === "overview" && (
-            <OverviewTab results={results} />
-          )}
-          {activeTab === "prompts" && (
-            <PromptsTab
-              results={results}
-              expandedPrompts={expandedPrompts}
-              togglePrompt={togglePrompt}
-            />
-          )}
-          {activeTab === "html" && <HtmlTab results={results} />}
-          {activeTab === "competitors" && (
-            <CompetitorsTab results={results} />
-          )}
-          {activeTab === "raw" && <RawTab audit={audit} />}
-        </>
+      {(status === "generating" || status === "processing") && (
+        <GeneratingContent audit={audit} user={user} business={business} />
+      )}
+
+      {status === "questions_review" && results?.generatedPrompts && (
+        <QuestionsReview
+          auditId={audit._id}
+          questions={results.generatedPrompts}
+          onApprove={() => handleAction("approve")}
+          onReject={() => handleAction("reject")}
+          onQuestionsUpdated={fetchAudit}
+        />
+      )}
+
+      {status === "auditing" && (
+        <AuditingContent audit={audit} user={user} business={business} />
+      )}
+
+      {(status === "audit_review" || status === "review_pending") && results && (
+        <AuditReview
+          onApprove={() => handleAction("approve")}
+          onReject={() => handleAction("reject")}
+        >
+          <AuditResultsContent
+            audit={audit}
+            user={user}
+            business={business}
+            results={results}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            expandedPrompts={expandedPrompts}
+            togglePrompt={togglePrompt}
+          />
+        </AuditReview>
+      )}
+
+      {status === "completed" && results && (
+        <CompletedContent
+          audit={audit}
+          user={user}
+          business={business}
+          results={results}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          expandedPrompts={expandedPrompts}
+          togglePrompt={togglePrompt}
+        />
+      )}
+
+      {(status === "rejected" || status === "failed") && results && (
+        <AuditResultsContent
+          audit={audit}
+          user={user}
+          business={business}
+          results={results}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          expandedPrompts={expandedPrompts}
+          togglePrompt={togglePrompt}
+        />
       )}
     </AdminLayout>
   );
 }
 
-// --- Sub-components ---
+// --- Stage Content Components ---
 
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    pending: "bg-gray-500",
-    processing: "bg-blue-500",
-    review_pending: "bg-yellow-500",
-    completed: "bg-green-500",
-    rejected: "bg-orange-500",
-    failed: "bg-red-500",
-  };
+function PendingContent({
+  audit,
+  user,
+  business,
+}: {
+  audit: AuditDetail;
+  user: UserInfo | null;
+  business: BusinessInfo | null;
+}) {
   return (
-    <span
-      className={`px-3 py-1 rounded text-sm font-medium text-white ${
-        colors[status] || "bg-gray-600"
-      }`}
-    >
-      {status}
-    </span>
+    <div className="space-y-4">
+      <div className="bg-gray-800 rounded-lg p-6 text-center">
+        <div className="text-4xl mb-3">&#9203;</div>
+        <p className="text-lg text-white mb-1">Audit is pending</p>
+        <p className="text-sm text-gray-400">
+          Waiting for the processing service to pick up this audit.
+        </p>
+      </div>
+      <MetaCards audit={audit} user={user} business={business} />
+    </div>
   );
 }
+
+function GeneratingContent({
+  audit,
+  user,
+  business,
+}: {
+  audit: AuditDetail;
+  user: UserInfo | null;
+  business: BusinessInfo | null;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="bg-gray-800 rounded-lg p-6 text-center">
+        <div className="flex justify-center mb-3">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+        <p className="text-lg text-white mb-1">Generating HTML scan &amp; questions</p>
+        <p className="text-sm text-gray-400">
+          The server is scanning the website and generating audit questions.
+        </p>
+      </div>
+      <MetaCards audit={audit} user={user} business={business} />
+    </div>
+  );
+}
+
+function AuditingContent({
+  audit,
+  user,
+  business,
+}: {
+  audit: AuditDetail;
+  user: UserInfo | null;
+  business: BusinessInfo | null;
+}) {
+  const results = audit.results;
+  return (
+    <div className="space-y-4">
+      <div className="bg-gray-800 rounded-lg p-6 text-center">
+        <div className="flex justify-center mb-3">
+          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+        <p className="text-lg text-white mb-1">Full audit in progress</p>
+        <p className="text-sm text-gray-400">
+          AI engines are processing the approved questions.
+        </p>
+        {results?.enginesUsed && (
+          <p className="text-sm text-gray-500 mt-2">
+            Engines: {results.enginesUsed.join(", ")}
+          </p>
+        )}
+      </div>
+      <MetaCards audit={audit} user={user} business={business} />
+    </div>
+  );
+}
+
+function CompletedContent({
+  audit,
+  user,
+  business,
+  results,
+  activeTab,
+  setActiveTab,
+  expandedPrompts,
+  togglePrompt,
+}: {
+  audit: AuditDetail;
+  user: UserInfo | null;
+  business: BusinessInfo | null;
+  results: NonNullable<AuditDetail["results"]>;
+  activeTab: string;
+  setActiveTab: (tab: "overview" | "prompts" | "html" | "competitors" | "raw") => void;
+  expandedPrompts: Set<string>;
+  togglePrompt: (id: string) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="bg-green-900/30 border border-green-700 rounded-lg p-4 flex items-center gap-3">
+        <span className="text-2xl">&#10003;</span>
+        <div>
+          <p className="text-green-300 font-medium">Audit delivered</p>
+          <p className="text-sm text-green-400/70">
+            {audit.completedAt
+              ? `Completed on ${new Date(audit.completedAt).toLocaleString("fr-FR")}`
+              : ""}
+            {audit.reviewedBy ? ` — reviewed by ${audit.reviewedBy}` : ""}
+          </p>
+        </div>
+      </div>
+      <AuditResultsContent
+        audit={audit}
+        user={user}
+        business={business}
+        results={results}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        expandedPrompts={expandedPrompts}
+        togglePrompt={togglePrompt}
+      />
+    </div>
+  );
+}
+
+// --- Shared Content ---
+
+function AuditResultsContent({
+  audit,
+  user,
+  business,
+  results,
+  activeTab,
+  setActiveTab,
+  expandedPrompts,
+  togglePrompt,
+}: {
+  audit: AuditDetail;
+  user: UserInfo | null;
+  business: BusinessInfo | null;
+  results: NonNullable<AuditDetail["results"]>;
+  activeTab: string;
+  setActiveTab: (tab: "overview" | "prompts" | "html" | "competitors" | "raw") => void;
+  expandedPrompts: Set<string>;
+  togglePrompt: (id: string) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <MetaCards audit={audit} user={user} business={business} />
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-gray-700">
+        {(["overview", "prompts", "html", "competitors", "raw"] as const).map(
+          (tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                activeTab === tab
+                  ? "border-blue-500 text-white"
+                  : "border-transparent text-gray-400 hover:text-white"
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          )
+        )}
+      </div>
+
+      {activeTab === "overview" && <OverviewTab results={results} />}
+      {activeTab === "prompts" && (
+        <PromptsTab
+          results={results}
+          expandedPrompts={expandedPrompts}
+          togglePrompt={togglePrompt}
+        />
+      )}
+      {activeTab === "html" && <HtmlTab results={results} />}
+      {activeTab === "competitors" && <CompetitorsTab results={results} />}
+      {activeTab === "raw" && <RawTab audit={audit} />}
+    </div>
+  );
+}
+
+function MetaCards({
+  audit,
+  user,
+  business,
+}: {
+  audit: AuditDetail;
+  user: UserInfo | null;
+  business: BusinessInfo | null;
+}) {
+  const results = audit.results;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Scores */}
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-sm text-gray-400 mb-3">Scores</h3>
+        <div className="space-y-2">
+          <ScoreRow label="GEO Score" value={audit.geoScore} suffix="%" bold />
+          <ScoreRow
+            label="AI Engine Score"
+            value={results?.auditEngineScore}
+            suffix="%"
+          />
+          <ScoreRow
+            label="HTML Scanner Score"
+            value={results?.htmlScannerScore}
+            suffix="%"
+          />
+        </div>
+        {results?.discoverabilityThreshold && (
+          <div className="mt-3 pt-3 border-t border-gray-700">
+            <p className="text-xs text-gray-400">Discoverability</p>
+            <p className="text-sm text-white">
+              Level {results.discoverabilityThreshold.level} —{" "}
+              {results.discoverabilityThreshold.label}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Business Info */}
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-sm text-gray-400 mb-3">Business</h3>
+        <div className="space-y-1 text-sm">
+          <p>
+            <span className="text-gray-400">Name:</span>{" "}
+            {results?.businessSnapshot?.name || business?.name || "N/A"}
+          </p>
+          <p>
+            <span className="text-gray-400">URL:</span>{" "}
+            <a
+              href={
+                results?.businessSnapshot?.primaryUrl || business?.primaryUrl
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline"
+            >
+              {results?.businessSnapshot?.primaryUrl ||
+                business?.primaryUrl ||
+                "N/A"}
+            </a>
+          </p>
+          <p>
+            <span className="text-gray-400">Category:</span>{" "}
+            {results?.businessSnapshot?.category ||
+              business?.category ||
+              "N/A"}
+          </p>
+          <p>
+            <span className="text-gray-400">Locality:</span>{" "}
+            {results?.localityTier || "N/A"}
+          </p>
+        </div>
+      </div>
+
+      {/* User & Timing */}
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-sm text-gray-400 mb-3">Context</h3>
+        <div className="space-y-1 text-sm">
+          <p>
+            <span className="text-gray-400">User:</span>{" "}
+            {user
+              ? `${user.name || ""} (${user.email})`
+              : audit.userId || "N/A"}
+          </p>
+          <p>
+            <span className="text-gray-400">Tier:</span>{" "}
+            {user?.subscriptionTier || "N/A"}
+          </p>
+          <p>
+            <span className="text-gray-400">Created:</span>{" "}
+            {audit.createdAt
+              ? new Date(audit.createdAt).toLocaleString("fr-FR")
+              : "N/A"}
+          </p>
+          <p>
+            <span className="text-gray-400">Completed:</span>{" "}
+            {audit.completedAt
+              ? new Date(audit.completedAt).toLocaleString("fr-FR")
+              : "N/A"}
+          </p>
+          {results?.processingTimeMs && (
+            <p>
+              <span className="text-gray-400">Processing time:</span>{" "}
+              {(results.processingTimeMs / 1000).toFixed(1)}s
+            </p>
+          )}
+          {results?.enginesUsed && (
+            <p>
+              <span className="text-gray-400">Engines:</span>{" "}
+              {results.enginesSucceeded?.join(", ") || "N/A"} (
+              {results.enginesSucceeded?.length || 0}/
+              {results.enginesUsed?.length || 0} succeeded)
+            </p>
+          )}
+          {results?.totalPromptsProcessed != null && (
+            <p>
+              <span className="text-gray-400">Prompts/Responses:</span>{" "}
+              {results.totalPromptsProcessed} /{" "}
+              {results.totalResponsesReceived}
+            </p>
+          )}
+        </div>
+        {audit.reviewedAt && (
+          <div className="mt-3 pt-3 border-t border-gray-700 text-sm">
+            <p className="text-gray-400">
+              Reviewed by {audit.reviewedBy} on{" "}
+              {new Date(audit.reviewedAt).toLocaleString("fr-FR")}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- Tab Components ---
 
 function ScoreRow({
   label,
@@ -453,12 +673,13 @@ function scoreColor(score: number): string {
   return "text-red-400";
 }
 
-function OverviewTab({ results }: { results: AuditDetail["results"] }) {
-  if (!results) return null;
-
+function OverviewTab({
+  results,
+}: {
+  results: NonNullable<AuditDetail["results"]>;
+}) {
   return (
     <div className="space-y-6">
-      {/* Category Scores */}
       {results.categoryScores && (
         <div>
           <h3 className="text-lg font-semibold text-white mb-3">
@@ -468,12 +689,16 @@ function OverviewTab({ results }: { results: AuditDetail["results"] }) {
             {Object.entries(results.categoryScores).map(([cat, data]) => (
               <div key={cat} className="bg-gray-800 rounded-lg p-3">
                 <p className="text-sm text-gray-400 capitalize">{cat}</p>
-                <p className={`text-2xl font-bold font-mono ${scoreColor(data.score * 100)}`}>
+                <p
+                  className={`text-2xl font-bold font-mono ${scoreColor(
+                    data.score * 100
+                  )}`}
+                >
                   {(data.score * 100).toFixed(1)}%
                 </p>
                 <p className="text-xs text-gray-500">
-                  {data.promptCount} prompts • {(data.mentionRate * 100).toFixed(0)}%
-                  mention rate
+                  {data.promptCount} prompts •{" "}
+                  {(data.mentionRate * 100).toFixed(0)}% mention rate
                 </p>
               </div>
             ))}
@@ -481,7 +706,6 @@ function OverviewTab({ results }: { results: AuditDetail["results"] }) {
         </div>
       )}
 
-      {/* Level Scores */}
       {results.levelScores && (
         <div>
           <h3 className="text-lg font-semibold text-white mb-3">
@@ -493,7 +717,11 @@ function OverviewTab({ results }: { results: AuditDetail["results"] }) {
               .map(([level, data]) => (
                 <div key={level} className="bg-gray-800 rounded-lg p-3">
                   <p className="text-sm text-gray-400 capitalize">{level}</p>
-                  <p className={`text-xl font-bold font-mono ${scoreColor(data.score * 100)}`}>
+                  <p
+                    className={`text-xl font-bold font-mono ${scoreColor(
+                      data.score * 100
+                    )}`}
+                  >
                     {(data.score * 100).toFixed(1)}%
                   </p>
                   <p className="text-xs text-gray-500">
@@ -513,11 +741,11 @@ function PromptsTab({
   expandedPrompts,
   togglePrompt,
 }: {
-  results: AuditDetail["results"];
+  results: NonNullable<AuditDetail["results"]>;
   expandedPrompts: Set<string>;
   togglePrompt: (id: string) => void;
 }) {
-  if (!results?.promptResults) {
+  if (!results.promptResults) {
     return <p className="text-gray-400">No prompt results available.</p>;
   }
 
@@ -544,7 +772,9 @@ function PromptsTab({
                     {pr.category}
                   </span>
                   <span
-                    className={`text-xs font-mono ${scoreColor(pr.promptScore * 100)}`}
+                    className={`text-xs font-mono ${scoreColor(
+                      pr.promptScore * 100
+                    )}`}
                   >
                     {(pr.promptScore * 100).toFixed(0)}%
                   </span>
@@ -619,8 +849,12 @@ function PromptsTab({
   );
 }
 
-function HtmlTab({ results }: { results: AuditDetail["results"] }) {
-  if (!results?.htmlScan) {
+function HtmlTab({
+  results,
+}: {
+  results: NonNullable<AuditDetail["results"]>;
+}) {
+  if (!results.htmlScan) {
     return <p className="text-gray-400">No HTML scan data available.</p>;
   }
 
@@ -645,8 +879,12 @@ function HtmlTab({ results }: { results: AuditDetail["results"] }) {
   );
 }
 
-function CompetitorsTab({ results }: { results: AuditDetail["results"] }) {
-  if (!results?.competitorResults || results.competitorResults.length === 0) {
+function CompetitorsTab({
+  results,
+}: {
+  results: NonNullable<AuditDetail["results"]>;
+}) {
+  if (!results.competitorResults || results.competitorResults.length === 0) {
     return <p className="text-gray-400">No competitor data available.</p>;
   }
 

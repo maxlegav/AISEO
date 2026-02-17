@@ -3,9 +3,11 @@ import { Schema, models, model } from "mongoose";
 
 export interface WaitlistDocument extends mongoose.Document {
   email: string;
-  howFound: string;
-  hasGeoExperience: string;
-  budgetRange: string;
+  howFound?: string;
+  hasGeoExperience?: string;
+  budgetRange?: string;
+  completed: boolean;
+  emailSent: boolean;
   createdAt: Date;
 }
 
@@ -20,15 +22,20 @@ const WaitlistSchema = new Schema<WaitlistDocument>(
     },
     howFound: {
       type: String,
-      required: true,
     },
     hasGeoExperience: {
       type: String,
-      required: true,
     },
     budgetRange: {
       type: String,
-      required: true,
+    },
+    completed: {
+      type: Boolean,
+      default: false,
+    },
+    emailSent: {
+      type: Boolean,
+      default: false,
     },
   },
   {

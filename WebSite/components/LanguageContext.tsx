@@ -147,6 +147,16 @@ export const translations: Translations = {
     "dashboard.recentAudits": "Audits récents",
     "dashboard.viewAllAudits": "Voir tous les audits",
     "dashboard.noAuditsYet": "Aucun audit pour le moment",
+    "dashboard.projectsDescription": "Gérez vos emplacements commerciaux et suivez leur performance de visibilité GEO sur différents marchés.",
+    "dashboard.createNewProject": "Créer un nouveau projet",
+    "dashboard.startTracking": "Commencer le suivi d'une entreprise",
+    "dashboard.visibilityScore": "Score de visibilité",
+    "dashboard.allProjects": "Tous les projets",
+    "dashboard.feedback": "Feedback",
+    "dashboard.newAudit": "Nouvel audit",
+    "dashboard.business": "Entreprise",
+    "dashboard.auditsRemaining": "Audits restants",
+    "dashboard.buyMore": "Acheter plus",
 
     // Display Name
     "displayName.title": "Comment souhaitez-vous être appelé ?",
@@ -227,6 +237,13 @@ export const translations: Translations = {
     "settings.confirmDelete": "Supprimer définitivement",
     "settings.noChanges": "Aucun changement à enregistrer",
     "settings.usernameSaved": "Nom d'utilisateur mis à jour",
+    "settings.auditCreditsRemaining": "Crédits d'audit restants",
+    "settings.buyCredits": "Acheter des crédits",
+    "settings.buyCreditsSubtitle": "Ajoutez des crédits d'audit à votre compte",
+    "settings.perAudit": "par audit",
+    "settings.includes": "Inclut",
+    "settings.buyNow": "Acheter maintenant",
+    "settings.popular": "Populaire",
 
     // Audits
     "audit.status.pending": "En attente",
@@ -430,6 +447,16 @@ export const translations: Translations = {
     "dashboard.recentAudits": "Recent Audits",
     "dashboard.viewAllAudits": "View All Audits",
     "dashboard.noAuditsYet": "No audits yet",
+    "dashboard.projectsDescription": "Manage your business locations and track their GEO visibility performance across different markets.",
+    "dashboard.createNewProject": "Create New Project",
+    "dashboard.startTracking": "Start tracking a new business",
+    "dashboard.visibilityScore": "Visibility Score",
+    "dashboard.allProjects": "All Projects",
+    "dashboard.feedback": "Feedback",
+    "dashboard.newAudit": "New Audit",
+    "dashboard.business": "Business",
+    "dashboard.auditsRemaining": "Audits remaining",
+    "dashboard.buyMore": "Buy more",
 
     // Display Name
     "displayName.title": "What should we call you?",
@@ -510,6 +537,13 @@ export const translations: Translations = {
     "settings.confirmDelete": "Delete Permanently",
     "settings.noChanges": "No changes to save",
     "settings.usernameSaved": "Username updated",
+    "settings.auditCreditsRemaining": "Audit credits remaining",
+    "settings.buyCredits": "Buy Credits",
+    "settings.buyCreditsSubtitle": "Add audit credits to your account",
+    "settings.perAudit": "per audit",
+    "settings.includes": "Includes",
+    "settings.buyNow": "Buy Now",
+    "settings.popular": "Popular",
 
     // Audits
     "audit.status.pending": "Pending",

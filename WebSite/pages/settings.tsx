@@ -12,8 +12,11 @@ import {
   X,
   Loader2,
   ExternalLink,
+  Zap,
+  Star,
 } from "lucide-react";
 import { useLanguage, Language } from "@/components/LanguageContext";
+import config from "@/config";
 
 export default function SettingsPage() {
   const { data: session, status, update } = useSession();
@@ -48,6 +51,7 @@ export default function SettingsPage() {
 
   // Stripe portal
   const [loadingPortal, setLoadingPortal] = useState(false);
+  const [buyingTier, setBuyingTier] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -201,6 +205,25 @@ export default function SettingsPage() {
     }
   };
 
+  const handleBuyAudit = async (priceId: string, tier: string) => {
+    setBuyingTier(tier);
+    try {
+      const res = await fetch("/api/checkout/buy-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const data = await res.json();
+      if (data.success && data.data.url) {
+        window.location.href = data.data.url;
+      }
+    } catch {
+      // ignore
+    } finally {
+      setBuyingTier(null);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== "DELETE") return;
     setDeleting(true);
@@ -252,12 +275,12 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout activeMenu="settings">
-      <h1 className="text-4xl font-serif font-medium text-gray-900 mb-8">
+      <h1 className="text-4xl font-heading font-medium text-gray-900 mb-8">
         {String(t("dashboard.settings"))}
       </h1>
 
       {/* Profile Section */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm mb-6">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 shadow-sm mb-6">
         <div className="flex items-center gap-3 mb-6">
           <User className="w-5 h-5 text-orange-600" />
           <h2 className="text-lg font-semibold text-gray-900">
@@ -335,46 +358,120 @@ export default function SettingsPage() {
       </div>
 
       {/* Subscription Section */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm mb-6">
-        <div className="flex items-center gap-3 mb-6">
-          <CreditCard className="w-5 h-5 text-orange-600" />
-          <h2 className="text-lg font-semibold text-gray-900">
-            {String(t("settings.subscription"))}
-          </h2>
+      <div id="subscription" className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 shadow-sm mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <CreditCard className="w-5 h-5 text-orange-600" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              {String(t("settings.subscription"))}
+            </h2>
+          </div>
+          <Button
+            onClick={handleManageSubscription}
+            disabled={loadingPortal}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 text-xs"
+          >
+            {loadingPortal ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <>
+                {String(t("settings.manageSubscription"))}
+                <ExternalLink className="w-3 h-3" />
+              </>
+            )}
+          </Button>
         </div>
 
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-gray-700">{String(t("settings.currentPlan"))}:</span>
-          <span className="px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-700 capitalize">
-            {getTierDisplay()}
-          </span>
-        </div>
-
-        {auditCredits > 0 && (
-          <p className="text-sm text-gray-500 mb-4">
-            {String(t("settings.auditCreditsRemaining"))}: {auditCredits}
-          </p>
-        )}
-
-        <Button
-          onClick={handleManageSubscription}
-          disabled={loadingPortal}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          {loadingPortal ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              {String(t("settings.manageSubscription"))}
-              <ExternalLink className="w-4 h-4" />
-            </>
+        {/* Current status */}
+        <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50/80 rounded-xl">
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-orange-500" />
+            <span className="text-gray-700 font-medium">{String(t("settings.auditCreditsRemaining"))}:</span>
+          </div>
+          <span className="text-2xl font-bold text-gray-900">{loadingSubscription ? "..." : auditCredits}</span>
+          {subscriptionTier !== "none" && (
+            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 capitalize ml-auto">
+              {getTierDisplay()}
+            </span>
           )}
-        </Button>
+        </div>
+
+        {/* Buy Credits subtitle */}
+        <div className="mb-5">
+          <h3 className="text-base font-semibold text-gray-900 mb-1">{String(t("settings.buyCredits"))}</h3>
+          <p className="text-sm text-gray-500">{String(t("settings.buyCreditsSubtitle"))}</p>
+        </div>
+
+        {/* Pricing cards */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Basic */}
+          <div className="relative border border-gray-200/80 rounded-xl p-6 bg-white/60 hover:shadow-md transition-all">
+            <h4 className="text-lg font-semibold text-gray-900 mb-1">{config.stripe.basic.name}</h4>
+            <div className="flex items-baseline gap-1 mb-1">
+              <span className="text-3xl font-bold text-gray-900">{config.stripe.basic.price}€</span>
+              <span className="text-sm text-gray-400 line-through">{config.stripe.basic.oldPrice}€</span>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">{String(t("settings.perAudit"))}</p>
+            <ul className="space-y-2 mb-6">
+              {config.stripe.basic.features.slice(0, 4).map((f, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  {f.name}
+                </li>
+              ))}
+            </ul>
+            <Button
+              onClick={() => handleBuyAudit(config.stripe.basic.priceId, "basic")}
+              disabled={buyingTier === "basic" || !config.stripe.basic.priceId}
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full"
+            >
+              {buyingTier === "basic" ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                String(t("settings.buyNow"))
+              )}
+            </Button>
+          </div>
+
+          {/* Pro */}
+          <div className="relative border-2 border-orange-300 rounded-xl p-6 bg-orange-50/40 hover:shadow-md transition-all">
+            <div className="absolute -top-3 right-4 px-3 py-0.5 bg-orange-500 text-white text-xs font-semibold rounded-full flex items-center gap-1">
+              <Star className="w-3 h-3" />
+              {String(t("settings.popular"))}
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-1">{config.stripe.pro.name}</h4>
+            <div className="flex items-baseline gap-1 mb-1">
+              <span className="text-3xl font-bold text-gray-900">{config.stripe.pro.price}€</span>
+              <span className="text-sm text-gray-400 line-through">{config.stripe.pro.oldPrice}€</span>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">{String(t("settings.perAudit"))}</p>
+            <ul className="space-y-2 mb-6">
+              {config.stripe.pro.features.slice(0, 4).map((f, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  {f.name}
+                </li>
+              ))}
+            </ul>
+            <Button
+              onClick={() => handleBuyAudit(config.stripe.pro.priceId, "pro")}
+              disabled={buyingTier === "pro" || !config.stripe.pro.priceId}
+              className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-full"
+            >
+              {buyingTier === "pro" ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                String(t("settings.buyNow"))
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Security Section */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm mb-6">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 shadow-sm mb-6">
         <div className="flex items-center gap-3 mb-6">
           <Shield className="w-5 h-5 text-orange-600" />
           <h2 className="text-lg font-semibold text-gray-900">
@@ -439,7 +536,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-2xl p-8 border border-red-200 shadow-sm">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-red-200/60 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <Trash2 className="w-5 h-5 text-red-600" />
           <h2 className="text-lg font-semibold text-red-900">

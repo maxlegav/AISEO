@@ -44,6 +44,7 @@ export default function WaitlistPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [emailRegistered, setEmailRegistered] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     howFound: "",
@@ -68,15 +69,31 @@ export default function WaitlistPage() {
     }
   };
 
+  const registerEmail = async () => {
+    try {
+      await fetch("/api/waitlist/register-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      setEmailRegistered(true);
+    } catch {
+      // Silent fail - email will be saved on final submit anyway
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError("");
 
     try {
-      const res = await fetch("/api/waitlist", {
+      const res = await fetch("/api/waitlist/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          sendWelcomeEmail: true,
+        }),
       });
 
       const data = await res.json();
@@ -96,6 +113,9 @@ export default function WaitlistPage() {
   };
 
   const handleNext = () => {
+    if (step === 1 && !emailRegistered) {
+      registerEmail();
+    }
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
@@ -116,7 +136,6 @@ export default function WaitlistPage() {
           description="You've joined the ShowYourBrand waitlist. We'll notify you when we launch."
         />
         <main className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100 flex items-center justify-center px-4 relative overflow-hidden">
-          {/* Decorative blobs - same as landing page */}
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-orange-300/40 rounded-full blur-3xl" />
@@ -157,12 +176,10 @@ export default function WaitlistPage() {
       />
 
       <main className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100 relative overflow-hidden">
-        {/* Decorative blobs - same as landing page */}
         <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-orange-300/40 rounded-full blur-3xl" />
 
-        {/* Header - same as landing page */}
         <header className="sticky top-0 z-50 backdrop-blur-sm">
           <div className="container mx-auto px-4">
             <div className="flex items-center h-16">
@@ -189,12 +206,9 @@ export default function WaitlistPage() {
           </div>
         </header>
 
-        {/* Main content */}
         <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-12 relative z-10">
           <div className="w-full max-w-lg">
-            {/* Card */}
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-              {/* Progress bar */}
               <div className="h-1.5 bg-gray-100">
                 <div
                   className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
@@ -203,7 +217,6 @@ export default function WaitlistPage() {
               </div>
 
               <div className="p-8">
-                {/* Step 1: Email */}
                 {step === 1 && (
                   <div className="space-y-6">
                     <div className="text-center">
@@ -234,7 +247,6 @@ export default function WaitlistPage() {
                   </div>
                 )}
 
-                {/* Step 2: How did you find us */}
                 {step === 2 && (
                   <div className="space-y-6">
                     <div className="text-center">
@@ -268,7 +280,6 @@ export default function WaitlistPage() {
                   </div>
                 )}
 
-                {/* Step 3: GEO experience */}
                 {step === 3 && (
                   <div className="space-y-6">
                     <div className="text-center">
@@ -302,7 +313,6 @@ export default function WaitlistPage() {
                   </div>
                 )}
 
-                {/* Step 4: Budget */}
                 {step === 4 && (
                   <div className="space-y-6">
                     <div className="text-center">
@@ -336,14 +346,12 @@ export default function WaitlistPage() {
                   </div>
                 )}
 
-                {/* Error message */}
                 {error && (
                   <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm text-center">
                     {error}
                   </div>
                 )}
 
-                {/* Navigation */}
                 <div className="flex items-center justify-between mt-8">
                   {step > 1 ? (
                     <Button
@@ -381,7 +389,6 @@ export default function WaitlistPage() {
                   </Button>
                 </div>
 
-                {/* Step indicator */}
                 <div className="flex justify-center gap-2 mt-6">
                   {[1, 2, 3, 4].map((s) => (
                     <div
@@ -399,7 +406,6 @@ export default function WaitlistPage() {
               </div>
             </div>
 
-            {/* Footer text */}
             <p className="text-center text-xs text-gray-600 mt-6">
               No spam, ever. Unsubscribe anytime.
             </p>

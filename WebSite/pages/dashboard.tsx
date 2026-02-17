@@ -36,7 +36,7 @@ export default function DashboardPage() {
   }, [status, session, router, generatingUsername, update]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
       <div className="text-center">
         <div className="w-12 h-12 mx-auto mb-4 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-gray-600">Loading your dashboard...</p>

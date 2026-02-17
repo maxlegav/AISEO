@@ -2,6 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { getDb } from "@/lib/db";
 
+// Map new statuses to include legacy equivalents for DB queries
+const STATUS_FILTER_MAP: Record<string, string[]> = {
+  generating: ["generating", "processing"],
+  audit_review: ["audit_review", "review_pending"],
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -15,7 +21,6 @@ export default async function handler(
 
   const db = await getDb();
 
-  // Query params
   const status = req.query.status as string | undefined;
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 50;
@@ -23,7 +28,12 @@ export default async function handler(
 
   const filter: Record<string, unknown> = {};
   if (status) {
-    filter.status = status;
+    const mappedStatuses = STATUS_FILTER_MAP[status];
+    if (mappedStatuses) {
+      filter.status = { $in: mappedStatuses };
+    } else {
+      filter.status = status;
+    }
   }
 
   const [audits, total] = await Promise.all([

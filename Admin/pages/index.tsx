@@ -8,8 +8,10 @@ interface Stats {
   audits: {
     total: number;
     pending: number;
-    processing: number;
-    review_pending: number;
+    generating: number;
+    questions_review: number;
+    auditing: number;
+    audit_review: number;
     completed: number;
     failed: number;
     rejected: number;
@@ -28,6 +30,9 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const awaitingAction =
+    (stats?.audits.questions_review ?? 0) + (stats?.audits.audit_review ?? 0);
+
   return (
     <AdminLayout title="Dashboard">
       {loading ? (
@@ -40,32 +45,93 @@ export default function DashboardPage() {
             <StatCard label="Businesses" value={stats.businesses} />
             <StatCard label="Total Audits" value={stats.audits.total} />
             <StatCard
-              label="Awaiting Review"
-              value={stats.audits.review_pending}
-              highlight={stats.audits.review_pending > 0}
-              href="/audits?status=review_pending"
+              label="Awaiting Action"
+              value={awaitingAction}
+              highlight={awaitingAction > 0}
+              href="/audits?status=questions_review"
             />
           </div>
+
+          {/* Needs attention */}
+          {awaitingAction > 0 && (
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-3">
+                Needs Your Attention
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {stats.audits.questions_review > 0 && (
+                  <Link
+                    href="/audits?status=questions_review"
+                    className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 hover:bg-amber-900/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-amber-300 font-medium">
+                          Questions to Review
+                        </p>
+                        <p className="text-sm text-amber-400/70">
+                          Validate generated questions before full audit
+                        </p>
+                      </div>
+                      <span className="text-3xl font-bold text-amber-300">
+                        {stats.audits.questions_review}
+                      </span>
+                    </div>
+                  </Link>
+                )}
+                {stats.audits.audit_review > 0 && (
+                  <Link
+                    href="/audits?status=audit_review"
+                    className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 hover:bg-yellow-900/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-yellow-300 font-medium">
+                          Audits to Review
+                        </p>
+                        <p className="text-sm text-yellow-400/70">
+                          Approve final audit results before delivery
+                        </p>
+                      </div>
+                      <span className="text-3xl font-bold text-yellow-300">
+                        {stats.audits.audit_review}
+                      </span>
+                    </div>
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Audit status breakdown */}
           <div>
             <h2 className="text-lg font-semibold text-white mb-3">
-              Audit Status Breakdown
+              Audit Pipeline
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
               <StatusCard
                 label="Pending"
                 value={stats.audits.pending}
                 color="bg-gray-600"
               />
               <StatusCard
-                label="Processing"
-                value={stats.audits.processing}
+                label="Generating"
+                value={stats.audits.generating}
                 color="bg-blue-600"
               />
               <StatusCard
-                label="Review Pending"
-                value={stats.audits.review_pending}
+                label="Questions Review"
+                value={stats.audits.questions_review}
+                color="bg-amber-600"
+              />
+              <StatusCard
+                label="Auditing"
+                value={stats.audits.auditing}
+                color="bg-indigo-600"
+              />
+              <StatusCard
+                label="Audit Review"
+                value={stats.audits.audit_review}
                 color="bg-yellow-600"
               />
               <StatusCard

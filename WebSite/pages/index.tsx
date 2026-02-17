@@ -1,17 +1,14 @@
 import TagSEO from "@/components/TagSEO";
 import TagSchema from "@/components/TagSchema";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ChevronDown,
   ChevronUp,
-  Eye,
-  TrendingUp,
   Search,
-  Layers,
   Check,
   Star,
   Calendar,
@@ -19,6 +16,9 @@ import {
   Twitter,
   Linkedin,
   X,
+  Eye,
+  Target,
+  Zap,
 } from "lucide-react";
 
 // AI Models with their actual logo files
@@ -56,19 +56,24 @@ const cmsLogos = [
   { name: "Webflow", logo: "/logos/webflow-svgrepo-com.svg" },
 ];
 
+// Trust badge initials for the counter
+const trustAvatars = [
+  { letter: "S", bg: "bg-gray-800" },
+  { letter: "M", bg: "bg-gray-600" },
+  { letter: "A", bg: "bg-gray-700" },
+  { letter: "L", bg: "bg-gray-500" },
+  { letter: "T", bg: "bg-gray-900" },
+];
+
 // Animated AI Model Marquee with real logos
 const AIModelMarquee = () => (
   <div className="mt-8">
-    {/* Title */}
     <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
       BE MENTIONNED BY THE FOLLOWING AI MODELS:
     </p>
 
-    {/* Marquee container with rounded pill shape */}
     <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-3xl border border-white/50 shadow-sm">
-      {/* Scrolling container */}
       <div className="flex animate-marquee items-center">
-        {/* First set */}
         {aiModels.map((model, i) => (
           <div
             key={`first-${i}`}
@@ -90,7 +95,6 @@ const AIModelMarquee = () => (
             />
           </div>
         ))}
-        {/* Duplicate for seamless loop */}
         {aiModels.map((model, i) => (
           <div
             key={`second-${i}`}
@@ -120,9 +124,7 @@ const AIModelMarquee = () => (
 // CMS Platform logos with scrolling marquee
 const CMSLogos = () => (
   <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-3xl border border-white/50 shadow-sm">
-    {/* Scrolling container */}
     <div className="flex animate-marquee-slow items-center">
-      {/* First set */}
       {cmsLogos.map((cms, i) => (
         <div
           key={`first-${i}`}
@@ -138,7 +140,6 @@ const CMSLogos = () => (
           <span className="text-gray-600 font-medium text-sm">{cms.name}</span>
         </div>
       ))}
-      {/* Duplicate for seamless loop */}
       {cmsLogos.map((cms, i) => (
         <div
           key={`second-${i}`}
@@ -188,10 +189,11 @@ const FAQItem = ({
   </div>
 );
 
-// Pricing Card Component - Redesigned
+// Pricing Card Component - With strikethrough old price
 const PricingCard = ({
   title,
   price,
+  oldPrice,
   period,
   features,
   highlighted = false,
@@ -200,6 +202,7 @@ const PricingCard = ({
 }: {
   title: string;
   price: string;
+  oldPrice: string;
   period: string;
   features: string[];
   highlighted?: boolean;
@@ -207,7 +210,7 @@ const PricingCard = ({
   ctaLink: string;
 }) => (
   <div
-    className={`relative rounded-3xl p-8 transition-all duration-300 ${
+    className={`relative rounded-3xl p-8 transition-all duration-300 flex flex-col h-full ${
       highlighted
         ? "bg-[#1E293B] text-white shadow-2xl shadow-slate-500/25 scale-[1.02]"
         : "bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg"
@@ -216,7 +219,7 @@ const PricingCard = ({
     {highlighted && (
       <div className="absolute -top-4 left-1/2 -translate-x-1/2">
         <span className="bg-pink-400 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-          POPULAR
+          MOST POPULAR
         </span>
       </div>
     )}
@@ -225,7 +228,7 @@ const PricingCard = ({
     >
       {title}
     </div>
-    <div className="flex items-baseline gap-1 mb-6">
+    <div className="flex items-baseline gap-2 mb-1">
       <span
         className={`text-5xl font-semibold ${highlighted ? "text-white" : "text-gray-900"}`}
       >
@@ -235,19 +238,33 @@ const PricingCard = ({
         /{period}
       </span>
     </div>
-    <ul className="space-y-4 mb-8">
+    <div className="mb-6">
+      <span
+        className={`text-lg line-through ${highlighted ? "text-gray-400" : "text-gray-400"}`}
+      >
+        {oldPrice}/{period}
+      </span>
+      <span
+        className={`text-xs ml-2 font-semibold ${highlighted ? "text-green-400" : "text-green-600"}`}
+      >
+        LAUNCH PRICE
+      </span>
+    </div>
+    <ul className="space-y-3 mb-8 flex-1">
       {features.map((feature, i) => (
         <li key={i} className="flex items-start gap-3">
           <Check
             className={`w-5 h-5 mt-0.5 flex-shrink-0 ${highlighted ? "text-green-400" : "text-green-500"}`}
           />
-          <span className={highlighted ? "text-gray-200" : "text-gray-600"}>
+          <span
+            className={`text-sm ${highlighted ? "text-gray-200" : "text-gray-600"}`}
+          >
             {feature}
           </span>
         </li>
       ))}
     </ul>
-    <Link href={ctaLink} className="block">
+    <Link href={ctaLink} className="block mt-auto">
       <Button
         className={`w-full h-12 rounded-xl font-semibold transition-all ${
           highlighted
@@ -262,17 +279,17 @@ const PricingCard = ({
   </div>
 );
 
-// Testimonial Card Component with Memoji
+// Testimonial Card Component with Initial Letter
 const TestimonialCard = ({
   quote,
   author,
   role,
-  memoji,
+  initial,
 }: {
   quote: string;
   author: string;
   role: string;
-  memoji: string;
+  initial: string;
 }) => (
   <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
     <div className="flex gap-1 mb-5">
@@ -284,13 +301,9 @@ const TestimonialCard = ({
       &ldquo;{quote}&rdquo;
     </p>
     <div className="flex items-center gap-4">
-      <Image
-        src={memoji}
-        alt={author}
-        width={48}
-        height={48}
-        className="w-12 h-12 rounded-full object-cover"
-      />
+      <div className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+        <span className="text-white font-semibold text-lg">{initial}</span>
+      </div>
       <div>
         <div className="font-semibold text-gray-900">{author}</div>
         <div className="text-sm text-gray-500">{role}</div>
@@ -319,6 +332,34 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
+// Subscriber Counter with Trust Avatars
+const SubscriberCounter = ({ count }: { count: number }) => (
+  <div className="flex items-center justify-center gap-3 mt-4">
+    {/* Overlapping avatars */}
+    <div className="flex -space-x-2">
+      {trustAvatars.map((avatar, i) => (
+        <div
+          key={i}
+          className={`w-8 h-8 rounded-full ${avatar.bg} flex items-center justify-center border-2 border-white text-white text-xs font-semibold`}
+        >
+          {avatar.letter}
+        </div>
+      ))}
+    </div>
+    {/* Stars */}
+    <div className="flex gap-0.5">
+      {[...Array(5)].map((_, i) => (
+        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+      ))}
+    </div>
+    {/* Count */}
+    <p className="text-sm text-gray-700 font-medium">
+      <span className="font-bold text-gray-900">{count}</span> professionals
+      already joined
+    </p>
+  </div>
+);
+
 // Cal.com Embed Modal Component
 const CalComModal = ({
   isOpen,
@@ -331,23 +372,17 @@ const CalComModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-
-      {/* Modal */}
       <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full shadow-md"
         >
           <X className="w-5 h-5" />
         </button>
-
-        {/* Cal.com Embed */}
         <div className="h-[600px]">
           <iframe
             src="https://cal.com/showyourbrand/presentation-of-showyourbrand?embed=true&theme=light"
@@ -366,6 +401,18 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
   const [showCalModal, setShowCalModal] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(51);
+
+  useEffect(() => {
+    fetch("/api/waitlist/count")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data?.count) {
+          setSubscriberCount(data.data.count);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleStartAudit = () => {
     if (url && url.includes(".")) {
@@ -407,7 +454,7 @@ export default function Home() {
     {
       question: "Do you offer white-label reports for agencies?",
       answer:
-        "Yes! Our Agency plan includes fully customizable white-label reports with your branding. You can add your logo, colors, and custom messaging to present professional GEO audits to your clients under your own brand.",
+        "Yes! Our Premium plan includes fully customizable white-label reports with your branding. You can add your logo, colors, and custom messaging to present professional GEO audits to your clients under your own brand.",
     },
   ];
 
@@ -420,7 +467,6 @@ export default function Home() {
       />
       <TagSchema />
 
-      {/* Custom styles for marquee animation */}
       <style jsx global>{`
         @keyframes marquee {
           0% {
@@ -449,7 +495,6 @@ export default function Home() {
         <header className="sticky top-0 z-50 backdrop-blur-sm">
           <div className="container mx-auto px-4">
             <div className="flex items-center h-16 relative">
-              {/* Logo - Left */}
               <Link href="/" className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center">
                   <Image
@@ -464,7 +509,6 @@ export default function Home() {
                 </span>
               </Link>
 
-              {/* Nav - Centered */}
               <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
                 <a
                   href="#features"
@@ -492,7 +536,6 @@ export default function Home() {
                 </a>
               </nav>
 
-              {/* Right - Waitlist + Login */}
               <div className="ml-auto flex items-center gap-2">
                 <Link href="/waitlist">
                   <Button variant="ghost" className="text-sm font-medium">
@@ -511,7 +554,6 @@ export default function Home() {
 
         {/* Hero Section */}
         <section className="pt-16 md:pt-20 pb-8 px-4 relative overflow-hidden">
-          {/* Decorative gradient blobs */}
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-orange-300/40 rounded-full blur-3xl" />
@@ -531,7 +573,6 @@ export default function Home() {
               AI models.
             </p>
 
-            {/* Animated AI Model Marquee with real logos */}
             <AIModelMarquee />
 
             {/* URL Input Section */}
@@ -556,7 +597,7 @@ export default function Home() {
                 </Button>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
                 <Button
                   variant="outline"
                   onClick={() => setShowCalModal(true)}
@@ -565,64 +606,83 @@ export default function Home() {
                   <Calendar className="w-4 h-4 mr-2" />
                   Book a Strategy Call
                 </Button>
+                <Link href="/waitlist">
+                  <Button
+                    className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Join the Waitlist
+                  </Button>
+                </Link>
               </div>
 
-              <p className="text-xs text-gray-600 mt-4 font-medium">
-                NO CREDIT CARD REQUIRED • 100 AI ANALYSIS
-              </p>
+              {/* Subscriber Counter + Trust Icons */}
+              <SubscriberCounter count={subscriberCount} />
             </div>
           </div>
         </section>
 
-        {/* The GEO Advantage Section */}
+        {/* The GEO Advantage Section - Aggressive Marketing */}
         <section id="features" className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-12">
-              <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-4">
-                The GEO Advantage
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-1.5 mb-6">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-red-700 text-sm font-semibold">
+                  YOUR CUSTOMERS HAVE ALREADY SWITCHED TO AI SEARCH
+                </span>
+              </div>
+              <h2 className="font-heading text-3xl md:text-5xl font-medium text-gray-900 mb-4">
+                Google is dying. AI is the new search.
               </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Why traditional SEO isn&apos;t enough anymore.
+              <p className="text-gray-600 max-w-3xl mx-auto text-lg">
+                58% of consumers now use ChatGPT, Perplexity, or Claude instead
+                of Google to find products and services. If AI doesn&apos;t
+                mention your brand, <strong>you don&apos;t exist</strong> for
+                these customers.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-6 mt-12">
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-                  <Eye className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                  <Eye className="w-6 h-6 text-gray-900" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  AI Visibility
+                  Be the brand AI recommends
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Ensure your brand is cited as the primary source when users
-                  ask AI models about your industry.
+                  <strong>87% of brands are invisible</strong> to AI. When users
+                  ask &ldquo;the best tool for...&rdquo;, AI names you — or your
+                  competitor.
                 </p>
               </div>
 
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6">
-                  <TrendingUp className="w-6 h-6 text-pink-600" />
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                  <Target className="w-6 h-6 text-gray-900" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Competitive Gap
+                  Crush your competitors
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Identify where competitors are being recommended by LLMs and
-                  you are not.
+                  See which competitors AI recommends instead of you.
+                  Understand <strong>why they rank higher</strong> — then steal
+                  their playbook.
                 </p>
               </div>
 
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                  <Layers className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                  <Zap className="w-6 h-6 text-gray-900" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Maximize ROI
+                  10x more qualified traffic
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Capture high-intent traffic from users who have already moved
-                  past traditional search engines.
+                  AI users have <strong>3x higher purchase intent</strong> than
+                  Google users. One AI mention drives more revenue than 1,000
+                  clicks.
                 </p>
               </div>
             </div>
@@ -636,7 +696,6 @@ export default function Home() {
         >
           <div className="container mx-auto max-w-6xl">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left column - Text */}
               <div>
                 <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-4">
                   Your competitors are already
@@ -694,7 +753,6 @@ export default function Home() {
 
               {/* Right column - Visualization */}
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 overflow-hidden">
-                {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -707,18 +765,16 @@ export default function Home() {
                   </span>
                 </div>
 
-                {/* AI Visibility Score */}
                 <div className="text-center mb-6 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
                   <div className="text-5xl font-bold text-gray-900 mb-1">
                     73<span className="text-2xl text-gray-400">%</span>
                   </div>
                   <div className="text-sm text-gray-600">GEO Health Score</div>
                   <div className="text-xs text-orange-500 mt-1 font-medium">
-                    ⚠️ Room for improvement
+                    Room for improvement
                   </div>
                 </div>
 
-                {/* Competitor comparison */}
                 <div className="space-y-3 mb-6">
                   <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">
                     vs. Top Competitors
@@ -767,7 +823,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Key insights */}
                 <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-100">
                   <div className="text-center py-3 bg-red-50 rounded-xl">
                     <div className="text-lg font-bold text-red-600">12</div>
@@ -789,7 +844,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Seamless Integration Section - Compact with real logos */}
+        {/* Seamless Integration Section */}
         <section className="py-12 px-4">
           <div className="container mx-auto max-w-4xl text-center">
             <h3 className="text-lg font-semibold text-gray-900 mb-8">
@@ -799,7 +854,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Pricing Section - Redesigned */}
+        {/* Pricing Section */}
         <section id="pricing" className="py-20 px-4">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-14">
@@ -807,52 +862,69 @@ export default function Home() {
                 Simple, transparent pricing
               </h2>
               <p className="text-gray-600">
-                Choose the plan that fits your needs
+                Choose the plan that fits your needs. Cancel anytime.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 items-center">
+            <div className="grid md:grid-cols-3 gap-6 items-stretch">
               <PricingCard
                 title="BASIC"
-                price="€100"
+                price="€199"
+                oldPrice="€299"
                 period="one-time"
                 features={[
                   "1 complete GEO audit",
-                  "ChatGPT analysis",
+                  "ChatGPT analysis (GPT-4o)",
                   "1 competitor comparison",
                   "100 AI prompt testing",
-                  "Full PDF report",
+                  "Full PDF report with insights",
+                  "HTML & schema.org scan",
+                  "Content optimization tips",
+                  "Email support (48h response)",
                 ]}
-                ctaText="Buy Now"
+                ctaText="Get Started"
                 ctaLink="/signup?plan=basic"
               />
               <PricingCard
                 title="PRO"
-                price="€200"
+                price="€399"
+                oldPrice="€599"
                 period="one-time"
                 features={[
                   "1 complete GEO audit",
-                  "All 4 AI engines",
+                  "All 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)",
                   "5 competitor comparisons",
                   "100 AI prompt testing",
-                  "Dashboard with history",
+                  "Full PDF report + executive summary",
+                  "HTML & schema.org deep scan",
+                  "AI-optimized FAQ generation",
+                  "Priority action plan (ranked by impact)",
+                  "Dashboard with full history",
+                  "Priority email support (24h)",
                 ]}
                 highlighted={true}
-                ctaText="Buy Now"
+                ctaText="Get Started"
                 ctaLink="/signup?plan=pro"
               />
               <PricingCard
                 title="PREMIUM"
-                price="€500"
+                price="€799"
+                oldPrice="€1,199"
                 period="mo"
                 features={[
-                  "20 audits per month",
-                  "All 4 AI engines",
-                  "Unlimited competitors",
-                  "White-label PDF reports",
-                  "+€20 per extra audit",
+                  "20 audits per month included",
+                  "All 4 AI engines per audit",
+                  "Unlimited competitor comparisons",
+                  "100 AI prompt testing per audit",
+                  "White-label PDF reports (your branding)",
+                  "Bulk audit management dashboard",
+                  "Client-ready executive summaries",
+                  "Schema markup & FAQ auto-generation",
+                  "Monthly GEO trend reports",
+                  "Dedicated account manager",
+                  "+€35 per extra audit beyond 20",
                 ]}
-                ctaText="Subscribe"
+                ctaText="Contact Sales"
                 ctaLink="/signup?plan=premium"
               />
             </div>
@@ -870,40 +942,42 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials Section - Separate */}
+        {/* Testimonials Section */}
         <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
                 Trusted by innovators
               </h2>
-              <p className="text-gray-600">See what our customers are saying</p>
+              <p className="text-gray-600">
+                See what early adopters are saying
+              </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
               <TestimonialCard
-                quote="We saw a 40% increase in referral traffic from Perplexity within 2 weeks of using ShowYourBrand.ai. The insights are incredible."
-                author="Sarah Jenkins"
-                role="CMO at TechFlow"
-                memoji="/memoji/memoji-1.svg"
+                quote="We ran a GEO audit for a client and discovered they were completely invisible on Perplexity. After implementing the recommendations, they saw a 40% increase in AI referral traffic in just 2 weeks."
+                author="Sarah J."
+                role="Founder, Digital Marketing Agency"
+                initial="S"
               />
               <TestimonialCard
-                quote="Finally, a tool that demystifies how LLMs perceive our brand. The semantic gap analysis is pure gold for our marketing team."
-                author="Marc Dubois"
-                role="Founder, Creative Digital"
-                memoji="/memoji/memoji-2.svg"
+                quote="Our SaaS was getting mentioned by ChatGPT for the wrong features. ShowYourBrand showed us exactly what to fix. Now we're the #1 recommendation in our niche for 3 out of 4 AI engines."
+                author="Marc D."
+                role="CTO, B2B SaaS Platform"
+                initial="M"
               />
               <TestimonialCard
-                quote="As an agency, we needed proof our GEO strategies work. ShowYourBrand gives us the data to show clients exactly where they stand with AI search."
-                author="Elena Rodriguez"
-                role="Director, Apex Marketing"
-                memoji="/memoji/memoji-3.svg"
+                quote="As an e-commerce brand, we didn't realize AI search was sending traffic to our competitors. The competitor gap analysis was eye-opening. ROI paid for itself in the first week."
+                author="Elena R."
+                role="Head of Growth, E-commerce Brand"
+                initial="E"
               />
             </div>
           </div>
         </section>
 
-        {/* FAQ Section - Separate */}
+        {/* FAQ Section */}
         <section id="faq" className="py-16 px-4">
           <div className="container mx-auto max-w-2xl">
             <div className="text-center mb-12">
@@ -929,9 +1003,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA Section - Full Hero Size */}
+        {/* CTA Section */}
         <section className="pt-16 md:pt-24 pb-20 md:pb-28 px-4 bg-[#1E293B] relative overflow-hidden">
-          {/* Decorative gradient blobs */}
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
@@ -946,7 +1019,6 @@ export default function Home() {
               stand.
             </p>
 
-            {/* URL Input Section */}
             <div className="mt-10 max-w-xl mx-auto">
               <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-xl border border-white/20">
                 <div className="flex-1 flex items-center gap-2 px-4">
@@ -962,7 +1034,7 @@ export default function Home() {
                 </Button>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
                 <Button
                   variant="outline"
                   onClick={() => setShowCalModal(true)}
@@ -971,20 +1043,51 @@ export default function Home() {
                   <Calendar className="w-4 h-4 mr-2" />
                   Book a Strategy Call
                 </Button>
+                <Link href="/waitlist">
+                  <Button
+                    className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Join the Waitlist
+                  </Button>
+                </Link>
               </div>
 
-              <p className="text-xs text-gray-400 mt-4 font-medium">
-                NO CREDIT CARD REQUIRED • 100 AI ANALYSIS
-              </p>
+              {/* Subscriber Counter (dark theme) */}
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <div className="flex -space-x-2">
+                  {trustAvatars.map((avatar, i) => (
+                    <div
+                      key={i}
+                      className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 text-white text-xs font-semibold"
+                    >
+                      {avatar.letter}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-300 font-medium">
+                  <span className="font-bold text-white">
+                    {subscriberCount}
+                  </span>{" "}
+                  professionals already joined
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Footer - Redesigned */}
+        {/* Footer */}
         <footer className=" text-black py-16">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-4 gap-12 mb-12">
-              {/* Brand */}
               <div className="md:col-span-2">
                 <Link href="/" className="flex items-center gap-2 mb-6">
                   <div className="w-16 h-16  rounded-lg flex items-center justify-center">
@@ -1025,7 +1128,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Product */}
               <div>
                 <h4 className="font-semibold mb-4">Product</h4>
                 <ul className="space-y-3 text-gray-400">
@@ -1064,7 +1166,6 @@ export default function Home() {
                 </ul>
               </div>
 
-              {/* Legal */}
               <div>
                 <h4 className="font-semibold mb-4">Legal</h4>
                 <ul className="space-y-3 text-gray-400">
