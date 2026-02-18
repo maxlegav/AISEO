@@ -5,8 +5,8 @@ export default function Document() {
   return (
     <Html lang='en'>
       <Head>
-        <meta name='theme-color' content={config.colors.primary} />
-        <meta name='msapplication-TileColor' content={config.colors.primary} />
+        <meta name='theme-color' content='#ffffff' />
+        <meta name='msapplication-TileColor' content='#ffffff' />
 
         <link
           rel='apple-touch-icon'
