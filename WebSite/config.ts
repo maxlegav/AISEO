@@ -92,7 +92,7 @@ const config = {
 
   // Theme & Colors (based on UX Design specification)
   colors: {
-    primary: "#3B82F6", // Blue (Primary)
+    primary: "#7C3AED", // Purple (Primary brand color)
     success: "#10B981", // Green (Success)
     error: "#EF4444", // Red (Error)
     warning: "#F59E0B", // Orange (Warning)

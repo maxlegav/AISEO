@@ -577,9 +577,9 @@ export default function Home() {
 
             {/* URL Input Section */}
             <div className="mt-10 max-w-xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-xl border border-white/50">
-                <div className="flex-1 flex items-center gap-2 px-4">
-                  <Search className="w-5 h-5 text-gray-400" />
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-full p-3 sm:p-2 shadow-xl border border-white/50">
+                <div className="flex-1 flex items-center gap-2 px-2 sm:px-4">
+                  <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
                   <Input
                     type="url"
                     placeholder="Enter your website URL"
@@ -591,9 +591,9 @@ export default function Home() {
                 </div>
                 <Button
                   onClick={handleStartAudit}
-                  className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-full px-6 shadow-lg"
+                  className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-xl sm:rounded-full px-6 py-3 sm:py-2 h-auto shadow-lg"
                 >
-                  Run Free Audit →
+                  Run Audit →
                 </Button>
               </div>
 
@@ -1020,17 +1020,17 @@ export default function Home() {
             </p>
 
             <div className="mt-10 max-w-xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-xl border border-white/20">
-                <div className="flex-1 flex items-center gap-2 px-4">
-                  <Search className="w-5 h-5 text-gray-400" />
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-full p-3 sm:p-2 shadow-xl border border-white/20">
+                <div className="flex-1 flex items-center gap-2 px-2 sm:px-4">
+                  <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
                   <Input
                     type="url"
                     placeholder="Enter your website URL"
                     className="border-0 shadow-none focus-visible:ring-0 px-0 bg-transparent"
                   />
                 </div>
-                <Button className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-full px-6 shadow-lg">
-                  Run Free Audit →
+                <Button className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-xl sm:rounded-full px-6 py-3 sm:py-2 h-auto shadow-lg">
+                  Run Audit →
                 </Button>
               </div>
 
