@@ -26,10 +26,17 @@ export function getCompetitorLimit(tier: SubscriptionTier): number {
 }
 
 /**
- * Check if user can create a new project based on their tier.
- * Returns { allowed: true } or { allowed: false, reason: string }.
+ * Check if user can create a new project based on their tier + audit credits.
+ * Each audit credit acts as an extra project slot beyond the subscription tier limit.
+ * Returns { allowed: true } or { allowed: false, reason: string, errorCode: string }.
  */
-export async function canCreateProject(userId: string | mongoose.Types.ObjectId): Promise<{ allowed: boolean; reason?: string; currentCount?: number; maxCount?: number }> {
+export async function canCreateProject(userId: string | mongoose.Types.ObjectId): Promise<{
+  allowed: boolean;
+  reason?: string;
+  errorCode?: string;
+  currentCount?: number;
+  maxCount?: number;
+}> {
   const user = await User.findById(userId);
   if (!user) {
     return { allowed: false, reason: 'User not found' };
@@ -37,9 +44,19 @@ export async function canCreateProject(userId: string | mongoose.Types.ObjectId)
 
   const tier = user.subscriptionTier as SubscriptionTier;
   const limits = getLimits(tier);
+  const credits = user.auditCredits || 0;
 
-  if (limits.projects === 0) {
-    return { allowed: false, reason: 'A subscription is required to create projects', currentCount: 0, maxCount: 0 };
+  // Total slots = subscription slots + one-shot audit credits
+  const maxProjects = limits.projects + credits;
+
+  if (maxProjects === 0) {
+    return {
+      allowed: false,
+      reason: 'A subscription or audit credits are required to create projects.',
+      errorCode: 'UPGRADE_REQUIRED',
+      currentCount: 0,
+      maxCount: 0,
+    };
   }
 
   const currentCount = await Business.countDocuments({
@@ -47,14 +64,17 @@ export async function canCreateProject(userId: string | mongoose.Types.ObjectId)
     deletedAt: null,
   });
 
-  if (currentCount >= limits.projects) {
+  if (currentCount >= maxProjects) {
     return {
       allowed: false,
-      reason: `You have reached the maximum of ${limits.projects} project(s) for your ${tier} plan. Upgrade to create more.`,
+      reason: credits > 0
+        ? `You have used all your available slots (${limits.projects} from your ${tier} plan + ${credits} audit credit(s)). Purchase more credits or upgrade your plan.`
+        : `You have reached the maximum of ${limits.projects} project(s) for your ${tier} plan. Upgrade or purchase audit credits to create more.`,
+      errorCode: 'UPGRADE_REQUIRED',
       currentCount,
-      maxCount: limits.projects,
+      maxCount: maxProjects,
     };
   }
 
-  return { allowed: true, currentCount, maxCount: limits.projects };
+  return { allowed: true, currentCount, maxCount: maxProjects };
 }

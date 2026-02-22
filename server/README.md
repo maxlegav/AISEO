@@ -226,4 +226,3 @@ server/
 
 - If using Atlas, make sure your IP is whitelisted
 - Check the connection string format in `MONGODB_URI`
-

@@ -20,7 +20,7 @@ const WaitlistWelcomeEmail: React.FC<WaitlistWelcomeEmailProps> = ({
   email,
 }) => {
   const baseUrl =
-    process.env.NEXTAUTH_URL || "https://showyourbrand.vercel.app";
+    process.env.NEXTAUTH_URL || "https://ShowYourBrand.vercel.app";
 
   return (
     <Html>

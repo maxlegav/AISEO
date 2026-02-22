@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -14,6 +14,8 @@ import {
   Loader2,
   User,
   Clock,
+  Trash2,
+  Zap,
 } from "lucide-react";
 
 interface Business {
@@ -26,71 +28,18 @@ interface Business {
   createdAt: string;
 }
 
-/* ─── Mock projects for demo ─── */
-const MOCK_PROJECTS: (Business & {
-  score?: number;
-  trend?: "up" | "down" | "flat" | "stable";
-  trendValue?: string;
-  auditStatus?: "completed" | "processing" | "pending";
-})[] = [
-  {
-    _id: "mock-1",
-    name: "Acme Corp",
-    slug: "acme-corp",
-    primaryUrl: "https://acme-corp.com",
-    category: "SaaS",
-    createdAt: "2023-10-24T00:00:00Z",
-    score: 34,
-    trend: "down",
-    trendValue: "-5%",
-    auditStatus: "completed",
-  },
-  {
-    _id: "mock-2",
-    name: "Fine Dining Paris",
-    slug: "fine-dining-paris",
-    primaryUrl: "https://finedining.fr",
-    category: "Restaurant Le Jardin",
-    createdAt: "2025-09-12T00:00:00Z",
-    score: 78,
-    trend: "up",
-    trendValue: "+12%",
-    auditStatus: "completed",
-  },
-  {
-    _id: "mock-3",
-    name: "Luxury Retail",
-    slug: "luxury-retail",
-    primaryUrl: "https://luxuryretail.com",
-    category: "Maison & Objet",
-    createdAt: "2025-10-01T00:00:00Z",
-    auditStatus: "pending",
-  },
-  {
-    _id: "mock-4",
-    name: "Tech Startups NY",
-    slug: "tech-startups-ny",
-    primaryUrl: "https://techstartups.io",
-    category: "Innovate Inc.",
-    createdAt: "2025-11-15T00:00:00Z",
-    score: 28,
-    trend: "down",
-    trendValue: "-5%",
-    auditStatus: "completed",
-  },
-  {
-    _id: "mock-5",
-    name: "Artisan Coffee",
-    slug: "artisan-coffee",
-    primaryUrl: "https://artisancoffee.co.uk",
-    category: "London Brews",
-    createdAt: "2025-08-20T00:00:00Z",
-    score: 62,
-    trend: "up",
-    trendValue: "+4%",
-    auditStatus: "completed",
-  },
-];
+interface LatestAudit {
+  _id: string;
+  businessId: string;
+  status: string;
+  geoScore?: number;
+}
+
+function mapAuditUIStatus(dbStatus: string): "completed" | "processing" | "pending" {
+  if (dbStatus === "completed") return "completed";
+  if (dbStatus === "pending" || dbStatus === "failed" || dbStatus === "rejected") return "pending";
+  return "processing";
+}
 
 /* ─── Mini Sparkline SVG ─── */
 function MiniSparkline({
@@ -172,19 +121,32 @@ function TrendBadge({
 function ProjectCard({
   business,
   username,
-  score,
+  latestAudit,
   trend = "stable",
   trendValue,
-  auditStatus,
+  onDelete,
 }: {
   business: Business;
   username: string;
-  score?: number;
+  latestAudit?: LatestAudit;
   trend?: "up" | "down" | "flat" | "stable";
   trendValue?: string;
-  auditStatus?: "completed" | "processing" | "pending";
+  onDelete: (id: string) => void;
 }) {
   const { t } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handle = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [menuOpen]);
 
   const sparklineColors = {
     up: "#10b981",
@@ -199,11 +161,22 @@ function ProjectCard({
     day: "2-digit",
   });
 
+  // Derive status and score from the latest audit
+  const auditStatus = latestAudit
+    ? mapAuditUIStatus(latestAudit.status)
+    : "pending";
   const isPending = auditStatus === "pending";
   const isProcessing = auditStatus === "processing";
+  const score =
+    latestAudit?.status === "completed" ? latestAudit.geoScore : undefined;
+
+  // Link to latest audit detail if available, otherwise to business page
+  const href = latestAudit
+    ? `/${username}/audits/${latestAudit._id}`
+    : `/${username}/${business.slug}`;
 
   return (
-    <Link href={`/${username}/${business.slug}`}>
+    <Link href={href}>
       <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 hover:shadow-lg transition-all cursor-pointer group h-full flex flex-col border border-white/60">
         {/* Header */}
         <div className="flex items-start justify-between mb-1">
@@ -215,12 +188,35 @@ function ProjectCard({
               {business.category}
             </p>
           </div>
-          <button
-            className="text-gray-300 hover:text-gray-500 transition-colors p-1 shrink-0"
-            onClick={(e) => e.preventDefault()}
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
+          {/* ─── Context menu ─── */}
+          <div ref={menuRef} className="relative shrink-0">
+            <button
+              className="text-gray-300 hover:text-gray-500 transition-colors p-1"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMenuOpen((o) => !o);
+              }}
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-7 z-30 bg-white border border-gray-100 rounded-xl shadow-lg py-1 w-44">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMenuOpen(false);
+                    onDelete(business._id);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  {String(t("project.delete"))}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Score / Pending state */}
@@ -273,7 +269,7 @@ function ProjectCard({
         >
           <div className="flex items-center gap-1.5">
             <Building2 className="w-3.5 h-3.5" />
-            <span>1 {String(t("dashboard.business"))}</span>
+            <span className="truncate max-w-[140px]">{business.primaryUrl}</span>
           </div>
           <span>Created {formattedDate}</span>
         </div>
@@ -369,10 +365,12 @@ export default function UserProfilePage() {
   const { username } = router.query;
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Business[]>([]);
+  const [latestAudits, setLatestAudits] = useState<Map<string, LatestAudit>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showDisplayNameModal, setShowDisplayNameModal] = useState(false);
   const [localDisplayName, setLocalDisplayName] = useState<string | null>(null);
   const [hasClosedModal, setHasClosedModal] = useState(false);
+  const [auditCredits, setAuditCredits] = useState<number | null>(null);
 
   /* Auth redirects */
   useEffect(() => {
@@ -408,24 +406,63 @@ export default function UserProfilePage() {
     }
   }, [status, session, localDisplayName, hasClosedModal]);
 
-  /* Fetch projects */
+  /* Fetch businesses + latest audits + credits */
+  const fetchData = async () => {
+    try {
+      const [projectsRes, auditsRes, creditsRes] = await Promise.all([
+        fetch("/api/businesses/list"),
+        fetch("/api/audits/list"),
+        fetch("/api/user/check-subscription"),
+      ]);
+      const [projectsData, auditsData, creditsData] = await Promise.all([
+        projectsRes.json(),
+        auditsRes.json(),
+        creditsRes.json(),
+      ]);
+
+      if (projectsData.success) {
+        setProjects(projectsData.data);
+      }
+
+      if (auditsData.success) {
+        // Build a map: businessId → latest audit (audits are sorted desc by createdAt)
+        const auditMap = new Map<string, LatestAudit>();
+        for (const audit of auditsData.data as LatestAudit[]) {
+          const bid = audit.businessId?.toString();
+          if (bid && !auditMap.has(bid)) {
+            auditMap.set(bid, audit);
+          }
+        }
+        setLatestAudits(auditMap);
+      }
+
+      if (creditsData.success) {
+        setAuditCredits(creditsData.auditCredits ?? 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (status !== "authenticated") return;
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/businesses/list");
-        const data = await res.json();
-        if (data.success) {
-          setProjects(data.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch projects:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
+
+  const handleDeleteProject = async (businessId: string) => {
+    if (!confirm(String(t("project.deleteConfirm")))) return;
+    const res = await fetch(`/api/businesses/${businessId}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.success) {
+      // Re-fetch to get updated project list + credits
+      await fetchData();
+    }
+  };
 
   /* Loading skeleton */
   if (status === "loading" || loading) {
@@ -444,8 +481,6 @@ export default function UserProfilePage() {
     );
   }
 
-  // Merge real projects with mock projects (mock first for demo)
-  const allProjects = [...MOCK_PROJECTS, ...projects.map((p) => ({ ...p }))];
 
   return (
     <DashboardLayout activeMenu="dashboard">
@@ -471,7 +506,15 @@ export default function UserProfilePage() {
             {String(t("dashboard.projectsDescription"))}
           </p>
         </div>
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-3 mt-2">
+          {/* Audit credits badge */}
+          {auditCredits !== null && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-white/60 rounded-full text-sm text-gray-600 shadow-sm">
+              <Zap className="w-3.5 h-3.5 text-orange-500" />
+              <span className="font-medium text-gray-800">{auditCredits}</span>
+              <span className="text-gray-400">{String(t("settings.auditCreditsRemaining"))}</span>
+            </div>
+          )}
           <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-white/60">
             <SlidersHorizontal className="w-5 h-5" />
           </button>
@@ -498,21 +541,17 @@ export default function UserProfilePage() {
           </div>
         </Link>
 
-        {/* Project Cards */}
-        {allProjects.map((project) => {
-          const mock = MOCK_PROJECTS.find((m) => m._id === project._id);
-          return (
-            <ProjectCard
-              key={project._id}
-              business={project}
-              username={session?.user?.username || ""}
-              score={mock?.score}
-              trend={mock?.trend}
-              trendValue={mock?.trendValue}
-              auditStatus={mock?.auditStatus}
-            />
-          );
-        })}
+        {/* Business + Audit Cards */}
+        {projects.map((project) => (
+          <ProjectCard
+            key={project._id}
+            business={project}
+            username={session?.user?.username || ""}
+            latestAudit={latestAudits.get(project._id)}
+            trend="stable"
+            onDelete={handleDeleteProject}
+          />
+        ))}
       </div>
     </DashboardLayout>
   );

@@ -124,7 +124,7 @@ export default function DashboardLayout({
             height={28}
           />
           <span className="text-[14px] font-semibold text-gray-900 tracking-tight">
-            Showyourbrand.ai
+            ShowYourBrand
           </span>
         </Link>
 
@@ -241,15 +241,7 @@ export default function DashboardLayout({
                   {String(t("dashboard.newAudit"))}
                 </button>
               </Link>
-              <Link href="/">
-                <Image
-                  src="/syb_logo_transparent.png"
-                  alt="ShowYourBrand"
-                  width={36}
-                  height={36}
-                  className="cursor-pointer"
-                />
-              </Link>
+              
             </div>
           </div>
         </header>

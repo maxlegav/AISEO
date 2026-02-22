@@ -25,7 +25,7 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
   language = "en",
 }) => {
   const baseUrl =
-    process.env.NEXTAUTH_URL || "https://showyourbrand.vercel.app";
+    process.env.NEXTAUTH_URL || "https://ShowYourBrand.vercel.app";
 
   const content =
     language === "fr"
@@ -94,7 +94,10 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
 
             <Section style={warningBox}>
               <Text style={warningText}>
-                ⏱ <strong>{language === "fr" ? "Important :" : "Important:"}</strong>{" "}
+                ⏱{" "}
+                <strong>
+                  {language === "fr" ? "Important :" : "Important:"}
+                </strong>{" "}
                 {content.expiry}
               </Text>
             </Section>

@@ -12,14 +12,17 @@ const connectDB = async () => {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
-    const { email, howFound, hasGeoExperience, budgetRange, sendWelcomeEmail } = req.body;
+    const { email, howFound, hasGeoExperience, budgetRange, sendWelcomeEmail } =
+      req.body;
 
     if (!email || !howFound || !hasGeoExperience || !budgetRange) {
       return res.status(400).json({
@@ -49,7 +52,7 @@ export default async function handler(
         budgetRange,
         completed: true,
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     if (sendWelcomeEmail && !entry.emailSent) {

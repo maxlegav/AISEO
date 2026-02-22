@@ -24,14 +24,14 @@ import {
 // AI Models with their actual logo files
 const aiModels = [
   {
+    name: "OpenAI",
+    logo: "/logos/openai-logo.svg",
+    text: "/logos/openai-text.svg",
+  },
+  {
     name: "Claude",
     logo: "/logos/claude-logo.svg",
     text: "/logos/claude-text.svg",
-  },
-  {
-    name: "Perplexity",
-    logo: "/logos/perplexity-logo.svg",
-    text: "/logos/perplexity-text.svg",
   },
   {
     name: "Gemini",
@@ -39,10 +39,11 @@ const aiModels = [
     text: "/logos/gemini-text.svg",
   },
   {
-    name: "OpenAI",
-    logo: "/logos/openai-logo.svg",
-    text: "/logos/openai-text.svg",
+    name: "Perplexity",
+    logo: "/logos/perplexity-logo.svg",
+    text: "/logos/perplexity-text.svg",
   },
+
   { name: "Grok", logo: "/logos/grok-logo.png", text: "/logos/grok-text.svg" },
 ];
 
@@ -69,15 +70,15 @@ const trustAvatars = [
 const AIModelMarquee = () => (
   <div className="mt-8">
     <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
-      BE MENTIONNED BY THE FOLLOWING AI MODELS:
+    BE MENTIONNED BY:
     </p>
 
-    <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-3xl border border-white/50 shadow-sm">
+    <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-7xl border border-white/50 shadow-sm">
       <div className="flex animate-marquee items-center">
         {aiModels.map((model, i) => (
           <div
             key={`first-${i}`}
-            className="flex items-center gap-3 mx-6 md:mx-10 flex-shrink-0"
+            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
           >
             <Image
               src={model.logo}
@@ -98,7 +99,49 @@ const AIModelMarquee = () => (
         {aiModels.map((model, i) => (
           <div
             key={`second-${i}`}
-            className="flex items-center gap-3 mx-6 md:mx-10 flex-shrink-0"
+            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
+          >
+            <Image
+              src={model.logo}
+              alt={`${model.name} logo`}
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain"
+            />
+            <Image
+              src={model.text}
+              alt={model.name}
+              width={100}
+              height={24}
+              className="h-6 w-auto object-contain"
+            />
+          </div>
+        ))}
+        {aiModels.map((model, i) => (
+          <div
+            key={`third-${i}`}
+            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
+          >
+            <Image
+              src={model.logo}
+              alt={`${model.name} logo`}
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain"
+            />
+            <Image
+              src={model.text}
+              alt={model.name}
+              width={100}
+              height={24}
+              className="h-6 w-auto object-contain"
+            />
+          </div>
+        ))}
+        {aiModels.map((model, i) => (
+          <div
+            key={`fourth-${i}`}
+            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
           >
             <Image
               src={model.logo}
@@ -385,7 +428,7 @@ const CalComModal = ({
         </button>
         <div className="h-[600px]">
           <iframe
-            src="https://cal.com/showyourbrand/presentation-of-showyourbrand?embed=true&theme=light"
+            src="https://cal.com/ShowYourBrand/presentation-of-ShowYourBrand?embed=true&theme=light"
             width="100%"
             height="100%"
             frameBorder="0"
@@ -473,11 +516,11 @@ export default function Home() {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            transform: translateX(-25%);
           }
         }
         .animate-marquee {
-          animation: marquee 12s linear infinite;
+          animation: marquee 10s linear infinite;
         }
         .animate-marquee:hover {
           animation-play-state: paused;
@@ -567,8 +610,8 @@ export default function Home() {
               </span>{" "}
               to AI
             </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-4 max-w-2xl mx-auto">
-              The first Generative Engine Optimization (GEO) platform. Audit,
+            <p className="text-lg md:text-xl text-gray-700 mb-10 max-w-2xl mx-auto">
+            The first Generative Engine Optimization (GEO) platform. Audit,
               analyze, and optimize your brand&apos;s presence across all major
               AI models.
             </p>
@@ -607,9 +650,7 @@ export default function Home() {
                   Book a Strategy Call
                 </Button>
                 <Link href="/waitlist">
-                  <Button
-                    className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg"
-                  >
+                  <Button className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg">
                     <Mail className="w-4 h-4 mr-2" />
                     Join the Waitlist
                   </Button>
@@ -666,9 +707,9 @@ export default function Home() {
                   Crush your competitors
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  See which competitors AI recommends instead of you.
-                  Understand <strong>why they rank higher</strong> — then steal
-                  their playbook.
+                  See which competitors AI recommends instead of you. Understand{" "}
+                  <strong>why they rank higher</strong> — then steal their
+                  playbook.
                 </p>
               </div>
 
@@ -907,7 +948,7 @@ export default function Home() {
                 ctaLink="/signup?plan=pro"
               />
               <PricingCard
-                title="PREMIUM"
+                title="PREMIUM FOR AGENCIES"
                 price="€799"
                 oldPrice="€1,199"
                 period="mo"
@@ -1044,9 +1085,7 @@ export default function Home() {
                   Book a Strategy Call
                 </Button>
                 <Link href="/waitlist">
-                  <Button
-                    className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg"
-                  >
+                  <Button className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg">
                     <Mail className="w-4 h-4 mr-2" />
                     Join the Waitlist
                   </Button>
@@ -1120,7 +1159,7 @@ export default function Home() {
                     <Linkedin className="w-5 h-5" />
                   </a>
                   <a
-                    href="mailto:contact@showyourbrand.ai"
+                    href="mailto:contact@ShowYourBrand"
                     className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
                   >
                     <Mail className="w-5 h-5" />
@@ -1191,7 +1230,7 @@ export default function Home() {
 
             <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-gray-500 text-sm">
-                © 2026 ShowYourBrand.ai. All rights reserved.
+                © 2026 ShowYourBrand. All rights reserved.
               </p>
             </div>
           </div>

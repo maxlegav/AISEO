@@ -25,7 +25,7 @@ const SubscriptionConfirmationEmail: React.FC<
   SubscriptionConfirmationEmailProps
 > = ({ name, tier, amount, currency, language = "en" }) => {
   const baseUrl =
-    process.env.NEXTAUTH_URL || "https://showyourbrand.vercel.app";
+    process.env.NEXTAUTH_URL || "https://ShowYourBrand.vercel.app";
 
   const formattedAmount = new Intl.NumberFormat(
     language === "fr" ? "fr-FR" : "en-US",
@@ -61,8 +61,7 @@ const SubscriptionConfirmationEmail: React.FC<
             ? "Vous disposez maintenant d'un crédit d'audit. Lancez votre premier audit GEO dès maintenant !"
             : "Vous pouvez maintenant profiter de toutes les fonctionnalités de votre plan.",
           ctaText: "Accéder au tableau de bord",
-          support:
-            "Des questions sur votre abonnement ? Répondez à cet email.",
+          support: "Des questions sur votre abonnement ? Répondez à cet email.",
           signature: "L'équipe ShowYourBrand",
         }
       : {

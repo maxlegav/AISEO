@@ -23,7 +23,7 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
   language = "en",
 }) => {
   const baseUrl =
-    process.env.NEXTAUTH_URL || "https://showyourbrand.vercel.app";
+    process.env.NEXTAUTH_URL || "https://ShowYourBrand.vercel.app";
 
   const content =
     language === "fr"

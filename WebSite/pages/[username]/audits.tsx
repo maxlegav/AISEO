@@ -8,69 +8,28 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
+  XCircle,
 } from "lucide-react";
 
-type AuditStatus = "completed" | "processing" | "pending";
+type UIStatus = "completed" | "processing" | "pending" | "failed";
 
-interface MockAudit {
-  id: string;
-  projectName: string;
-  score: number;
-  status: AuditStatus;
-  date: string;
-  engines: string[];
+interface Audit {
+  _id: string;
+  businessId?: string;
+  businessName?: string;
+  businessPrimaryUrl?: string;
+  status: string;
+  geoScore?: number;
+  createdAt?: string;
+  completedAt?: string;
 }
 
-const MOCK_AUDITS: MockAudit[] = [
-  {
-    id: "mock-1",
-    projectName: "Acme Corp",
-    score: 34,
-    status: "completed",
-    date: "2026-02-06",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-  {
-    id: "mock-2",
-    projectName: "Fine Dining Paris",
-    score: 78,
-    status: "completed",
-    date: "2026-02-04",
-    engines: ["ChatGPT", "Claude", "Perplexity"],
-  },
-  {
-    id: "mock-3",
-    projectName: "Artisan Coffee",
-    score: 62,
-    status: "completed",
-    date: "2026-01-28",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-  {
-    id: "mock-4",
-    projectName: "Tech Startups NY",
-    score: 28,
-    status: "completed",
-    date: "2026-01-25",
-    engines: ["ChatGPT", "Claude"],
-  },
-  {
-    id: "mock-5",
-    projectName: "Luxury Retail",
-    score: 0,
-    status: "pending",
-    date: "2026-02-08",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-  {
-    id: "mock-6",
-    projectName: "Acme Corp",
-    score: 0,
-    status: "processing",
-    date: "2026-02-08",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-];
+function mapToUIStatus(dbStatus: string): UIStatus {
+  if (dbStatus === "completed") return "completed";
+  if (dbStatus === "pending") return "pending";
+  if (dbStatus === "failed" || dbStatus === "rejected") return "failed";
+  return "processing";
+}
 
 function scoreColor(score: number) {
   if (score >= 70) return "text-emerald-600";
@@ -78,9 +37,9 @@ function scoreColor(score: number) {
   return "text-red-500";
 }
 
-function StatusBadge({ status }: { status: AuditStatus }) {
+function StatusBadge({ status }: { status: UIStatus }) {
   const { t } = useLanguage();
-  const config = {
+  const config: Record<UIStatus, { bg: string; icon: React.ReactNode; label: string }> = {
     completed: {
       bg: "bg-emerald-50 text-emerald-700",
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
@@ -95,6 +54,11 @@ function StatusBadge({ status }: { status: AuditStatus }) {
       bg: "bg-gray-100 text-gray-600",
       icon: <Clock className="w-3.5 h-3.5" />,
       label: String(t("audit.status.pending")),
+    },
+    failed: {
+      bg: "bg-red-50 text-red-600",
+      icon: <XCircle className="w-3.5 h-3.5" />,
+      label: String(t("audit.status.failed")),
     },
   };
   const c = config[status];
@@ -163,7 +127,9 @@ export default function AuditsPage() {
   const router = useRouter();
   const { username } = router.query;
   const { t } = useLanguage();
-  const [filter, setFilter] = useState<"all" | AuditStatus>("all");
+  const [filter, setFilter] = useState<"all" | UIStatus>("all");
+  const [audits, setAudits] = useState<Audit[]>([]);
+  const [loadingAudits, setLoadingAudits] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -185,39 +151,72 @@ export default function AuditsPage() {
     }
   }, [status, session, username, router]);
 
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const fetchAudits = async () => {
+      try {
+        const res = await fetch("/api/audits/list");
+        const data = await res.json();
+        if (data.success) {
+          setAudits(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch audits:", err);
+      } finally {
+        setLoadingAudits(false);
+      }
+    };
+    fetchAudits();
+  }, [status]);
+
+  const uiAudits = audits.map((a) => ({
+    ...a,
+    uiStatus: mapToUIStatus(a.status),
+  }));
+
   const filteredAudits =
     filter === "all"
-      ? MOCK_AUDITS
-      : MOCK_AUDITS.filter((a) => a.status === filter);
+      ? uiAudits
+      : uiAudits.filter((a) => a.uiStatus === filter);
 
-  const filterTabs: {
-    key: "all" | AuditStatus;
-    label: string;
-    count: number;
-  }[] = [
-    {
-      key: "all",
-      label: String(t("audit.filterAll")),
-      count: MOCK_AUDITS.length,
-    },
-    {
-      key: "completed",
-      label: String(t("audit.filterCompleted")),
-      count: MOCK_AUDITS.filter((a) => a.status === "completed").length,
-    },
-    {
-      key: "processing",
-      label: String(t("audit.filterProcessing")),
-      count: MOCK_AUDITS.filter((a) => a.status === "processing").length,
-    },
-    {
-      key: "pending",
-      label: String(t("audit.filterPending")),
-      count: MOCK_AUDITS.filter((a) => a.status === "pending").length,
-    },
-  ];
+  const counts = {
+    all: uiAudits.length,
+    completed: uiAudits.filter((a) => a.uiStatus === "completed").length,
+    processing: uiAudits.filter((a) => a.uiStatus === "processing").length,
+    pending: uiAudits.filter((a) => a.uiStatus === "pending").length,
+    failed: uiAudits.filter((a) => a.uiStatus === "failed").length,
+  };
 
-  if (status === "loading") {
+  const filterTabs: { key: "all" | UIStatus; label: string; count: number }[] =
+    [
+      { key: "all", label: String(t("audit.filterAll")), count: counts.all },
+      {
+        key: "completed",
+        label: String(t("audit.filterCompleted")),
+        count: counts.completed,
+      },
+      {
+        key: "processing",
+        label: String(t("audit.filterProcessing")),
+        count: counts.processing,
+      },
+      {
+        key: "pending",
+        label: String(t("audit.filterPending")),
+        count: counts.pending,
+      },
+      ...(counts.failed > 0
+        ? [
+            {
+              key: "failed" as UIStatus,
+              label: String(t("audit.status.failed")),
+              count: counts.failed,
+            },
+          ]
+        : []),
+    ];
+
+  if (status === "loading" || loadingAudits) {
     return (
       <DashboardLayout activeMenu="audits">
         <div className="animate-pulse space-y-6">
@@ -239,13 +238,11 @@ export default function AuditsPage() {
         <h1 className="text-4xl font-heading font-medium text-gray-900 mb-2">
           {String(t("audit.listTitle"))}
         </h1>
-        <p className="text-gray-500">
-          {String(t("audit.listSubtitle"))}
-        </p>
+        <p className="text-gray-500">{String(t("audit.listSubtitle"))}</p>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
         {filterTabs.map((tab) => (
           <button
             key={tab.key}
@@ -275,48 +272,57 @@ export default function AuditsPage() {
             <p className="text-gray-500">{String(t("audit.noAudits"))}</p>
           </div>
         ) : (
-          filteredAudits.map((audit) => (
-            <Link
-              key={audit.id}
-              href={`/${session?.user?.username}/audits/${audit.id}`}
-              className="block bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 hover:shadow-md transition-all p-5"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-5">
-                  {audit.status === "completed" ? (
-                    <ScoreRing score={audit.score} />
-                  ) : (
-                    <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                      {audit.status === "processing" ? (
-                        <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
-                      ) : (
-                        <Clock className="w-5 h-5 text-gray-400" />
-                      )}
-                    </div>
-                  )}
+          filteredAudits.map((audit) => {
+            const formattedDate = audit.createdAt
+              ? new Date(audit.createdAt).toLocaleDateString("fr-FR", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "-";
 
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-[16px]">
-                      {audit.projectName}
-                    </h3>
-                    <p className="text-sm text-gray-400 mt-0.5">{audit.date}</p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      {audit.engines.map((engine) => (
-                        <span
-                          key={engine}
-                          className="px-2 py-0.5 bg-gray-50 rounded text-[11px] text-gray-500 font-medium"
-                        >
-                          {engine}
-                        </span>
-                      ))}
+            return (
+              <Link
+                key={audit._id}
+                href={`/${session?.user?.username}/audits/${audit._id}`}
+                className="block bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 hover:shadow-md transition-all p-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-5">
+                    {audit.uiStatus === "completed" && audit.geoScore != null ? (
+                      <ScoreRing score={audit.geoScore} />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+                        {audit.uiStatus === "processing" ? (
+                          <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                        ) : audit.uiStatus === "failed" ? (
+                          <XCircle className="w-5 h-5 text-red-400" />
+                        ) : (
+                          <Clock className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                    )}
+
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-[16px]">
+                        {audit.businessName || "—"}
+                      </h3>
+                      {audit.businessPrimaryUrl && (
+                        <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">
+                          {audit.businessPrimaryUrl}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-400 mt-0.5">
+                        {formattedDate}
+                      </p>
                     </div>
                   </div>
-                </div>
 
-                <StatusBadge status={audit.status} />
-              </div>
-            </Link>
-          ))
+                  <StatusBadge status={audit.uiStatus} />
+                </div>
+              </Link>
+            );
+          })
         )}
       </div>
     </DashboardLayout>

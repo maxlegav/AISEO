@@ -152,8 +152,8 @@ export default function WaitlistPage() {
               <strong>{formData.email}</strong>.
             </p>
             <p className="text-gray-600 mb-8">
-              We&apos;ll notify you as soon as ShowYourBrand launches. Early members get
-              exclusive access and founding member pricing.
+              We&apos;ll notify you as soon as ShowYourBrand launches. Early
+              members get exclusive access and founding member pricing.
             </p>
             <Link href="/">
               <Button className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-full px-8 h-12 shadow-lg">
@@ -227,8 +227,8 @@ export default function WaitlistPage() {
                         Join the waitlist
                       </h2>
                       <p className="text-gray-600">
-                        Be the first to access the most powerful GEO audit platform.
-                        Early members get exclusive pricing.
+                        Be the first to access the most powerful GEO audit
+                        platform. Early members get exclusive pricing.
                       </p>
                     </div>
                     <div>
@@ -238,7 +238,9 @@ export default function WaitlistPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, email: e.target.value })
                         }
-                        onKeyDown={(e) => e.key === "Enter" && canProceed() && handleNext()}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && canProceed() && handleNext()
+                        }
                         placeholder="you@company.com"
                         className="h-12 rounded-xl text-center text-lg"
                         autoFocus
@@ -298,7 +300,10 @@ export default function WaitlistPage() {
                         <button
                           key={option}
                           onClick={() =>
-                            setFormData({ ...formData, hasGeoExperience: option })
+                            setFormData({
+                              ...formData,
+                              hasGeoExperience: option,
+                            })
                           }
                           className={`p-3.5 text-sm rounded-xl border-2 transition-all text-left ${
                             formData.hasGeoExperience === option
@@ -323,7 +328,8 @@ export default function WaitlistPage() {
                         Budget for an audit?
                       </h2>
                       <p className="text-gray-600">
-                        How much would you be willing to pay for a complete GEO audit?
+                        How much would you be willing to pay for a complete GEO
+                        audit?
                       </p>
                     </div>
                     <div className="grid grid-cols-1 gap-2">

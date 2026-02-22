@@ -6,7 +6,7 @@ import Business from '@/models/Business';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
 import { CreateBusinessSchema } from '@/lib/validation/business';
 import { handleZodError } from '@/lib/validation/helpers';
-import { canCreateProject, getCompetitorLimit } from '@/lib/subscription-limits';
+import { canCreateProject, getCompetitorLimit, getLimits } from '@/lib/subscription-limits';
 import User from '@/models/User';
 
 const connectDB = async () => {
@@ -39,10 +39,14 @@ export default async function handler(
 
     await connectDB();
 
-    // Check tier limits
+    // Check tier limits (subscription + audit credits)
     const check = await canCreateProject(session.user.id);
     if (!check.allowed) {
-      throw new ApiError(ErrorType.AUTHORIZATION, check.reason);
+      return res.status(403).json({
+        success: false,
+        error: check.errorCode || 'AUTHORIZATION_ERROR',
+        message: check.reason,
+      });
     }
 
     // Check competitor limit
@@ -54,6 +58,11 @@ export default async function handler(
         `Your plan allows a maximum of ${competitorLimit} competitor URL(s)`
       );
     }
+
+    // Determine if this project consumes an audit credit slot (beyond subscription tier)
+    const tierLimit = getLimits(user!.subscriptionTier as any).projects;
+    const currentCount = check.currentCount ?? 0;
+    const usesCreditSlot = currentCount >= tierLimit && (user!.auditCredits || 0) > 0;
 
     // Create business (slug auto-generated from name via pre-validate hook)
     const business = new Business({
@@ -77,6 +86,11 @@ export default async function handler(
           throw err;
         }
       }
+    }
+
+    // Deduct audit credit if this project uses a credit slot
+    if (usesCreditSlot) {
+      await User.findByIdAndUpdate(session.user.id, { $inc: { auditCredits: -1 } });
     }
 
     return res.status(201).json({

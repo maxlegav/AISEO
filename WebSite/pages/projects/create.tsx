@@ -35,6 +35,7 @@ export default function CreateProjectPage() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
 
   // Form state
   const [name, setName] = useState("");
@@ -55,7 +56,7 @@ export default function CreateProjectPage() {
 
   const addUrl = (
     list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     setter([...list, ""]);
   };
@@ -63,7 +64,7 @@ export default function CreateProjectPage() {
   const removeUrl = (
     index: number,
     list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     setter(list.filter((_, i) => i !== index));
   };
@@ -72,7 +73,7 @@ export default function CreateProjectPage() {
     index: number,
     value: string,
     list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     const updated = [...list];
     updated[index] = value;
@@ -102,10 +103,11 @@ export default function CreateProjectPage() {
     try {
       const cleanSubUrls = subUrls.filter((u) => u.trim().length > 0);
       const cleanCompetitorUrls = competitorUrls.filter(
-        (u) => u.trim().length > 0
+        (u) => u.trim().length > 0,
       );
 
-      const res = await fetch("/api/businesses/create", {
+      // Step 1: Create the business
+      const businessRes = await fetch("/api/businesses/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,13 +120,37 @@ export default function CreateProjectPage() {
         }),
       });
 
-      const data = await res.json();
+      const businessData = await businessRes.json();
 
-      if (data.success) {
-        router.push(`/${session?.user?.username}/${data.data.slug}`);
-      } else {
-        setError(data.message || "Failed to create project");
+      if (!businessData.success) {
+        if (businessData.error === 'UPGRADE_REQUIRED') {
+          setUpgradeRequired(true);
+        }
+        setError(businessData.message || "Failed to create project");
+        return;
       }
+
+      const business = businessData.data;
+
+      // Step 2: Create audit document and trigger the processing server
+      await fetch("/api/audits/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessId: business._id,
+          businessName: business.name,
+          businessUrl: business.primaryUrl,
+          businessType: business.category,
+          category: business.category,
+          description: business.description || business.category,
+          subUrls: business.subUrls || [],
+          competitorUrls: business.competitorUrls || [],
+          language: "fr",
+        }),
+      });
+      // Note: we don't fail if audit creation errors — the project is already created
+
+      router.push(`/${session?.user?.username}/${business.slug}`);
     } catch {
       setError("An error occurred. Please try again.");
     } finally {
@@ -155,8 +181,8 @@ export default function CreateProjectPage() {
               width={40}
               height={40}
             />
-            <span className="text-[14px] font-semibold text-gray-900 tracking-tight">
-              Showyourbrand.ai
+            <span className="text-[26px] font-semibold text-gray-900 tracking-tight">
+              ShowYourBrand
             </span>
           </Link>
           <h1 className="text-3xl font-heading font-semibold text-gray-900 mb-2">
@@ -173,8 +199,8 @@ export default function CreateProjectPage() {
                 i === step
                   ? "bg-orange-500 w-8"
                   : i < step
-                  ? "bg-orange-400 w-3"
-                  : "bg-white/60 w-3"
+                    ? "bg-orange-400 w-3"
+                    : "bg-white/60 w-3"
               }`}
             />
           ))}
@@ -315,7 +341,7 @@ export default function CreateProjectPage() {
                         i,
                         e.target.value,
                         competitorUrls,
-                        setCompetitorUrls
+                        setCompetitorUrls,
                       )
                     }
                     className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
@@ -408,7 +434,15 @@ export default function CreateProjectPage() {
           {/* Error */}
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-              {error}
+              <p>{error}</p>
+              {upgradeRequired && (
+                <Link
+                  href="/settings"
+                  className="mt-2 inline-flex items-center gap-1 text-orange-600 font-medium hover:underline"
+                >
+                  {String(t("nav.settings"))} →
+                </Link>
+              )}
             </div>
           )}
 

@@ -12,10 +12,12 @@ const connectDB = async () => {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
@@ -71,7 +73,11 @@ export default async function handler(
   } catch (error: unknown) {
     console.error("[Waitlist] Error:", error);
 
-    if (error instanceof Error && "code" in error && (error as { code: number }).code === 11000) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      (error as { code: number }).code === 11000
+    ) {
       return res.status(409).json({
         success: false,
         error: "ALREADY_EXISTS",
