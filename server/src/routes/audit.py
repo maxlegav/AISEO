@@ -22,6 +22,7 @@ from models.business import AuditRequest
 from models.audit import (
     BusinessSnapshot,
     EngineResult,
+    GeneratedPrompt,
     PromptResult,
     ResultsBlob,
 )
@@ -107,10 +108,12 @@ def _create_business_snapshot(request: AuditRequest) -> BusinessSnapshot:
     )
 
 
-async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRequest):
-    """Run the full audit pipeline (prompts → AI → mentions → scoring → DB write)."""
+async def _phase1_generate_prompts(audit_id: str, oid: ObjectId, request: AuditRequest):
+    """Phase 1: classify locality, build snapshot, generate prompts, pause for approval.
+
+    Writes prompts + originalRequest to DB and sets status = awaiting_prompt_approval.
+    """
     db = app_config.get_db()
-    start_time = time.time()
 
     # 1b. Auto-classify locality tier if not provided
     if request.localityTier is None:
@@ -126,24 +129,50 @@ async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRe
     logger.info(f"[{audit_id}] Generating prompts...")
     prompts = await generate_prompts(request)
 
-    # Store prompts immediately (so admin can see them even if execution fails)
-    # Schema v2: store inside results blob, keep top-level slim
+    # Write prompts + originalRequest to DB, then pause for manual approval
     await db.audits.update_one(
         {"_id": oid},
         {
             "$set": {
+                "status": "awaiting_prompt_approval",
                 "businessName": request.businessName,
                 "schemaVersion": 2,
                 "results.businessSnapshot": snapshot.model_dump(),
                 "results.localityTier": request.localityTier.value if request.localityTier else None,
                 "results.generatedPrompts": [p.model_dump() for p in prompts],
+                "results.originalRequest": request.model_dump(),
             }
         },
     )
-    logger.info(f"[{audit_id}] {len(prompts)} prompts generated and stored")
+    logger.info(f"[{audit_id}] {len(prompts)} prompts generated — awaiting prompt approval")
+
+
+async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
+    """Phase 2: read approved prompts from DB, run AI + scoring, write final results.
+
+    Reads whatever prompts are currently in the DB (allows manual edits between phases).
+    """
+    db = app_config.get_db()
+    start_time = time.time()
+
+    # 1. Load audit document and reconstruct objects from stored data
+    doc = await db.audits.find_one({"_id": oid}, {"results": 1})
+    if not doc:
+        raise ValueError(f"Audit {audit_id} not found when starting Phase 2")
+
+    stored_results = doc.get("results", {})
+    stored_prompts = stored_results.get("generatedPrompts", [])
+    stored_request = stored_results.get("originalRequest", {})
+    stored_snapshot = stored_results.get("businessSnapshot", {})
+
+    # 2. Reconstruct objects
+    request = AuditRequest(**stored_request)
+    snapshot = BusinessSnapshot(**stored_snapshot)
+    prompts = [GeneratedPrompt(**p) for p in stored_prompts]
+
+    logger.info(f"[{audit_id}] Phase 2 starting with {len(prompts)} prompts")
 
     # 4. Execute AI queries + HTML scan in parallel
-    # F8: Use return_exceptions=True so HTML scan failure doesn't kill AI execution
     location_context = _build_location_context(request)
     if location_context:
         logger.info(f"[{audit_id}] Location context: {location_context['text_hint']}")
@@ -179,7 +208,6 @@ async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRe
         engines_data: dict[str, EngineResult] = {}
 
         for engine_name in engine_results:
-            # Find the result for this prompt from this engine
             engine_prompt_results = engine_results[engine_name]
             engine_prompt_result = next(
                 (r for r in engine_prompt_results if r["promptId"] == prompt.id),
@@ -193,7 +221,6 @@ async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRe
                 )
                 continue
 
-            # Run mention detection
             mention_result = detect_mention(
                 engine_prompt_result["rawResponse"],
                 request.businessName,
@@ -202,7 +229,6 @@ async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRe
             mention_result.responseTime = engine_prompt_result.get("responseTime", 0)
             engines_data[engine_name] = mention_result
 
-        # Calculate prompt-level scores
         prompt_score, mention_rate = calculate_prompt_score(engines_data)
 
         prompt_results.append(PromptResult(
@@ -282,11 +308,33 @@ async def _execute_audit_pipeline(audit_id: str, oid: ObjectId, request: AuditRe
 
 
 async def _run_audit_background(audit_id: str, oid: ObjectId, request: AuditRequest):
-    """Wrapper that catches all exceptions and marks the audit as failed in MongoDB."""
+    """Phase 1 background wrapper: generate prompts and pause for approval."""
     try:
-        await _execute_audit_pipeline(audit_id, oid, request)
+        await _phase1_generate_prompts(audit_id, oid, request)
     except Exception as e:
-        logger.error(f"[{audit_id}] Background audit failed: {e}", exc_info=True)
+        logger.error(f"[{audit_id}] Phase 1 (prompt generation) failed: {e}", exc_info=True)
+        try:
+            db = app_config.get_db()
+            await db.audits.update_one(
+                {"_id": oid},
+                {
+                    "$set": {
+                        "status": "failed",
+                        "error": str(e),
+                        "completedAt": datetime.now(timezone.utc).isoformat(),
+                    },
+                },
+            )
+        except Exception as db_err:
+            logger.critical(f"[{audit_id}] Could not write failed status: {db_err}")
+
+
+async def _run_phase2_background(audit_id: str, oid: ObjectId):
+    """Phase 2 background wrapper: execute AI queries, score, write final results."""
+    try:
+        await _phase2_execute_audit(audit_id, oid)
+    except Exception as e:
+        logger.error(f"[{audit_id}] Phase 2 (AI execution) failed: {e}", exc_info=True)
         try:
             db = app_config.get_db()
             await db.audits.update_one(
@@ -343,7 +391,7 @@ async def run_audit(
 
     # Prevent double-submission
     current_status = existing.get("status")
-    if current_status in ("processing", "review_pending", "completed"):
+    if current_status in ("processing", "awaiting_prompt_approval", "review_pending", "completed"):
         return JSONResponse(
             status_code=409,
             content={
@@ -362,6 +410,73 @@ async def run_audit(
 
     # Fire-and-forget: process in background
     asyncio.create_task(_run_audit_background(audit_id, oid, request))
+
+    return JSONResponse(
+        status_code=202,
+        content={
+            "success": True,
+            "data": {
+                "auditId": audit_id,
+                "status": "processing",
+            },
+        },
+    )
+
+
+@router.post("/audit/{audit_id}/approve-prompts", status_code=202)
+async def approve_prompts(
+    audit_id: str,
+    _token: Annotated[str, Depends(verify_bearer_token)],
+) -> JSONResponse:
+    """
+    Approve the generated prompts and kick off Phase 2 (AI execution).
+
+    The prompts stored in DB are used as-is, allowing manual edits in MongoDB
+    between prompt generation and this call.
+    """
+    db = app_config.get_db()
+
+    try:
+        oid = ObjectId(audit_id)
+    except (InvalidId, Exception):
+        return JSONResponse(
+            status_code=400,
+            content={
+                "success": False,
+                "error": "INVALID_AUDIT_ID",
+                "message": "The provided auditId is not a valid identifier",
+            },
+        )
+
+    existing = await db.audits.find_one({"_id": oid}, {"_id": 1, "status": 1})
+    if not existing:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "success": False,
+                "error": "AUDIT_NOT_FOUND",
+                "message": "No audit document found with the provided auditId",
+            },
+        )
+
+    current_status = existing.get("status")
+    if current_status != "awaiting_prompt_approval":
+        return JSONResponse(
+            status_code=409,
+            content={
+                "success": False,
+                "error": "INVALID_STATUS",
+                "message": f"Audit must be in 'awaiting_prompt_approval' state, currently '{current_status}'",
+            },
+        )
+
+    await db.audits.update_one(
+        {"_id": oid},
+        {"$set": {"status": "processing"}},
+    )
+    logger.info(f"[{audit_id}] Prompts approved — starting Phase 2 (AI execution)")
+
+    asyncio.create_task(_run_phase2_background(audit_id, oid))
 
     return JSONResponse(
         status_code=202,

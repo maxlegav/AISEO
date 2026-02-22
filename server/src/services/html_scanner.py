@@ -15,12 +15,14 @@ Produces an HTML Scanner Score (0-100).
 """
 
 import asyncio
+import gzip
 import ipaddress
 import json
 import logging
 import os
 import socket
 import subprocess
+import xml.etree.ElementTree as ET
 from collections import Counter
 from urllib.parse import urljoin, urlparse
 from urllib.robotparser import RobotFileParser
@@ -86,15 +88,17 @@ def _validate_url(url: str) -> str:
 
 # Score weights (total = 100%)
 WEIGHTS = {
-    "w3c": 0.08,
-    "links": 0.08,
-    "schema": 0.18,
-    "meta": 0.18,
-    "headings": 0.13,
-    "alt_text": 0.13,
-    "keywords": 0.08,
+    "w3c": 0.07,
+    "links": 0.07,
+    "schema": 0.17,
+    "meta": 0.17,
+    "headings": 0.12,
+    "alt_text": 0.12,
+    "keywords": 0.06,      # was 0.08
     "ai_bots": 0.10,
-    "robots": 0.04,
+    "robots": 0.02,        # was 0.04
+    "sitemap": 0.04,       # was 0.06
+    "legal_pages": 0.06,   # NEW: trust-signal pages for AI crawlers
 }
 
 # AI bot user agents for accessibility checks
@@ -109,6 +113,47 @@ AI_BOT_USER_AGENTS = [
     ("meta-externalagent", "meta-externalagent/1.1"),
     ("Applebot-Extended", "Applebot-Extended"),
 ]
+
+LEGAL_PAGE_PATTERNS: dict[str, dict] = {
+    "privacyPolicy": {
+        "name": "Privacy Policy",
+        "url_patterns": [
+            "/privacy", "/privacy-policy", "/privacy-notice",
+            "/politique-de-confidentialite", "/politique-confidentialite",
+            "/confidentialite",
+        ],
+        "link_text": ["privacy", "confidentialit"],
+        "link_href": ["privacy", "confidentialit"],
+    },
+    "termsOfService": {
+        "name": "Terms of Service",
+        "url_patterns": [
+            "/terms", "/terms-of-service", "/terms-and-conditions", "/tos",
+            "/cgu", "/conditions-generales", "/conditions-generales-utilisation",
+            "/conditions-utilisation", "/cgv",
+        ],
+        "link_text": ["terms", "conditions", "cgu", "cgv"],
+        "link_href": ["terms", "conditions", "cgu", "cgv"],
+    },
+    "mentionsLegales": {
+        "name": "Mentions légales",
+        "url_patterns": [
+            "/mentions-legales", "/mentions-légales", "/legal",
+            "/informations-legales", "/legal-notice",
+        ],
+        "link_text": ["mentions légales", "mentions legales", "legal notice", "legal"],
+        "link_href": ["mentions-legales", "mentions-légales", "/legal"],
+    },
+    "cookiePolicy": {
+        "name": "Cookie Policy",
+        "url_patterns": [
+            "/cookies", "/cookie-policy", "/politique-cookies",
+            "/politique-de-cookies", "/cookie-notice",
+        ],
+        "link_text": ["cookie"],
+        "link_href": ["cookie"],
+    },
+}
 
 
 # ---------------------------------------------------------------------------
@@ -755,6 +800,533 @@ async def analyze_robots_txt(url: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Sitemap.xml Analysis
+# ---------------------------------------------------------------------------
+
+SITEMAP_NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
+VALID_CHANGEFREQ = {"always", "hourly", "daily", "weekly", "monthly", "yearly", "never"}
+SITEMAP_MAX_URLS = 50_000
+SITEMAP_MAX_BYTES = 50 * 1024 * 1024  # 50 MB uncompressed
+
+
+async def analyze_sitemap(url: str, robots_sitemaps: list[str] | None = None) -> dict:
+    """Fetch, parse, and validate sitemap.xml files.
+
+    Discovery order:
+    1. URLs declared in robots.txt (passed via robots_sitemaps)
+    2. Fallback to {origin}/sitemap.xml
+    """
+    parsed = urlparse(url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+
+    default_result = {
+        "exists": False,
+        "sitemapUrls": [],
+        "urlCount": 0,
+        "isSitemapIndex": False,
+        "childSitemapsCount": 0,
+        "sizeBytes": 0,
+        "hasValidNamespace": False,
+        "validationIssues": [],
+        "urlSample": [],
+        "hasLastmod": 0,
+        "hasPriority": 0,
+        "hasChangefreq": 0,
+        "duplicateUrls": 0,
+        "invalidUrls": [],
+    }
+
+    sitemap_urls = list(robots_sitemaps) if robots_sitemaps else []
+    if not sitemap_urls:
+        sitemap_urls = [f"{origin}/sitemap.xml"]
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            # Try each sitemap URL until one works
+            raw_body: bytes | None = None
+            working_url: str | None = None
+
+            for sm_url in sitemap_urls:
+                try:
+                    resp = await client.get(sm_url)
+                    if resp.status_code >= 400:
+                        continue
+                    # Detect framework catch-all pages returning HTML instead of real sitemap
+                    content_type = resp.headers.get("content-type", "")
+                    body_start = resp.content[:200].strip().lower()
+                    if (
+                        "text/html" in content_type
+                        or body_start.startswith((b"<!doctype", b"<html"))
+                    ):
+                        continue
+                    raw_body = resp.content
+                    working_url = sm_url
+                    break
+                except Exception:
+                    continue
+
+            if raw_body is None or working_url is None:
+                return {**default_result, "sitemapUrls": sitemap_urls}
+
+            # Handle gzip
+            if working_url.endswith(".gz"):
+                try:
+                    raw_body = gzip.decompress(raw_body)
+                except Exception:
+                    pass  # try parsing as-is
+
+            size_bytes = len(raw_body)
+            issues: list[str] = []
+
+            if size_bytes > SITEMAP_MAX_BYTES:
+                issues.append(f"Sitemap exceeds 50 MB limit ({size_bytes:,} bytes)")
+
+            # Parse XML
+            try:
+                root = ET.fromstring(raw_body)
+            except ET.ParseError as e:
+                return {
+                    **default_result,
+                    "exists": True,
+                    "sitemapUrls": [working_url],
+                    "sizeBytes": size_bytes,
+                    "validationIssues": [f"Malformed XML: {e}"],
+                }
+
+            # Strip namespace for easier tag matching
+            tag_local = root.tag.split("}")[-1] if "}" in root.tag else root.tag
+            ns = root.tag.replace(tag_local, "").strip("{}") if "}" in root.tag else ""
+
+            has_valid_ns = ns == SITEMAP_NS
+            if not has_valid_ns and ns:
+                issues.append(f"Non-standard namespace: {ns}")
+
+            is_index = tag_local == "sitemapindex"
+            ns_prefix = f"{{{ns}}}" if ns else ""
+
+            # --- Sitemap Index ---
+            if is_index:
+                child_sitemaps = root.findall(f"{ns_prefix}sitemap")
+                child_locs = []
+                for child in child_sitemaps:
+                    loc_el = child.find(f"{ns_prefix}loc")
+                    if loc_el is not None and loc_el.text:
+                        child_locs.append(loc_el.text.strip())
+
+                # Fetch and validate first child sitemap for deeper analysis
+                child_result = {
+                    "urlCount": 0, "urlSample": [], "hasLastmod": 0,
+                    "hasPriority": 0, "hasChangefreq": 0,
+                    "duplicateUrls": 0, "invalidUrls": [],
+                }
+                if child_locs:
+                    try:
+                        child_resp = await client.get(child_locs[0])
+                        if child_resp.status_code < 400:
+                            child_body = child_resp.content
+                            if child_locs[0].endswith(".gz"):
+                                try:
+                                    child_body = gzip.decompress(child_body)
+                                except Exception:
+                                    pass
+                            child_result = _parse_urlset(child_body, ns_prefix)
+                    except Exception:
+                        pass
+
+                return {
+                    "exists": True,
+                    "sitemapUrls": [working_url],
+                    "urlCount": child_result["urlCount"],
+                    "isSitemapIndex": True,
+                    "childSitemapsCount": len(child_locs),
+                    "sizeBytes": size_bytes,
+                    "hasValidNamespace": has_valid_ns,
+                    "validationIssues": issues + child_result.get("_issues", []),
+                    "urlSample": child_result["urlSample"],
+                    "hasLastmod": child_result["hasLastmod"],
+                    "hasPriority": child_result["hasPriority"],
+                    "hasChangefreq": child_result["hasChangefreq"],
+                    "duplicateUrls": child_result["duplicateUrls"],
+                    "invalidUrls": child_result["invalidUrls"],
+                }
+
+            # --- Regular urlset ---
+            if tag_local != "urlset":
+                issues.append(f"Unexpected root element: <{tag_local}>")
+
+            urlset_result = _parse_urlset(raw_body, ns_prefix)
+            issues.extend(urlset_result.get("_issues", []))
+
+            return {
+                "exists": True,
+                "sitemapUrls": [working_url],
+                "urlCount": urlset_result["urlCount"],
+                "isSitemapIndex": False,
+                "childSitemapsCount": 0,
+                "sizeBytes": size_bytes,
+                "hasValidNamespace": has_valid_ns,
+                "validationIssues": issues,
+                "urlSample": urlset_result["urlSample"],
+                "hasLastmod": urlset_result["hasLastmod"],
+                "hasPriority": urlset_result["hasPriority"],
+                "hasChangefreq": urlset_result["hasChangefreq"],
+                "duplicateUrls": urlset_result["duplicateUrls"],
+                "invalidUrls": urlset_result["invalidUrls"],
+            }
+
+    except Exception as e:
+        logger.error(f"Sitemap analysis error: {e}")
+        return {**default_result, "error": str(e), "sitemapUrls": sitemap_urls}
+
+
+def _parse_urlset(xml_bytes: bytes, ns_prefix: str) -> dict:
+    """Parse a <urlset> sitemap and validate its <url> entries."""
+    issues: list[str] = []
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return {
+            "urlCount": 0, "urlSample": [], "hasLastmod": 0,
+            "hasPriority": 0, "hasChangefreq": 0,
+            "duplicateUrls": 0, "invalidUrls": [], "_issues": ["Malformed child sitemap XML"],
+        }
+
+    # Re-detect namespace from this document if needed
+    tag_local = root.tag.split("}")[-1] if "}" in root.tag else root.tag
+    ns = root.tag.replace(tag_local, "").strip("{}") if "}" in root.tag else ""
+    ns_prefix = f"{{{ns}}}" if ns else ""
+
+    url_elements = root.findall(f"{ns_prefix}url")
+    url_count = len(url_elements)
+
+    if url_count > SITEMAP_MAX_URLS:
+        issues.append(f"URL count ({url_count:,}) exceeds 50,000 limit")
+
+    seen_locs: set[str] = set()
+    url_sample: list[str] = []
+    has_lastmod = 0
+    has_priority = 0
+    has_changefreq = 0
+    duplicate_count = 0
+    invalid_urls: list[str] = []
+
+    for url_el in url_elements:
+        loc_el = url_el.find(f"{ns_prefix}loc")
+        loc_text = loc_el.text.strip() if loc_el is not None and loc_el.text else ""
+
+        # Validate loc
+        if not loc_text:
+            if len(invalid_urls) < 5:
+                invalid_urls.append("(empty <loc>)")
+            continue
+
+        if not loc_text.startswith(("http://", "https://")):
+            if len(invalid_urls) < 5:
+                invalid_urls.append(loc_text[:100])
+
+        # Duplicates
+        if loc_text in seen_locs:
+            duplicate_count += 1
+        else:
+            seen_locs.add(loc_text)
+
+        # Sample
+        if len(url_sample) < 5:
+            url_sample.append(loc_text)
+
+        # lastmod
+        lastmod_el = url_el.find(f"{ns_prefix}lastmod")
+        if lastmod_el is not None and lastmod_el.text:
+            has_lastmod += 1
+
+        # priority
+        priority_el = url_el.find(f"{ns_prefix}priority")
+        if priority_el is not None and priority_el.text:
+            has_priority += 1
+            try:
+                pval = float(priority_el.text.strip())
+                if not (0.0 <= pval <= 1.0):
+                    issues.append(f"Invalid priority value: {priority_el.text.strip()}")
+            except ValueError:
+                issues.append(f"Non-numeric priority: {priority_el.text.strip()}")
+
+        # changefreq
+        changefreq_el = url_el.find(f"{ns_prefix}changefreq")
+        if changefreq_el is not None and changefreq_el.text:
+            has_changefreq += 1
+            if changefreq_el.text.strip().lower() not in VALID_CHANGEFREQ:
+                issues.append(f"Invalid changefreq: {changefreq_el.text.strip()}")
+
+    if duplicate_count:
+        issues.append(f"{duplicate_count} duplicate URL(s) found")
+
+    return {
+        "urlCount": url_count,
+        "urlSample": url_sample,
+        "hasLastmod": has_lastmod,
+        "hasPriority": has_priority,
+        "hasChangefreq": has_changefreq,
+        "duplicateUrls": duplicate_count,
+        "invalidUrls": invalid_urls[:5],
+        "_issues": issues,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Legal Pages Detection
+# ---------------------------------------------------------------------------
+
+# Soft-404 indicators in page title / body (both FR and EN)
+_SOFT_404_TITLE_PATTERNS = [
+    "404", "not found", "page not found", "introuvable",
+    "page introuvable", "cette page n'existe pas", "error",
+]
+
+
+async def _get_soft_404_fingerprint(
+    client: httpx.AsyncClient, origin: str
+) -> dict | None:
+    """GET a guaranteed-nonexistent URL to detect frameworks with catch-all routing.
+
+    Returns a fingerprint dict if the site returns 200 for missing pages, else None.
+    """
+    canary = f"{origin}/syb-canary-nonexistent-page-xyz123"
+    try:
+        resp = await client.get(canary)
+        if resp.status_code != 200:
+            return None  # site returns real 4xx for missing pages — no issue
+        # The site returns 200 for missing pages — capture fingerprint
+        return {
+            "content_length": len(resp.content),
+            "title": _extract_title(resp.text),
+        }
+    except Exception:
+        return None
+
+
+def _extract_title(html: str) -> str:
+    """Extract <title> text from HTML string (lowercased)."""
+    soup = BeautifulSoup(html, "lxml")
+    tag = soup.find("title")
+    return tag.get_text(strip=True).lower() if tag else ""
+
+
+def _is_soft_404(resp: httpx.Response, fingerprint: dict) -> bool:
+    """Return True if this response looks like a framework catch-all 404 page."""
+    # Check title for known 404 phrases
+    title = _extract_title(resp.text)
+    if any(pat in title for pat in _SOFT_404_TITLE_PATTERNS):
+        return True
+    # Compare body length: if within 5% of canary, it's likely the same catch-all page
+    fp_len = fingerprint["content_length"]
+    resp_len = len(resp.content)
+    if fp_len > 0 and abs(resp_len - fp_len) / fp_len < 0.05:
+        return True
+    return False
+
+
+async def check_legal_pages(html: str, base_url: str, language: str = "fr") -> dict:
+    """Detect legal pages (privacy, terms, mentions légales, cookies).
+
+    Phase 1: footer link discovery (uses already-fetched HTML, no HTTP).
+    Phase 2: soft-404 fingerprinting to detect catch-all frameworks.
+    Phase 3: GET-request probing of common URL patterns with soft-404 filtering.
+    """
+    import re as _re
+
+    parsed = urlparse(base_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+
+    # mentionsLegales is a French-specific legal requirement — skip for non-French sites
+    active_patterns = {
+        k: v for k, v in LEGAL_PAGE_PATTERNS.items()
+        if k != "mentionsLegales" or language == "fr"
+    }
+
+    # --- Phase 1: footer link discovery ---
+    soup = BeautifulSoup(html, "lxml")
+    footer_el = (
+        soup.find("footer")
+        or soup.find(attrs={"id": _re.compile(r"footer", _re.I)})
+        or soup.find(attrs={"class": _re.compile(r"footer", _re.I)})
+        or soup  # fallback: search whole page
+    )
+    footer_links = footer_el.find_all("a", href=True)
+
+    found: dict[str, tuple[str | None, str | None]] = {k: (None, None) for k in active_patterns}
+
+    for page_key, patterns in active_patterns.items():
+        for link in footer_links:
+            href = link.get("href", "").lower()
+            text = link.get_text(strip=True).lower()
+            if (
+                any(pat in href for pat in patterns["link_href"])
+                or any(pat in text for pat in patterns["link_text"])
+            ):
+                found[page_key] = (urljoin(base_url, link["href"]), "footer_link")
+                break
+
+    # --- Phase 2 + 3: URL probing for missing pages ---
+    missing = [k for k, (url, _) in found.items() if url is None]
+    if missing:
+        async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+            # Phase 2: fingerprint the site's 404 behavior
+            soft_404_fingerprint = await _get_soft_404_fingerprint(client, origin)
+
+            # Phase 3: probe URL patterns
+            for page_key in missing:
+                for url_pat in active_patterns[page_key]["url_patterns"]:
+                    probe = f"{origin}{url_pat}"
+                    try:
+                        _validate_url(probe)
+                        resp = await client.get(probe)
+                        if resp.status_code >= 400:
+                            continue
+                        # Soft-404 check: reject if it looks like a catch-all page
+                        if soft_404_fingerprint and _is_soft_404(resp, soft_404_fingerprint):
+                            continue
+                        found[page_key] = (str(resp.url), "url_probe")
+                        break
+                    except Exception:
+                        continue
+
+    # --- Build result ---
+    pages_found = 0
+    issues: list[str] = []
+    result: dict = {}
+
+    for page_key, patterns in active_patterns.items():
+        url, via = found[page_key]
+        if url:
+            pages_found += 1
+            result[page_key] = {"found": True, "url": url, "detectedVia": via}
+        else:
+            result[page_key] = {"found": False, "url": None, "detectedVia": None}
+            issues.append(f"{patterns['name']} page not found")
+
+    total = len(active_patterns)
+    return {
+        **result,
+        "pagesFound": pages_found,
+        "totalPages": total,
+        "issues": issues,
+        "score": round(pages_found / total * 100, 1),
+    }
+
+
+# ---------------------------------------------------------------------------
+# llms.txt Analysis
+# ---------------------------------------------------------------------------
+
+
+async def analyze_llms_txt(url: str) -> dict:
+    """Fetch and analyze llms.txt for AI LLM context directives.
+
+    llms.txt is an emerging standard (https://llmstxt.org/) that provides
+    structured Markdown context for Large Language Models about a website.
+
+    False-positive protection: rejects HTML catch-all pages returned by
+    frameworks that respond 200 to every path.
+    """
+    import re as _re
+
+    parsed = urlparse(url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    llms_url = f"{origin}/llms.txt"
+    llms_full_url = f"{origin}/llms-full.txt"
+
+    default_missing = {
+        "exists": False,
+        "hasFullVersion": False,
+        "title": None,
+        "description": None,
+        "sections": [],
+        "linkCount": 0,
+        "contentPreview": None,
+        "issues": ["No llms.txt found"],
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            resp = await client.get(llms_url, headers={"User-Agent": USER_AGENT})
+
+            if resp.status_code >= 400:
+                return default_missing
+
+            # Detect framework catch-all pages returning HTML instead of real llms.txt
+            content_type = resp.headers.get("content-type", "")
+            body_stripped = resp.text.strip()
+            if "text/html" in content_type or body_stripped.lower().startswith(("<!doctype", "<html")):
+                return {
+                    **default_missing,
+                    "issues": ["No llms.txt found (server returned HTML fallback page)"],
+                }
+
+            if len(body_stripped) < 10:
+                return {
+                    **default_missing,
+                    "exists": True,
+                    "issues": ["llms.txt exists but is empty"],
+                }
+
+            content = resp.text
+
+            # Check for llms-full.txt (the extended version of the spec)
+            has_full = False
+            try:
+                full_resp = await client.head(llms_full_url, headers={"User-Agent": USER_AGENT})
+                if full_resp.status_code < 400:
+                    full_ct = full_resp.headers.get("content-type", "")
+                    if "text/html" not in full_ct:
+                        has_full = True
+            except Exception:
+                pass
+
+            # Parse Markdown structure
+            title: str | None = None
+            description: str | None = None
+            sections: list[str] = []
+            link_count = 0
+
+            for line in content.splitlines():
+                stripped = line.strip()
+                if stripped.startswith("# ") and title is None:
+                    title = stripped[2:].strip()
+                elif stripped.startswith("> ") and description is None:
+                    description = stripped[2:].strip()
+                elif stripped.startswith("## "):
+                    sections.append(stripped[3:].strip())
+                # Count Markdown links: [text](https://...)
+                link_count += len(_re.findall(r"\[.+?\]\(https?://.+?\)", stripped))
+
+            # Quality issues
+            issues: list[str] = []
+            if not title:
+                issues.append("llms.txt missing title (H1 heading)")
+            if not description:
+                issues.append("llms.txt missing description (blockquote)")
+            if not sections:
+                issues.append("llms.txt has no sections (H2 headings)")
+            if link_count == 0:
+                issues.append("llms.txt contains no links to key pages")
+
+            return {
+                "exists": True,
+                "hasFullVersion": has_full,
+                "title": title,
+                "description": description,
+                "sections": sections,
+                "linkCount": link_count,
+                "contentPreview": content[:500].strip(),
+                "issues": issues,
+            }
+
+    except Exception as e:
+        logger.error(f"llms.txt analysis error: {e}")
+        return {"error": str(e), "exists": False}
+
+
+# ---------------------------------------------------------------------------
 # HTML Scanner Score calculation
 # ---------------------------------------------------------------------------
 
@@ -877,6 +1449,35 @@ def calculate_html_scanner_score(scan_data: dict) -> float:
                 robots_score += 20.0
         scores["robots"] = robots_score
 
+    # Sitemap (6%) — existence, valid XML, URL count, clean validation
+    sitemap = scan_data.get("sitemapAnalysis", {})
+    if not completeness.get("sitemap", True):
+        pass  # skip — tool unavailable
+    else:
+        sitemap_score = 0.0
+        if sitemap.get("exists"):
+            sitemap_score += 30.0
+            if sitemap.get("hasValidNamespace"):
+                sitemap_score += 20.0
+            url_count = sitemap.get("urlCount", 0)
+            if url_count > 0:
+                sitemap_score += 20.0
+                if 10 <= url_count <= SITEMAP_MAX_URLS:
+                    sitemap_score += 10.0
+            sitemap_issues = sitemap.get("validationIssues", [])
+            if len(sitemap_issues) == 0:
+                sitemap_score += 20.0
+            elif len(sitemap_issues) <= 2:
+                sitemap_score += 10.0
+        scores["sitemap"] = sitemap_score
+
+    # Legal Pages (6%) — presence of privacy, terms, mentions légales, cookie policy
+    legal_pages = scan_data.get("legalPages", {})
+    if not completeness.get("legal_pages", True):
+        pass  # skip — check failed
+    else:
+        scores["legal_pages"] = legal_pages.get("score", 0.0)
+
     # Re-normalize weights: only include components that ran
     active_weights = {k: w for k, w in WEIGHTS.items() if k in scores}
     total_weight = sum(active_weights.values())
@@ -910,6 +1511,8 @@ async def _scan_single_page(
         keyword_result,
         ai_bots_result,
         robots_result,
+        legal_pages_result,
+        llms_txt_result,
     ) = await asyncio.gather(
         asyncio.to_thread(validate_html_w3c, html),
         asyncio.to_thread(check_links_lychee, url),
@@ -920,7 +1523,13 @@ async def _scan_single_page(
         asyncio.to_thread(extract_keywords, html, language),
         check_ai_bot_accessibility(url),
         analyze_robots_txt(url),
+        check_legal_pages(html, url, language),
+        analyze_llms_txt(url),
     )
+
+    # Sitemap analysis (depends on robots.txt results for sitemap URLs)
+    robots_sitemaps = robots_result.get("sitemaps", []) if isinstance(robots_result, dict) else []
+    sitemap_result = await analyze_sitemap(url, robots_sitemaps=robots_sitemaps)
 
     # Track which tools ran successfully vs errored
     tool_results = {
@@ -929,6 +1538,9 @@ async def _scan_single_page(
         "schema": ("Schema", schema_result),
         "ai_bots": ("AI Bot Access", ai_bots_result),
         "robots": ("robots.txt", robots_result),
+        "sitemap": ("Sitemap", sitemap_result),
+        "legal_pages": ("Legal Pages", legal_pages_result),
+        "llms_txt": ("llms.txt", llms_txt_result),
     }
     completeness: dict[str, bool] = {}
     for key, (name, result) in tool_results.items():
@@ -955,6 +1567,9 @@ async def _scan_single_page(
         "keywords": keyword_result,
         "aiBotAccessibility": ai_bots_result,
         "robotsTxtAnalysis": robots_result,
+        "sitemapAnalysis": sitemap_result,
+        "legalPages": legal_pages_result,
+        "llmsTxtAnalysis": llms_txt_result,
         "scanCompleteness": completeness,
     }
     return scan_data, scan_errors
@@ -1035,6 +1650,9 @@ async def scan_website(
         keywords=primary_data.get("keywords"),
         aiBotAccessibility=primary_data.get("aiBotAccessibility"),
         robotsTxtAnalysis=primary_data.get("robotsTxtAnalysis"),
+        sitemapAnalysis=primary_data.get("sitemapAnalysis"),
+        legalPages=primary_data.get("legalPages"),
+        llmsTxtAnalysis=primary_data.get("llmsTxtAnalysis"),
         htmlScannerScore=final_score,
         scanCompleteness=primary_data.get("scanCompleteness", {}),
         scanErrors=scan_errors,
