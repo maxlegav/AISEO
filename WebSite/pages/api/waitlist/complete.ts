@@ -21,7 +21,8 @@ export default async function handler(
   }
 
   try {
-    const { email, howFound, hasGeoExperience, budgetRange } = req.body;
+    const { email, howFound, hasGeoExperience, budgetRange, sendWelcomeEmail } =
+      req.body;
 
     if (!email || !howFound || !hasGeoExperience || !budgetRange) {
       return res.status(400).json({
@@ -42,48 +43,37 @@ export default async function handler(
 
     await connectDB();
 
-    const existing = await Waitlist.findOne({ email: email.toLowerCase() });
-    if (existing) {
-      return res.status(409).json({
-        success: false,
-        error: "ALREADY_EXISTS",
-        message: "This email is already on the waitlist",
-      });
+    const entry = await Waitlist.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      {
+        email: email.toLowerCase().trim(),
+        howFound,
+        hasGeoExperience,
+        budgetRange,
+        completed: true,
+      },
+      { upsert: true, new: true },
+    );
+
+    if (sendWelcomeEmail && !entry.emailSent) {
+      const html = await render(WaitlistWelcomeEmail({ email }));
+      sendEmail({
+        to: email,
+        subject: "You're on the ShowYourBrand waitlist!",
+        html,
+      })
+        .then(async () => {
+          await Waitlist.updateOne({ _id: entry._id }, { emailSent: true });
+        })
+        .catch((err) => console.error("[Waitlist] Email send error:", err));
     }
 
-    await Waitlist.create({
-      email: email.toLowerCase().trim(),
-      howFound,
-      hasGeoExperience,
-      budgetRange,
-    });
-
-    // Send welcome email (non-blocking)
-    const html = await render(WaitlistWelcomeEmail({ email }));
-    sendEmail({
-      to: email,
-      subject: "You're on the ShowYourBrand waitlist!",
-      html,
-    }).catch((err) => console.error("[Waitlist] Email send error:", err));
-
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       data: { message: "Successfully joined the waitlist" },
     });
   } catch (error: unknown) {
-    console.error("[Waitlist] Error:", error);
-
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      (error as { code: number }).code === 11000
-    ) {
-      return res.status(409).json({
-        success: false,
-        error: "ALREADY_EXISTS",
-        message: "This email is already on the waitlist",
-      });
-    }
+    console.error("[Waitlist] Complete error:", error);
 
     return res.status(500).json({
       success: false,

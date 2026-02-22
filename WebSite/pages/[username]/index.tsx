@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import ProjectList from "@/components/projects/ProjectList";
 import { useLanguage } from "@/components/LanguageContext";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
-  FolderKanban,
-  FileText,
-  TrendingUp,
-  Zap,
-  ArrowRight,
-  Clock,
-  CheckCircle2,
+  Plus,
+  MoreVertical,
+  SlidersHorizontal,
+  LayoutGrid,
+  Building2,
   Loader2,
   User,
+  Clock,
+  Trash2,
+  Zap,
 } from "lucide-react";
 
 interface Business {
@@ -24,76 +24,262 @@ interface Business {
   slug: string;
   primaryUrl: string;
   category: string;
+  description?: string;
+  createdAt: string;
 }
 
-// Mock audit data for visualization
-const MOCK_RECENT_AUDITS = [
-  {
-    id: "mock-1",
-    projectName: "Mon Site Web",
-    score: 72,
-    status: "completed" as const,
-    date: "2026-02-06",
-    engines: ["ChatGPT", "Claude", "Perplexity"],
-  },
-  {
-    id: "mock-2",
-    projectName: "E-commerce Store",
-    score: 45,
-    status: "completed" as const,
-    date: "2026-02-04",
-    engines: ["ChatGPT", "Claude", "DeepSeek"],
-  },
-  {
-    id: "mock-3",
-    projectName: "Blog Tech",
-    score: 0,
-    status: "processing" as const,
-    date: "2026-02-08",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-];
-
-function ScoreColor(score: number) {
-  if (score >= 70) return "text-green-600";
-  if (score >= 40) return "text-orange-500";
-  return "text-red-500";
+interface LatestAudit {
+  _id: string;
+  businessId: string;
+  status: string;
+  geoScore?: number;
 }
 
-function StatusBadge({ status }: { status: "completed" | "processing" | "pending" }) {
-  const { t } = useLanguage();
-  const config = {
-    completed: {
-      bg: "bg-green-100 text-green-700",
-      icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-      label: String(t("audit.status.completed")),
-    },
-    processing: {
-      bg: "bg-blue-100 text-blue-700",
-      icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
-      label: String(t("audit.status.processing")),
-    },
-    pending: {
-      bg: "bg-gray-100 text-gray-600",
-      icon: <Clock className="w-3.5 h-3.5" />,
-      label: String(t("audit.status.pending")),
-    },
+function mapAuditUIStatus(dbStatus: string): "completed" | "processing" | "pending" {
+  if (dbStatus === "completed") return "completed";
+  if (dbStatus === "pending" || dbStatus === "failed" || dbStatus === "rejected") return "pending";
+  return "processing";
+}
+
+/* ─── Mini Sparkline SVG ─── */
+function MiniSparkline({
+  trend,
+  color,
+}: {
+  trend: "up" | "down" | "flat" | "stable";
+  color: string;
+}) {
+  if (trend === "stable") {
+    return (
+      <svg
+        viewBox="0 0 120 24"
+        className="w-full h-6"
+        preserveAspectRatio="none"
+      >
+        <line
+          x1="0"
+          y1="12"
+          x2="120"
+          y2="12"
+          stroke={color}
+          strokeWidth="2.5"
+          strokeDasharray="8 6"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  const paths: Record<string, string> = {
+    up: "M0,20 C20,18 35,14 50,11 C65,8 80,5 100,4 C110,3 115,2 120,2",
+    down: "M0,4 C20,6 35,9 50,13 C65,16 80,19 100,21 C110,22 115,22 120,22",
+    flat: "M0,14 C15,11 25,16 40,12 C55,15 65,10 80,14 C95,11 110,15 120,12",
   };
-  const c = config[status];
+
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${c.bg}`}>
-      {c.icon}
-      {c.label}
+    <svg
+      viewBox="0 0 120 24"
+      className="w-full h-6"
+      preserveAspectRatio="none"
+    >
+      <path
+        d={paths[trend]}
+        stroke={color}
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* ─── Trend Badge ─── */
+function TrendBadge({
+  value,
+  trend,
+}: {
+  value: string;
+  trend: "up" | "down" | "flat" | "stable";
+}) {
+  const config = {
+    up: { cls: "text-emerald-600 bg-emerald-50", icon: "\u2197" },
+    down: { cls: "text-red-500 bg-red-50", icon: "\u2198" },
+    flat: { cls: "text-orange-500", icon: "\u2192" },
+    stable: { cls: "text-gray-400 border border-gray-200", icon: "\u2014" },
+  };
+  const c = config[trend];
+  return (
+    <span
+      className={`inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${c.cls}`}
+    >
+      {c.icon} {value}
     </span>
   );
 }
 
-// Display Name Popup Component
-function DisplayNameModal({
-  onSave,
+/* ─── Project Card ─── */
+function ProjectCard({
+  business,
+  username,
+  latestAudit,
+  trend = "stable",
+  trendValue,
+  onDelete,
 }: {
-  onSave: (name: string) => void;
+  business: Business;
+  username: string;
+  latestAudit?: LatestAudit;
+  trend?: "up" | "down" | "flat" | "stable";
+  trendValue?: string;
+  onDelete: (id: string) => void;
 }) {
+  const { t } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handle = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [menuOpen]);
+
+  const sparklineColors = {
+    up: "#10b981",
+    down: "#ef4444",
+    flat: "#f97316",
+    stable: "#cbd5e1",
+  } as const;
+
+  const created = new Date(business.createdAt);
+  const formattedDate = created.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+  });
+
+  // Derive status and score from the latest audit
+  const auditStatus = latestAudit
+    ? mapAuditUIStatus(latestAudit.status)
+    : "pending";
+  const isPending = auditStatus === "pending";
+  const isProcessing = auditStatus === "processing";
+  const score =
+    latestAudit?.status === "completed" ? latestAudit.geoScore : undefined;
+
+  // Link to latest audit detail if available, otherwise to business page
+  const href = latestAudit
+    ? `/${username}/audits/${latestAudit._id}`
+    : `/${username}/${business.slug}`;
+
+  return (
+    <Link href={href}>
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 hover:shadow-lg transition-all cursor-pointer group h-full flex flex-col border border-white/60">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-1">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-[17px] font-heading font-semibold text-gray-900 group-hover:text-gray-700 transition-colors leading-snug">
+              {business.name}
+            </h3>
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
+              {business.category}
+            </p>
+          </div>
+          {/* ─── Context menu ─── */}
+          <div ref={menuRef} className="relative shrink-0">
+            <button
+              className="text-gray-300 hover:text-gray-500 transition-colors p-1"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMenuOpen((o) => !o);
+              }}
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-7 z-30 bg-white border border-gray-100 rounded-xl shadow-lg py-1 w-44">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMenuOpen(false);
+                    onDelete(business._id);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  {String(t("project.delete"))}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Score / Pending state */}
+        <div className="mt-4 flex-1">
+          {isPending || isProcessing ? (
+            <div className="flex flex-col items-center justify-center py-4">
+              {isProcessing ? (
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-2" />
+              ) : (
+                <Clock className="w-8 h-8 text-gray-300 mb-2" />
+              )}
+              <span className="text-sm text-gray-400 font-medium">
+                {isPending
+                  ? String(t("audit.status.pending"))
+                  : String(t("audit.status.processing"))}
+              </span>
+              <span className="text-[11px] text-gray-300 mt-1">
+                {String(t("project.noScoreYet"))}
+              </span>
+            </div>
+          ) : (
+            <>
+              <p className="text-[11px] text-gray-400 mb-1">
+                {String(t("dashboard.visibilityScore"))}
+              </p>
+              <div className="flex items-end justify-between">
+                <span className="text-[44px] font-bold text-gray-900 leading-none tracking-tight">
+                  {score !== undefined ? score : "\u2014"}
+                </span>
+                {trendValue && (
+                  <TrendBadge value={trendValue} trend={trend} />
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Sparkline */}
+        {!isPending && !isProcessing && (
+          <div className="mt-3 mb-4">
+            <MiniSparkline trend={trend} color={sparklineColors[trend]} />
+          </div>
+        )}
+
+        {/* Footer */}
+        <div
+          className={`flex items-center justify-between text-[12px] text-gray-400 ${
+            isPending || isProcessing ? "mt-4" : ""
+          }`}
+        >
+          <div className="flex items-center gap-1.5">
+            <Building2 className="w-3.5 h-3.5" />
+            <span className="truncate max-w-[140px]">{business.primaryUrl}</span>
+          </div>
+          <span>Created {formattedDate}</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ─── Display Name Modal ─── */
+function DisplayNameModal({ onSave }: { onSave: (name: string) => void }) {
   const { t } = useLanguage();
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -129,7 +315,7 @@ function DisplayNameModal({
             <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <User className="w-8 h-8 text-orange-600" />
             </div>
-            <h3 className="text-2xl font-serif font-medium text-gray-900 mb-2">
+            <h3 className="text-2xl font-heading font-medium text-gray-900 mb-2">
               {String(t("displayName.title"))}
             </h3>
             <p className="text-gray-500 text-sm">
@@ -172,28 +358,30 @@ function DisplayNameModal({
   );
 }
 
+/* ─── Page ─── */
 export default function UserProfilePage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const { username } = router.query;
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Business[]>([]);
+  const [latestAudits, setLatestAudits] = useState<Map<string, LatestAudit>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showDisplayNameModal, setShowDisplayNameModal] = useState(false);
   const [localDisplayName, setLocalDisplayName] = useState<string | null>(null);
   const [hasClosedModal, setHasClosedModal] = useState(false);
+  const [auditCredits, setAuditCredits] = useState<number | null>(null);
 
+  /* Auth redirects */
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
       return;
     }
-
     if (status === "authenticated" && !session?.user?.username) {
       router.push("/dashboard");
       return;
     }
-
     if (
       status === "authenticated" &&
       session?.user?.username &&
@@ -205,7 +393,7 @@ export default function UserProfilePage() {
     }
   }, [status, session, username, router]);
 
-  // Show display name popup if not set (only once, never re-open after close)
+  /* Display name popup */
   useEffect(() => {
     if (
       status === "authenticated" &&
@@ -218,39 +406,74 @@ export default function UserProfilePage() {
     }
   }, [status, session, localDisplayName, hasClosedModal]);
 
+  /* Fetch businesses + latest audits + credits */
+  const fetchData = async () => {
+    try {
+      const [projectsRes, auditsRes, creditsRes] = await Promise.all([
+        fetch("/api/businesses/list"),
+        fetch("/api/audits/list"),
+        fetch("/api/user/check-subscription"),
+      ]);
+      const [projectsData, auditsData, creditsData] = await Promise.all([
+        projectsRes.json(),
+        auditsRes.json(),
+        creditsRes.json(),
+      ]);
+
+      if (projectsData.success) {
+        setProjects(projectsData.data);
+      }
+
+      if (auditsData.success) {
+        // Build a map: businessId → latest audit (audits are sorted desc by createdAt)
+        const auditMap = new Map<string, LatestAudit>();
+        for (const audit of auditsData.data as LatestAudit[]) {
+          const bid = audit.businessId?.toString();
+          if (bid && !auditMap.has(bid)) {
+            auditMap.set(bid, audit);
+          }
+        }
+        setLatestAudits(auditMap);
+      }
+
+      if (creditsData.success) {
+        setAuditCredits(creditsData.auditCredits ?? 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (status !== "authenticated") return;
-
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/businesses/list");
-        const data = await res.json();
-        if (data.success) {
-          setProjects(data.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch projects:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
+  const handleDeleteProject = async (businessId: string) => {
+    if (!confirm(String(t("project.deleteConfirm")))) return;
+    const res = await fetch(`/api/businesses/${businessId}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.success) {
+      // Re-fetch to get updated project list + credits
+      await fetchData();
+    }
+  };
+
+  /* Loading skeleton */
   if (status === "loading" || loading) {
     return (
       <DashboardLayout activeMenu="dashboard">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/3" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="h-10 bg-white/50 rounded-xl w-1/3" />
+          <div className="h-5 bg-white/30 rounded w-2/3" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-28 bg-gray-200 rounded-2xl" />
-            ))}
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded-2xl" />
+              <div key={i} className="h-64 bg-white/50 rounded-2xl" />
             ))}
           </div>
         </div>
@@ -258,35 +481,6 @@ export default function UserProfilePage() {
     );
   }
 
-  // Mock stats
-  const stats = [
-    {
-      label: String(t("dashboard.totalProjects")),
-      value: projects.length || 3,
-      icon: FolderKanban,
-      gradient: "from-purple-500 to-purple-600",
-    },
-    {
-      label: String(t("dashboard.totalAudits")),
-      value: 7,
-      icon: FileText,
-      gradient: "from-orange-500 to-amber-500",
-    },
-    {
-      label: String(t("dashboard.avgScore")),
-      value: "58%",
-      icon: TrendingUp,
-      gradient: "from-purple-600 to-orange-500",
-    },
-    {
-      label: String(t("dashboard.creditsUsed")),
-      value: "3/10",
-      icon: Zap,
-      gradient: "from-amber-500 to-orange-500",
-    },
-  ];
-
-  const displayName = localDisplayName || session?.user?.displayName || session?.user?.name?.split(" ")[0];
 
   return (
     <DashboardLayout activeMenu="dashboard">
@@ -302,99 +496,62 @@ export default function UserProfilePage() {
         />
       )}
 
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-serif font-medium text-gray-900 mb-2">
-          {String(t("dashboard.welcome"))}, {displayName}
-        </h1>
-        <p className="text-gray-500">
-          {String(t("dashboard.projectsSubtitle"))}
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
-                <stat.icon className="w-5 h-5 text-white" />
-              </div>
+      {/* Page Header */}
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-heading font-medium text-gray-900 mb-2">
+            {String(t("dashboard.projects"))}
+          </h1>
+          <p className="text-gray-500 text-[15px] max-w-2xl leading-relaxed">
+            {String(t("dashboard.projectsDescription"))}
+          </p>
+        </div>
+        <div className="flex items-center gap-3 mt-2">
+          {/* Audit credits badge */}
+          {auditCredits !== null && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-white/60 rounded-full text-sm text-gray-600 shadow-sm">
+              <Zap className="w-3.5 h-3.5 text-orange-500" />
+              <span className="font-medium text-gray-800">{auditCredits}</span>
+              <span className="text-gray-400">{String(t("settings.auditCreditsRemaining"))}</span>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
+          )}
+          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-white/60">
+            <SlidersHorizontal className="w-5 h-5" />
+          </button>
+          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-white/60">
+            <LayoutGrid className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Project Cards Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Create New Project Card */}
+        <Link href="/projects/create">
+          <div className="bg-gradient-to-br from-orange-300/90 via-orange-200/80 to-amber-100/70 rounded-2xl p-6 h-full flex flex-col items-center justify-center text-center cursor-pointer hover:shadow-lg transition-all min-h-[280px] group border border-orange-200/40">
+            <div className="w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center mb-5 group-hover:bg-white/50 transition-all">
+              <Plus className="w-7 h-7 text-orange-800/50" />
+            </div>
+            <h3 className="text-lg font-heading font-semibold text-gray-800 mb-1">
+              {String(t("dashboard.createNewProject"))}
+            </h3>
+            <p className="text-sm text-orange-800/50">
+              {String(t("dashboard.startTracking"))}
+            </p>
           </div>
+        </Link>
+
+        {/* Business + Audit Cards */}
+        {projects.map((project) => (
+          <ProjectCard
+            key={project._id}
+            business={project}
+            username={session?.user?.username || ""}
+            latestAudit={latestAudits.get(project._id)}
+            trend="stable"
+            onDelete={handleDeleteProject}
+          />
         ))}
-      </div>
-
-      {/* Projects Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-serif font-medium text-gray-900 mb-4">
-          {String(t("dashboard.projects"))}
-        </h2>
-        <ProjectList
-          projects={projects}
-          username={session?.user?.username || ""}
-        />
-      </div>
-
-      {/* Recent Audits */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-serif font-medium text-gray-900">
-            {String(t("dashboard.recentAudits"))}
-          </h2>
-          <Link
-            href={`/${session?.user?.username}/audits`}
-            className="text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1"
-          >
-            {String(t("dashboard.viewAllAudits"))}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="divide-y divide-gray-100">
-          {MOCK_RECENT_AUDITS.map((audit) => (
-            <Link
-              key={audit.id}
-              href={`/${session?.user?.username}/audits/${audit.id}`}
-              className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-100 to-orange-100 flex items-center justify-center">
-                  {audit.status === "completed" ? (
-                    <span className={`text-lg font-bold ${ScoreColor(audit.score)}`}>
-                      {audit.score}
-                    </span>
-                  ) : (
-                    <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
-                  )}
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">{audit.projectName}</p>
-                  <p className="text-sm text-gray-500">{audit.date}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="hidden sm:flex items-center gap-1.5">
-                  {audit.engines.map((engine) => (
-                    <span
-                      key={engine}
-                      className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600"
-                    >
-                      {engine}
-                    </span>
-                  ))}
-                </div>
-                <StatusBadge status={audit.status} />
-              </div>
-            </Link>
-          ))}
-        </div>
       </div>
     </DashboardLayout>
   );

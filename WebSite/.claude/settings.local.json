@@ -1,11 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(python3:*)",
+      "Bash(cat:*)",
+      "Bash(npx tsc --noEmit 2>&1 | head -40)",
+      "Bash(npx tsc --noEmit 2>&1 | head -30)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "agentvibes"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(npm run build:*)"
-    ]
-  }
+  ]
 }

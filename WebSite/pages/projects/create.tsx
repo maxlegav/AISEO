@@ -35,6 +35,7 @@ export default function CreateProjectPage() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
 
   // Form state
   const [name, setName] = useState("");
@@ -55,7 +56,7 @@ export default function CreateProjectPage() {
 
   const addUrl = (
     list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     setter([...list, ""]);
   };
@@ -63,7 +64,7 @@ export default function CreateProjectPage() {
   const removeUrl = (
     index: number,
     list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     setter(list.filter((_, i) => i !== index));
   };
@@ -72,7 +73,7 @@ export default function CreateProjectPage() {
     index: number,
     value: string,
     list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     const updated = [...list];
     updated[index] = value;
@@ -86,11 +87,8 @@ export default function CreateProjectPage() {
       case 1:
         return category.trim().length > 0;
       case 2:
-        return true; // description is optional
       case 3:
-        return true; // sub-urls optional
       case 4:
-        return true; // competitors optional
       case 5:
         return true;
       default:
@@ -104,9 +102,12 @@ export default function CreateProjectPage() {
 
     try {
       const cleanSubUrls = subUrls.filter((u) => u.trim().length > 0);
-      const cleanCompetitorUrls = competitorUrls.filter((u) => u.trim().length > 0);
+      const cleanCompetitorUrls = competitorUrls.filter(
+        (u) => u.trim().length > 0,
+      );
 
-      const res = await fetch("/api/businesses/create", {
+      // Step 1: Create the business
+      const businessRes = await fetch("/api/businesses/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -119,13 +120,37 @@ export default function CreateProjectPage() {
         }),
       });
 
-      const data = await res.json();
+      const businessData = await businessRes.json();
 
-      if (data.success) {
-        router.push(`/${session?.user?.username}/${data.data.slug}`);
-      } else {
-        setError(data.message || "Failed to create project");
+      if (!businessData.success) {
+        if (businessData.error === 'UPGRADE_REQUIRED') {
+          setUpgradeRequired(true);
+        }
+        setError(businessData.message || "Failed to create project");
+        return;
       }
+
+      const business = businessData.data;
+
+      // Step 2: Create audit document and trigger the processing server
+      await fetch("/api/audits/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessId: business._id,
+          businessName: business.name,
+          businessUrl: business.primaryUrl,
+          businessType: business.category,
+          category: business.category,
+          description: business.description || business.category,
+          subUrls: business.subUrls || [],
+          competitorUrls: business.competitorUrls || [],
+          language: "fr",
+        }),
+      });
+      // Note: we don't fail if audit creation errors — the project is already created
+
+      router.push(`/${session?.user?.username}/${business.slug}`);
     } catch {
       setError("An error occurred. Please try again.");
     } finally {
@@ -135,8 +160,8 @@ export default function CreateProjectPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-        <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
+        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -145,7 +170,7 @@ export default function CreateProjectPage() {
   const StepIcon = currentStep?.icon ?? Globe;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
@@ -156,9 +181,11 @@ export default function CreateProjectPage() {
               width={40}
               height={40}
             />
-            <span className="text-xl font-bold text-gray-900">ShowYourBrand</span>
+            <span className="text-[26px] font-semibold text-gray-900 tracking-tight">
+              ShowYourBrand
+            </span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-heading font-semibold text-gray-900 mb-2">
             {String(t("project.create"))}
           </h1>
         </div>
@@ -168,22 +195,22 @@ export default function CreateProjectPage() {
           {STEPS.map((_, i) => (
             <div
               key={i}
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`h-2 rounded-full transition-all ${
                 i === step
-                  ? "bg-purple-600 w-8"
+                  ? "bg-orange-500 w-8"
                   : i < step
-                  ? "bg-purple-400"
-                  : "bg-gray-300"
+                    ? "bg-orange-400 w-3"
+                    : "bg-white/60 w-3"
               }`}
             />
           ))}
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 shadow-sm">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center">
-              <StepIcon className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-amber-100 rounded-xl flex items-center justify-center">
+              <StepIcon className="w-5 h-5 text-orange-600" />
             </div>
             <div>
               <h2 className="font-semibold text-gray-900">
@@ -206,7 +233,7 @@ export default function CreateProjectPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
                   placeholder="My Business"
                   autoFocus
                 />
@@ -219,7 +246,7 @@ export default function CreateProjectPage() {
                   type="text"
                   value={primaryUrl}
                   onChange={(e) => setPrimaryUrl(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
                   placeholder="https://example.com"
                 />
               </div>
@@ -236,7 +263,7 @@ export default function CreateProjectPage() {
                 type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
                 placeholder="e.g. Restaurant, SaaS, E-commerce..."
                 autoFocus
               />
@@ -252,7 +279,7 @@ export default function CreateProjectPage() {
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none bg-white"
                 rows={4}
                 placeholder={String(t("wizard.descriptionPlaceholder"))}
                 autoFocus
@@ -272,8 +299,10 @@ export default function CreateProjectPage() {
                   <input
                     type="text"
                     value={url}
-                    onChange={(e) => updateUrl(i, e.target.value, subUrls, setSubUrls)}
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                    onChange={(e) =>
+                      updateUrl(i, e.target.value, subUrls, setSubUrls)
+                    }
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
                     placeholder="https://example.com/page"
                   />
                   {subUrls.length > 1 && (
@@ -288,7 +317,7 @@ export default function CreateProjectPage() {
               ))}
               <button
                 onClick={() => addUrl(subUrls, setSubUrls)}
-                className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700"
+                className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
               >
                 <Plus className="w-4 h-4" />
                 {String(t("wizard.addUrl"))}
@@ -308,14 +337,21 @@ export default function CreateProjectPage() {
                     type="text"
                     value={url}
                     onChange={(e) =>
-                      updateUrl(i, e.target.value, competitorUrls, setCompetitorUrls)
+                      updateUrl(
+                        i,
+                        e.target.value,
+                        competitorUrls,
+                        setCompetitorUrls,
+                      )
                     }
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
                     placeholder="https://competitor.com"
                   />
                   {competitorUrls.length > 1 && (
                     <button
-                      onClick={() => removeUrl(i, competitorUrls, setCompetitorUrls)}
+                      onClick={() =>
+                        removeUrl(i, competitorUrls, setCompetitorUrls)
+                      }
                       className="text-gray-400 hover:text-red-500"
                     >
                       <X className="w-5 h-5" />
@@ -325,7 +361,7 @@ export default function CreateProjectPage() {
               ))}
               <button
                 onClick={() => addUrl(competitorUrls, setCompetitorUrls)}
-                className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700"
+                className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
               >
                 <Plus className="w-4 h-4" />
                 {String(t("wizard.addCompetitor"))}
@@ -338,40 +374,56 @@ export default function CreateProjectPage() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                 <div>
-                  <span className="text-xs text-gray-500 uppercase">{String(t("project.name"))}</span>
+                  <span className="text-xs text-gray-500 uppercase">
+                    {String(t("project.name"))}
+                  </span>
                   <p className="font-medium text-gray-900">{name}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500 uppercase">{String(t("project.url"))}</span>
+                  <span className="text-xs text-gray-500 uppercase">
+                    {String(t("project.url"))}
+                  </span>
                   <p className="font-medium text-gray-900">{primaryUrl}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500 uppercase">{String(t("project.category"))}</span>
+                  <span className="text-xs text-gray-500 uppercase">
+                    {String(t("project.category"))}
+                  </span>
                   <p className="font-medium text-gray-900">{category}</p>
                 </div>
                 {description && (
                   <div>
-                    <span className="text-xs text-gray-500 uppercase">{String(t("project.description"))}</span>
+                    <span className="text-xs text-gray-500 uppercase">
+                      {String(t("project.description"))}
+                    </span>
                     <p className="text-sm text-gray-700">{description}</p>
                   </div>
                 )}
                 {subUrls.filter((u) => u.trim()).length > 0 && (
                   <div>
-                    <span className="text-xs text-gray-500 uppercase">{String(t("project.subUrls"))}</span>
+                    <span className="text-xs text-gray-500 uppercase">
+                      {String(t("project.subUrls"))}
+                    </span>
                     {subUrls
                       .filter((u) => u.trim())
                       .map((url, i) => (
-                        <p key={i} className="text-sm text-gray-700">{url}</p>
+                        <p key={i} className="text-sm text-gray-700">
+                          {url}
+                        </p>
                       ))}
                   </div>
                 )}
                 {competitorUrls.filter((u) => u.trim()).length > 0 && (
                   <div>
-                    <span className="text-xs text-gray-500 uppercase">{String(t("project.competitors"))}</span>
+                    <span className="text-xs text-gray-500 uppercase">
+                      {String(t("project.competitors"))}
+                    </span>
                     {competitorUrls
                       .filter((u) => u.trim())
                       .map((url, i) => (
-                        <p key={i} className="text-sm text-gray-700">{url}</p>
+                        <p key={i} className="text-sm text-gray-700">
+                          {url}
+                        </p>
                       ))}
                   </div>
                 )}
@@ -382,7 +434,15 @@ export default function CreateProjectPage() {
           {/* Error */}
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-              {error}
+              <p>{error}</p>
+              {upgradeRequired && (
+                <Link
+                  href="/settings"
+                  className="mt-2 inline-flex items-center gap-1 text-orange-600 font-medium hover:underline"
+                >
+                  {String(t("nav.settings"))} →
+                </Link>
+              )}
             </div>
           )}
 
@@ -400,7 +460,7 @@ export default function CreateProjectPage() {
               <Button
                 onClick={() => setStep(step + 1)}
                 disabled={!canProceed()}
-                className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white flex items-center gap-2 disabled:opacity-50"
+                className="bg-gray-900 hover:bg-gray-800 text-white flex items-center gap-2 disabled:opacity-50 rounded-full px-6"
               >
                 {String(t("common.next"))}
                 <ArrowRight className="w-4 h-4" />
@@ -409,7 +469,7 @@ export default function CreateProjectPage() {
               <Button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white flex items-center gap-2 disabled:opacity-50"
+                className="bg-gray-900 hover:bg-gray-800 text-white flex items-center gap-2 disabled:opacity-50 rounded-full px-6"
               >
                 {submitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

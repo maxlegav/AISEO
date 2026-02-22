@@ -10,6 +10,7 @@ import {
   Hr,
   Preview,
   Button,
+  Img,
 } from "@react-email/components";
 
 interface PasswordResetEmailProps {
@@ -23,23 +24,26 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
   resetUrl,
   language = "en",
 }) => {
+  const baseUrl =
+    process.env.NEXTAUTH_URL || "https://ShowYourBrand.vercel.app";
+
   const content =
     language === "fr"
       ? {
-          preview: "Reinitialisation de votre mot de passe ShowYourBrand",
-          title: "Reinitialisation du mot de passe",
+          preview: "Réinitialisation de votre mot de passe ShowYourBrand",
+          title: "Réinitialisation du mot de passe",
           greeting: `Bonjour ${name},`,
           intro:
-            "Nous avons recu une demande de reinitialisation de votre mot de passe pour votre compte ShowYourBrand.",
+            "Nous avons reçu une demande de réinitialisation de votre mot de passe pour votre compte ShowYourBrand.",
           action:
-            "Cliquez sur le bouton ci-dessous pour creer un nouveau mot de passe:",
-          ctaText: "Reinitialiser le mot de passe",
+            "Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :",
+          ctaText: "Réinitialiser le mot de passe",
           expiry: "Ce lien expirera dans 1 heure.",
           noRequest:
-            "Si vous n'avez pas demande cette reinitialisation, vous pouvez ignorer cet email. Votre mot de passe restera inchange.",
+            "Si vous n'avez pas demandé cette réinitialisation, ignorez cet email. Votre mot de passe restera inchangé.",
           security:
-            "Pour des raisons de securite, ne partagez jamais ce lien avec personne.",
-          signature: "L'equipe ShowYourBrand",
+            "Pour votre sécurité, ne partagez jamais ce lien avec personne.",
+          signature: "L'équipe ShowYourBrand",
         }
       : {
           preview: "Reset your ShowYourBrand password",
@@ -51,8 +55,8 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
           ctaText: "Reset Password",
           expiry: "This link will expire in 1 hour.",
           noRequest:
-            "If you did not request this reset, you can safely ignore this email. Your password will remain unchanged.",
-          security: "For security reasons, never share this link with anyone.",
+            "If you did not request this, you can safely ignore this email. Your password will remain unchanged.",
+          security: "For your security, never share this link with anyone.",
           signature: "The ShowYourBrand Team",
         };
 
@@ -62,37 +66,44 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
       <Preview>{content.preview}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={header}>
-            <div style={logoContainer}>
-              <span style={logoText}>AI</span>
-            </div>
-            <Heading style={headerTitle}>{content.title}</Heading>
+          {/* Gradient header */}
+          <Section style={headerBanner}>
+            <Img
+              src={`${baseUrl}/syb_logo_transparent.png`}
+              alt="ShowYourBrand"
+              width="56"
+              height="56"
+              style={logoImg}
+            />
+            <Text style={brandName}>ShowYourBrand</Text>
+            <Text style={brandTagline}>Generative Engine Optimization</Text>
           </Section>
 
-          <Hr style={divider} />
-
+          {/* Content */}
           <Section style={contentSection}>
+            <Heading style={contentTitle}>{content.title}</Heading>
             <Text style={greeting}>{content.greeting}</Text>
             <Text style={paragraph}>{content.intro}</Text>
             <Text style={paragraph}>{content.action}</Text>
 
             <Section style={ctaSection}>
               <Button href={resetUrl} style={ctaButton}>
-                {content.ctaText}
+                {content.ctaText} →
               </Button>
             </Section>
 
             <Section style={warningBox}>
               <Text style={warningText}>
+                ⏱{" "}
                 <strong>
-                  {language === "fr" ? "Important:" : "Important:"}
+                  {language === "fr" ? "Important :" : "Important:"}
                 </strong>{" "}
                 {content.expiry}
               </Text>
             </Section>
 
             <Text style={paragraph}>{content.noRequest}</Text>
-            <Text style={securityNote}>{content.security}</Text>
+            <Text style={securityNote}>🔒 {content.security}</Text>
 
             <Text style={signature}>
               {language === "fr" ? "Cordialement," : "Best regards,"}
@@ -104,10 +115,10 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
           <Hr style={divider} />
 
           <Section style={footer}>
-            <Text style={footerText}>ShowYourBrand - GEO Audit Platform</Text>
+            <Text style={footerBrand}>ShowYourBrand</Text>
             <Text style={footerText}>
               {language === "fr"
-                ? "Cet email a ete envoye car une reinitialisation de mot de passe a ete demandee."
+                ? "Cet email a été envoyé suite à une demande de réinitialisation de mot de passe."
                 : "This email was sent because a password reset was requested."}
             </Text>
           </Section>
@@ -119,70 +130,76 @@ const PasswordResetEmail: React.FC<PasswordResetEmailProps> = ({
 
 export default PasswordResetEmail;
 
-// Styles
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
 const main = {
-  backgroundColor: "#f6f9fc",
+  backgroundColor: "#f8f8f8",
   fontFamily:
-    "-apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,open sans,helvetica neue,sans-serif",
+    "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Helvetica Neue',sans-serif",
 };
 
 const container = {
   backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
+  margin: "32px auto",
+  borderRadius: "16px",
+  overflow: "hidden" as const,
   maxWidth: "600px",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
 };
 
-const header = {
-  padding: "32px 32px 24px",
+const headerBanner = {
+  background: "linear-gradient(135deg, #ddd6fe 0%, #fce7f3 55%, #fed7aa 100%)",
+  padding: "36px 32px 28px",
   textAlign: "center" as const,
 };
 
-const logoContainer = {
-  width: "48px",
-  height: "48px",
-  background: "linear-gradient(135deg, #9333ea 0%, #ec4899 100%)",
+const logoImg = {
+  display: "block",
+  margin: "0 auto 12px",
   borderRadius: "12px",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: "16px",
 };
 
-const logoText = {
-  color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "700",
-};
-
-const headerTitle = {
+const brandName = {
   color: "#1E293B",
-  fontSize: "24px",
+  fontSize: "22px",
+  fontWeight: "700",
+  lineHeight: "28px",
+  margin: "0 0 4px",
+  letterSpacing: "-0.3px",
+};
+
+const brandTagline = {
+  color: "#7c3aed",
+  fontSize: "12px",
   fontWeight: "600",
-  lineHeight: "32px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase" as const,
   margin: "0",
 };
 
-const divider = {
-  borderColor: "#e1e8ed",
-  margin: "24px 0",
+const contentSection = {
+  padding: "32px 36px 8px",
 };
 
-const contentSection = {
-  padding: "0 32px",
+const contentTitle = {
+  color: "#1E293B",
+  fontSize: "26px",
+  fontWeight: "700",
+  lineHeight: "34px",
+  margin: "0 0 20px",
+  letterSpacing: "-0.3px",
 };
 
 const greeting = {
   color: "#1E293B",
-  fontSize: "16px",
+  fontSize: "15px",
   fontWeight: "600",
   lineHeight: "24px",
-  margin: "0 0 16px",
+  margin: "0 0 12px",
 };
 
 const paragraph = {
-  color: "#374151",
+  color: "#4b5563",
   fontSize: "14px",
   lineHeight: "22px",
   margin: "0 0 16px",
@@ -190,57 +207,72 @@ const paragraph = {
 
 const ctaSection = {
   textAlign: "center" as const,
-  margin: "24px 0",
+  margin: "28px 0",
 };
 
 const ctaButton = {
   backgroundColor: "#1E293B",
   color: "#ffffff",
-  padding: "14px 28px",
-  borderRadius: "8px",
+  padding: "14px 32px",
+  borderRadius: "50px",
   textDecoration: "none",
   fontWeight: "600",
   fontSize: "14px",
+  display: "inline-block",
 };
 
 const warningBox = {
-  backgroundColor: "#fef3c7",
-  padding: "12px 16px",
-  borderRadius: "8px",
-  border: "1px solid #fcd34d",
-  margin: "16px 0",
+  backgroundColor: "#fff7ed",
+  padding: "14px 18px",
+  borderRadius: "10px",
+  border: "1px solid #fed7aa",
+  margin: "0 0 16px",
 };
 
 const warningText = {
-  color: "#92400e",
+  color: "#c2410c",
   fontSize: "14px",
   lineHeight: "20px",
   margin: "0",
 };
 
 const securityNote = {
-  color: "#6b7280",
-  fontSize: "13px",
+  color: "#9ca3af",
+  fontSize: "12px",
   fontStyle: "italic" as const,
-  lineHeight: "20px",
-  margin: "0 0 16px",
+  lineHeight: "18px",
+  margin: "0 0 20px",
 };
 
 const signature = {
-  color: "#374151",
+  color: "#4b5563",
   fontSize: "14px",
   lineHeight: "22px",
-  margin: "24px 0 0",
+  margin: "24px 0 28px",
+};
+
+const divider = {
+  borderColor: "#f3f4f6",
+  margin: "0",
 };
 
 const footer = {
-  padding: "0 32px",
+  padding: "20px 36px",
   textAlign: "center" as const,
+  backgroundColor: "#fafafa",
+  borderTop: "3px solid #fed7aa",
+};
+
+const footerBrand = {
+  color: "#1E293B",
+  fontSize: "13px",
+  fontWeight: "700",
+  margin: "0 0 4px",
 };
 
 const footerText = {
-  color: "#6b7280",
-  fontSize: "12px",
+  color: "#9ca3af",
+  fontSize: "11px",
   lineHeight: "16px",
-  margin: "0 0 4px",
+  margin: "0",
 };

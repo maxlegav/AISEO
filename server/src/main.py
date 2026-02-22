@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
     try:
         db = app_config.get_db()
         await db.command("ping")
-        logger.info("MongoDB connection established (database: showyourbrand)")
+        logger.info("MongoDB connection established (database: ShowYourBrand)")
 
         # Create indexes on audits collection
         await db.audits.create_index([("businessId", 1), ("createdAt", -1)])

@@ -14,29 +14,33 @@ const config = {
   // Domain (TODO: Story 1.2 - set actual domain)
   domainName: "ShowYourBrand.com",
 
-  // Stripe Configuration - ShowYourBrand Pricing (per BMAD specs)
+  // Stripe Configuration - ShowYourBrand Pricing
   stripe: {
-    // Basic One-Shot: €100 (ChatGPT only, 1 competitor, no history)
+    // Basic One-Shot: €199 (ChatGPT only, 1 competitor, no history)
     basic: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_BASIC || "",
       name: "Basic",
-      price: 100,
+      price: 199,
+      oldPrice: 299,
       currency: "EUR",
       mode: "payment", // one-shot
       features: [
         { name: "1 complete GEO audit" },
-        { name: "ChatGPT analysis only" },
+        { name: "ChatGPT analysis (GPT-4o)" },
         { name: "1 competitor comparison" },
         { name: "100 AI prompt testing" },
-        { name: "Full PDF report" },
-        { name: "Email support" },
+        { name: "Full PDF report with insights" },
+        { name: "HTML & schema.org scan" },
+        { name: "Content optimization tips" },
+        { name: "Email support (48h response)" },
       ],
     },
-    // Pro One-Shot: €200 (all 4 AI engines, 5 competitors, with history)
+    // Pro One-Shot: €399 (all 4 AI engines, 5 competitors, with history)
     pro: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO || "",
       name: "Pro",
-      price: 200,
+      price: 399,
+      oldPrice: 599,
       currency: "EUR",
       mode: "payment", // one-shot
       features: [
@@ -44,30 +48,37 @@ const config = {
         { name: "All 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)" },
         { name: "5 competitor comparisons" },
         { name: "100 AI prompt testing" },
-        { name: "Full PDF report" },
-        { name: "Dashboard with history" },
-        { name: "Priority email support" },
+        { name: "Full PDF report + executive summary" },
+        { name: "HTML & schema.org deep scan" },
+        { name: "AI-optimized FAQ generation" },
+        { name: "Priority action plan (ranked by impact)" },
+        { name: "Dashboard with full history" },
+        { name: "Priority email support (24h)" },
       ],
     },
-    // Premium Subscription: €500/month (20 audits included, unlimited competitors, white-label)
+    // Premium Subscription: €799/month (20 audits included, unlimited competitors, white-label)
     premium: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PREMIUM || "",
       name: "Premium",
-      price: 500,
+      price: 799,
+      oldPrice: 1199,
       currency: "EUR",
       interval: "month",
       mode: "subscription",
       auditsIncluded: 20,
-      extraAuditPrice: 20,
+      extraAuditPrice: 35,
       features: [
         { name: "20 audits per month included" },
-        { name: "All 4 AI engines" },
+        { name: "All 4 AI engines per audit" },
         { name: "Unlimited competitor comparisons" },
         { name: "100 AI prompt testing per audit" },
         { name: "White-label PDF reports (your branding)" },
-        { name: "Full dashboard with history" },
-        { name: "Priority support" },
-        { name: "+€20 per extra audit beyond 20" },
+        { name: "Bulk audit management dashboard" },
+        { name: "Client-ready executive summaries" },
+        { name: "Schema markup & FAQ auto-generation" },
+        { name: "Monthly GEO trend reports" },
+        { name: "Dedicated account manager" },
+        { name: "+€35 per extra audit beyond 20" },
       ],
     },
   },
@@ -81,7 +92,7 @@ const config = {
 
   // Theme & Colors (based on UX Design specification)
   colors: {
-    primary: "#3B82F6", // Blue (Primary)
+    primary: "#7C3AED", // Purple (Primary brand color)
     success: "#10B981", // Green (Success)
     error: "#EF4444", // Red (Error)
     warning: "#F59E0B", // Orange (Warning)

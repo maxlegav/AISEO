@@ -34,7 +34,7 @@ from datetime import datetime, timezone
 SERVER_URL = "http://localhost:8080"
 API_KEY = "p6jgXU4DDgWKt3Mp5WEtIZtoeS9m+ZKncQpCNW6ShBg"
 MONGODB_URI = "mongodb+srv://automateitcontact:q1ziUY6sTrKPUexf@automateit.ljmnevl.mongodb.net/ShowYourBrand"
-DB_NAME = "showyourbrand"
+DB_NAME = "ShowYourBrand"
 
 POLL_INTERVAL = 15   # seconds between status checks
 MAX_WAIT = 900       # 15 minutes max wait per audit

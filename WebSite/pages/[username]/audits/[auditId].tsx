@@ -1,72 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useLanguage } from "@/components/LanguageContext";
 import {
   ArrowLeft,
-  Download,
+  Loader2,
+  Clock,
+  XCircle,
+  RefreshCw,
   CheckCircle2,
-  AlertTriangle,
-  Info,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-// Mock audit detail data
-const MOCK_AUDIT_DATA: Record<string, {
-  projectName: string;
-  score: number;
-  date: string;
-  engines: { name: string; score: number }[];
-  recommendations: { title: string; priority: "high" | "medium" | "low"; description: string }[];
-  htmlScan: { label: string; status: "pass" | "warning" | "fail"; detail: string }[];
-  competitors: { name: string; score: number }[];
-}> = {
-  "mock-1": {
-    projectName: "Mon Site Web",
-    score: 72,
-    date: "2026-02-06",
-    engines: [
-      { name: "ChatGPT", score: 78 },
-      { name: "Claude", score: 82 },
-      { name: "Perplexity", score: 65 },
-      { name: "DeepSeek", score: 63 },
-    ],
-    recommendations: [
-      { title: "Add FAQ schema markup", priority: "high", description: "Your site lacks FAQ structured data. Adding schema.org FAQPage markup will significantly improve AI engine citations." },
-      { title: "Improve meta descriptions", priority: "high", description: "47% of your pages have missing or duplicate meta descriptions. Write unique, keyword-rich descriptions for each page." },
-      { title: "Add alt text to images", priority: "medium", description: "23 images are missing alt text. Descriptive alt text helps AI engines understand your visual content." },
-      { title: "Optimize heading structure", priority: "medium", description: "Some pages have multiple H1 tags or skip heading levels. Use a clean H1 > H2 > H3 hierarchy." },
-      { title: "Add Organization schema", priority: "low", description: "Adding Organization structured data helps AI engines identify and cite your brand correctly." },
-    ],
-    htmlScan: [
-      { label: "Schema.org", status: "warning", detail: "Found: Organization. Missing: FAQPage, Product, BreadcrumbList" },
-      { label: "Meta Tags", status: "warning", detail: "47% of pages missing unique meta descriptions" },
-      { label: "Heading Structure", status: "pass", detail: "Clean H1-H3 hierarchy on 89% of pages" },
-      { label: "Alt Text", status: "fail", detail: "23 images missing alt text out of 45 total" },
-      { label: "Keywords", status: "pass", detail: "Top keywords: SaaS, automation, productivity, workflow, integration" },
-    ],
-    competitors: [
-      { name: "competitor-a.com", score: 81 },
-      { name: "competitor-b.com", score: 65 },
-      { name: "competitor-c.com", score: 54 },
-    ],
-  },
-};
-
-// Fallback for unknown audit IDs
-const DEFAULT_AUDIT = MOCK_AUDIT_DATA["mock-1"]!;
-
-function scoreColor(score: number) {
-  if (score >= 70) return "text-green-600";
-  if (score >= 40) return "text-orange-500";
-  return "text-red-500";
+interface AuditDoc {
+  _id: string;
+  businessId?: string;
+  businessName?: string;
+  status: string;
+  geoScore?: number | null;
+  createdAt?: string;
+  completedAt?: string;
+  error?: string;
+  results?: {
+    categoryScores?: Record<string, number>;
+    competitorResults?: { name: string; url?: string; score: number }[];
+    enginesUsed?: string[];
+    enginesSucceeded?: string[];
+    htmlScan?: {
+      hasSchema?: boolean;
+      schemaTypes?: string[];
+      metaTitle?: string;
+      metaDescription?: string;
+    } | null;
+    htmlScannerScore?: number | null;
+    totalPromptsProcessed?: number;
+    totalResponsesReceived?: number;
+  };
 }
 
-function ScoreRing({ score, size = 160 }: { score: number; size?: number }) {
-  const radius = (size - 12) / 2;
+function mapUIStatus(
+  status: string
+): "pending" | "processing" | "completed" | "failed" {
+  if (status === "completed") return "completed";
+  if (status === "failed" || status === "rejected") return "failed";
+  if (status === "pending") return "pending";
+  return "processing";
+}
+
+const POLL_INTERVAL_MS = 12000;
+
+/* ─── Score Ring ─── */
+function ScoreRing({
+  score,
+  size = 140,
+}: {
+  score: number;
+  size?: number;
+}) {
+  const strokeWidth = 10;
+  const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
+  const color =
+    score >= 70 ? "#10b981" : score >= 40 ? "#f97316" : "#ef4444";
+  const label =
+    score >= 70 ? "GOOD" : score >= 40 ? "MODERATE" : "CRITICAL";
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -76,55 +74,66 @@ function ScoreRing({ score, size = 160 }: { score: number; size?: number }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#f3f4f6"
-          strokeWidth={8}
+          stroke="#e5e7eb"
+          strokeWidth={strokeWidth}
         />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="url(#scoreGradLarge)"
-          strokeWidth={8}
+          stroke={color}
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           className="transition-all duration-1000"
         />
-        <defs>
-          <linearGradient id="scoreGradLarge" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#9333ea" />
-            <stop offset="100%" stopColor="#f97316" />
-          </linearGradient>
-        </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-4xl font-bold ${scoreColor(score)}`}>{score}</span>
-        <span className="text-sm text-gray-400">/ 100</span>
+        <span className="text-3xl font-bold text-gray-900">{score}%</span>
+        <span
+          className="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          style={{ color }}
+        >
+          {label}
+        </span>
       </div>
     </div>
   );
 }
 
-function PriorityBadge({ priority }: { priority: "high" | "medium" | "low" }) {
-  const { t } = useLanguage();
-  const config = {
-    high: { bg: "bg-red-100 text-red-700", label: String(t("audit.priority.high")) },
-    medium: { bg: "bg-orange-100 text-orange-700", label: String(t("audit.priority.medium")) },
-    low: { bg: "bg-green-100 text-green-700", label: String(t("audit.priority.low")) },
-  };
-  const c = config[priority];
-  return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${c.bg}`}>
-      {c.label}
-    </span>
-  );
-}
+/* ─── Category Bar ─── */
+function CategoryBar({ name, score }: { name: string; score: number }) {
+  const barColor =
+    score >= 70
+      ? "bg-emerald-500"
+      : score >= 40
+      ? "bg-orange-500"
+      : "bg-red-500";
+  const textColor =
+    score >= 70
+      ? "text-emerald-600"
+      : score >= 40
+      ? "text-orange-600"
+      : "text-red-600";
 
-function ScanStatusIcon({ status }: { status: "pass" | "warning" | "fail" }) {
-  if (status === "pass") return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-  if (status === "warning") return <AlertTriangle className="w-5 h-5 text-orange-500" />;
-  return <AlertTriangle className="w-5 h-5 text-red-500" />;
+  return (
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-sm text-gray-700 capitalize">{name}</span>
+        <span className={`text-sm font-bold ${textColor}`}>
+          {Math.round(score * 100)}%
+        </span>
+      </div>
+      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div
+          className={`h-full ${barColor} rounded-full transition-all`}
+          style={{ width: `${Math.round(score * 100)}%` }}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function AuditDetailPage() {
@@ -132,8 +141,11 @@ export default function AuditDetailPage() {
   const router = useRouter();
   const { username, auditId } = router.query;
   const { t } = useLanguage();
-  const [toast, setToast] = useState(false);
+  const [audit, setAudit] = useState<AuditDoc | null>(null);
+  const [loading, setLoading] = useState(true);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  /* Auth guard */
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
@@ -146,166 +158,277 @@ export default function AuditDetailPage() {
       session.user.username !== username
     ) {
       router.push(`/${session.user.username}`);
-      return;
     }
   }, [status, session, username, router]);
 
-  const auditData = (typeof auditId === "string" && MOCK_AUDIT_DATA[auditId]) || DEFAULT_AUDIT;
+  const fetchAudit = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`/api/audits/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        setAudit(data.data);
+        return data.data as AuditDoc;
+      }
+    } catch (err) {
+      console.error("Failed to fetch audit:", err);
+    } finally {
+      setLoading(false);
+    }
+    return null;
+  }, []);
 
-  const handleDownload = () => {
-    setToast(true);
-    setTimeout(() => setToast(false), 3000);
-  };
+  useEffect(() => {
+    if (status !== "authenticated" || !auditId || typeof auditId !== "string")
+      return;
 
-  if (status === "loading") {
+    fetchAudit(auditId).then((fetched) => {
+      if (!fetched) return;
+      const uiStatus = mapUIStatus(fetched.status);
+      if (uiStatus === "pending" || uiStatus === "processing") {
+        pollRef.current = setInterval(async () => {
+          const updated = await fetchAudit(auditId);
+          if (updated) {
+            const updatedUI = mapUIStatus(updated.status);
+            if (updatedUI === "completed" || updatedUI === "failed") {
+              if (pollRef.current) clearInterval(pollRef.current);
+            }
+          }
+        }, POLL_INTERVAL_MS);
+      }
+    });
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [status, auditId, fetchAudit]);
+
+  /* Loading skeleton */
+  if (status === "loading" || loading) {
     return (
       <DashboardLayout activeMenu="audits">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/3" />
-          <div className="h-64 bg-gray-200 rounded-2xl" />
+          <div className="h-8 bg-white/50 rounded-xl w-1/3" />
+          <div className="h-64 bg-white/50 rounded-2xl" />
         </div>
       </DashboardLayout>
     );
   }
 
-  return (
-    <DashboardLayout activeMenu="audits">
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-20 right-8 z-50 bg-white border border-orange-200 rounded-xl p-4 shadow-lg animate-in slide-in-from-right">
-          <div className="flex items-center gap-2">
-            <Info className="w-4 h-4 text-orange-500" />
-            <p className="text-sm text-gray-700">{String(t("audit.comingSoon"))}</p>
-          </div>
-        </div>
-      )}
+  const uiStatus = audit ? mapUIStatus(audit.status) : "pending";
 
-      {/* Breadcrumb + Actions */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2">
+  /* ── Pending / Processing ── */
+  if (!audit || uiStatus === "pending" || uiStatus === "processing") {
+    return (
+      <DashboardLayout activeMenu="audits">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-8">
           <button
             onClick={() => router.push(`/${session?.user?.username}/audits`)}
-            className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
           >
             <ArrowLeft className="w-4 h-4" />
             {String(t("dashboard.audits"))}
           </button>
-          <span className="text-gray-400">/</span>
-          <span className="text-sm text-gray-600">{auditData.projectName}</span>
         </div>
-        <Button
-          onClick={handleDownload}
-          className="bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white flex items-center gap-2"
-        >
-          <Download className="w-4 h-4" />
-          {String(t("audit.downloadPdf"))}
-        </Button>
+
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-16 border border-white/60 flex flex-col items-center justify-center text-center">
+          {uiStatus === "processing" ? (
+            <>
+              <div className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center mb-6">
+                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+              </div>
+              <h2 className="text-2xl font-heading font-medium text-gray-900 mb-2">
+                {String(t("audit.status.processing"))}
+              </h2>
+              <p className="text-gray-500 max-w-sm leading-relaxed mb-6">
+                {String(t("project.auditRunning"))}
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                {String(t("project.autoRefresh"))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="w-24 h-24 rounded-full border-4 border-gray-100 flex items-center justify-center mb-6">
+                <Clock className="w-12 h-12 text-gray-300" />
+              </div>
+              <h2 className="text-2xl font-heading font-medium text-gray-900 mb-2">
+                {String(t("audit.status.pending"))}
+              </h2>
+              <p className="text-gray-500 max-w-sm leading-relaxed mb-6">
+                {String(t("project.auditQueued"))}
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                {String(t("project.autoRefresh"))}
+              </div>
+            </>
+          )}
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  /* ── Failed ── */
+  if (uiStatus === "failed") {
+    return (
+      <DashboardLayout activeMenu="audits">
+        <div className="flex items-center gap-2 mb-8">
+          <button
+            onClick={() => router.push(`/${session?.user?.username}/audits`)}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {String(t("dashboard.audits"))}
+          </button>
+        </div>
+        <div className="bg-white/90 rounded-2xl p-16 border border-red-100 flex flex-col items-center text-center">
+          <XCircle className="w-16 h-16 text-red-400 mb-4" />
+          <h2 className="text-2xl font-heading font-medium text-gray-900 mb-2">
+            {String(t("audit.status.failed"))}
+          </h2>
+          <p className="text-gray-500 max-w-sm">
+            {audit?.error || String(t("project.auditFailed"))}
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  /* ── Completed ── */
+  const geoScore = audit.geoScore ?? 0;
+  const categoryScores = audit.results?.categoryScores ?? {};
+  const competitors = audit.results?.competitorResults ?? [];
+  const enginesUsed = audit.results?.enginesSucceeded ?? audit.results?.enginesUsed ?? [];
+  const totalPrompts = audit.results?.totalPromptsProcessed;
+  const totalResponses = audit.results?.totalResponsesReceived;
+
+  const formattedDate = audit.completedAt
+    ? new Date(audit.completedAt).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
+
+  return (
+    <DashboardLayout activeMenu="audits">
+      {/* Breadcrumb */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push(`/${session?.user?.username}/audits`)}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {String(t("dashboard.audits"))}
+          </button>
+          <span className="text-gray-300">/</span>
+          <span className="text-sm text-gray-900 font-medium">
+            {audit.businessName ?? "Audit"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          {String(t("audit.status.completed"))}
+        </div>
       </div>
 
-      {/* Header with Score */}
-      <div className="bg-gradient-to-r from-purple-600 to-orange-500 rounded-2xl p-8 mb-8 text-white">
-        <div className="flex items-center justify-between">
+      {/* Header card: score + meta */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 mb-6">
+        <div className="flex items-center justify-between gap-8 flex-wrap">
           <div>
-            <h1 className="text-3xl font-serif font-medium mb-2">
-              {String(t("audit.detailTitle"))}
+            <h1 className="text-3xl font-heading font-medium text-gray-900 mb-1">
+              {audit.businessName ?? "Audit Report"}
             </h1>
-            <p className="text-white/80 text-lg">{auditData.projectName}</p>
-            <p className="text-white/60 text-sm mt-1">{auditData.date}</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-            <ScoreRing score={auditData.score} />
-          </div>
-        </div>
-      </div>
-
-      {/* Score Breakdown by Engine */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm mb-8">
-        <h2 className="text-xl font-serif font-medium text-gray-900 mb-6">
-          {String(t("audit.scoreBreakdown"))}
-        </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {auditData.engines.map((engine) => (
-            <div key={engine.name} className="text-center">
-              <ScoreRing score={engine.score} size={100} />
-              <p className="mt-3 font-medium text-gray-900">{engine.name}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-8 mb-8">
-        {/* Recommendations */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-          <h2 className="text-xl font-serif font-medium text-gray-900 mb-6">
-            {String(t("audit.recommendations"))}
-          </h2>
-          <div className="space-y-4">
-            {auditData.recommendations.map((rec, i) => (
-              <div key={i} className="p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900">{rec.title}</h3>
-                  <PriorityBadge priority={rec.priority} />
-                </div>
-                <p className="text-sm text-gray-600">{rec.description}</p>
+            {formattedDate && (
+              <p className="text-sm text-gray-400">{formattedDate}</p>
+            )}
+            {enginesUsed.length > 0 && (
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                {enginesUsed.map((e) => (
+                  <span
+                    key={e}
+                    className="px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-full text-xs text-gray-600 font-medium capitalize"
+                  >
+                    {e}
+                  </span>
+                ))}
               </div>
+            )}
+            {totalPrompts != null && (
+              <p className="text-xs text-gray-400 mt-3">
+                {totalResponses}/{totalPrompts * enginesUsed.length} responses collected
+              </p>
+            )}
+          </div>
+          <ScoreRing score={geoScore} />
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Category Scores */}
+        {Object.keys(categoryScores).length > 0 && (
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-white/60">
+            <h2 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-5">
+              {String(t("audit.categoryScores"))}
+            </h2>
+            {Object.entries(categoryScores).map(([cat, score]) => (
+              <CategoryBar key={cat} name={cat} score={score} />
             ))}
           </div>
-        </div>
+        )}
 
-        {/* HTML Scan Results */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-          <h2 className="text-xl font-serif font-medium text-gray-900 mb-6">
-            {String(t("audit.htmlScanResults"))}
-          </h2>
-          <div className="space-y-4">
-            {auditData.htmlScan.map((item, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                <ScanStatusIcon status={item.status} />
-                <div>
-                  <h3 className="font-medium text-gray-900">{item.label}</h3>
-                  <p className="text-sm text-gray-600 mt-0.5">{item.detail}</p>
+        {/* Competitor Comparison */}
+        {competitors.length > 0 && (
+          <div className="bg-gray-900 rounded-2xl p-6 text-white">
+            <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-5">
+              {String(t("audit.competitorComparison"))}
+            </h2>
+            <div className="space-y-4">
+              {/* Your score */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm font-semibold text-blue-300">
+                    {audit.businessName}
+                  </span>
+                  <span className="text-sm font-bold text-gray-200">
+                    {geoScore}%
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 rounded-full"
+                    style={{ width: `${geoScore}%` }}
+                  />
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Competitor Comparison */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-        <h2 className="text-xl font-serif font-medium text-gray-900 mb-6">
-          {String(t("audit.competitorComparison"))}
-        </h2>
-        <div className="space-y-4">
-          {/* Your site */}
-          <div className="flex items-center gap-4">
-            <span className="w-40 text-sm font-medium text-gray-900 truncate">
-              {auditData.projectName}
-            </span>
-            <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-600 to-orange-500 rounded-full flex items-center justify-end pr-3"
-                style={{ width: `${auditData.score}%` }}
-              >
-                <span className="text-xs font-bold text-white">{auditData.score}%</span>
-              </div>
+              {/* Competitors */}
+              {competitors.map((comp, i) => {
+                const compScore = Math.round(comp.score * 100);
+                return (
+                  <div key={i}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm text-gray-300 truncate max-w-[180px]">
+                        {comp.name || comp.url}
+                      </span>
+                      <span className="text-sm font-bold text-gray-300">
+                        {compScore}%
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gray-500 rounded-full"
+                        style={{ width: `${compScore}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          {/* Competitors */}
-          {auditData.competitors.map((comp, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <span className="w-40 text-sm text-gray-600 truncate">{comp.name}</span>
-              <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gray-400 rounded-full flex items-center justify-end pr-3"
-                  style={{ width: `${comp.score}%` }}
-                >
-                  <span className="text-xs font-bold text-white">{comp.score}%</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
     </DashboardLayout>
   );

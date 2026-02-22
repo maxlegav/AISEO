@@ -10,6 +10,7 @@ import {
   Hr,
   Preview,
   Button,
+  Img,
 } from "@react-email/components";
 
 interface WelcomeEmailProps {
@@ -21,6 +22,9 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
   name,
   language = "en",
 }) => {
+  const baseUrl =
+    process.env.NEXTAUTH_URL || "https://ShowYourBrand.vercel.app";
+
   const content =
     language === "fr"
       ? {
@@ -28,33 +32,32 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
           title: "Bienvenue sur ShowYourBrand!",
           greeting: `Bonjour ${name},`,
           intro:
-            "Merci de vous etre inscrit sur ShowYourBrand, votre plateforme de GEO (Generative Engine Optimization).",
-          whatNext: "Que pouvez-vous faire maintenant?",
-          feature1: "Configurer votre premier projet (site web a auditer)",
+            "Merci de vous être inscrit sur ShowYourBrand, votre plateforme de GEO (Generative Engine Optimization).",
+          whatNext: "Que pouvez-vous faire maintenant ?",
+          feature1: "Configurer votre premier projet (site web à auditer)",
           feature2: "Lancer un audit GEO sur 100 prompts IA",
           feature3:
-            "Recevoir des recommandations pour ameliorer votre visibilite IA",
-          ctaText: "Acceder au tableau de bord",
+            "Recevoir des recommandations pour améliorer votre visibilité IA",
+          ctaText: "Accéder au tableau de bord",
           support:
-            "Si vous avez des questions, n'hesitez pas a nous contacter.",
-          signature: "L'equipe ShowYourBrand",
+            "Des questions ? Répondez directement à cet email, nous lisons tout.",
+          signature: "L'équipe ShowYourBrand",
         }
       : {
           preview: "Welcome to ShowYourBrand - Your GEO Platform",
           title: "Welcome to ShowYourBrand!",
           greeting: `Hello ${name},`,
           intro:
-            "Thank you for signing up for ShowYourBrand, your GEO (Generative Engine Optimization) platform.",
+            "Thank you for signing up for ShowYourBrand — the first Generative Engine Optimization (GEO) platform.",
           whatNext: "What can you do now?",
           feature1: "Set up your first project (website to audit)",
           feature2: "Run a GEO audit across 100 AI prompts",
           feature3: "Get recommendations to improve your AI visibility",
           ctaText: "Go to Dashboard",
-          support: "If you have any questions, feel free to reach out to us.",
+          support:
+            "Questions? Just reply to this email — we read every message.",
           signature: "The ShowYourBrand Team",
         };
-
-  const baseUrl = process.env.NEXTAUTH_URL || "https://ShowYourBrand.com";
 
   return (
     <Html>
@@ -62,16 +65,22 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
       <Preview>{content.preview}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={header}>
-            <div style={logoContainer}>
-              <span style={logoText}>AI</span>
-            </div>
-            <Heading style={headerTitle}>{content.title}</Heading>
+          {/* Gradient header */}
+          <Section style={headerBanner}>
+            <Img
+              src={`${baseUrl}/syb_logo_transparent.png`}
+              alt="ShowYourBrand"
+              width="56"
+              height="56"
+              style={logoImg}
+            />
+            <Text style={brandName}>ShowYourBrand</Text>
+            <Text style={brandTagline}>Generative Engine Optimization</Text>
           </Section>
 
-          <Hr style={divider} />
-
+          {/* Content */}
           <Section style={contentSection}>
+            <Heading style={contentTitle}>{content.title}</Heading>
             <Text style={greeting}>{content.greeting}</Text>
             <Text style={paragraph}>{content.intro}</Text>
 
@@ -80,14 +89,20 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
             </Heading>
 
             <Section style={featureList}>
-              <Text style={featureItem}>1. {content.feature1}</Text>
-              <Text style={featureItem}>2. {content.feature2}</Text>
-              <Text style={featureItem}>3. {content.feature3}</Text>
+              <Text style={featureItem}>
+                <span style={featureNumber}>01</span> {content.feature1}
+              </Text>
+              <Text style={featureItem}>
+                <span style={featureNumber}>02</span> {content.feature2}
+              </Text>
+              <Text style={featureItem}>
+                <span style={featureNumber}>03</span> {content.feature3}
+              </Text>
             </Section>
 
             <Section style={ctaSection}>
               <Button href={`${baseUrl}/dashboard`} style={ctaButton}>
-                {content.ctaText}
+                {content.ctaText} →
               </Button>
             </Section>
 
@@ -103,11 +118,11 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
           <Hr style={divider} />
 
           <Section style={footer}>
-            <Text style={footerText}>ShowYourBrand - GEO Audit Platform</Text>
+            <Text style={footerBrand}>ShowYourBrand</Text>
             <Text style={footerText}>
               {language === "fr"
-                ? "Rendez votre entreprise visible dans les moteurs de recherche IA"
-                : "Make your business visible in AI search engines"}
+                ? "Rendez votre marque visible dans les moteurs de recherche IA"
+                : "Make your brand visible in AI search engines"}
             </Text>
           </Section>
         </Container>
@@ -118,70 +133,76 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
 
 export default WelcomeEmail;
 
-// Styles
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
 const main = {
-  backgroundColor: "#f6f9fc",
+  backgroundColor: "#f8f8f8",
   fontFamily:
-    "-apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,open sans,helvetica neue,sans-serif",
+    "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Helvetica Neue',sans-serif",
 };
 
 const container = {
   backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
+  margin: "32px auto",
+  borderRadius: "16px",
+  overflow: "hidden" as const,
   maxWidth: "600px",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
 };
 
-const header = {
-  padding: "32px 32px 24px",
+const headerBanner = {
+  background: "linear-gradient(135deg, #ddd6fe 0%, #fce7f3 55%, #fed7aa 100%)",
+  padding: "36px 32px 28px",
   textAlign: "center" as const,
 };
 
-const logoContainer = {
-  width: "48px",
-  height: "48px",
-  background: "linear-gradient(135deg, #9333ea 0%, #ec4899 100%)",
+const logoImg = {
+  display: "block",
+  margin: "0 auto 12px",
   borderRadius: "12px",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: "16px",
 };
 
-const logoText = {
-  color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "700",
-};
-
-const headerTitle = {
+const brandName = {
   color: "#1E293B",
-  fontSize: "24px",
+  fontSize: "22px",
+  fontWeight: "700",
+  lineHeight: "28px",
+  margin: "0 0 4px",
+  letterSpacing: "-0.3px",
+};
+
+const brandTagline = {
+  color: "#7c3aed",
+  fontSize: "12px",
   fontWeight: "600",
-  lineHeight: "32px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase" as const,
   margin: "0",
 };
 
-const divider = {
-  borderColor: "#e1e8ed",
-  margin: "24px 0",
+const contentSection = {
+  padding: "32px 36px 8px",
 };
 
-const contentSection = {
-  padding: "0 32px",
+const contentTitle = {
+  color: "#1E293B",
+  fontSize: "26px",
+  fontWeight: "700",
+  lineHeight: "34px",
+  margin: "0 0 20px",
+  letterSpacing: "-0.3px",
 };
 
 const greeting = {
   color: "#1E293B",
-  fontSize: "16px",
+  fontSize: "15px",
   fontWeight: "600",
   lineHeight: "24px",
-  margin: "0 0 16px",
+  margin: "0 0 12px",
 };
 
 const paragraph = {
-  color: "#374151",
+  color: "#4b5563",
   fontSize: "14px",
   lineHeight: "22px",
   margin: "0 0 16px",
@@ -189,56 +210,77 @@ const paragraph = {
 
 const sectionTitle = {
   color: "#1E293B",
-  fontSize: "16px",
+  fontSize: "15px",
   fontWeight: "600",
   margin: "24px 0 12px",
 };
 
 const featureList = {
-  backgroundColor: "#f9fafb",
+  backgroundColor: "#fff7ed",
   padding: "16px 20px",
-  borderRadius: "8px",
-  border: "1px solid #e5e7eb",
+  borderRadius: "10px",
+  border: "1px solid #fed7aa",
   margin: "0 0 24px",
 };
 
 const featureItem = {
   color: "#374151",
   fontSize: "14px",
-  lineHeight: "24px",
-  margin: "0 0 8px",
+  lineHeight: "26px",
+  margin: "0",
+};
+
+const featureNumber = {
+  color: "#f97316",
+  fontWeight: "700" as const,
+  marginRight: "8px",
 };
 
 const ctaSection = {
   textAlign: "center" as const,
-  margin: "24px 0",
+  margin: "28px 0",
 };
 
 const ctaButton = {
   backgroundColor: "#1E293B",
   color: "#ffffff",
-  padding: "12px 24px",
-  borderRadius: "8px",
+  padding: "14px 32px",
+  borderRadius: "50px",
   textDecoration: "none",
   fontWeight: "600",
   fontSize: "14px",
+  display: "inline-block",
 };
 
 const signature = {
-  color: "#374151",
+  color: "#4b5563",
   fontSize: "14px",
   lineHeight: "22px",
-  margin: "24px 0 0",
+  margin: "24px 0 28px",
+};
+
+const divider = {
+  borderColor: "#f3f4f6",
+  margin: "0",
 };
 
 const footer = {
-  padding: "0 32px",
+  padding: "20px 36px",
   textAlign: "center" as const,
+  backgroundColor: "#fafafa",
+  borderTop: "3px solid #fed7aa",
+};
+
+const footerBrand = {
+  color: "#1E293B",
+  fontSize: "13px",
+  fontWeight: "700",
+  margin: "0 0 4px",
 };
 
 const footerText = {
-  color: "#6b7280",
-  fontSize: "12px",
+  color: "#9ca3af",
+  fontSize: "11px",
   lineHeight: "16px",
-  margin: "0 0 4px",
+  margin: "0",
 };

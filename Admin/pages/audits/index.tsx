@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import AdminLayout from "@/components/AdminLayout";
+import { statusLabel, statusColor } from "@/components/AuditStepper";
 import toast from "react-hot-toast";
 
 interface AuditSummary {
@@ -15,19 +16,12 @@ interface AuditSummary {
   userId?: string;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-gray-500",
-  processing: "bg-blue-500",
-  review_pending: "bg-yellow-500",
-  completed: "bg-green-500",
-  rejected: "bg-orange-500",
-  failed: "bg-red-500",
-};
-
 const STATUS_OPTIONS = [
   { value: "", label: "All" },
-  { value: "review_pending", label: "Review Pending" },
-  { value: "processing", label: "Processing" },
+  { value: "questions_review", label: "Questions Review" },
+  { value: "audit_review", label: "Audit Review" },
+  { value: "generating", label: "Generating" },
+  { value: "auditing", label: "Auditing" },
   { value: "completed", label: "Completed" },
   { value: "pending", label: "Pending" },
   { value: "failed", label: "Failed" },
@@ -69,9 +63,12 @@ export default function AuditsPage() {
     }
   }, [router.isReady, fetchAudits]);
 
-  const handleApprove = async (auditId: string) => {
-    if (!confirm("Approve this audit and make it visible to the client?"))
-      return;
+  const handleApprove = async (auditId: string, status: string) => {
+    const msg =
+      status === "questions_review"
+        ? "Approve these questions and start the full audit?"
+        : "Approve this audit and make it visible to the client?";
+    if (!confirm(msg)) return;
     try {
       const res = await fetch("/api/audits/approve", {
         method: "POST",
@@ -80,7 +77,7 @@ export default function AuditsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success("Audit approved");
+        toast.success(`Approved — moved to "${data.newStatus}"`);
         fetchAudits();
       } else {
         toast.error(data.error || "Failed to approve");
@@ -109,6 +106,9 @@ export default function AuditsPage() {
       toast.error("Network error");
     }
   };
+
+  const isReviewable = (status: string) =>
+    ["questions_review", "audit_review", "review_pending"].includes(status);
 
   return (
     <AdminLayout title={`Audits (${total})`}>
@@ -171,11 +171,11 @@ export default function AuditsPage() {
                     </td>
                     <td className="py-3 pr-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium text-white ${
-                          STATUS_COLORS[audit.status] || "bg-gray-600"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium text-white ${statusColor(
+                          audit.status
+                        )}`}
                       >
-                        {audit.status}
+                        {statusLabel(audit.status)}
                       </span>
                     </td>
                     <td className="py-3 pr-4 font-mono">
@@ -185,12 +185,15 @@ export default function AuditsPage() {
                     </td>
                     <td className="py-3 pr-4 text-gray-400">
                       {audit.createdAt
-                        ? new Date(audit.createdAt).toLocaleDateString("fr-FR", {
-                            day: "2-digit",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
+                        ? new Date(audit.createdAt).toLocaleDateString(
+                            "fr-FR",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )
                         : "-"}
                     </td>
                     <td className="py-3 pr-4 text-gray-400">
@@ -214,10 +217,12 @@ export default function AuditsPage() {
                         >
                           View
                         </Link>
-                        {audit.status === "review_pending" && (
+                        {isReviewable(audit.status) && (
                           <>
                             <button
-                              onClick={() => handleApprove(audit._id)}
+                              onClick={() =>
+                                handleApprove(audit._id, audit.status)
+                              }
                               className="text-xs px-2 py-1 bg-green-700 rounded hover:bg-green-600 transition-colors"
                             >
                               Approve

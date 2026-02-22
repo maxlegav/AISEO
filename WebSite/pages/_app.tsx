@@ -13,6 +13,7 @@ import { NotificationProvider } from "../components/NotificationSystem";
 import { LanguageProvider } from "../components/LanguageContext";
 import { useUserStore } from "@/stores";
 import type { AppProps } from "next/app";
+import { Analytics } from "@vercel/analytics/next"
 
 // Configure fonts
 const inter = Inter({
@@ -68,6 +69,7 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <LanguageProvider>
+        <Analytics/>
         <div
           className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} ${poppins.variable} ${lato.variable} ${cormorantGaramond.variable} font-sans`}
         >

@@ -10,8 +10,14 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+    background-color: #ffffff;
+  }
+
   /* Définition des polices selon la charte graphique */
   body {
+    overflow-x: hidden;
     font-family:
       var(--font-inter),
       "Inter",

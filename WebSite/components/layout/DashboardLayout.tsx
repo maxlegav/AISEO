@@ -1,15 +1,14 @@
-import { ReactNode, useEffect, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { ReactNode, useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   FileText,
-  FolderKanban,
   Settings,
-  Bell,
   Plus,
-  LogOut,
+  Search,
+  ChevronDown,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,7 +16,13 @@ import { useLanguage } from "@/components/LanguageContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  activeMenu?: "dashboard" | "audits" | "projects" | "settings";
+  activeMenu?: "dashboard" | "audits" | "settings";
+}
+
+interface ProjectItem {
+  _id: string;
+  name: string;
+  slug: string;
 }
 
 export default function DashboardLayout({
@@ -27,21 +32,43 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const { t } = useLanguage();
-  const [creditsUsed, setCreditsUsed] = useState(0);
-  const [creditsTotal, setCreditsTotal] = useState(0);
+  const [auditCredits, setAuditCredits] = useState(0);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch real credits data
+  // Fetch audit credits
   useEffect(() => {
     if (status === "authenticated") {
-      setCreditsUsed(session?.user?.auditCredits || 0);
-      const tier = session?.user?.subscriptionTier;
-      if (tier === "premium") setCreditsTotal(20);
-      else if (tier === "pro" || tier === "basic") setCreditsTotal(1);
-      else setCreditsTotal(0);
+      setAuditCredits(session?.user?.auditCredits || 0);
     }
   }, [status, session]);
 
-  // Redirect if not authenticated
+  // Fetch projects for dropdown
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/businesses/list")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) setProjects(data.data);
+      })
+      .catch(() => {});
+  }, [status]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/dashboard");
@@ -50,7 +77,7 @@ export default function DashboardLayout({
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
         <div className="text-center">
           <div className="w-12 h-12 mx-auto mb-4 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-gray-600">{String(t("common.loading"))}</p>
@@ -60,6 +87,8 @@ export default function DashboardLayout({
   }
 
   const username = session?.user?.username;
+  const displayName =
+    session?.user?.displayName || session?.user?.name || "User";
 
   const menuItems = [
     {
@@ -75,12 +104,6 @@ export default function DashboardLayout({
       href: username ? `/${username}/audits` : "/dashboard",
     },
     {
-      key: "projects" as const,
-      icon: FolderKanban,
-      label: String(t("dashboard.projects")),
-      href: username ? `/${username}` : "/dashboard",
-    },
-    {
       key: "settings" as const,
       icon: Settings,
       label: String(t("dashboard.settings")),
@@ -89,115 +112,142 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200 flex flex-col">
-        <div className="p-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-              <Image
-                src="/syb_logo_transparent.png"
-                alt="ShowYourBrand"
-                width={40}
-                height={40}
-              />
-            </div>
-            <span className="font-heading text-lg font-bold text-gray-900 tracking-tight">
-              ShowYourBrand
-            </span>
-          </Link>
-        </div>
+      <aside className="w-52 flex flex-col py-5 shrink-0">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 px-5 mb-6">
+          <Image
+            src="/syb_logo_transparent.png"
+            alt="ShowYourBrand"
+            width={28}
+            height={28}
+          />
+          <span className="text-[14px] font-semibold text-gray-900 tracking-tight">
+            ShowYourBrand
+          </span>
+        </Link>
 
-        <div className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-          MENU
-        </div>
-
-        <nav className="flex-1 px-4 space-y-1">
+        <nav className="flex-1 space-y-0.5 px-3">
           {menuItems.map((item) => (
             <Link
               key={item.key}
               href={item.href}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-[13.5px] ${
                 activeMenu === item.key
-                  ? "bg-white shadow-sm text-gray-900"
-                  : "text-gray-600 hover:bg-white/50"
+                  ? "bg-white/90 shadow-sm text-gray-900 font-medium"
+                  : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
               }`}
             >
-              <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
+              <item.icon
+                className="w-[17px] h-[17px]"
+                strokeWidth={activeMenu === item.key ? 2.2 : 1.8}
+              />
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
 
-        {/* Credits Widget */}
-        <div className="p-4 m-4 bg-white rounded-xl border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              {String(t("dashboard.credits"))}
-            </span>
-            <span className="text-sm font-bold text-gray-900">
-              {creditsUsed}/{creditsTotal}
+        {/* Audit Credits Widget */}
+        <div className="mx-3 bg-white/90 rounded-xl p-4 border border-gray-100/80 shadow-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <Zap className="w-4 h-4 text-orange-500" />
+            <span className="text-[13px] font-medium text-gray-700">
+              {String(t("dashboard.auditsRemaining"))}
             </span>
           </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
-            <div
-              className="h-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all"
-              style={{
-                width: creditsTotal > 0 ? `${(creditsUsed / creditsTotal) * 100}%` : "0%",
-              }}
-            />
-          </div>
-          <Link href="/settings">
-            <Button className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm h-9">
-              {String(t("dashboard.upgradePlan"))}
-            </Button>
-          </Link>
-        </div>
-
-        {/* Logout Button */}
-        <div className="px-4 pb-4">
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all"
+          <p className="text-3xl font-bold text-gray-900 mb-2">
+            {auditCredits}
+          </p>
+          <Link
+            href="/settings#subscription"
+            className="text-[13px] text-blue-600 hover:text-blue-700 font-medium"
           >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">{String(t("btn.logout"))}</span>
-          </button>
+            {String(t("dashboard.buyMore"))}
+          </Link>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto flex flex-col">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
-          <div className="flex items-center justify-between px-8 py-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {(session?.user?.displayName || session?.user?.name)?.[0] || "U"}
-                </div>
-                <span className="font-medium text-gray-900">
-                  {session?.user?.displayName || session?.user?.name || "User"}
+        <header className="px-8 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5 text-sm">
+              <Search className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" />
+              <span className="text-gray-300">/</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-orange-400 to-amber-500" />
+                <span className="font-medium text-gray-600">
+                  {username || displayName}
                 </span>
+              </div>
+              <span className="text-gray-300">/</span>
+
+              {/* Projects Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-1 text-gray-900 font-semibold hover:text-gray-700 transition-colors"
+                >
+                  {String(t("dashboard.allProjects"))}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-gray-500 transition-transform ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    {projects.length === 0 ? (
+                      <p className="px-4 py-3 text-sm text-gray-400">
+                        {String(t("dashboard.noProjects"))}
+                      </p>
+                    ) : (
+                      projects.map((project) => (
+                        <Link
+                          key={project._id}
+                          href={`/${username}/${project.slug}`}
+                          onClick={() => setDropdownOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          {project.name}
+                        </Link>
+                      ))
+                    )}
+                    <div className="border-t border-gray-100 mt-1 pt-1">
+                      <Link
+                        href="/projects/create"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        {String(t("dashboard.createNewProject"))}
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link href="/projects/create">
-                <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  {String(t("dashboard.newProject"))}
-                </Button>
-              </Link>
-              <button className="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
-                <Bell className="w-5 h-5" />
+            <div className="flex items-center gap-4">
+              <button className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                {String(t("dashboard.feedback"))}
               </button>
+              <Link href="/projects/create">
+                <button className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full px-5 h-9 flex items-center gap-2 transition-colors">
+                  <Plus className="w-3.5 h-3.5" />
+                  {String(t("dashboard.newAudit"))}
+                </button>
+              </Link>
+              
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-8">{children}</div>
+        <div className="px-8 pb-8 flex-1">{children}</div>
       </main>
     </div>
   );

@@ -8,100 +8,45 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
+  XCircle,
 } from "lucide-react";
 
-type AuditStatus = "completed" | "processing" | "pending";
+type UIStatus = "completed" | "processing" | "pending" | "failed";
 
-interface MockAudit {
-  id: string;
-  projectName: string;
-  score: number;
-  status: AuditStatus;
-  date: string;
-  engines: string[];
+interface Audit {
+  _id: string;
+  businessId?: string;
+  businessName?: string;
+  businessPrimaryUrl?: string;
+  status: string;
+  geoScore?: number;
+  createdAt?: string;
+  completedAt?: string;
 }
 
-const MOCK_AUDITS: MockAudit[] = [
-  {
-    id: "mock-1",
-    projectName: "Mon Site Web",
-    score: 72,
-    status: "completed",
-    date: "2026-02-06",
-    engines: ["ChatGPT", "Claude", "Perplexity"],
-  },
-  {
-    id: "mock-2",
-    projectName: "E-commerce Store",
-    score: 45,
-    status: "completed",
-    date: "2026-02-04",
-    engines: ["ChatGPT", "Claude", "DeepSeek"],
-  },
-  {
-    id: "mock-3",
-    projectName: "Blog Tech",
-    score: 0,
-    status: "processing",
-    date: "2026-02-08",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-  {
-    id: "mock-4",
-    projectName: "Restaurant Le Gourmet",
-    score: 83,
-    status: "completed",
-    date: "2026-01-28",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-  {
-    id: "mock-5",
-    projectName: "Agence Marketing Pro",
-    score: 31,
-    status: "completed",
-    date: "2026-01-25",
-    engines: ["ChatGPT", "Claude"],
-  },
-  {
-    id: "mock-6",
-    projectName: "SaaS Platform",
-    score: 0,
-    status: "pending",
-    date: "2026-02-08",
-    engines: ["ChatGPT", "Claude", "Perplexity", "DeepSeek"],
-  },
-  {
-    id: "mock-7",
-    projectName: "Mon Site Web",
-    score: 58,
-    status: "completed",
-    date: "2026-01-15",
-    engines: ["ChatGPT", "Claude", "Perplexity"],
-  },
-];
+function mapToUIStatus(dbStatus: string): UIStatus {
+  if (dbStatus === "completed") return "completed";
+  if (dbStatus === "pending") return "pending";
+  if (dbStatus === "failed" || dbStatus === "rejected") return "failed";
+  return "processing";
+}
 
 function scoreColor(score: number) {
-  if (score >= 70) return "text-green-600";
+  if (score >= 70) return "text-emerald-600";
   if (score >= 40) return "text-orange-500";
   return "text-red-500";
 }
 
-function scoreBg(score: number) {
-  if (score >= 70) return "from-green-400 to-green-500";
-  if (score >= 40) return "from-orange-400 to-amber-500";
-  return "from-red-400 to-red-500";
-}
-
-function StatusBadge({ status }: { status: AuditStatus }) {
+function StatusBadge({ status }: { status: UIStatus }) {
   const { t } = useLanguage();
-  const config = {
+  const config: Record<UIStatus, { bg: string; icon: React.ReactNode; label: string }> = {
     completed: {
-      bg: "bg-green-100 text-green-700",
+      bg: "bg-emerald-50 text-emerald-700",
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
       label: String(t("audit.status.completed")),
     },
     processing: {
-      bg: "bg-blue-100 text-blue-700",
+      bg: "bg-blue-50 text-blue-700",
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
       label: String(t("audit.status.processing")),
     },
@@ -110,18 +55,25 @@ function StatusBadge({ status }: { status: AuditStatus }) {
       icon: <Clock className="w-3.5 h-3.5" />,
       label: String(t("audit.status.pending")),
     },
+    failed: {
+      bg: "bg-red-50 text-red-600",
+      icon: <XCircle className="w-3.5 h-3.5" />,
+      label: String(t("audit.status.failed")),
+    },
   };
   const c = config[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${c.bg}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${c.bg}`}
+    >
       {c.icon}
       {c.label}
     </span>
   );
 }
 
-function ScoreRing({ score, size = 64 }: { score: number; size?: number }) {
-  const radius = (size - 8) / 2;
+function ScoreRing({ score, size = 56 }: { score: number; size?: number }) {
+  const radius = (size - 6) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
 
@@ -141,7 +93,7 @@ function ScoreRing({ score, size = 64 }: { score: number; size?: number }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="url(#scoreGrad)"
+          stroke="url(#auditScoreGrad)"
           strokeWidth={4}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -149,14 +101,22 @@ function ScoreRing({ score, size = 64 }: { score: number; size?: number }) {
           className="transition-all duration-700"
         />
         <defs>
-          <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#9333ea" />
-            <stop offset="100%" stopColor="#f97316" />
+          <linearGradient
+            id="auditScoreGrad"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="0%"
+          >
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="100%" stopColor="#059669" />
           </linearGradient>
         </defs>
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`text-sm font-bold ${scoreColor(score)}`}>{score}%</span>
+        <span className={`text-sm font-bold ${scoreColor(score)}`}>
+          {score}%
+        </span>
       </div>
     </div>
   );
@@ -167,7 +127,9 @@ export default function AuditsPage() {
   const router = useRouter();
   const { username } = router.query;
   const { t } = useLanguage();
-  const [filter, setFilter] = useState<"all" | AuditStatus>("all");
+  const [filter, setFilter] = useState<"all" | UIStatus>("all");
+  const [audits, setAudits] = useState<Audit[]>([]);
+  const [loadingAudits, setLoadingAudits] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -189,25 +151,79 @@ export default function AuditsPage() {
     }
   }, [status, session, username, router]);
 
-  const filteredAudits = filter === "all"
-    ? MOCK_AUDITS
-    : MOCK_AUDITS.filter((a) => a.status === filter);
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const fetchAudits = async () => {
+      try {
+        const res = await fetch("/api/audits/list");
+        const data = await res.json();
+        if (data.success) {
+          setAudits(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch audits:", err);
+      } finally {
+        setLoadingAudits(false);
+      }
+    };
+    fetchAudits();
+  }, [status]);
 
-  const filterTabs: { key: "all" | AuditStatus; label: string; count: number }[] = [
-    { key: "all", label: String(t("audit.filterAll")), count: MOCK_AUDITS.length },
-    { key: "completed", label: String(t("audit.filterCompleted")), count: MOCK_AUDITS.filter((a) => a.status === "completed").length },
-    { key: "processing", label: String(t("audit.filterProcessing")), count: MOCK_AUDITS.filter((a) => a.status === "processing").length },
-    { key: "pending", label: String(t("audit.filterPending")), count: MOCK_AUDITS.filter((a) => a.status === "pending").length },
-  ];
+  const uiAudits = audits.map((a) => ({
+    ...a,
+    uiStatus: mapToUIStatus(a.status),
+  }));
 
-  if (status === "loading") {
+  const filteredAudits =
+    filter === "all"
+      ? uiAudits
+      : uiAudits.filter((a) => a.uiStatus === filter);
+
+  const counts = {
+    all: uiAudits.length,
+    completed: uiAudits.filter((a) => a.uiStatus === "completed").length,
+    processing: uiAudits.filter((a) => a.uiStatus === "processing").length,
+    pending: uiAudits.filter((a) => a.uiStatus === "pending").length,
+    failed: uiAudits.filter((a) => a.uiStatus === "failed").length,
+  };
+
+  const filterTabs: { key: "all" | UIStatus; label: string; count: number }[] =
+    [
+      { key: "all", label: String(t("audit.filterAll")), count: counts.all },
+      {
+        key: "completed",
+        label: String(t("audit.filterCompleted")),
+        count: counts.completed,
+      },
+      {
+        key: "processing",
+        label: String(t("audit.filterProcessing")),
+        count: counts.processing,
+      },
+      {
+        key: "pending",
+        label: String(t("audit.filterPending")),
+        count: counts.pending,
+      },
+      ...(counts.failed > 0
+        ? [
+            {
+              key: "failed" as UIStatus,
+              label: String(t("audit.status.failed")),
+              count: counts.failed,
+            },
+          ]
+        : []),
+    ];
+
+  if (status === "loading" || loadingAudits) {
     return (
       <DashboardLayout activeMenu="audits">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/3" />
+          <div className="h-10 bg-white/50 rounded-xl w-1/3" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded-2xl" />
+              <div key={i} className="h-24 bg-white/50 rounded-2xl" />
             ))}
           </div>
         </div>
@@ -219,28 +235,30 @@ export default function AuditsPage() {
     <DashboardLayout activeMenu="audits">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-serif font-medium text-gray-900 mb-2">
+        <h1 className="text-4xl font-heading font-medium text-gray-900 mb-2">
           {String(t("audit.listTitle"))}
         </h1>
-        <p className="text-gray-500">
-          {String(t("audit.listSubtitle"))}
-        </p>
+        <p className="text-gray-500">{String(t("audit.listSubtitle"))}</p>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
         {filterTabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               filter === tab.key
-                ? "bg-gradient-to-r from-purple-600 to-orange-500 text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                ? "bg-gray-900 text-white shadow-md"
+                : "bg-white/80 text-gray-600 hover:bg-white border border-gray-200/60"
             }`}
           >
             {tab.label}
-            <span className={`ml-1.5 ${filter === tab.key ? "text-white/80" : "text-gray-400"}`}>
+            <span
+              className={`ml-1.5 ${
+                filter === tab.key ? "text-white/70" : "text-gray-400"
+              }`}
+            >
               {tab.count}
             </span>
           </button>
@@ -248,59 +266,63 @@ export default function AuditsPage() {
       </div>
 
       {/* Audit Cards */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredAudits.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200 text-center">
+          <div className="bg-white/90 rounded-2xl p-12 border border-white/60 text-center">
             <p className="text-gray-500">{String(t("audit.noAudits"))}</p>
           </div>
         ) : (
-          filteredAudits.map((audit) => (
-            <Link
-              key={audit.id}
-              href={`/${session?.user?.username}/audits/${audit.id}`}
-              className="block bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-5">
-                  {audit.status === "completed" ? (
-                    <ScoreRing score={audit.score} />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-                      {audit.status === "processing" ? (
-                        <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
-                      ) : (
-                        <Clock className="w-6 h-6 text-gray-400" />
-                      )}
-                    </div>
-                  )}
+          filteredAudits.map((audit) => {
+            const formattedDate = audit.createdAt
+              ? new Date(audit.createdAt).toLocaleDateString("fr-FR", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "-";
 
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-lg">{audit.projectName}</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">{audit.date}</p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      {audit.engines.map((engine) => (
-                        <span
-                          key={engine}
-                          className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600"
-                        >
-                          {engine}
-                        </span>
-                      ))}
+            return (
+              <Link
+                key={audit._id}
+                href={`/${session?.user?.username}/audits/${audit._id}`}
+                className="block bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 hover:shadow-md transition-all p-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-5">
+                    {audit.uiStatus === "completed" && audit.geoScore != null ? (
+                      <ScoreRing score={audit.geoScore} />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+                        {audit.uiStatus === "processing" ? (
+                          <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                        ) : audit.uiStatus === "failed" ? (
+                          <XCircle className="w-5 h-5 text-red-400" />
+                        ) : (
+                          <Clock className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                    )}
+
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-[16px]">
+                        {audit.businessName || "—"}
+                      </h3>
+                      {audit.businessPrimaryUrl && (
+                        <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">
+                          {audit.businessPrimaryUrl}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-400 mt-0.5">
+                        {formattedDate}
+                      </p>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex flex-col items-end gap-2">
-                  <StatusBadge status={audit.status} />
-                  {audit.status === "completed" && (
-                    <div className="flex items-center gap-1">
-                      <div className={`w-20 h-2 rounded-full bg-gradient-to-r ${scoreBg(audit.score)}`} />
-                    </div>
-                  )}
+                  <StatusBadge status={audit.uiStatus} />
                 </div>
-              </div>
-            </Link>
-          ))
+              </Link>
+            );
+          })
         )}
       </div>
     </DashboardLayout>
