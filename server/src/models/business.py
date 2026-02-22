@@ -7,7 +7,9 @@ ALL fields and adapts prompts accordingly.
 
 from enum import Enum
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+
+from models.audit import PyObjectId
 
 
 class LocalityTier(str, Enum):
@@ -21,10 +23,12 @@ class LocalityTier(str, Enum):
 class AuditRequest(BaseModel):
     """Request model for the /audit endpoint."""
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     # Required fields — every audit must have these
     auditId: str  # MongoDB ObjectId string, created by Next.js
-    businessId: str  # MongoDB ObjectId string
-    userId: str  # MongoDB ObjectId string
+    businessId: PyObjectId
+    userId: PyObjectId
 
     # Core business identity
     businessName: str  # Brand/business name (e.g., "MaisonCuir")

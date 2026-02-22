@@ -2,6 +2,7 @@
 
 from models.business import AuditRequest, HtmlScanRequest, LocalityTier
 from models.audit import (
+    PyObjectId,
     EngineResult,
     PromptResult,
     CategoryScore,
@@ -16,6 +17,7 @@ from models.audit import (
 )
 
 __all__ = [
+    "PyObjectId",
     "AuditRequest",
     "HtmlScanRequest",
     "LocalityTier",

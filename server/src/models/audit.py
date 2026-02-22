@@ -8,7 +8,22 @@ When reading: _id is an ObjectId — convert with str()
 Schema version 2: slim top-level fields + single `results` JSON blob.
 """
 
-from pydantic import BaseModel
+from typing import Annotated, Any
+
+from bson import ObjectId
+from pydantic import BaseModel, BeforeValidator, ConfigDict
+
+
+def _validate_object_id(v: Any) -> ObjectId:
+    if isinstance(v, ObjectId):
+        return v
+    try:
+        return ObjectId(v)
+    except Exception:
+        raise ValueError(f"Invalid ObjectId: {v!r}")
+
+
+PyObjectId = Annotated[ObjectId, BeforeValidator(_validate_object_id)]
 
 
 class EngineResult(BaseModel):
@@ -106,6 +121,9 @@ class HtmlScanResult(BaseModel):
     keywords: list[dict] = []  # top 30 keywords by frequency
     aiBotAccessibility: dict = {}  # AI bot HEAD-request results
     robotsTxtAnalysis: dict = {}  # robots.txt parsing results
+    sitemapAnalysis: dict = {}  # sitemap.xml parsing and validation results
+    legalPages: dict = {}  # legal page presence check results
+    llmsTxtAnalysis: dict = {}  # llms.txt presence and content analysis
     htmlScannerScore: float = 0.0  # 0-100
     scanCompleteness: dict[str, bool] = {}  # which analysis tools ran successfully
     scanErrors: list[str] = []
@@ -135,6 +153,8 @@ class ResultsBlob(BaseModel):
     discoverabilityThreshold: DiscoverabilityThreshold | None = None
     competitorResults: list[CompetitorResult] = []
 
+    originalRequest: dict = {}  # Stored so Phase 2 can reconstruct AuditRequest without the HTTP call
+
     enginesUsed: list[str] = []
     enginesSucceeded: list[str] = []
     totalPromptsProcessed: int = 0
@@ -149,10 +169,13 @@ class AuditDocument(BaseModel):
     Everything else lives in the `results` blob.
     """
 
-    businessId: str
-    userId: str
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    businessId: PyObjectId
+    userId: PyObjectId
     businessName: str = ""
-    status: str = "pending"  # pending, processing, review_pending, completed, rejected, failed
+    status: str = "pending"
+    # pending → processing → awaiting_prompt_approval → processing → review_pending / failed
     geoScore: float | None = None
     schemaVersion: int = 2
 
