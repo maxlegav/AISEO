@@ -4,18 +4,14 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   ChevronDown,
   ChevronUp,
-  Search,
   Check,
   Star,
-  Calendar,
   Mail,
   Twitter,
   Linkedin,
-  X,
   Eye,
   Target,
   Zap,
@@ -403,47 +399,9 @@ const SubscriberCounter = ({ count }: { count: number }) => (
   </div>
 );
 
-// Cal.com Embed Modal Component
-const CalComModal = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full shadow-md"
-        >
-          <X className="w-5 h-5" />
-        </button>
-        <div className="h-[600px]">
-          <iframe
-            src="https://cal.com/ShowYourBrand/presentation-of-ShowYourBrand?embed=true&theme=light"
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            className="rounded-3xl"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function Home() {
-  const [url, setUrl] = useState("");
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
-  const [showCalModal, setShowCalModal] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(51);
 
   useEffect(() => {
@@ -456,12 +414,6 @@ export default function Home() {
       })
       .catch(() => {});
   }, []);
-
-  const handleStartAudit = () => {
-    if (url && url.includes(".")) {
-      window.location.href = `/signup?url=${encodeURIComponent(url)}`;
-    }
-  };
 
   const faqs = [
     {
@@ -535,19 +487,19 @@ export default function Home() {
 
       <main className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
         {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-sm">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md">
           <div className="container mx-auto px-4">
             <div className="flex items-center h-16 relative">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                   <Image
                     src={"/syb_logo_transparent.png"}
                     alt="logo"
-                    width={120}
-                    height={120}
-                  ></Image>
+                    width={32}
+                    height={32}
+                  />
                 </div>
-                <span className="font-heading text-4xl font-bold text-gray-900 tracking-tight">
+                <span className="text-base font-semibold text-gray-900 tracking-tight">
                   ShowYourBrand
                 </span>
               </Link>
@@ -577,6 +529,12 @@ export default function Home() {
                 >
                   FAQ
                 </a>
+                <Link
+                  href="/blog"
+                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                >
+                  Blog
+                </Link>
               </nav>
 
               <div className="ml-auto flex items-center gap-2">
@@ -596,7 +554,7 @@ export default function Home() {
         </header>
 
         {/* Hero Section */}
-        <section className="pt-16 md:pt-20 pb-8 px-4 relative overflow-hidden">
+        <section className="pt-32 md:pt-36 pb-8 px-4 relative overflow-hidden">
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-orange-300/40 rounded-full blur-3xl" />
@@ -618,39 +576,11 @@ export default function Home() {
 
             <AIModelMarquee />
 
-            {/* URL Input Section */}
+            {/* Single CTA Section */}
             <div className="mt-10 max-w-xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-full p-3 sm:p-2 shadow-xl border border-white/50">
-                <div className="flex-1 flex items-center gap-2 px-2 sm:px-4">
-                  <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <Input
-                    type="url"
-                    placeholder="Enter your website URL"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleStartAudit()}
-                    className="border-0 shadow-none focus-visible:ring-0 px-0 bg-transparent"
-                  />
-                </div>
-                <Button
-                  onClick={handleStartAudit}
-                  className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-xl sm:rounded-full px-6 py-3 sm:py-2 h-auto shadow-lg"
-                >
-                  Run Audit →
-                </Button>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCalModal(true)}
-                  className="rounded-full border-gray-300 text-gray-700 bg-white/70 backdrop-blur-sm hover:bg-white hover:border-gray-400"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book a Strategy Call
-                </Button>
+              <div className="flex justify-center">
                 <Link href="/waitlist">
-                  <Button className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg">
+                  <Button className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold">
                     <Mail className="w-4 h-4 mr-2" />
                     Join the Waitlist
                   </Button>
@@ -923,8 +853,8 @@ export default function Home() {
                   "Content optimization tips",
                   "Email support (48h response)",
                 ]}
-                ctaText="Get Started"
-                ctaLink="/signup?plan=basic"
+                ctaText="Join the Waitlist"
+                ctaLink="/waitlist"
               />
               <PricingCard
                 title="PRO"
@@ -944,8 +874,8 @@ export default function Home() {
                   "Priority email support (24h)",
                 ]}
                 highlighted={true}
-                ctaText="Get Started"
-                ctaLink="/signup?plan=pro"
+                ctaText="Join the Waitlist"
+                ctaLink="/waitlist"
               />
               <PricingCard
                 title="PREMIUM FOR AGENCIES"
@@ -965,8 +895,8 @@ export default function Home() {
                   "Dedicated account manager",
                   "+€35 per extra audit beyond 20",
                 ]}
-                ctaText="Contact Sales"
-                ctaLink="/signup?plan=premium"
+                ctaText="Join the Waitlist"
+                ctaLink="/waitlist"
               />
             </div>
 
@@ -988,7 +918,7 @@ export default function Home() {
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
-                Trusted by innovators
+                Trusted by our beta-Testers
               </h2>
               <p className="text-gray-600">
                 See what early adopters are saying
@@ -1061,31 +991,9 @@ export default function Home() {
             </p>
 
             <div className="mt-10 max-w-xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-stretch sm:items-center bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-full p-3 sm:p-2 shadow-xl border border-white/20">
-                <div className="flex-1 flex items-center gap-2 px-2 sm:px-4">
-                  <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <Input
-                    type="url"
-                    placeholder="Enter your website URL"
-                    className="border-0 shadow-none focus-visible:ring-0 px-0 bg-transparent"
-                  />
-                </div>
-                <Button className="bg-[#1E293B] hover:bg-[#334155] text-white rounded-xl sm:rounded-full px-6 py-3 sm:py-2 h-auto shadow-lg">
-                  Run Audit →
-                </Button>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCalModal(true)}
-                  className="rounded-full border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/40"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book a Strategy Call
-                </Button>
+              <div className="flex justify-center">
                 <Link href="/waitlist">
-                  <Button className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg">
+                  <Button className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold">
                     <Mail className="w-4 h-4 mr-2" />
                     Join the Waitlist
                   </Button>
@@ -1137,7 +1045,7 @@ export default function Home() {
                       height={120}
                     ></Image>
                   </div>
-                  <span className="font-heading text-xl font-bold text-gray-900 tracking-tight">
+                  <span className="text-base font-semibold text-gray-900 tracking-tight">
                     ShowYourBrand
                   </span>
                 </Link>
@@ -1196,6 +1104,14 @@ export default function Home() {
                   </li>
                   <li>
                     <Link
+                      href="/blog"
+                      className="hover:text-white transition-colors"
+                    >
+                      Blog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
                       href="/login"
                       className="hover:text-white transition-colors"
                     >
@@ -1237,11 +1153,6 @@ export default function Home() {
         </footer>
       </main>
 
-      {/* Modals */}
-      <CalComModal
-        isOpen={showCalModal}
-        onClose={() => setShowCalModal(false)}
-      />
     </>
   );
 }
