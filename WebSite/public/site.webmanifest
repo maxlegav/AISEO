@@ -1,20 +1,22 @@
 {
-  "name": "ShowYourBrand - AI SEO Optimization Platform",
+  "name": "ShowYourBrand - GEO Audit Platform",
   "short_name": "ShowYourBrand",
   "description": "Make your business visible in AI search engines with comprehensive GEO audits",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "theme_color": "#3B82F6",
+  "theme_color": "#C4B5FD",
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",
