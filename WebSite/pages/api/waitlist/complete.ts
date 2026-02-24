@@ -56,16 +56,22 @@ export default async function handler(
     );
 
     if (sendWelcomeEmail && !entry.emailSent) {
-      const html = await render(WaitlistWelcomeEmail({ email }));
-      sendEmail({
-        to: email,
-        subject: "You're on the ShowYourBrand waitlist!",
-        html,
-      })
-        .then(async () => {
+      try {
+        const html = await render(WaitlistWelcomeEmail({ email }));
+        const result = await sendEmail({
+          to: email,
+          subject: "You're on the ShowYourBrand waitlist!",
+          html,
+        });
+        if (result.success) {
           await Waitlist.updateOne({ _id: entry._id }, { emailSent: true });
-        })
-        .catch((err) => console.error("[Waitlist] Email send error:", err));
+          console.log("[Waitlist] Welcome email sent to", email);
+        } else {
+          console.error("[Waitlist] Email failed:", result.error);
+        }
+      } catch (emailErr) {
+        console.error("[Waitlist] Email exception:", emailErr);
+      }
     }
 
     return res.status(200).json({
