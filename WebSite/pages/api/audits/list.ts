@@ -1,11 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { ObjectId } from 'mongodb';
-import clientPromise from '@/libs/mongo';
+import mongoose from 'mongoose';
+import Audit from '@/models/Audit';
+import Business from '@/models/Business';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
 
-const DB_NAME = 'ShowYourBrand';
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  await mongoose.connect(process.env.MONGODB_URI!);
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,66 +29,52 @@ export default async function handler(
       throw new ApiError(ErrorType.AUTHENTICATION, 'You must be logged in');
     }
 
-    const client = await clientPromise;
-    const db = client.db(DB_NAME);
+    await connectDB();
 
-    // userId and businessId are stored as plain strings in the audits collection
+    // Mongoose auto-casts string → ObjectId for ObjectId-typed fields
     const filter: Record<string, unknown> = {
       userId: session.user.id,
     };
 
-    // Optional businessId filter
     const { businessId } = req.query;
     if (businessId && typeof businessId === 'string') {
+      if (!mongoose.Types.ObjectId.isValid(businessId)) {
+        throw new ApiError(ErrorType.VALIDATION, 'Invalid businessId format');
+      }
       filter.businessId = businessId;
     }
 
-    const audits = await db
-      .collection('audits')
-      .find(filter, {
-        projection: {
-          _id: 1,
-          businessId: 1,
-          businessName: 1,
-          status: 1,
-          geoScore: 1,
-          createdAt: 1,
-          completedAt: 1,
-        },
-      })
+    const audits = await Audit.find(filter)
       .sort({ createdAt: -1 })
-      .toArray();
+      .select('_id businessId businessName status geoScore createdAt completedAt')
+      .lean();
 
-    // Fetch fresh business data for all referenced businesses
-    const businessIds = [...new Set(audits.map((a) => a.businessId).filter(Boolean))];
+    // Fetch fresh business data for all referenced businesses.
+    // With .lean(), businessId is an ObjectId object — use .toString() for the map key.
+    const businessIds = [
+      ...new Set(audits.map((a) => a.businessId.toString()).filter(Boolean)),
+    ];
     const businessMap: Record<string, { name: string; primaryUrl: string }> = {};
 
     if (businessIds.length > 0) {
-      const validObjectIds = businessIds
-        .filter((id) => ObjectId.isValid(id))
-        .map((id) => new ObjectId(id as string));
+      const businesses = await Business.find({
+        _id: { $in: businessIds },
+        deletedAt: null,
+      })
+        .select('_id name primaryUrl')
+        .lean();
 
-      if (validObjectIds.length > 0) {
-        const businesses = await db
-          .collection('businesses')
-          .find(
-            { _id: { $in: validObjectIds }, deletedAt: null },
-            { projection: { _id: 1, name: 1, primaryUrl: 1 } }
-          )
-          .toArray();
-
-        for (const biz of businesses) {
-          businessMap[biz._id.toString()] = {
-            name: biz.name,
-            primaryUrl: biz.primaryUrl,
-          };
-        }
+      for (const biz of businesses) {
+        businessMap[biz._id.toString()] = {
+          name: biz.name,
+          primaryUrl: biz.primaryUrl,
+        };
       }
     }
 
     // Enrich each audit with live business data
     const enrichedAudits = audits.map((audit) => {
-      const biz = businessMap[audit.businessId as string];
+      const biz = businessMap[audit.businessId.toString()];
       return {
         ...audit,
         businessName: biz?.name ?? audit.businessName,

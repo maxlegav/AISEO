@@ -1,11 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { ObjectId } from 'mongodb';
-import clientPromise from '@/libs/mongo';
+import mongoose from 'mongoose';
+import Audit from '@/models/Audit';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
 
-const DB_NAME = 'ShowYourBrand';
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  await mongoose.connect(process.env.MONGODB_URI!);
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -38,29 +41,32 @@ export default async function handler(
     } = req.body;
 
     if (!businessId || !businessName || !businessUrl || !category) {
-      throw new ApiError(ErrorType.VALIDATION, 'Missing required fields: businessId, businessName, businessUrl, category');
+      throw new ApiError(
+        ErrorType.VALIDATION,
+        'Missing required fields: businessId, businessName, businessUrl, category'
+      );
     }
 
-    const client = await clientPromise;
-    const db = client.db(DB_NAME);
+    if (!mongoose.Types.ObjectId.isValid(businessId)) {
+      throw new ApiError(ErrorType.VALIDATION, 'Invalid businessId format');
+    }
 
-    // Create audit document — userId and businessId stored as strings (matching server convention)
-    const auditId = new ObjectId();
-    const now = new Date().toISOString();
+    await connectDB();
 
-    await db.collection('audits').insertOne({
-      _id: auditId,
-      businessId: businessId.toString(),
-      userId: session.user.id,
+    const audit = await Audit.create({
+      userId: new mongoose.Types.ObjectId(session.user.id),
+      businessId: new mongoose.Types.ObjectId(businessId),
       businessName,
       status: 'pending',
       schemaVersion: 2,
       geoScore: null,
       error: null,
       results: {},
-      createdAt: now,
+      createdAt: new Date(),
       completedAt: null,
     });
+
+    const auditId = audit._id.toString();
 
     // Fire-and-forget: trigger the Python processing server
     const processingUrl = process.env.PROCESSING_SERVICE_URL || 'http://localhost:8080';
@@ -68,7 +74,7 @@ export default async function handler(
 
     if (processingKey) {
       const auditRequest = {
-        auditId: auditId.toString(),
+        auditId,
         businessId: businessId.toString(),
         userId: session.user.id,
         businessName,
@@ -93,12 +99,14 @@ export default async function handler(
         console.error('[Audit] Failed to trigger processing server:', err.message);
       });
     } else {
-      console.warn('[Audit] PROCESSING_SERVICE_API_KEY not configured — audit created in DB but not triggered');
+      console.warn(
+        '[Audit] PROCESSING_SERVICE_API_KEY not configured — audit created in DB but not triggered'
+      );
     }
 
     return res.status(201).json({
       success: true,
-      data: { auditId: auditId.toString(), status: 'pending' },
+      data: { auditId, status: 'pending' },
     });
   } catch (error) {
     return handleApiError(error, res);

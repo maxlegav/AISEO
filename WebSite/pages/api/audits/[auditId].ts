@@ -1,11 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { ObjectId } from 'mongodb';
-import clientPromise from '@/libs/mongo';
+import mongoose from 'mongoose';
+import Audit from '@/models/Audit';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
 
-const DB_NAME = 'ShowYourBrand';
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  await mongoose.connect(process.env.MONGODB_URI!);
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,29 +33,22 @@ export default async function handler(
       throw new ApiError(ErrorType.VALIDATION, 'Missing auditId');
     }
 
-    let oid: ObjectId;
-    try {
-      oid = new ObjectId(auditId);
-    } catch {
-      throw new ApiError(ErrorType.VALIDATION, 'Invalid auditId format');
-    }
+    await connectDB();
 
-    const client = await clientPromise;
-    const db = client.db(DB_NAME);
-
-    const audit = await db.collection('audits').findOne({ _id: oid });
+    // Mongoose handles invalid ObjectId format gracefully (returns null)
+    const audit = await Audit.findById(auditId).lean();
 
     if (!audit) {
       throw new ApiError(ErrorType.NOT_FOUND, 'Audit not found');
     }
 
-    // Security: ensure the audit belongs to the current user
-    if (audit.userId !== session.user.id) {
+    // Security: userId is ObjectId — compare via .toString()
+    if (audit.userId.toString() !== session.user.id) {
       throw new ApiError(ErrorType.AUTHORIZATION, 'Access denied');
     }
 
     if (req.method === 'DELETE') {
-      await db.collection('audits').deleteOne({ _id: oid });
+      await Audit.findByIdAndDelete(auditId);
       return res.status(200).json({ success: true, data: { deleted: true } });
     }
 
