@@ -10,7 +10,7 @@ import {
   Check,
   Star,
   Mail,
-  Twitter,
+  Twitter ,
   Linkedin,
   Eye,
   Target,
@@ -1055,13 +1055,13 @@ export default function Home() {
                 </p>
                 <div className="flex gap-4">
                   <a
-                    href="https://twitter.com"
+                    href="https://x.com/showyourbrand_"
                     className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
                   >
                     <Twitter className="w-5 h-5" />
                   </a>
                   <a
-                    href="https://linkedin.com"
+                    href="https://www.linkedin.com/company/showyourbrand/"
                     className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
                   >
                     <Linkedin className="w-5 h-5" />

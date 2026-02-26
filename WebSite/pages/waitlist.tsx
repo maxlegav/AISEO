@@ -32,11 +32,11 @@ const GEO_EXPERIENCE_OPTIONS = [
 ];
 
 const BUDGET_OPTIONS = [
-  "Less than €50",
-  "€50 - €150",
-  "€150 - €300",
-  "€300 - €500",
-  "More than €500",
+  "Less than 100€",
+  "€100 - €200",
+  "€200 - €500",
+  "€500 - €1000",
+  "More than €1000",
 ];
 
 export default function WaitlistPage() {

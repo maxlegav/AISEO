@@ -7,7 +7,11 @@
       "Bash(npx tsc --noEmit 2>&1 | head -40)",
       "Bash(npx tsc --noEmit 2>&1 | head -30)",
       "Bash(ls:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(npm install @vercel/analytics 2>&1 | tail -5)",
+      "Bash(npm install gray-matter 2>&1 | tail -3)",
+      "Bash(git add pages/api/waitlist/complete.ts && git commit -m \"$(cat <<'EOF'\nfix: await email send in waitlist complete for proper error logging\n\nReplace fire-and-forget pattern with await to surface Resend errors\nin Vercel function logs instead of silently failing.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n)\" && git push)",
+      "Bash(git pull)"
     ]
   },
   "enableAllProjectMcpServers": true,
