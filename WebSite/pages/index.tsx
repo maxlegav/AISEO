@@ -393,8 +393,8 @@ const SubscriberCounter = ({ count }: { count: number }) => (
     </div>
     {/* Count */}
     <p className="text-sm text-gray-700 font-medium">
-      <span className="font-bold text-gray-900">{count}</span> professionals
-      already joined
+      <span className="font-bold text-gray-900"> {count} </span> professionals
+      already joined, be one of them !
     </p>
   </div>
 );
@@ -457,8 +457,16 @@ export default function Home() {
     <>
       <TagSEO
         canonicalSlug=""
-        title="ShowYourBrand - Stop Being Invisible to AI | GEO Optimization Platform"
-        description="The first Generative Engine Optimization (GEO) platform. Audit, analyze, and optimize your brand's presence across all major AI models."
+        title="ShowYourBrand — GEO Audit: Appear in ChatGPT, Claude & Perplexity"
+        description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers."
+        keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
+        og={{
+          title: "ShowYourBrand — Appear in AI Search Results",
+          description:
+            "Is your brand cited by ChatGPT, Claude or Perplexity? Test 100 AI prompts, get your GEO score and a clear action plan. Start your free audit today.",
+          image: `https://ShowYourBrand.com/shareMain.png`,
+          url: "https://ShowYourBrand.com/",
+        }}
       />
       <TagSchema />
 
@@ -1024,7 +1032,7 @@ export default function Home() {
                   <span className="font-bold text-white">
                     {subscriberCount}
                   </span>{" "}
-                  professionals already joined
+                  professionals already joined, be one of them 
                 </p>
               </div>
             </div>

@@ -5,12 +5,14 @@ import type { ReactNode } from 'react';
 // Predefined SEO tags — prefilled with default values but you can customize them for each page
 // This let you add default SEO tags to all pages, like /terms, /privacy, without rewrtting them all
 const defaults = {
-  title: `up to 50 characters | ${config.appName}`,
-  description: '60 to 180 characters',
-  keywords: `${config.appName}, some other keywords if needed`,
+  title: `${config.appName} — GEO Audit: Appear in ChatGPT, Claude & Perplexity`,
+  description:
+    'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers.',
+  keywords: `GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit, ${config.appName}`,
   og: {
-    title: `up to 50 characters | ${config.appName}`,
-    description: '60 to 180 characters',
+    title: `${config.appName} — GEO Audit: Appear in ChatGPT, Claude & Perplexity`,
+    description:
+      'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers.',
     image: `https://${config.domainName}/shareMain.png`,
     url: `https://${config.domainName}/`,
   },
@@ -71,7 +73,9 @@ const TagSEO = ({
       />
       <meta property='og:url' content={og?.url || defaults.og.url} />
       <meta name='twitter:card' content='summary_large_image' />
-      <meta name='twitter:creator' content='@marc_louvion' />
+      <meta name='twitter:title' content={og?.title || defaults.og.title} />
+      <meta name='twitter:description' content={og?.description || defaults.og.description} />
+      <meta name='twitter:image' content={og?.image || defaults.og.image} />
 
       {/* CANONICAL TAG */}
       <link
