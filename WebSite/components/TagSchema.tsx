@@ -20,7 +20,7 @@ const TagSchema = () => {
             name: config.appName,
             description:
               "Audit your brand's visibility across 100 AI prompts on ChatGPT, Claude, Perplexity and DeepSeek. Get a GEO Health Score and actionable recommendations to appear in AI answers.",
-            image: `${config.siteUrl}/api/og`,
+            image: `${config.siteUrl}/og-image.png`,
             url: `${config.siteUrl}/`,
             author: {
               "@type": "Organization",
