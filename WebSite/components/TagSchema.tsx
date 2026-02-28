@@ -1,6 +1,7 @@
 import Head from "next/head";
 import config from "@/config";
 
+
 // Strctured Data for Rich Results on Google. Learn more: https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data
 // Find your type here (SoftwareApp, Book...): https://developers.google.com/search/docs/appearance/structured-data/search-gallery
 // Use this tool to check data is well structure: https://search.google.com/test/rich-results
@@ -19,8 +20,8 @@ const TagSchema = () => {
             name: config.appName,
             description:
               "Audit your brand's visibility across 100 AI prompts on ChatGPT, Claude, Perplexity and DeepSeek. Get a GEO Health Score and actionable recommendations to appear in AI answers.",
-            image: `https://${config.domainName}/shareMain.png`,
-            url: `https://${config.domainName}/`,
+            image: `${config.siteUrl}/api/og`,
+            url: `${config.siteUrl}/`,
             author: {
               "@type": "Organization",
               name: config.appName,

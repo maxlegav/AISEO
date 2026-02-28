@@ -464,8 +464,8 @@ export default function Home() {
           title: "ShowYourBrand — Appear in AI Search Results",
           description:
             "Is your brand cited by ChatGPT, Claude or Perplexity? Test 100 AI prompts, get your GEO score and a clear action plan. Start your free audit today.",
-          image: `https://ShowYourBrand.com/api/og`,
-          url: "https://ShowYourBrand.com/",
+          image: `https://showyourbrand.vercel.app/api/og`,
+          url: "https://showyourbrand.vercel.app/",
         }}
       />
       <TagSchema />

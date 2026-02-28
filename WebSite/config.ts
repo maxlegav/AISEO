@@ -14,6 +14,10 @@ const config = {
   // Domain (TODO: Story 1.2 - set actual domain)
   domainName: "ShowYourBrand.com",
 
+  // Live site URL — reads from NEXT_PUBLIC_SITE_URL env var (set in Vercel dashboard)
+  // Falls back to the current Vercel deployment URL
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://showyourbrand.vercel.app",
+
   // Stripe Configuration - ShowYourBrand Pricing
   stripe: {
     // Basic One-Shot: €199 (ChatGPT only, 1 competitor, no history)
