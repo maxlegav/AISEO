@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import {
   LayoutDashboard,
@@ -9,6 +9,7 @@ import {
   Search,
   ChevronDown,
   Zap,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -241,7 +242,13 @@ export default function DashboardLayout({
                   {String(t("dashboard.newAudit"))}
                 </button>
               </Link>
-              
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-red-500 transition-colors"
+                title={String(t("btn.logout"))}
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </header>
