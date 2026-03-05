@@ -24,6 +24,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from routes.health import router as health_router
 from routes.audit import router as audit_router
 from routes.html_scan import router as html_scan_router
+from routes.gsc import router as gsc_router
 
 import config as app_config
 
@@ -146,6 +147,7 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(audit_router)
 app.include_router(html_scan_router)
+app.include_router(gsc_router)
 
 
 @app.get("/")

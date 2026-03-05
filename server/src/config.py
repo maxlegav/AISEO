@@ -28,6 +28,10 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:4b")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 
 MOCK_AI = os.getenv("MOCK_AI", "false").lower() in ("true", "1", "yes")
+MOCK_GSC = os.getenv("MOCK_GSC", "false").lower() in ("true", "1", "yes")
+
+GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
+MOCK_GOOGLE_REVIEWS = os.getenv("MOCK_GOOGLE_REVIEWS", "false").lower() in ("true", "1", "yes")
 
 if MOCK_AI:
     MIN_ENGINES_REQUIRED = 1

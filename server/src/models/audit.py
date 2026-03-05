@@ -35,6 +35,18 @@ class EngineResult(BaseModel):
     rawResponse: str = ""
     responseTime: int = 0  # milliseconds
     error: str | None = None
+    citations: list[dict] = []  # [{"url": str, "title": str|None}, ...]
+    targetCited: bool = False  # True if target business URL found in citations
+
+
+class CitationStats(BaseModel):
+    """Aggregated citation statistics across all prompts and engines."""
+
+    totalCitations: int = 0          # Total citation entries across all prompts/engines
+    uniqueUrls: int = 0              # Count of unique URLs cited
+    targetCitationRate: float = 0.0  # Fraction of prompt/engine pairs where target URL was cited
+    topDomains: list[dict] = []      # [{"domain": str, "count": int}] top 10 cited domains
+    byEngine: dict[str, dict] = {}   # {engine: {"totalCitations": int, "targetCitationRate": float}}
 
 
 class GeneratedPrompt(BaseModel):
@@ -131,6 +143,79 @@ class HtmlScanResult(BaseModel):
     subPagesScanned: list[dict] | None = None  # [{url, score}] if sub-URLs were scanned
 
 
+class GscQuery(BaseModel):
+    """Single GSC search query row."""
+
+    query: str
+    clicks: int
+    impressions: int
+    ctr: float        # 0.0–1.0 (raw fraction from API)
+    position: float   # average rank position
+
+
+class GscCountryData(BaseModel):
+    """GSC traffic breakdown for one country."""
+
+    countryCode: str  # ISO 3166-1 alpha-3, GSC format (e.g. "fra", "usa")
+    clicks: int
+    impressions: int
+    ctr: float
+    position: float
+
+
+class GscIndexStatus(BaseModel):
+    """URL Inspection API result for a single URL."""
+
+    inspectedUrl: str
+    indexingState: str           # "INDEXING_ALLOWED" | "BLOCKED_BY_META_TAG" | etc.
+    robotsTxtState: str | None = None
+    pageFetchState: str | None = None
+    lastCrawlTime: str | None = None
+    googleCanonical: str | None = None
+    coverageState: str | None = None
+
+
+class GscAnalysisResult(BaseModel):
+    """Aggregated GSC analysis result stored inside ResultsBlob.gscData."""
+
+    siteUrl: str
+    startDate: str
+    endDate: str
+    topQueries: list[GscQuery] = []
+    countryBreakdown: list[GscCountryData] = []
+    indexStatus: GscIndexStatus | None = None
+    totalClicks: int = 0
+    totalImpressions: int = 0
+    avgCtr: float = 0.0
+    avgPosition: float = 0.0
+    primaryGeography: str | None = None  # Top country code by clicks
+    geoRelevanceScore: float | None = None  # 0–100
+    errors: list[str] = []
+    processingTimeMs: int = 0
+
+
+class GoogleReviewSample(BaseModel):
+    """Single review from Places API (up to 5 returned)."""
+
+    authorName: str = ""
+    rating: int = 0  # 1-5
+    relativeTime: str = ""  # e.g. "2 months ago"
+    text: str = ""
+
+
+class GoogleReviewsResult(BaseModel):
+    """Google Reviews data — contextual only, not included in GEO Score."""
+
+    placeId: str | None = None
+    rating: float | None = None  # 1.0-5.0 average
+    totalReviews: int | None = None  # userRatingCount
+    businessNameOnGoogle: str | None = None
+    reviewSamples: list[GoogleReviewSample] = []  # up to 5 from API
+    warning: str | None = None  # "NO_GOOGLE_PLACE_FOUND" etc.
+    errors: list[str] = []
+    processingTimeMs: int = 0
+
+
 class ResultsBlob(BaseModel):
     """All audit data that lives inside the `results` field in MongoDB.
 
@@ -149,9 +234,15 @@ class ResultsBlob(BaseModel):
 
     htmlScan: HtmlScanResult | None = None
     htmlScannerScore: float | None = None
+    gscData: GscAnalysisResult | None = None
+    googleReviews: GoogleReviewsResult | None = None
+
+    citationStats: CitationStats | None = None
+    citationVisibilityScore: float | None = None  # 0-100
 
     discoverabilityThreshold: DiscoverabilityThreshold | None = None
     competitorResults: list[CompetitorResult] = []
+    llmHijackPrompt: str | None = None
 
     originalRequest: dict = {}  # Stored so Phase 2 can reconstruct AuditRequest without the HTTP call
 

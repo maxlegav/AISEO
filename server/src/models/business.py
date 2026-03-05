@@ -64,6 +64,23 @@ class AuditRequest(BaseModel):
     # Catch-all for business-specific data
     customFields: dict = {}
 
+    # Google Search Console (optional — frontend provides OAuth2 token)
+    gscAccessToken: str | None = None   # GSC OAuth2 access token
+    gscSiteUrl: str | None = None       # GSC property URL (may differ from businessUrl)
+
+    googlePlaceId: str | None = None  # Auto-detected if not provided
+
+
+class GscAnalysisRequest(BaseModel):
+    """Request model for the standalone /gsc-analysis endpoint."""
+
+    accessToken: str
+    siteUrl: str       # GSC property (e.g. "https://example.com/" or "sc-domain:example.com")
+    primaryUrl: str    # URL to inspect via the URL Inspection API
+    localityTier: str | None = None   # For geo relevance scoring
+    country: str | None = None        # Business's expected country (ISO alpha-2)
+    daysBack: int = 28
+
 
 class HtmlScanRequest(BaseModel):
     """Request model for the /html-scan endpoint."""

@@ -14,6 +14,10 @@ Each function returns a standardized response format:
 
 from typing import Optional, List, Dict, Any
 import json
+import logging
+import re as _re
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -50,15 +54,61 @@ def call_openai_api(
         messages = conversation_history.copy() if conversation_history else []
         messages.append({"role": "user", "content": message})
 
-        # OpenAI Chat Completions API (web_search not natively supported — ignored)
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            **kwargs
-        )
+        citations: list[dict] = []
+        assistant_message = ""
+        tokens_meta: dict = {}
 
-        # Extract response
-        assistant_message = response.choices[0].message.content
+        # Try Responses API with web_search_preview when web search is requested
+        _used_responses_api = False
+        if use_web_search and hasattr(client, "responses"):
+            try:
+                resp = client.responses.create(
+                    model=model,
+                    tools=[{"type": "web_search_preview"}],
+                    input=messages,
+                )
+                seen_urls: set[str] = set()
+                for item in (resp.output or []):
+                    if getattr(item, "type", "") == "message":
+                        for content in getattr(item, "content", []):
+                            if getattr(content, "type", "") == "output_text":
+                                assistant_message += getattr(content, "text", "")
+                                for ann in getattr(content, "annotations", []):
+                                    if getattr(ann, "type", "") == "url_citation":
+                                        url = getattr(ann, "url", None)
+                                        title = getattr(ann, "title", None)
+                                        if url and url not in seen_urls:
+                                            citations.append({"url": url, "title": title})
+                                            seen_urls.add(url)
+                if not assistant_message:
+                    raise ValueError("No message content in Responses API output")
+                usage = getattr(resp, "usage", None)
+                tokens_meta = {
+                    "prompt": getattr(usage, "input_tokens", None) if usage else None,
+                    "completion": getattr(usage, "output_tokens", None) if usage else None,
+                    "total": getattr(usage, "total_tokens", None) if usage else None,
+                }
+                _used_responses_api = True
+            except Exception as ws_err:
+                logger.warning(
+                    f"OpenAI web_search_preview failed: {ws_err}, falling back to chat completions"
+                )
+                assistant_message = ""
+                citations = []
+
+        # Fall back to Chat Completions API
+        if not _used_responses_api:
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                **kwargs,
+            )
+            assistant_message = response.choices[0].message.content
+            tokens_meta = {
+                "prompt": response.usage.prompt_tokens,
+                "completion": response.usage.completion_tokens,
+                "total": response.usage.total_tokens,
+            }
 
         # Update conversation history
         messages.append({"role": "assistant", "content": assistant_message})
@@ -69,22 +119,19 @@ def call_openai_api(
             "conversation_history": messages,
             "metadata": {
                 "model": model,
-                "tokens_used": {
-                    "prompt": response.usage.prompt_tokens,
-                    "completion": response.usage.completion_tokens,
-                    "total": response.usage.total_tokens
-                },
-                "finish_reason": response.choices[0].finish_reason
+                "tokens_used": tokens_meta,
             },
-            "error": None
+            "citations": citations,
+            "error": None,
         }
-        
+
     except Exception as e:
         return {
             "success": False,
             "response": None,
             "conversation_history": conversation_history,
             "metadata": {},
+            "citations": [],
             "error": f"OpenAI API Error: {str(e)}"
         }
 
@@ -144,15 +191,41 @@ def call_anthropic_api(
         # Make API call
         response = client.messages.create(**api_params)
         
-        # Extract text content from response
+        # Extract text content and citations from response blocks
         assistant_message = ""
+        citations: list[dict] = []
+        seen_urls: set[str] = set()
+
         for block in response.content:
-            if block.type == "text":
+            block_type = getattr(block, "type", "")
+            if block_type == "text":
                 assistant_message += block.text
-        
+            elif block_type == "web_search_tool_result":
+                # Server-side web search results: extract cited URLs
+                for result in getattr(block, "content", []):
+                    if isinstance(result, dict):
+                        r_type = result.get("type", "")
+                        url = result.get("url")
+                        title = result.get("title")
+                    else:
+                        r_type = getattr(result, "type", "")
+                        url = getattr(result, "url", None)
+                        title = getattr(result, "title", None)
+                    if r_type == "web_search_result" and url and url not in seen_urls:
+                        citations.append({"url": url, "title": title})
+                        seen_urls.add(url)
+
+        # Fallback: regex-extract URLs from text if no structured citations
+        if not citations:
+            for url in _re.findall(r'https?://[^\s\)\]"<>,;]+', assistant_message):
+                url = url.rstrip(".,;")
+                if url and url not in seen_urls:
+                    citations.append({"url": url, "title": None})
+                    seen_urls.add(url)
+
         # Update conversation history
         messages.append({"role": "assistant", "content": assistant_message})
-        
+
         return {
             "success": True,
             "response": assistant_message,
@@ -165,15 +238,17 @@ def call_anthropic_api(
                 },
                 "stop_reason": response.stop_reason
             },
+            "citations": citations,
             "error": None
         }
-        
+
     except Exception as e:
         return {
             "success": False,
             "response": None,
             "conversation_history": conversation_history,
             "metadata": {},
+            "citations": [],
             "error": f"Anthropic API Error: {str(e)}"
         }
 
@@ -237,11 +312,31 @@ def call_google_api(
         )
         
         assistant_message = response.text
-        
+
+        # Extract grounding citations from Gemini response
+        citations: list[dict] = []
+        try:
+            candidates = getattr(response, "candidates", None) or []
+            if candidates:
+                grounding_meta = getattr(candidates[0], "grounding_metadata", None)
+                if grounding_meta:
+                    chunks = getattr(grounding_meta, "grounding_chunks", None) or []
+                    seen_urls: set[str] = set()
+                    for chunk in chunks:
+                        web = getattr(chunk, "web", None)
+                        if web:
+                            uri = getattr(web, "uri", None)
+                            title = getattr(web, "title", None)
+                            if uri and uri not in seen_urls:
+                                citations.append({"url": uri, "title": title})
+                                seen_urls.add(uri)
+        except Exception:
+            citations = []
+
         return {
             "success": True,
             "response": assistant_message,
-            "full_repsonse" : response,
+            "full_repsonse": response,
             "metadata": {
                 "model": model,
                 "tokens_used": {
@@ -250,15 +345,17 @@ def call_google_api(
                     "total": response.usage_metadata.total_token_count if hasattr(response, 'usage_metadata') else None
                 }
             },
+            "citations": citations,
             "error": None
         }
-        
+
     except Exception as e:
         return {
             "success": False,
             "response": None,
             "conversation_history": conversation_history,
             "metadata": {},
+            "citations": [],
             "error": f"Google API Error: {str(e)}"
         }
 
@@ -320,6 +417,12 @@ def call_perplexity_api(
         # Extract response
         assistant_message = response.choices[0].message.content
 
+        # Extract citations (Perplexity appends non-standard 'citations' list to the response)
+        citations_raw: list = []
+        if hasattr(response, "model_extra") and response.model_extra:
+            citations_raw = response.model_extra.get("citations", [])
+        citations = [{"url": u, "title": None} for u in citations_raw if isinstance(u, str)]
+
         # Update conversation history
         messages.append({"role": "assistant", "content": assistant_message})
 
@@ -336,15 +439,17 @@ def call_perplexity_api(
                 },
                 "finish_reason": response.choices[0].finish_reason if response.choices else None,
             },
-            "error": None
+            "citations": citations,
+            "error": None,
         }
-        
+
     except Exception as e:
         return {
             "success": False,
             "response": None,
             "conversation_history": conversation_history,
             "metadata": {},
+            "citations": [],
             "error": f"Perplexity API Error: {str(e)}"
         }
 

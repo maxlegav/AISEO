@@ -15,6 +15,7 @@ Implements all scoring formulas from audit-engine-spec.md sections 7-9, 13:
 import logging
 
 from models.audit import (
+    CitationStats,
     EngineResult,
     PromptResult,
     CategoryScore,
@@ -176,15 +177,118 @@ def calculate_discoverability_threshold(
 def calculate_geo_score(
     audit_engine_score: float,
     html_scanner_score: float | None,
+    citation_visibility_score: float | None = None,
 ) -> float:
     """
-    Final GEO Score = auditEngineScore × 0.70 + htmlScannerScore × 0.30.
-    If HTML scanner failed (None), use audit engine score at 100% weight.
-    """
-    if html_scanner_score is None:
-        return round(audit_engine_score, 1)
+    Final GEO Score with optional citation visibility component.
 
-    return round(audit_engine_score * 0.70 + html_scanner_score * 0.30, 1)
+    With all three components:
+        GEO = AES × 0.60 + HSS × 0.25 + CVS × 0.15
+    Without citation data (None):
+        GEO = AES × 0.70 + HSS × 0.30  (unchanged)
+    When a component is missing, its weight is redistributed to AES.
+    """
+    has_html = html_scanner_score is not None
+    has_citations = citation_visibility_score is not None
+
+    if has_html and has_citations:
+        return round(
+            audit_engine_score * 0.60
+            + html_scanner_score * 0.25
+            + citation_visibility_score * 0.15,
+            1,
+        )
+    if has_html and not has_citations:
+        return round(audit_engine_score * 0.70 + html_scanner_score * 0.30, 1)
+    if not has_html and has_citations:
+        # HTML weight (0.25) redistributed to AES
+        return round(audit_engine_score * 0.85 + citation_visibility_score * 0.15, 1)
+    # No HTML, no citations
+    return round(audit_engine_score, 1)
+
+
+def calculate_citation_stats(
+    prompt_results: list[PromptResult],
+    target_url: str,
+) -> tuple[CitationStats, float | None]:
+    """
+    Aggregate citation data from all PromptResults.
+
+    Returns (CitationStats, citationVisibilityScore 0-100 or None if no citations).
+    citationVisibilityScore = None when no engine returned any citations (no-penalty fallback).
+    """
+    from collections import Counter
+    from urllib.parse import urlparse
+
+    all_urls: list[str] = []
+    total_pairs_with_citations = 0
+    total_target_hits = 0
+    engine_data: dict[str, dict] = {}
+
+    for pr in prompt_results:
+        for engine_name, er in pr.engines.items():
+            if engine_name not in engine_data:
+                engine_data[engine_name] = {
+                    "total": 0,
+                    "target_hits": 0,
+                    "pairs_with_citations": 0,
+                }
+            if er.citations:
+                for c in er.citations:
+                    url = c.get("url", "")
+                    if url:
+                        all_urls.append(url)
+                engine_data[engine_name]["total"] += len(er.citations)
+                engine_data[engine_name]["pairs_with_citations"] += 1
+                total_pairs_with_citations += 1
+            if er.targetCited:
+                engine_data[engine_name]["target_hits"] += 1
+                total_target_hits += 1
+
+    # Count unique URLs
+    unique_urls = len(set(all_urls))
+
+    # Target citation rate
+    target_citation_rate = (
+        total_target_hits / total_pairs_with_citations
+        if total_pairs_with_citations > 0
+        else 0.0
+    )
+
+    # Top domains
+    domain_counter: Counter = Counter()
+    for url in all_urls:
+        try:
+            netloc = urlparse(url if "://" in url else f"https://{url}").netloc
+            domain = netloc.lstrip("www.")
+            if domain:
+                domain_counter[domain] += 1
+        except Exception:
+            pass
+    top_domains = [{"domain": d, "count": c} for d, c in domain_counter.most_common(10)]
+
+    # Per-engine stats
+    by_engine: dict[str, dict] = {}
+    for engine, data in engine_data.items():
+        pairs = data["pairs_with_citations"]
+        by_engine[engine] = {
+            "totalCitations": data["total"],
+            "targetCitationRate": round(data["target_hits"] / pairs, 4) if pairs > 0 else 0.0,
+        }
+
+    stats = CitationStats(
+        totalCitations=len(all_urls),
+        uniqueUrls=unique_urls,
+        targetCitationRate=round(target_citation_rate, 4),
+        topDomains=top_domains,
+        byEngine=by_engine,
+    )
+
+    # Return None score when no citations to avoid penalizing with 0
+    citation_visibility_score = (
+        round(target_citation_rate * 100, 1) if total_pairs_with_citations > 0 else None
+    )
+    return stats, citation_visibility_score
 
 
 def score_competitor(

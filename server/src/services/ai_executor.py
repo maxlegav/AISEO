@@ -9,6 +9,7 @@ but all 4 engines run concurrently.
 import asyncio
 import logging
 import os
+import re
 import time
 
 from models.audit import GeneratedPrompt
@@ -30,6 +31,27 @@ from config import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _normalize_url(url: str) -> str:
+    """Strip scheme, www., trailing slash and lowercase for comparison."""
+    url = url.lower().strip()
+    url = re.sub(r"^https?://", "", url)
+    url = re.sub(r"^www\.", "", url)
+    return url.rstrip("/")
+
+
+def _is_target_cited(citations: list[dict], target_url: str) -> bool:
+    """Return True if the target URL appears in any citation."""
+    if not target_url or not citations:
+        return False
+    norm_target = _normalize_url(target_url)
+    for c in citations:
+        norm_cite = _normalize_url(c.get("url", ""))
+        if norm_cite == norm_target or norm_cite.startswith(norm_target + "/"):
+            return True
+    return False
+
 
 # Engine configurations
 if MOCK_AI:
@@ -116,6 +138,7 @@ async def _execute_single_prompt(
     api_key: str,
     prompt: GeneratedPrompt,
     location_context: dict | None = None,
+    target_url: str = "",
 ) -> dict:
     """Execute a single prompt against one engine with retry/backoff.
 
@@ -151,11 +174,14 @@ async def _execute_single_prompt(
             elapsed_ms = int((time.time() - start) * 1000)
 
             if result["success"]:
+                raw_citations = result.get("citations", [])
                 return {
                     "promptId": prompt.id,
                     "rawResponse": result["response"] or "",
                     "responseTime": elapsed_ms,
                     "error": None,
+                    "citations": raw_citations,
+                    "targetCited": _is_target_cited(raw_citations, target_url),
                 }
 
             error_msg = result.get("error", "Unknown error")
@@ -176,6 +202,8 @@ async def _execute_single_prompt(
                 "rawResponse": "",
                 "responseTime": elapsed_ms,
                 "error": error_msg,
+                "citations": [],
+                "targetCited": False,
             }
 
         except asyncio.TimeoutError:
@@ -184,6 +212,8 @@ async def _execute_single_prompt(
                 "rawResponse": "",
                 "responseTime": REQUEST_TIMEOUT * 1000,
                 "error": f"Timeout after {REQUEST_TIMEOUT}s",
+                "citations": [],
+                "targetCited": False,
             }
         except Exception as e:
             return {
@@ -191,6 +221,8 @@ async def _execute_single_prompt(
                 "rawResponse": "",
                 "responseTime": 0,
                 "error": str(e),
+                "citations": [],
+                "targetCited": False,
             }
 
     return {
@@ -198,6 +230,8 @@ async def _execute_single_prompt(
         "rawResponse": "",
         "responseTime": 0,
         "error": f"Max retries ({MAX_RETRIES}) exceeded",
+        "citations": [],
+        "targetCited": False,
     }
 
 
@@ -205,11 +239,12 @@ async def execute_engine(
     engine_config: dict,
     prompts: list[GeneratedPrompt],
     location_context: dict | None = None,
+    target_url: str = "",
 ) -> list[dict]:
     """
     Run all prompts sequentially against one engine.
 
-    Returns list of {promptId, rawResponse, responseTime, error} per prompt.
+    Returns list of {promptId, rawResponse, responseTime, error, citations, targetCited} per prompt.
     """
     engine_name = engine_config["name"]
     api_key = os.getenv(engine_config["key_env"])
@@ -222,6 +257,8 @@ async def execute_engine(
                 "rawResponse": "",
                 "responseTime": 0,
                 "error": f"API key not configured for {engine_name}",
+                "citations": [],
+                "targetCited": False,
             }
             for p in prompts
         ]
@@ -230,7 +267,7 @@ async def execute_engine(
     results = []
 
     for i, prompt in enumerate(prompts):
-        result = await _execute_single_prompt(engine_config, api_key, prompt, location_context)
+        result = await _execute_single_prompt(engine_config, api_key, prompt, location_context, target_url)
         results.append(result)
 
         if (i + 1) % 25 == 0:
@@ -245,6 +282,7 @@ async def execute_engine(
 async def execute_all_engines(
     prompts: list[GeneratedPrompt],
     location_context: dict | None = None,
+    target_url: str = "",
 ) -> tuple[dict[str, list[dict]], list[str], list[str]]:
     """
     Run all prompts across all 4 engines in parallel.
@@ -252,6 +290,7 @@ async def execute_all_engines(
     Args:
         prompts: The 100 generated prompts.
         location_context: Optional location info for geo-biased queries.
+        target_url: Business URL used to detect citation visibility.
 
     Returns:
         - results: {"chatgpt": [...], "claude": [...], ...}
@@ -263,7 +302,7 @@ async def execute_all_engines(
     else:
         active_engines = [e for e in ENGINES if e["name"] in AI_ENGINES]
     engines_used = [e["name"] for e in active_engines]
-    tasks = [execute_engine(engine, prompts, location_context) for engine in active_engines]
+    tasks = [execute_engine(engine, prompts, location_context, target_url) for engine in active_engines]
 
     logger.info(f"Executing {len(prompts)} prompts across {len(active_engines)} engines in parallel...")
 
@@ -291,6 +330,8 @@ async def execute_all_engines(
                     "rawResponse": "",
                     "responseTime": 0,
                     "error": str(engine_result),
+                    "citations": [],
+                    "targetCited": False,
                 }
                 for p in prompts
             ]

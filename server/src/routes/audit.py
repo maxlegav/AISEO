@@ -21,6 +21,7 @@ import config as app_config
 from models.business import AuditRequest
 from models.audit import (
     BusinessSnapshot,
+    CitationStats,
     EngineResult,
     GeneratedPrompt,
     PromptResult,
@@ -38,9 +39,12 @@ from services.scoring import (
     calculate_audit_engine_score,
     calculate_discoverability_threshold,
     calculate_geo_score,
+    calculate_citation_stats,
     score_competitor,
 )
 from services.html_scanner import scan_website
+from services.gsc_analyzer import fetch_gsc_data
+from services.google_reviews import fetch_google_reviews
 
 logger = logging.getLogger(__name__)
 
@@ -172,31 +176,82 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
 
     logger.info(f"[{audit_id}] Phase 2 starting with {len(prompts)} prompts")
 
-    # 4. Execute AI queries + HTML scan in parallel
+    # 4. Execute AI queries + HTML scan + optional GSC in parallel
     location_context = _build_location_context(request)
     if location_context:
         logger.info(f"[{audit_id}] Location context: {location_context['text_hint']}")
 
-    ai_task = execute_all_engines(prompts, location_context)
+    ai_task = execute_all_engines(prompts, location_context, target_url=request.businessUrl)
     html_task = scan_website(request.businessUrl, request.subUrls, request.language)
 
-    results = await asyncio.gather(
+    gsc_token = request.gscAccessToken
+    gsc_task = (
+        fetch_gsc_data(
+            access_token=gsc_token,
+            site_url=request.gscSiteUrl or request.businessUrl,
+            primary_url=request.businessUrl,
+            locality_tier=request.localityTier.value if request.localityTier else None,
+            country=request.country,
+        )
+        if gsc_token
+        else asyncio.sleep(0)
+    )
+
+    if gsc_token:
+        logger.info(f"[{audit_id}] GSC analysis enabled for {request.gscSiteUrl or request.businessUrl}")
+
+    google_reviews_enabled = bool(app_config.GOOGLE_PLACES_API_KEY) or app_config.MOCK_GOOGLE_REVIEWS
+    google_reviews_task = (
+        fetch_google_reviews(
+            business_name=request.businessName,
+            city=request.city,
+            country=request.country,
+            place_id=request.googlePlaceId,
+        )
+        if google_reviews_enabled
+        else asyncio.sleep(0)
+    )
+
+    if google_reviews_enabled:
+        logger.info(f"[{audit_id}] Google Reviews analysis enabled for {request.businessName}")
+
+    gathered = await asyncio.gather(
         ai_task,
         html_task,
+        gsc_task,
+        google_reviews_task,
         return_exceptions=True,
     )
 
     # Unpack AI results (mandatory — re-raise if failed)
-    if isinstance(results[0], BaseException):
-        raise results[0]
-    ai_results_tuple = results[0]
+    if isinstance(gathered[0], BaseException):
+        raise gathered[0]
+    ai_results_tuple = gathered[0]
 
     # Unpack HTML results (optional — graceful degradation)
-    if isinstance(results[1], BaseException):
-        logger.warning(f"[{audit_id}] HTML scan failed: {results[1]}")
+    if isinstance(gathered[1], BaseException):
+        logger.warning(f"[{audit_id}] HTML scan failed: {gathered[1]}")
         html_result = None
     else:
-        html_result = results[1]
+        html_result = gathered[1]
+
+    # Unpack GSC results (optional — graceful degradation)
+    if gsc_token and not isinstance(gathered[2], BaseException):
+        gsc_result = gathered[2]
+        logger.info(f"[{audit_id}] GSC analysis complete — errors: {len(gsc_result.errors)}")
+    else:
+        if gsc_token and isinstance(gathered[2], BaseException):
+            logger.warning(f"[{audit_id}] GSC analysis failed: {gathered[2]}")
+        gsc_result = None
+
+    # Unpack Google Reviews results (optional — graceful degradation)
+    if google_reviews_enabled and not isinstance(gathered[3], BaseException):
+        google_reviews_result = gathered[3]
+        logger.info(f"[{audit_id}] Google Reviews complete — rating: {google_reviews_result.rating}, reviews: {google_reviews_result.totalReviews}")
+    else:
+        if google_reviews_enabled and isinstance(gathered[3], BaseException):
+            logger.warning(f"[{audit_id}] Google Reviews failed: {gathered[3]}")
+        google_reviews_result = None
 
     engine_results, engines_used, engines_succeeded = ai_results_tuple
 
@@ -227,6 +282,8 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
                 request.businessUrl,
             )
             mention_result.responseTime = engine_prompt_result.get("responseTime", 0)
+            mention_result.citations = engine_prompt_result.get("citations", [])
+            mention_result.targetCited = engine_prompt_result.get("targetCited", False)
             engines_data[engine_name] = mention_result
 
         prompt_score, mention_rate = calculate_prompt_score(engines_data)
@@ -248,7 +305,10 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
     engine_score = calculate_audit_engine_score(cat_scores)
     threshold = calculate_discoverability_threshold(lvl_scores)
     html_scanner_score = html_result.htmlScannerScore if html_result else None
-    geo_score = calculate_geo_score(engine_score, html_scanner_score)
+    citation_stats, citation_visibility_score = calculate_citation_stats(
+        prompt_results, request.businessUrl
+    )
+    geo_score = calculate_geo_score(engine_score, html_scanner_score, citation_visibility_score)
 
     # 7. Score competitors
     logger.info(f"[{audit_id}] Scoring {len(request.competitorNames)} competitors...")
@@ -256,6 +316,23 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
     for comp_name, comp_url in zip(request.competitorNames, request.competitorUrls):
         comp_result = score_competitor(prompt_results, comp_name, comp_url)
         competitor_results.append(comp_result)
+
+    # 7b. Generate LLM hijack prompt (non-blocking)
+    logger.info(f"[{audit_id}] Generating LLM hijack prompt...")
+    try:
+        from services.llm_hijack_generator import generate_llm_hijack_prompt
+        llm_hijack_prompt = await generate_llm_hijack_prompt(
+            snapshot=snapshot,
+            category_scores=cat_scores,
+            level_scores=lvl_scores,
+            audit_engine_score=engine_score,
+            discoverability_threshold=threshold,
+            competitor_results=competitor_results,
+            html_scan=html_result,
+        )
+    except Exception as e:
+        logger.warning(f"[{audit_id}] LLM hijack generation failed (non-blocking): {e}")
+        llm_hijack_prompt = None
 
     # 8. Calculate totals
     processing_time = int((time.time() - start_time) * 1000)
@@ -277,8 +354,13 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         auditEngineScore=engine_score,
         htmlScan=html_result,
         htmlScannerScore=html_scanner_score,
+        gscData=gsc_result,
+        googleReviews=google_reviews_result,
+        citationStats=citation_stats,
+        citationVisibilityScore=citation_visibility_score,
         discoverabilityThreshold=threshold,
         competitorResults=competitor_results,
+        llmHijackPrompt=llm_hijack_prompt,
         enginesUsed=engines_used,
         enginesSucceeded=engines_succeeded,
         totalPromptsProcessed=len(prompts),
@@ -303,6 +385,7 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
     logger.info(
         f"[{audit_id}] Audit complete — GEO Score: {geo_score}, "
         f"Engine: {engine_score}, HTML: {html_scanner_score}, "
+        f"Citations: {citation_visibility_score}, "
         f"Time: {processing_time}ms"
     )
 
