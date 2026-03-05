@@ -7,8 +7,6 @@ const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URI!);
 };
 
-const BASE_COUNT = 51;
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -20,18 +18,18 @@ export default async function handler(
   try {
     await connectDB();
 
-    const completedCount = await Waitlist.countDocuments({ completed: true });
+    const count = await Waitlist.countDocuments({ completed: true });
 
     return res.status(200).json({
       success: true,
-      data: { count: BASE_COUNT + completedCount },
+      data: { count },
     });
   } catch (error: unknown) {
     console.error("[Waitlist] Count error:", error);
 
     return res.status(200).json({
       success: true,
-      data: { count: BASE_COUNT },
+      data: { count: 0 },
     });
   }
 }

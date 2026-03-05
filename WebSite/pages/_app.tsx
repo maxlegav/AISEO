@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { SessionProvider } from "next-auth/react";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 import "@/styles/globals.css";
 import {
   Inter,
@@ -64,6 +66,23 @@ export default function App({
   // Rehydrate persisted stores on client mount (SSR-safe)
   useEffect(() => {
     useUserStore.persist.rehydrate();
+  }, []);
+
+  // Smooth scroll with Lenis
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 0.8,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => lenis.destroy();
   }, []);
 
   return (

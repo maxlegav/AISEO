@@ -151,6 +151,12 @@ const PlanCard = ({
 export default function SignupPage() {
   const router = useRouter();
   const { status } = useSession();
+
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_APP_STATE !== "production") {
+      router.replace("/");
+    }
+  }, [router]);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);

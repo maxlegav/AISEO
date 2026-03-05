@@ -1,7 +1,7 @@
 import TagSEO from "@/components/TagSEO";
 import TagSchema from "@/components/TagSchema";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,74 +69,11 @@ const AIModelMarquee = () => (
     BE MENTIONNED BY:
     </p>
 
-    <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-7xl border border-white/50 shadow-sm">
-      <div className="flex animate-marquee items-center">
-        {aiModels.map((model, i) => (
+    <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-xl border border-white/50 shadow-sm">
+      <div className="flex animate-marquee items-center w-max">
+        {[...aiModels, ...aiModels].map((model, i) => (
           <div
-            key={`first-${i}`}
-            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
-          >
-            <Image
-              src={model.logo}
-              alt={`${model.name} logo`}
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
-            />
-            <Image
-              src={model.text}
-              alt={model.name}
-              width={100}
-              height={24}
-              className="h-6 w-auto object-contain"
-            />
-          </div>
-        ))}
-        {aiModels.map((model, i) => (
-          <div
-            key={`second-${i}`}
-            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
-          >
-            <Image
-              src={model.logo}
-              alt={`${model.name} logo`}
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
-            />
-            <Image
-              src={model.text}
-              alt={model.name}
-              width={100}
-              height={24}
-              className="h-6 w-auto object-contain"
-            />
-          </div>
-        ))}
-        {aiModels.map((model, i) => (
-          <div
-            key={`third-${i}`}
-            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
-          >
-            <Image
-              src={model.logo}
-              alt={`${model.name} logo`}
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
-            />
-            <Image
-              src={model.text}
-              alt={model.name}
-              width={100}
-              height={24}
-              className="h-6 w-auto object-contain"
-            />
-          </div>
-        ))}
-        {aiModels.map((model, i) => (
-          <div
-            key={`fourth-${i}`}
+            key={i}
             className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
           >
             <Image
@@ -371,38 +308,44 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
-// Subscriber Counter with Trust Avatars
-const SubscriberCounter = ({ count }: { count: number }) => (
-  <div className="flex items-center justify-center gap-3 mt-4">
-    {/* Overlapping avatars */}
-    <div className="flex -space-x-2">
-      {trustAvatars.map((avatar, i) => (
-        <div
-          key={i}
-          className={`w-8 h-8 rounded-full ${avatar.bg} flex items-center justify-center border-2 border-white text-white text-xs font-semibold`}
-        >
-          {avatar.letter}
-        </div>
-      ))}
-    </div>
-    {/* Stars */}
-    <div className="flex gap-0.5">
-      {[...Array(5)].map((_, i) => (
-        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-      ))}
-    </div>
-    {/* Count */}
-    <p className="text-sm text-gray-700 font-medium">
-      <span className="font-bold text-gray-900"> {count} </span> professionals
-      already joined, be one of them !
-    </p>
-  </div>
-);
+// Subscriber Counter - shows real count if above threshold, otherwise encouragement
+const WAITLIST_THRESHOLD = 20;
 
+const SubscriberCounter = ({ count }: { count: number }) => {
+  if (count > WAITLIST_THRESHOLD) {
+    return (
+      <div className="flex items-center justify-center gap-3 mt-4">
+        <div className="flex -space-x-2">
+          {trustAvatars.map((avatar, i) => (
+            <div
+              key={i}
+              className={`w-8 h-8 rounded-full ${avatar.bg} flex items-center justify-center border-2 border-white text-white text-xs font-semibold`}
+            >
+              {avatar.letter}
+            </div>
+          ))}
+        </div>
+        <p className="text-sm text-gray-700 font-medium">
+          <span className="font-bold text-gray-900"> {count} </span> professionals
+          already joined, be one of them!
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <p className="text-sm text-gray-500 mt-4">
+      Be among the first to join us !
+    </p>
+  );
+};
+
+
+const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 
 export default function Home() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
-  const [subscriberCount, setSubscriberCount] = useState(51);
+  const [subscriberCount, setSubscriberCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/waitlist/count")
@@ -476,11 +419,11 @@ export default function Home() {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-25%);
+            transform: translateX(-50%);
           }
         }
         .animate-marquee {
-          animation: marquee 10s linear infinite;
+          animation: marquee 20s linear infinite;
         }
         .animate-marquee:hover {
           animation-play-state: paused;
@@ -491,9 +434,22 @@ export default function Home() {
         .animate-marquee-slow:hover {
           animation-play-state: paused;
         }
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          50% {
+            transform: translateY(8px);
+            opacity: 0.5;
+          }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
+        }
       `}</style>
 
-      <main className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
+      <main className="bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
         {/* Header */}
         <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md">
           <div className="container mx-auto px-4">
@@ -525,12 +481,14 @@ export default function Home() {
                 >
                   Process
                 </a>
-                <a
-                  href="#pricing"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                >
-                  Pricing
-                </a>
+                {isProduction && (
+                  <a
+                    href="#pricing"
+                    className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  >
+                    Pricing
+                  </a>
+                )}
                 <a
                   href="#faq"
                   className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
@@ -551,41 +509,45 @@ export default function Home() {
                     Join Waitlist
                   </Button>
                 </Link>
-                <Link href="/login">
-                  <Button variant="ghost" className="text-sm font-medium">
-                    Login
-                  </Button>
-                </Link>
+                {isProduction && (
+                  <Link href="/login">
+                    <Button variant="ghost" className="text-sm font-medium">
+                      Login
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
         </header>
 
         {/* Hero Section */}
-        <section className="pt-32 md:pt-36 pb-8 px-4 relative overflow-hidden">
+        <section className="h-screen px-4 relative overflow-hidden flex flex-col items-center">
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-orange-300/40 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-300/40 rounded-full blur-3xl" />
 
-          <div className="container mx-auto max-w-4xl text-center relative z-10">
-            <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-medium text-gray-900 mb-6 leading-tight">
-              Stop being{" "}
-              <span className="relative inline-block">
-                invisible
-                <HandDrawnUnderline />
-              </span>{" "}
-              to AI
-            </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-10 max-w-2xl mx-auto">
-            The first Generative Engine Optimization (GEO) platform. Audit,
-              analyze, and optimize your brand&apos;s presence across all major
-              AI models.
-            </p>
+          <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-28 pb-20">
+            {/* Centered: Title + Subtitle + Marquee */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-6">
+              <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-gray-900 leading-tight">
+                Stop being{" "}
+                <span className="relative inline-block">
+                  invisible
+                  <HandDrawnUnderline />
+                </span>{" "}
+                to AI
+              </h1>
+              <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                The first Generative Engine Optimization (GEO) platform. Audit,
+                analyze, and optimize your brand&apos;s presence across all major
+                AI models.
+              </p>
+              <AIModelMarquee />
+            </div>
 
-            <AIModelMarquee />
-
-            {/* Single CTA Section */}
-            <div className="mt-10 max-w-xl mx-auto">
+            {/* Bottom: CTA pinned to bottom */}
+            <div className="max-w-xl mx-auto">
               <div className="flex justify-center">
                 <Link href="/waitlist">
                   <Button className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold">
@@ -594,27 +556,33 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
-
-              {/* Subscriber Counter + Trust Icons */}
               <SubscriberCounter count={subscriberCount} />
             </div>
           </div>
+
+          {/* Scroll down arrow */}
+          <a
+            href="#features"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce-slow"
+          >
+            <ChevronDown className="w-8 h-8 text-gray-400" />
+          </a>
         </section>
 
         {/* The GEO Advantage Section - Aggressive Marketing */}
-        <section id="features" className="py-16 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-1.5 mb-6">
+        <section id="features" className="h-screen px-4 flex flex-col items-center justify-center">
+          <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-5 py-2 mb-8">
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-red-700 text-sm font-semibold">
                   YOUR CUSTOMERS HAVE ALREADY SWITCHED TO AI SEARCH
                 </span>
               </div>
-              <h2 className="font-heading text-3xl md:text-5xl font-medium text-gray-900 mb-4">
+              <h2 className="font-heading text-4xl md:text-6xl font-medium text-gray-900 mb-6">
                 Google is dying. AI is the new search.
               </h2>
-              <p className="text-gray-600 max-w-3xl mx-auto text-lg">
+              <p className="text-gray-600 max-w-3xl mx-auto text-lg md:text-xl">
                 58% of consumers now use ChatGPT, Perplexity, or Claude instead
                 of Google to find products and services. If AI doesn&apos;t
                 mention your brand, <strong>you don&apos;t exist</strong> for
@@ -622,43 +590,43 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 mt-12">
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
-                  <Eye className="w-6 h-6 text-gray-900" />
+            <div className="grid md:grid-cols-3 gap-8 mt-16">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                  <Eye className="w-7 h-7 text-gray-900" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                   Be the brand AI recommends
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed text-base">
                   <strong>87% of brands are invisible</strong> to AI. When users
                   ask &ldquo;the best tool for...&rdquo;, AI names you — or your
                   competitor.
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
-                  <Target className="w-6 h-6 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                  <Target className="w-7 h-7 text-gray-900" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                   Crush your competitors
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed text-base">
                   See which competitors AI recommends instead of you. Understand{" "}
                   <strong>why they rank higher</strong> — then steal their
                   playbook.
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
-                  <Zap className="w-6 h-6 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                  <Zap className="w-7 h-7 text-gray-900" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                   10x more qualified traffic
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed text-base">
                   AI users have <strong>3x higher purchase intent</strong> than
                   Google users. One AI mention drives more revenue than 1,000
                   clicks.
@@ -671,57 +639,57 @@ export default function Home() {
         {/* Infrastructure Section */}
         <section
           id="process"
-          className="py-20 px-4 bg-white/50 backdrop-blur-sm"
+          className="h-screen px-4 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center"
         >
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="container mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-4">
+                <h2 className="font-heading text-4xl md:text-6xl font-medium text-gray-900 mb-6">
                   Your competitors are already
                   <br />
                   <span className="italic text-purple-600">
                     winning AI search
                   </span>
                 </h2>
-                <p className="text-gray-600 mb-8 leading-relaxed">
+                <p className="text-gray-600 mb-10 leading-relaxed text-lg">
                   Every day, millions of potential customers ask AI for
                   recommendations. If your brand isn&apos;t being cited,
                   you&apos;re losing deals to competitors who are. We show you
                   exactly where you stand—and how to fix it.
                 </p>
 
-                <div className="space-y-6">
+                <div className="space-y-8">
                   <div className="flex items-start gap-4">
-                    <Check className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-gray-900">
+                      <h4 className="font-semibold text-gray-900 text-lg">
                         See What AI Says About You
                       </h4>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600">
                         Real queries. Real responses. Know exactly how ChatGPT,
                         Claude, and Perplexity describe your brand.
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <Check className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-gray-900">
+                      <h4 className="font-semibold text-gray-900 text-lg">
                         Outrank Your Competition
                       </h4>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600">
                         Discover which competitors are getting recommended
                         instead of you—and steal their playbook.
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <Check className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-gray-900">
+                      <h4 className="font-semibold text-gray-900 text-lg">
                         Actionable Fixes in Minutes
                       </h4>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600">
                         Copy-paste schema markup, optimized FAQs, and content
                         suggestions you can implement today.
                       </p>
@@ -731,89 +699,89 @@ export default function Home() {
               </div>
 
               {/* Right column - Visualization */}
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 overflow-hidden">
-                <div className="flex items-center justify-between mb-6">
+              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 overflow-hidden">
+                <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-xs text-gray-500 font-medium">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-sm text-gray-500 font-medium">
                       Live AI Analysis
                     </span>
                   </div>
-                  <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
+                  <span className="text-sm text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full">
                     Your Brand
                   </span>
                 </div>
 
-                <div className="text-center mb-6 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
-                  <div className="text-5xl font-bold text-gray-900 mb-1">
-                    73<span className="text-2xl text-gray-400">%</span>
+                <div className="text-center mb-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl">
+                  <div className="text-6xl font-bold text-gray-900 mb-1">
+                    73<span className="text-3xl text-gray-400">%</span>
                   </div>
-                  <div className="text-sm text-gray-600">GEO Health Score</div>
-                  <div className="text-xs text-orange-500 mt-1 font-medium">
+                  <div className="text-base text-gray-600">GEO Health Score</div>
+                  <div className="text-sm text-orange-500 mt-1 font-medium">
                     Room for improvement
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+                <div className="space-y-4 mb-8">
+                  <div className="text-sm text-gray-500 uppercase tracking-wider mb-3">
                     vs. Top Competitors
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 w-24 truncate">
+                    <span className="text-base text-gray-700 w-28 truncate">
                       You
                     </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                       <div
                         className="bg-purple-500 h-full rounded-full"
                         style={{ width: "73%" }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-gray-900 w-10 text-right">
+                    <span className="text-base font-semibold text-gray-900 w-12 text-right">
                       73%
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-500 w-24 truncate">
+                    <span className="text-base text-gray-500 w-28 truncate">
                       Competitor A
                     </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                       <div
                         className="bg-green-400 h-full rounded-full"
                         style={{ width: "89%" }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-green-600 w-10 text-right">
+                    <span className="text-base font-semibold text-green-600 w-12 text-right">
                       89%
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-500 w-24 truncate">
+                    <span className="text-base text-gray-500 w-28 truncate">
                       Competitor B
                     </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                       <div
                         className="bg-blue-400 h-full rounded-full"
                         style={{ width: "81%" }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-gray-900 w-10 text-right">
+                    <span className="text-base font-semibold text-gray-900 w-12 text-right">
                       81%
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-100">
-                  <div className="text-center py-3 bg-red-50 rounded-xl">
-                    <div className="text-lg font-bold text-red-600">12</div>
-                    <div className="text-xs text-gray-600">
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
+                  <div className="text-center py-4 bg-red-50 rounded-xl">
+                    <div className="text-xl font-bold text-red-600">12</div>
+                    <div className="text-sm text-gray-600">
                       Missing Citations
                     </div>
                   </div>
-                  <div className="text-center py-3 bg-green-50 rounded-xl">
-                    <div className="text-lg font-bold text-green-600">
+                  <div className="text-center py-4 bg-green-50 rounded-xl">
+                    <div className="text-xl font-bold text-green-600">
                       +340%
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-sm text-gray-600">
                       Potential Traffic
                     </div>
                   </div>
@@ -823,18 +791,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Seamless Integration Section */}
-        <section className="py-12 px-4">
-          <div className="container mx-auto max-w-4xl text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-8">
-              Seamless Integration with your CMS
-            </h3>
-            <CMSLogos />
-          </div>
-        </section>
-
         {/* Pricing Section */}
-        <section id="pricing" className="py-20 px-4">
+        {isProduction && <section id="pricing" className="py-20 px-4">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-14">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
@@ -919,7 +877,7 @@ export default function Home() {
               to access your dashboard
             </p>
           </div>
-        </section>
+        </section>}
 
         {/* Testimonials Section */}
         <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
@@ -980,25 +938,33 @@ export default function Home() {
               ))}
             </div>
           </div>
+          {/* Seamless Integration Section */}
+          <div className="container mx-auto max-w-4xl text-center mt-12">
+            <h3 className="text-lg font-semibold text-gray-900 mb-8">
+              Seamless Integration with your CMS
+            </h3>
+            <CMSLogos />
+          </div>
+        
         </section>
 
         {/* CTA Section */}
-        <section className="pt-16 md:pt-24 pb-20 md:pb-28 px-4 bg-[#1E293B] relative overflow-hidden">
+        <section className="h-[75vh] px-4 bg-[#1E293B] relative overflow-hidden flex flex-col items-center justify-center">
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
 
-          <div className="container mx-auto max-w-4xl text-center relative z-10">
-            <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl font-medium text-white mb-6 leading-tight">
+          <div className="container mx-auto max-w-5xl text-center relative z-10">
+            <h2 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-white mb-8 leading-tight">
               Ready to dominate AI search?
             </h2>
-            <p className="text-lg md:text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto">
               Join hundreds of brands already optimizing for the future of
               search. Start your free audit today and see exactly where you
               stand.
             </p>
 
-            <div className="mt-10 max-w-xl mx-auto">
+            <div className="mt-14 max-w-xl mx-auto">
               <div className="flex justify-center">
                 <Link href="/waitlist">
                   <Button className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold">
@@ -1008,33 +974,30 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Subscriber Counter (dark theme) */}
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <div className="flex -space-x-2">
-                  {trustAvatars.map((avatar, i) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 text-white text-xs font-semibold"
-                    >
-                      {avatar.letter}
-                    </div>
-                  ))}
+              {subscriberCount > WAITLIST_THRESHOLD ? (
+                <div className="flex items-center justify-center gap-3 mt-4">
+                  <div className="flex -space-x-2">
+                    {trustAvatars.map((avatar, i) => (
+                      <div
+                        key={i}
+                        className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 text-white text-xs font-semibold"
+                      >
+                        {avatar.letter}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-300 font-medium">
+                    <span className="font-bold text-white">
+                      {subscriberCount}
+                    </span>{" "}
+                    professionals already joined, be one of them!
+                  </p>
                 </div>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-300 font-medium">
-                  <span className="font-bold text-white">
-                    {subscriberCount}
-                  </span>{" "}
-                  professionals already joined, be one of them 
+              ) : (
+                <p className="text-sm text-gray-400 mt-4">
+                  Be among the first to join us !
                 </p>
-              </div>
+              )}
             </div>
           </div>
         </section>
@@ -1094,14 +1057,16 @@ export default function Home() {
                       Features
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="#pricing"
-                      className="hover:text-white transition-colors"
-                    >
-                      Pricing
-                    </a>
-                  </li>
+                  {isProduction && (
+                    <li>
+                      <a
+                        href="#pricing"
+                        className="hover:text-white transition-colors"
+                      >
+                        Pricing
+                      </a>
+                    </li>
+                  )}
                   <li>
                     <a
                       href="#faq"
@@ -1118,14 +1083,16 @@ export default function Home() {
                       Blog
                     </Link>
                   </li>
-                  <li>
-                    <Link
-                      href="/login"
-                      className="hover:text-white transition-colors"
-                    >
-                      Login
-                    </Link>
-                  </li>
+                  {isProduction && (
+                    <li>
+                      <Link
+                        href="/login"
+                        className="hover:text-white transition-colors"
+                      >
+                        Login
+                      </Link>
+                    </li>
+                  )}
                 </ul>
               </div>
 

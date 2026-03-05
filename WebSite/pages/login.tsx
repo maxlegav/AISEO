@@ -11,6 +11,12 @@ import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
   const { data: _session, status } = useSession();
+
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_APP_STATE !== "production") {
+      router.replace("/");
+    }
+  }, [router]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
