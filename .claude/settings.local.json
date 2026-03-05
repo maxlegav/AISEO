@@ -114,16 +114,14 @@
       "Bash(docker rm:*)",
       "Bash(npx next build:*)",
       "Bash(git rm:*)",
-<<<<<<< HEAD
       "Bash(cd:*)",
       "Bash(/Users/chocomushrooms/AISEO/server/server-venv/bin/pip install:*)",
-      "Bash(/Users/chocomushrooms/AISEO/server/server-venv/bin/python3:*)"
-=======
-      "Bash(grep:*)",
-      "Bash(git rebase:*)"
->>>>>>> 171365a1d44dd453e785428a37b7065832fbf3f5
+      "Bash(/Users/chocomushrooms/AISEO/server/server-venv/bin/python3:*)",
+      "Bash(pip3 list:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["agentvibes"]
+  "enabledMcpjsonServers": [
+    "agentvibes"
+  ]
 }
