@@ -1,7 +1,7 @@
 import TagSEO from "@/components/TagSEO";
 import TagSchema from "@/components/TagSchema";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -346,6 +346,8 @@ const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 export default function Home() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
   const [subscriberCount, setSubscriberCount] = useState(0);
+  const mainRef = useRef<HTMLElement>(null);
+  const isScrolling = useRef(false);
 
   useEffect(() => {
     fetch("/api/waitlist/count")
@@ -356,6 +358,74 @@ export default function Home() {
         }
       })
       .catch(() => {});
+  }, []);
+
+  // Fullpage section scroll
+  useEffect(() => {
+    const getSections = () => {
+      if (!mainRef.current) return [];
+      return Array.from(mainRef.current.querySelectorAll<HTMLElement>(":scope > section, :scope > footer"));
+    };
+
+    const findCurrentSectionIndex = (sections: HTMLElement[]) => {
+      const scrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const scrollCenter = scrollY + viewportHeight / 2;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= scrollCenter) return i;
+      }
+      return 0;
+    };
+
+    const scrollToSection = (section: HTMLElement) => {
+      isScrolling.current = true;
+      window.scrollTo({ top: section.offsetTop, behavior: "smooth" });
+      setTimeout(() => { isScrolling.current = false; }, 800);
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (isScrolling.current) { e.preventDefault(); return; }
+
+      const sections = getSections();
+      if (sections.length === 0) return;
+
+      const currentIndex = findCurrentSectionIndex(sections);
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const nextIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + direction));
+
+      const nextSection = sections[nextIndex];
+      if (nextIndex !== currentIndex && nextSection) {
+        e.preventDefault();
+        scrollToSection(nextSection);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isScrolling.current) return;
+      const sections = getSections();
+      if (sections.length === 0) return;
+      const currentIndex = findCurrentSectionIndex(sections);
+
+      let nextIndex = currentIndex;
+      if (e.key === "ArrowDown" || e.key === "PageDown") nextIndex = Math.min(sections.length - 1, currentIndex + 1);
+      else if (e.key === "ArrowUp" || e.key === "PageUp") nextIndex = Math.max(0, currentIndex - 1);
+      else return;
+
+      const nextSection = sections[nextIndex];
+      if (nextIndex !== currentIndex && nextSection) {
+        e.preventDefault();
+        scrollToSection(nextSection);
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const faqs = [
@@ -449,7 +519,7 @@ export default function Home() {
         }
       `}</style>
 
-      <main className="bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
+      <main ref={mainRef} className="bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
         {/* Header */}
         <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md">
           <div className="container mx-auto px-4">
