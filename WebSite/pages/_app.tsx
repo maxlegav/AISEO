@@ -14,6 +14,7 @@ import {
 import { Analytics } from "@vercel/analytics/react";
 import { NotificationProvider } from "../components/NotificationSystem";
 import { LanguageProvider } from "../components/LanguageContext";
+import WaitlistModal from "../components/WaitlistModal";
 import { useUserStore } from "@/stores";
 import type { AppProps } from "next/app";
 
@@ -94,6 +95,7 @@ export default function App({
         >
           <NotificationProvider position="top-right" maxNotifications={3}>
             <Component {...pageProps} />
+            <WaitlistModal />
           </NotificationProvider>
           <Analytics />
         </div>

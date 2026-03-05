@@ -1,9 +1,11 @@
 import TagSEO from "@/components/TagSEO";
 import TagSchema from "@/components/TagSchema";
+import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useWaitlistModalStore } from "@/stores";
 import {
   ChevronDown,
   ChevronUp,
@@ -175,6 +177,7 @@ const PricingCard = ({
   highlighted = false,
   ctaText,
   ctaLink,
+  onCtaClick,
 }: {
   title: string;
   price: string;
@@ -184,6 +187,7 @@ const PricingCard = ({
   highlighted?: boolean;
   ctaText: string;
   ctaLink: string;
+  onCtaClick?: () => void;
 }) => (
   <div
     className={`relative rounded-3xl p-8 transition-all duration-300 flex flex-col h-full ${
@@ -240,9 +244,10 @@ const PricingCard = ({
         </li>
       ))}
     </ul>
-    <Link href={ctaLink} className="block mt-auto">
+    {onCtaClick ? (
       <Button
-        className={`w-full h-12 rounded-xl font-semibold transition-all ${
+        onClick={onCtaClick}
+        className={`w-full h-12 rounded-xl font-semibold transition-all mt-auto ${
           highlighted
             ? "bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg"
             : "bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
@@ -251,7 +256,20 @@ const PricingCard = ({
       >
         {ctaText}
       </Button>
-    </Link>
+    ) : (
+      <Link href={ctaLink} className="block mt-auto">
+        <Button
+          className={`w-full h-12 rounded-xl font-semibold transition-all ${
+            highlighted
+              ? "bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg"
+              : "bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+          }`}
+          size="lg"
+        >
+          {ctaText}
+        </Button>
+      </Link>
+    )}
   </div>
 );
 
@@ -344,6 +362,7 @@ const SubscriberCounter = ({ count }: { count: number }) => {
 const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 
 export default function Home() {
+  const { openWaitlistModal } = useWaitlistModalStore();
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
   const [subscriberCount, setSubscriberCount] = useState(0);
   const mainRef = useRef<HTMLElement>(null);
@@ -520,76 +539,7 @@ export default function Home() {
       `}</style>
 
       <main ref={mainRef} className="bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center h-16 relative">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-                  <Image
-                    src={"/syb_logo_transparent.png"}
-                    alt="logo"
-                    width={32}
-                    height={32}
-                  />
-                </div>
-                <span className="text-base font-semibold text-gray-900 tracking-tight">
-                  ShowYourBrand
-                </span>
-              </Link>
-
-              <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-                <a
-                  href="#features"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                >
-                  Features
-                </a>
-                <a
-                  href="#process"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                >
-                  Process
-                </a>
-                {isProduction && (
-                  <a
-                    href="#pricing"
-                    className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                  >
-                    Pricing
-                  </a>
-                )}
-                <a
-                  href="#faq"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                >
-                  FAQ
-                </a>
-                <Link
-                  href="/blog"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
-                >
-                  Blog
-                </Link>
-              </nav>
-
-              <div className="ml-auto flex items-center gap-2">
-                <Link href="/waitlist">
-                  <Button variant="ghost" className="text-sm font-medium">
-                    Join Waitlist
-                  </Button>
-                </Link>
-                {isProduction && (
-                  <Link href="/login">
-                    <Button variant="ghost" className="text-sm font-medium">
-                      Login
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Hero Section */}
         <section className="h-screen px-4 relative overflow-hidden flex flex-col items-center">
@@ -619,12 +569,13 @@ export default function Home() {
             {/* Bottom: CTA pinned to bottom */}
             <div className="max-w-xl mx-auto">
               <div className="flex justify-center">
-                <Link href="/waitlist">
-                  <Button className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Join the Waitlist
-                  </Button>
-                </Link>
+                <Button
+                  onClick={openWaitlistModal}
+                  className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Join the Waitlist
+                </Button>
               </div>
               <SubscriberCounter count={subscriberCount} />
             </div>
@@ -891,6 +842,7 @@ export default function Home() {
                 ]}
                 ctaText="Join the Waitlist"
                 ctaLink="/waitlist"
+                onCtaClick={openWaitlistModal}
               />
               <PricingCard
                 title="PRO"
@@ -912,6 +864,7 @@ export default function Home() {
                 highlighted={true}
                 ctaText="Join the Waitlist"
                 ctaLink="/waitlist"
+                onCtaClick={openWaitlistModal}
               />
               <PricingCard
                 title="PREMIUM FOR AGENCIES"
@@ -933,6 +886,7 @@ export default function Home() {
                 ]}
                 ctaText="Join the Waitlist"
                 ctaLink="/waitlist"
+                onCtaClick={openWaitlistModal}
               />
             </div>
 
@@ -1036,12 +990,13 @@ export default function Home() {
 
             <div className="mt-14 max-w-xl mx-auto">
               <div className="flex justify-center">
-                <Link href="/waitlist">
-                  <Button className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Join the Waitlist
-                  </Button>
-                </Link>
+                <Button
+                  onClick={openWaitlistModal}
+                  className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Join the Waitlist
+                </Button>
               </div>
 
               {subscriberCount > WAITLIST_THRESHOLD ? (

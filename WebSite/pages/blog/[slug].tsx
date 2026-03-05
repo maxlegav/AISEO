@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { GetStaticProps, GetStaticPaths } from "next";
 import TagSEO from "@/components/TagSEO";
+import Navbar from "@/components/Navbar";
 import { BlogPost } from "./index";
+import { useWaitlistModalStore } from "@/stores";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -186,6 +188,7 @@ function inlineFormat(text: string): string {
 }
 
 export default function BlogPostPage({ post, content }: Props) {
+  const { openWaitlistModal } = useWaitlistModalStore();
   const categoryColor =
     CATEGORY_COLORS[post.category] || "bg-gray-50 text-gray-700";
 
@@ -198,35 +201,7 @@ export default function BlogPostPage({ post, content }: Props) {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
-        {/* Fixed Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center h-16 relative">
-              <Link href="/" className="flex items-center gap-2">
-                <Image src="/syb_logo_transparent.png" alt="logo" width={32} height={32} />
-                <span className="text-base font-semibold text-gray-900 tracking-tight">
-                  ShowYourBrand
-                </span>
-              </Link>
-
-              <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-                <Link href="/#features" className="text-sm text-gray-600 hover:text-purple-600 transition-colors">Features</Link>
-                <Link href="/#pricing" className="text-sm text-gray-600 hover:text-purple-600 transition-colors">Pricing</Link>
-                <Link href="/#faq" className="text-sm text-gray-600 hover:text-purple-600 transition-colors">FAQ</Link>
-                <Link href="/blog" className="text-sm text-purple-700 font-semibold transition-colors">Blog</Link>
-              </nav>
-
-              <div className="ml-auto">
-                <Link
-                  href="/waitlist"
-                  className="text-sm font-medium bg-[#1E293B] text-white px-4 py-2 rounded-full hover:bg-[#334155] transition-colors"
-                >
-                  Join Waitlist
-                </Link>
-              </div>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Content */}
         <div className="pt-24 pb-24 px-4">
@@ -280,12 +255,12 @@ export default function BlogPostPage({ post, content }: Props) {
                 <p className="text-gray-300 text-sm mb-6 max-w-md mx-auto">
                   100 prompts across ChatGPT, Claude, Perplexity and Gemini. Full technical scan. Prioritized action plan. Prices start at €199.
                 </p>
-                <Link
-                  href="/waitlist"
+                <button
+                  onClick={openWaitlistModal}
                   className="inline-flex items-center gap-2 bg-white text-[#1E293B] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm shadow-lg"
                 >
                   Join the Waitlist →
-                </Link>
+                </button>
               </div>
             </article>
 

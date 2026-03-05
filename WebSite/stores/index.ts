@@ -2,14 +2,16 @@
 import { useUserStore } from './useUserStore';
 import { useAuditStore } from './useAuditStore';
 import { useDashboardStore } from './useDashboardStore';
+import { useWaitlistModalStore } from './useWaitlistModalStore';
 
 // Export stores
-export { useUserStore, useAuditStore, useDashboardStore };
+export { useUserStore, useAuditStore, useDashboardStore, useWaitlistModalStore };
 
 // Re-export store types
 export type { UserState, UserProfile, Theme, SubscriptionTier } from './useUserStore';
 export type { AuditState } from './useAuditStore';
 export type { DashboardState, DashboardView, DashboardFilters } from './useDashboardStore';
+export type { WaitlistModalState } from './useWaitlistModalStore';
 
 // Re-export Audit types for convenience (F9 fix)
 export type { Audit, AuditProgress } from '@/types';
