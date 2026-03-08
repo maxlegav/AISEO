@@ -326,9 +326,11 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
-// Subscriber Counter - always shows count (real or 50+ fallback)
 const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: boolean }) => {
-  const displayCount = count > 0 ? `${count}+` : "50+";
+  const baseCount = 50;
+  const totalCount = baseCount + (count || 0); // 50 + nombre réel en BDD
+  const displayCount = `${totalCount}+`;
+
   return (
     <div className="flex items-center justify-center gap-3 mt-4">
       <div className="flex -space-x-2">
@@ -352,7 +354,6 @@ const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: bool
     </div>
   );
 };
-
 
 const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 
@@ -816,7 +817,7 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        {isProduction && <section id="pricing" className="py-20 px-4">
+        <section id="pricing" className="py-20 px-4">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-14">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
@@ -904,7 +905,7 @@ export default function Home() {
               to access your dashboard
             </p>
           </div>
-        </section>}
+        </section>
 
         {/* Testimonials Section */}
         <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
@@ -1061,16 +1062,14 @@ export default function Home() {
                       Features
                     </a>
                   </li>
-                  {isProduction && (
-                    <li>
-                      <a
-                        href="#pricing"
-                        className="hover:text-white transition-colors"
-                      >
-                        Pricing
-                      </a>
-                    </li>
-                  )}
+                  <li>
+                    <a
+                      href="#pricing"
+                      className="hover:text-white transition-colors"
+                    >
+                      Pricing
+                    </a>
+                  </li>
                   <li>
                     <a
                       href="#faq"

@@ -11,9 +11,7 @@ const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 const navLinks = [
   { label: "Features", href: "/#features", anchor: "#features" },
   { label: "Process", href: "/#process", anchor: "#process" },
-  ...(isProduction
-    ? [{ label: "Pricing", href: "/#pricing", anchor: "#pricing" }]
-    : []),
+  { label: "Pricing", href: "/#pricing", anchor: "#pricing" },
   { label: "FAQ", href: "/#faq", anchor: "#faq" },
   { label: "Blog", href: "/blog" },
 ];
