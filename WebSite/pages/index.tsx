@@ -405,6 +405,7 @@ export default function Home() {
     };
 
     const handleWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 768) return;
       if (isScrolling.current) { e.preventDefault(); return; }
 
       const sections = getSections();
@@ -422,6 +423,7 @@ export default function Home() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (window.innerWidth < 768) return;
       if (isScrolling.current) return;
       const sections = getSections();
       if (sections.length === 0) return;
@@ -543,14 +545,14 @@ export default function Home() {
 
         {/* Hero Section */}
         <section className="h-screen px-4 relative overflow-hidden flex flex-col items-center">
-          <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
-          <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-300/40 rounded-full blur-3xl" />
+          <div className="absolute top-10 left-0 w-48 h-48 md:w-96 md:h-96 bg-purple-400/30 md:bg-purple-400/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-0 w-48 h-48 md:w-[500px] md:h-[500px] bg-pink-400/20 md:bg-pink-400/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-[500px] md:h-[500px] bg-orange-300/40 rounded-full blur-3xl" />
 
-          <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-28 pb-20">
+          <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-20 md:pt-28 pb-16 md:pb-20">
             {/* Centered: Title + Subtitle + Marquee */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-6">
-              <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-gray-900 leading-tight">
+            <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6">
+              <h1 className="font-heading text-4xl md:text-7xl lg:text-8xl font-medium text-gray-900 leading-tight">
                 Stop being{" "}
                 <span className="relative inline-block">
                   invisible
@@ -591,7 +593,7 @@ export default function Home() {
         </section>
 
         {/* The GEO Advantage Section - Aggressive Marketing */}
-        <section id="features" className="h-screen px-4 flex flex-col items-center justify-center">
+        <section id="features" className="min-h-screen md:h-screen px-4 py-16 md:py-0 flex flex-col items-center justify-center">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-5 py-2 mb-8">
@@ -611,12 +613,12 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 mt-16">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+            <div className="grid md:grid-cols-3 gap-6 mt-8 md:mt-16">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 md:mb-6">
                   <Eye className="w-7 h-7 text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 md:mb-4">
                   Be the brand AI recommends
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-base">
@@ -626,11 +628,11 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 md:mb-6">
                   <Target className="w-7 h-7 text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 md:mb-4">
                   Crush your competitors
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-base">
@@ -640,11 +642,11 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 md:mb-6">
                   <Zap className="w-7 h-7 text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 md:mb-4">
                   10x more qualified traffic
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-base">
@@ -660,10 +662,10 @@ export default function Home() {
         {/* Infrastructure Section */}
         <section
           id="process"
-          className="h-screen px-4 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center"
+          className="min-h-screen md:h-screen px-4 py-16 md:py-0 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center"
         >
           <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div>
                 <h2 className="font-heading text-4xl md:text-6xl font-medium text-gray-900 mb-6">
                   Your competitors are already
@@ -679,7 +681,7 @@ export default function Home() {
                   exactly where you stand—and how to fix it.
                 </p>
 
-                <div className="space-y-8">
+                <div className="space-y-6 md:space-y-8">
                   <div className="flex items-start gap-4">
                     <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
@@ -973,13 +975,13 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="h-[75vh] px-4 bg-[#1E293B] relative overflow-hidden flex flex-col items-center justify-center">
+        <section className="min-h-[60vh] md:h-[75vh] px-4 py-20 md:py-0 bg-[#1E293B] relative overflow-hidden flex flex-col items-center justify-center">
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
 
           <div className="container mx-auto max-w-5xl text-center relative z-10">
-            <h2 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-white mb-8 leading-tight">
+            <h2 className="font-heading text-4xl md:text-7xl lg:text-8xl font-medium text-white mb-6 md:mb-8 leading-tight">
               Ready to dominate AI search?
             </h2>
             <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto">
@@ -1030,7 +1032,7 @@ export default function Home() {
         {/* Footer */}
         <footer className=" text-black py-16">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-4 gap-12 mb-12">
+            <div className="grid md:grid-cols-4 gap-8 md:gap-12 mb-12">
               <div className="md:col-span-2">
                 <Link href="/" className="flex items-center gap-2 mb-6">
                   <div className="w-16 h-16  rounded-lg flex items-center justify-center">
