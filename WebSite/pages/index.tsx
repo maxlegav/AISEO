@@ -66,31 +66,31 @@ const trustAvatars = [
 
 // Animated AI Model Marquee with real logos
 const AIModelMarquee = () => (
-  <div className="mt-8">
+  <div className="mt-8 w-full">
     <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
     BE MENTIONNED BY:
     </p>
 
-    <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-xl border border-white/50 shadow-sm">
-      <div className="flex animate-marquee items-center w-max">
+    <div className="relative overflow-hidden py-4 md:py-6 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-sm sm:max-w-xl md:max-w-4xl border border-white/50 shadow-sm">
+      <div className="flex animate-marquee md:animate-marquee-fast items-center w-max">
         {[...aiModels, ...aiModels].map((model, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
+            className="flex items-center gap-3 mx-5 md:mx-10 flex-shrink-0"
           >
             <Image
               src={model.logo}
               alt={`${model.name} logo`}
               width={32}
               height={32}
-              className="h-8 w-8 object-contain"
+              className="h-8 w-8 md:h-12 md:w-12 object-contain"
             />
             <Image
               src={model.text}
               alt={model.name}
               width={100}
               height={24}
-              className="h-6 w-auto object-contain"
+              className="h-6 md:h-8 w-auto object-contain"
             />
           </div>
         ))}
@@ -326,35 +326,30 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
-// Subscriber Counter - shows real count if above threshold, otherwise encouragement
-const WAITLIST_THRESHOLD = 20;
-
-const SubscriberCounter = ({ count }: { count: number }) => {
-  if (count > WAITLIST_THRESHOLD) {
-    return (
-      <div className="flex items-center justify-center gap-3 mt-4">
-        <div className="flex -space-x-2">
-          {trustAvatars.map((avatar, i) => (
-            <div
-              key={i}
-              className={`w-8 h-8 rounded-full ${avatar.bg} flex items-center justify-center border-2 border-white text-white text-xs font-semibold`}
-            >
-              {avatar.letter}
-            </div>
-          ))}
-        </div>
-        <p className="text-sm text-gray-700 font-medium">
-          <span className="font-bold text-gray-900"> {count} </span> professionals
-          already joined, be one of them!
-        </p>
-      </div>
-    );
-  }
-
+// Subscriber Counter - always shows count (real or 50+ fallback)
+const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: boolean }) => {
+  const displayCount = count > 0 ? `${count}+` : "50+";
   return (
-    <p className="text-sm text-gray-500 mt-4">
-      Be among the first to join us !
-    </p>
+    <div className="flex items-center justify-center gap-3 mt-4">
+      <div className="flex -space-x-2">
+        {trustAvatars.map((avatar, i) => (
+          <div
+            key={i}
+            className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs font-semibold ${
+              dark
+                ? "bg-white/20 border-white/30 text-white"
+                : `${avatar.bg} border-white text-white`
+            }`}
+          >
+            {avatar.letter}
+          </div>
+        ))}
+      </div>
+      <p className={`text-sm font-medium ${dark ? "text-gray-300" : "text-gray-700"}`}>
+        <span className={`font-bold ${dark ? "text-white" : "text-gray-900"}`}>{displayCount}</span>{" "}
+        already joined the waitlist, be one of them
+      </p>
+    </div>
   );
 };
 
@@ -491,11 +486,11 @@ export default function Home() {
     <>
       <TagSEO
         canonicalSlug=""
-        title="ShowYourBrand — GEO Audit: Appear in ChatGPT, Claude & Perplexity"
+        title="ShowYourBrand | GEO Audit: Appear in ChatGPT, Claude & Perplexity"
         description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers."
         keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
         og={{
-          title: "ShowYourBrand — Appear in AI Search Results",
+          title: "ShowYourBrand | Appear in AI Search Results",
           description:
             "Is your brand cited by ChatGPT, Claude or Perplexity? Test 100 AI prompts, get your GEO score and a clear action plan. Start your free audit today.",
           image: `https://showyourbrand.vercel.app/og-image.png`,
@@ -517,6 +512,12 @@ export default function Home() {
           animation: marquee 20s linear infinite;
         }
         .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+        .animate-marquee-fast {
+          animation: marquee 10s linear infinite;
+        }
+        .animate-marquee-fast:hover {
           animation-play-state: paused;
         }
         .animate-marquee-slow {
@@ -552,15 +553,15 @@ export default function Home() {
           <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-20 md:pt-28 pb-16 md:pb-20">
             {/* Centered: Title + Subtitle + Marquee */}
             <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6">
-              <h1 className="font-heading text-4xl md:text-7xl lg:text-8xl font-medium text-gray-900 leading-tight">
-                Stop being{" "}
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-medium text-gray-900 leading-tight px-2 sm:px-0">
+                Mention your{" "}
                 <span className="relative inline-block">
-                  invisible
+                  Brand
                   <HandDrawnUnderline />
                 </span>{" "}
-                to AI
+                on AI
               </h1>
-              <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl mx-auto px-2 sm:px-0">
                 The first Generative Engine Optimization (GEO) platform. Audit,
                 analyze, and optimize your brand&apos;s presence across all major
                 AI models.
@@ -570,7 +571,8 @@ export default function Home() {
 
             {/* Bottom: CTA pinned to bottom */}
             <div className="max-w-xl mx-auto">
-              <div className="flex justify-center">
+              <SubscriberCounter count={subscriberCount} />
+              <div className="flex justify-center mt-4">
                 <Button
                   onClick={openWaitlistModal}
                   className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
@@ -579,7 +581,6 @@ export default function Home() {
                   Join the Waitlist
                 </Button>
               </div>
-              <SubscriberCounter count={subscriberCount} />
             </div>
           </div>
 
@@ -623,7 +624,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-base">
                   <strong>87% of brands are invisible</strong> to AI. When users
-                  ask &ldquo;the best tool for...&rdquo;, AI names you — or your
+                  ask &ldquo;the best tool for...&rdquo;, AI names you, or your
                   competitor.
                 </p>
               </div>
@@ -637,7 +638,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-base">
                   See which competitors AI recommends instead of you. Understand{" "}
-                  <strong>why they rank higher</strong> — then steal their
+                  <strong>why they rank higher</strong>, then steal their
                   playbook.
                 </p>
               </div>
@@ -678,7 +679,7 @@ export default function Home() {
                   Every day, millions of potential customers ask AI for
                   recommendations. If your brand isn&apos;t being cited,
                   you&apos;re losing deals to competitors who are. We show you
-                  exactly where you stand—and how to fix it.
+                  exactly where you stand and how to fix it.
                 </p>
 
                 <div className="space-y-6 md:space-y-8">
@@ -702,7 +703,7 @@ export default function Home() {
                       </h4>
                       <p className="text-gray-600">
                         Discover which competitors are getting recommended
-                        instead of you—and steal their playbook.
+                        instead of you, and steal their playbook.
                       </p>
                     </div>
                   </div>
@@ -991,7 +992,8 @@ export default function Home() {
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">
-              <div className="flex justify-center">
+              <SubscriberCounter count={subscriberCount} dark />
+              <div className="flex justify-center mt-4">
                 <Button
                   onClick={openWaitlistModal}
                   className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold"
@@ -1000,31 +1002,6 @@ export default function Home() {
                   Join the Waitlist
                 </Button>
               </div>
-
-              {subscriberCount > WAITLIST_THRESHOLD ? (
-                <div className="flex items-center justify-center gap-3 mt-4">
-                  <div className="flex -space-x-2">
-                    {trustAvatars.map((avatar, i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 text-white text-xs font-semibold"
-                      >
-                        {avatar.letter}
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-300 font-medium">
-                    <span className="font-bold text-white">
-                      {subscriberCount}
-                    </span>{" "}
-                    professionals already joined, be one of them!
-                  </p>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400 mt-4">
-                  Be among the first to join us !
-                </p>
-              )}
             </div>
           </div>
         </section>
