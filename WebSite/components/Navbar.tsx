@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWaitlistModalStore } from "@/stores";
+import { Label } from "./ui/label";
 
 const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 
@@ -47,7 +48,11 @@ export default function Navbar() {
               const isActive =
                 !link.anchor && router.pathname.startsWith(link.href);
               const El = isHome && link.anchor ? "a" : Link;
-
+              if(link.label==="Pricing" && !isProduction){
+                return (
+                  <></>
+                )
+              }
               return (
                 <El
                   key={link.label}

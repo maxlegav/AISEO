@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import AdminLayout from "@/components/AdminLayout";
 import AuditStepper, {
+  normalizeStatus,
   statusLabel,
   statusColor,
   type AuditStatus,
@@ -149,7 +150,7 @@ export default function AuditDetailPage() {
   const handleAction = async (action: "approve" | "reject") => {
     const status = audit?.status;
     let confirmMsg = "";
-    if (action === "approve" && (status === "questions_review")) {
+    if (action === "approve" && (status === "questions_review" || status === "awaiting_prompt_approval")) {
       confirmMsg = "Approve these questions and start the full audit?";
     } else if (action === "approve") {
       confirmMsg = "Approve this audit and deliver it to the client?";
@@ -206,7 +207,8 @@ export default function AuditDetailPage() {
   }
 
   const results = audit.results;
-  const status = audit.status as AuditStatus;
+  const hasPrompts = Array.isArray(results?.generatedPrompts) && results.generatedPrompts.length > 0;
+  const status = normalizeStatus(audit.status, hasPrompts);
 
   return (
     <AdminLayout>
@@ -255,7 +257,7 @@ export default function AuditDetailPage() {
         <GeneratingContent audit={audit} user={user} business={business} />
       )}
 
-      {status === "questions_review" && results?.generatedPrompts && (
+      {(status === "questions_review" || status === "awaiting_prompt_approval") && results?.generatedPrompts && (
         <QuestionsReview
           auditId={audit._id}
           questions={results.generatedPrompts}

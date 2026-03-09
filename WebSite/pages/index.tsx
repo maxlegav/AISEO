@@ -293,13 +293,16 @@ const HandDrawnUnderline = () => (
 );
 
 const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: boolean }) => {
-  const baseCount = 50;
+  const baseCount = 0;
   const totalCount = baseCount + (count || 0); // 50 + nombre réel en BDD
   const displayCount = `${totalCount}+`;
 
   return (
     <div className="flex items-center justify-center gap-3 mt-4">
-      <div className="flex -space-x-2">
+      {
+        totalCount > 50 ?
+        <>
+        <div className="flex -space-x-2">
         {trustAvatars.map((avatar, i) => (
           <div
             key={i}
@@ -317,6 +320,11 @@ const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: bool
         <span className={`font-bold ${dark ? "text-white" : "text-gray-900"}`}>{displayCount}</span>{" "}
         already joined the waitlist, be one of them
       </p>
+      </> :
+      <>
+        <p>Be amoung the first to be visible in AI search !</p>
+      </>
+      }
     </div>
   );
 };
@@ -476,20 +484,20 @@ export default function Home() {
           }
         }
         .animate-marquee {
-          animation: marquee 20s linear infinite;
+          animation: marquee 30s linear infinite;
         }
         .animate-marquee:hover {
           animation-play-state: paused;
         }
         .animate-marquee-fast {
-          animation: marquee 10s linear infinite;
+          animation: marquee 15s linear infinite;
         }
         .animate-marquee-fast:hover {
           animation-play-state: paused;
         }
         @media (min-width: 1024px) {
           .animate-marquee {
-            animation-duration: 10s;
+            animation-duration: 18s;
           }
         }
         .animate-marquee-slow {
@@ -559,7 +567,7 @@ export default function Home() {
           {/* Scroll down arrow */}
           <a
             href="#features"
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce-slow"
+            className="absolute bottom-8 inset-x-0 mx-auto w-fit z-10 animate-bounce-slow"
           >
             <ChevronDown className="w-8 h-8 text-gray-400" />
           </a>
@@ -782,6 +790,7 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
+        { isProduction &&
         <section id="pricing" className="py-16 md:py-20 px-4">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-10 md:mb-14">
@@ -792,7 +801,7 @@ export default function Home() {
                 Choose the plan that fits your needs. Cancel anytime.
               </p>
             </div>
-
+          
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               <PricingCard
                 title="BASIC"
@@ -872,9 +881,10 @@ export default function Home() {
               to access your dashboard
             </p>
           </div>
-        </section>
+        </section>}
 
         {/* Testimonials Section */}
+        {isProduction && 
         <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
@@ -885,29 +895,8 @@ export default function Home() {
                 See what early adopters are saying
               </p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              <TestimonialCard
-                quote="We ran a GEO audit for a client and discovered they were completely invisible on Perplexity. After implementing the recommendations, they saw a 40% increase in AI referral traffic in just 2 weeks."
-                author="Sarah J."
-                role="Founder, Digital Marketing Agency"
-                initial="S"
-              />
-              <TestimonialCard
-                quote="Our SaaS was getting mentioned by ChatGPT for the wrong features. ShowYourBrand showed us exactly what to fix. Now we're the #1 recommendation in our niche for 3 out of 4 AI engines."
-                author="Marc D."
-                role="CTO, B2B SaaS Platform"
-                initial="M"
-              />
-              <TestimonialCard
-                quote="As an e-commerce brand, we didn't realize AI search was sending traffic to our competitors. The competitor gap analysis was eye-opening. ROI paid for itself in the first week."
-                author="Elena R."
-                role="Head of Growth, E-commerce Brand"
-                initial="E"
-              />
-            </div>
           </div>
-        </section>
+        </section>}
 
         {/* FAQ Section */}
         <section id="faq" className="py-16 px-4">
@@ -1029,14 +1018,14 @@ export default function Home() {
                       Features
                     </a>
                   </li>
-                  <li>
+                  {isProduction && <li>
                     <a
                       href="#pricing"
                       className="hover:text-white transition-colors"
                     >
                       Pricing
                     </a>
-                  </li>
+                  </li>}
                   <li>
                     <a
                       href="#faq"

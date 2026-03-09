@@ -17,10 +17,14 @@ import { getDb } from "@/lib/db";
 
 const ALLOWED_TRANSITIONS: Record<string, { approve: string; reject: string }> = {
   questions_review: { approve: "auditing", reject: "rejected" },
+  awaiting_prompt_approval: { approve: "auditing", reject: "rejected" },
   audit_review: { approve: "completed", reject: "rejected" },
   // Legacy support
   review_pending: { approve: "completed", reject: "rejected" },
 };
+
+/** Statuses that require calling the backend server to start Phase 2 */
+const PHASE2_TRIGGER_STATUSES = new Set(["questions_review", "awaiting_prompt_approval"]);
 
 export default async function handler(
   req: NextApiRequest,
@@ -71,13 +75,67 @@ export default async function handler(
 
   const newStatus = transition[action];
 
+  // When approving questions (Phase 1 → Phase 2), call the backend server
+  if (action === "approve" && PHASE2_TRIGGER_STATUSES.has(audit.status)) {
+    const serviceUrl = process.env.PROCESSING_SERVICE_URL;
+    const serviceKey = process.env.PROCESSING_SERVICE_API_KEY;
+
+    if (!serviceUrl || !serviceKey) {
+      return res.status(500).json({
+        error: "PROCESSING_SERVICE_URL or PROCESSING_SERVICE_API_KEY not configured",
+      });
+    }
+
+    try {
+      const serverRes = await fetch(
+        `${serviceUrl}/audit/${auditId}/approve-prompts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${serviceKey}`,
+          },
+        }
+      );
+
+      if (!serverRes.ok) {
+        const errorBody = await serverRes.text();
+        return res.status(502).json({
+          error: `Backend server returned ${serverRes.status}: ${errorBody}`,
+        });
+      }
+
+      // Record who reviewed (server handles the status transition)
+      await db.collection("audits").updateOne(
+        { _id: oid },
+        {
+          $set: {
+            reviewedAt: new Date().toISOString(),
+            reviewedBy: session.user?.email,
+          },
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        auditId,
+        previousStatus: audit.status,
+        newStatus: "processing", // server sets this
+      });
+    } catch (err) {
+      return res.status(502).json({
+        error: `Failed to reach backend server: ${err instanceof Error ? err.message : String(err)}`,
+      });
+    }
+  }
+
+  // For all other transitions (audit_review → completed, any → rejected)
   const updateFields: Record<string, unknown> = {
     status: newStatus,
     reviewedAt: new Date().toISOString(),
     reviewedBy: session.user?.email,
   };
 
-  // When approving final audit, also set completedAt
   if (newStatus === "completed") {
     updateFields.completedAt = new Date().toISOString();
   }
