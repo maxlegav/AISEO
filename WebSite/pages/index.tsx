@@ -65,31 +65,31 @@ const trustAvatars = [
 
 // Animated AI Model Marquee with real logos
 const AIModelMarquee = () => (
-  <div className="mt-8">
+  <div className="mt-8 w-full">
     <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
     BE MENTIONNED BY:
     </p>
 
-    <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-xl border border-white/50 shadow-sm">
+    <div className="relative overflow-hidden py-4 lg:py-6 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-[280px] sm:max-w-sm md:max-w-xl lg:max-w-4xl border border-white/50 shadow-sm">
       <div className="flex animate-marquee items-center w-max">
         {[...aiModels, ...aiModels].map((model, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 mx-5 md:mx-8 flex-shrink-0"
+            className="flex items-center gap-2 md:gap-3 mx-4 md:mx-6 lg:mx-10 flex-shrink-0"
           >
             <Image
               src={model.logo}
               alt={`${model.name} logo`}
               width={32}
               height={32}
-              className="h-8 w-8 object-contain"
+              className="h-7 w-7 lg:h-12 lg:w-12 object-contain"
             />
             <Image
               src={model.text}
               alt={model.name}
               width={100}
               height={24}
-              className="h-6 w-auto object-contain"
+              className="h-5 lg:h-8 w-auto object-contain"
             />
           </div>
         ))}
@@ -292,38 +292,34 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
-// Subscriber Counter - shows real count if above threshold, otherwise encouragement
-const WAITLIST_THRESHOLD = 20;
-
-const SubscriberCounter = ({ count }: { count: number }) => {
-  if (count > WAITLIST_THRESHOLD) {
-    return (
-      <div className="flex items-center justify-center gap-3 mt-4">
-        <div className="flex -space-x-2">
-          {trustAvatars.map((avatar, i) => (
-            <div
-              key={i}
-              className={`w-8 h-8 rounded-full ${avatar.bg} flex items-center justify-center border-2 border-white text-white text-xs font-semibold`}
-            >
-              {avatar.letter}
-            </div>
-          ))}
-        </div>
-        <p className="text-sm text-gray-700 font-medium">
-          <span className="font-bold text-gray-900"> {count} </span> professionals
-          already joined, be one of them!
-        </p>
-      </div>
-    );
-  }
+const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: boolean }) => {
+  const baseCount = 50;
+  const totalCount = baseCount + (count || 0); // 50 + nombre réel en BDD
+  const displayCount = `${totalCount}+`;
 
   return (
-    <p className="text-sm text-gray-500 mt-4">
-      Be among the first to join us !
-    </p>
+    <div className="flex items-center justify-center gap-3 mt-4">
+      <div className="flex -space-x-2">
+        {trustAvatars.map((avatar, i) => (
+          <div
+            key={i}
+            className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs font-semibold ${
+              dark
+                ? "bg-white/20 border-white/30 text-white"
+                : `${avatar.bg} border-white text-white`
+            }`}
+          >
+            {avatar.letter}
+          </div>
+        ))}
+      </div>
+      <p className={`text-sm font-medium ${dark ? "text-gray-300" : "text-gray-700"}`}>
+        <span className={`font-bold ${dark ? "text-white" : "text-gray-900"}`}>{displayCount}</span>{" "}
+        already joined the waitlist, be one of them
+      </p>
+    </div>
   );
 };
-
 
 const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 
@@ -371,6 +367,7 @@ export default function Home() {
     };
 
     const handleWheel = (e: WheelEvent) => {
+      if (window.innerWidth < 1024) return;
       if (isScrolling.current) { e.preventDefault(); return; }
 
       const sections = getSections();
@@ -388,6 +385,7 @@ export default function Home() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (window.innerWidth < 1024) return;
       if (isScrolling.current) return;
       const sections = getSections();
       if (sections.length === 0) return;
@@ -455,11 +453,11 @@ export default function Home() {
     <>
       <TagSEO
         canonicalSlug=""
-        title="ShowYourBrand — GEO Audit: Appear in ChatGPT, Claude & Perplexity"
+        title="ShowYourBrand | GEO Audit: Appear in ChatGPT, Claude & Perplexity"
         description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers."
         keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
         og={{
-          title: "ShowYourBrand — Appear in AI Search Results",
+          title: "ShowYourBrand | Appear in AI Search Results",
           description:
             "Is your brand cited by ChatGPT, Claude or Perplexity? Test 100 AI prompts, get your GEO score and a clear action plan. Start your free audit today.",
           image: `https://showyourbrand.vercel.app/og-image.png`,
@@ -482,6 +480,17 @@ export default function Home() {
         }
         .animate-marquee:hover {
           animation-play-state: paused;
+        }
+        .animate-marquee-fast {
+          animation: marquee 10s linear infinite;
+        }
+        .animate-marquee-fast:hover {
+          animation-play-state: paused;
+        }
+        @media (min-width: 1024px) {
+          .animate-marquee {
+            animation-duration: 10s;
+          }
         }
         .animate-marquee-slow {
           animation: marquee 20s linear infinite;
@@ -509,22 +518,22 @@ export default function Home() {
 
         {/* Hero Section */}
         <section className="h-screen px-4 relative overflow-hidden flex flex-col items-center">
-          <div className="absolute top-10 left-0 w-96 h-96 bg-purple-400/40 rounded-full blur-3xl" />
-          <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-400/30 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-300/40 rounded-full blur-3xl" />
+          <div className="absolute top-10 left-0 w-48 h-48 md:w-96 md:h-96 bg-purple-400/30 md:bg-purple-400/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-0 w-48 h-48 md:w-[500px] md:h-[500px] bg-pink-400/20 md:bg-pink-400/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-[500px] md:h-[500px] bg-orange-300/40 rounded-full blur-3xl" />
 
-          <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-28 pb-20">
+          <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-20 md:pt-28 pb-16 md:pb-20">
             {/* Centered: Title + Subtitle + Marquee */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-6">
-              <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-gray-900 leading-tight">
-                Stop being{" "}
+            <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6">
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-tight px-2 sm:px-0">
+                Mention your{" "}
                 <span className="relative inline-block">
-                  invisible
+                  Brand
                   <HandDrawnUnderline />
                 </span>{" "}
-                to AI
+                on AI
               </h1>
-              <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+              <p className="text-base sm:text-lg md:text-lg lg:text-xl text-gray-700 max-w-2xl lg:max-w-3xl mx-auto px-2 sm:px-0">
                 The first Generative Engine Optimization (GEO) platform. Audit,
                 analyze, and optimize your brand&apos;s presence across all major
                 AI models.
@@ -534,7 +543,8 @@ export default function Home() {
 
             {/* Bottom: CTA pinned to bottom */}
             <div className="max-w-xl mx-auto">
-              <div className="flex justify-center">
+              <SubscriberCounter count={subscriberCount} />
+              <div className="flex justify-center mt-4">
                 <Button
                   onClick={openWaitlistModal}
                   className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
@@ -543,7 +553,6 @@ export default function Home() {
                   Join the Waitlist
                 </Button>
               </div>
-              <SubscriberCounter count={subscriberCount} />
             </div>
           </div>
 
@@ -557,19 +566,19 @@ export default function Home() {
         </section>
 
         {/* The GEO Advantage Section - Aggressive Marketing */}
-        <section id="features" className="h-screen px-4 flex flex-col items-center justify-center">
+        <section id="features" className="px-4 py-16 md:py-20 lg:min-h-screen lg:flex lg:flex-col lg:items-center lg:justify-center">
           <div className="container mx-auto max-w-7xl">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-5 py-2 mb-8">
+            <div className="text-center mb-8 md:mb-12">
+              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-2 mb-6">
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-red-700 text-sm font-semibold">
+                <span className="text-red-700 text-xs sm:text-sm font-semibold">
                   YOUR CUSTOMERS HAVE ALREADY SWITCHED TO AI SEARCH
                 </span>
               </div>
-              <h2 className="font-heading text-4xl md:text-6xl font-medium text-gray-900 mb-6">
+              <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-4 md:mb-6">
                 Google is dying. AI is the new search.
               </h2>
-              <p className="text-gray-600 max-w-3xl mx-auto text-lg md:text-xl">
+              <p className="text-gray-600 max-w-2xl lg:max-w-3xl mx-auto text-base md:text-lg lg:text-xl">
                 58% of consumers now use ChatGPT, Perplexity, or Claude instead
                 of Google to find products and services. If AI doesn&apos;t
                 mention your brand, <strong>you don&apos;t exist</strong> for
@@ -577,43 +586,43 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 mt-16">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
-                  <Eye className="w-7 h-7 text-gray-900" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 lg:mb-6">
+                  <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   Be the brand AI recommends
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-base">
+                <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   <strong>87% of brands are invisible</strong> to AI. When users
-                  ask &ldquo;the best tool for...&rdquo;, AI names you — or your
+                  ask &ldquo;the best tool for...&rdquo;, AI names you, or your
                   competitor.
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
-                  <Target className="w-7 h-7 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 lg:mb-6">
+                  <Target className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   Crush your competitors
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-base">
+                <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   See which competitors AI recommends instead of you. Understand{" "}
-                  <strong>why they rank higher</strong> — then steal their
+                  <strong>why they rank higher</strong>, then steal their
                   playbook.
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
-                  <Zap className="w-7 h-7 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all sm:col-span-2 lg:col-span-1">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 lg:mb-6">
+                  <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   10x more qualified traffic
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-base">
+                <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   AI users have <strong>3x higher purchase intent</strong> than
                   Google users. One AI mention drives more revenue than 1,000
                   clicks.
@@ -626,33 +635,49 @@ export default function Home() {
         {/* Infrastructure Section */}
         <section
           id="process"
-          className="h-screen px-4 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center"
+          className="px-4 py-16 md:py-20 lg:min-h-screen bg-white/50 backdrop-blur-sm lg:flex lg:flex-col lg:items-center lg:justify-center"
         >
           <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div>
-                <h2 className="font-heading text-4xl md:text-6xl font-medium text-gray-900 mb-6">
-                  Your competitors are already {' '}
+                <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-medium text-gray-900 mb-4 md:mb-6">
+                  Your competitors are already
+                  <br />
                   <span className="italic text-purple-600">
                     winning AI search
                   </span>
                 </h2>
-                <p className="text-gray-600 mb-10 leading-relaxed text-lg">
-                  Millions ask AI for recommendations daily. If you&apos;re not cited, you&apos;re losing deals. We show you where you stand—and how to fix it.
+                <p className="text-gray-600 mb-8 md:mb-10 leading-relaxed text-base md:text-lg">
+                  Every day, millions of potential customers ask AI for
+                  recommendations. If your brand isn&apos;t being cited,
+                  you&apos;re losing deals to competitors who are. We show you
+                  exactly where you stand and how to fix it.
                 </p>
 
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
-                    <p className="text-gray-900 text-lg">
-                      See how AI describes your brand across engines
-                    </p>
+                <div className="space-y-6 md:space-y-8">
+                  <div className="flex items-start gap-4">
+                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gray-900 text-lg">
+                        See What AI Says About You
+                      </h4>
+                      <p className="text-gray-600">
+                        Real queries. Real responses. Know exactly how ChatGPT,
+                        Claude, and Perplexity describe your brand.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
-                    <p className="text-gray-900 text-lg">
-                      Find which competitors outrank you—and why
-                    </p>
+                  <div className="flex items-start gap-4">
+                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gray-900 text-lg">
+                        Outrank Your Competition
+                      </h4>
+                      <p className="text-gray-600">
+                        Discover which competitors are getting recommended
+                        instead of you, and steal their playbook.
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
@@ -757,9 +782,9 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        {isProduction && <section id="pricing" className="py-20 px-4">
+        <section id="pricing" className="py-16 md:py-20 px-4">
           <div className="container mx-auto max-w-5xl">
-            <div className="text-center mb-14">
+            <div className="text-center mb-10 md:mb-14">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
                 Simple, transparent pricing
               </h2>
@@ -768,7 +793,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               <PricingCard
                 title="BASIC"
                 price="€199"
@@ -810,28 +835,30 @@ export default function Home() {
                 ctaLink="/waitlist"
                 onCtaClick={openWaitlistModal}
               />
-              <PricingCard
-                title="PREMIUM FOR AGENCIES"
-                price="€799"
-                oldPrice="€1,199"
-                period="mo"
-                features={[
-                  "20 audits per month included",
-                  "All 4 AI engines per audit",
-                  "Unlimited competitor comparisons",
-                  "100 AI prompt testing per audit",
-                  "White-label PDF reports (your branding)",
-                  "Bulk audit management dashboard",
-                  "Client-ready executive summaries",
-                  "Schema markup & FAQ auto-generation",
-                  "Monthly GEO trend reports",
-                  "Dedicated account manager",
-                  "+€35 per extra audit beyond 20",
-                ]}
-                ctaText="Join the Waitlist"
-                ctaLink="/waitlist"
-                onCtaClick={openWaitlistModal}
-              />
+              <div className="md:col-span-2 lg:col-span-1 flex flex-col">
+                <PricingCard
+                  title="PREMIUM FOR AGENCIES"
+                  price="€799"
+                  oldPrice="€1,199"
+                  period="mo"
+                  features={[
+                    "20 audits per month included",
+                    "All 4 AI engines per audit",
+                    "Unlimited competitor comparisons",
+                    "100 AI prompt testing per audit",
+                    "White-label PDF reports (your branding)",
+                    "Bulk audit management dashboard",
+                    "Client-ready executive summaries",
+                    "Schema markup & FAQ auto-generation",
+                    "Monthly GEO trend reports",
+                    "Dedicated account manager",
+                    "+€35 per extra audit beyond 20",
+                  ]}
+                  ctaText="Join the Waitlist"
+                  ctaLink="/waitlist"
+                  onCtaClick={openWaitlistModal}
+                />
+              </div>
             </div>
 
             <p className="mt-8 text-center text-sm text-gray-600">
@@ -845,7 +872,42 @@ export default function Home() {
               to access your dashboard
             </p>
           </div>
-        </section>}
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
+          <div className="container mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
+                Trusted by our beta-Testers
+              </h2>
+              <p className="text-gray-600">
+                See what early adopters are saying
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              <TestimonialCard
+                quote="We ran a GEO audit for a client and discovered they were completely invisible on Perplexity. After implementing the recommendations, they saw a 40% increase in AI referral traffic in just 2 weeks."
+                author="Sarah J."
+                role="Founder, Digital Marketing Agency"
+                initial="S"
+              />
+              <TestimonialCard
+                quote="Our SaaS was getting mentioned by ChatGPT for the wrong features. ShowYourBrand showed us exactly what to fix. Now we're the #1 recommendation in our niche for 3 out of 4 AI engines."
+                author="Marc D."
+                role="CTO, B2B SaaS Platform"
+                initial="M"
+              />
+              <TestimonialCard
+                quote="As an e-commerce brand, we didn't realize AI search was sending traffic to our competitors. The competitor gap analysis was eye-opening. ROI paid for itself in the first week."
+                author="Elena R."
+                role="Head of Growth, E-commerce Brand"
+                initial="E"
+              />
+            </div>
+          </div>
+        </section>
 
         {/* FAQ Section */}
         <section id="faq" className="py-16 px-4">
@@ -882,23 +944,24 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="h-[75vh] px-4 bg-[#1E293B] relative overflow-hidden flex flex-col items-center justify-center">
+        <section className="min-h-[60vh] md:h-[75vh] px-4 py-20 md:py-0 bg-[#1E293B] relative overflow-hidden flex flex-col items-center justify-center">
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
 
           <div className="container mx-auto max-w-5xl text-center relative z-10">
-            <h2 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-white mb-8 leading-tight">
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-medium text-white mb-4 md:mb-6 lg:mb-8 leading-tight">
               Ready to dominate AI search?
             </h2>
-            <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 max-w-2xl lg:max-w-3xl mx-auto">
               Join hundreds of brands already optimizing for the future of
               search. Start your free audit today and see exactly where you
               stand.
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">
-              <div className="flex justify-center">
+              <SubscriberCounter count={subscriberCount} dark />
+              <div className="flex justify-center mt-4">
                 <Button
                   onClick={openWaitlistModal}
                   className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold"
@@ -907,31 +970,6 @@ export default function Home() {
                   Join the Waitlist
                 </Button>
               </div>
-
-              {subscriberCount > WAITLIST_THRESHOLD ? (
-                <div className="flex items-center justify-center gap-3 mt-4">
-                  <div className="flex -space-x-2">
-                    {trustAvatars.map((avatar, i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 text-white text-xs font-semibold"
-                      >
-                        {avatar.letter}
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-300 font-medium">
-                    <span className="font-bold text-white">
-                      {subscriberCount}
-                    </span>{" "}
-                    professionals already joined, be one of them!
-                  </p>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400 mt-4">
-                  Be among the first to join us !
-                </p>
-              )}
             </div>
           </div>
         </section>
@@ -939,7 +977,7 @@ export default function Home() {
         {/* Footer */}
         <footer className=" text-black py-16">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-4 gap-12 mb-12">
+            <div className="grid md:grid-cols-4 gap-8 md:gap-12 mb-12">
               <div className="md:col-span-2">
                 <Link href="/" className="flex items-center gap-2 mb-6">
                   <div className="w-16 h-16  rounded-lg flex items-center justify-center">
@@ -991,16 +1029,14 @@ export default function Home() {
                       Features
                     </a>
                   </li>
-                  {isProduction && (
-                    <li>
-                      <a
-                        href="#pricing"
-                        className="hover:text-white transition-colors"
-                      >
-                        Pricing
-                      </a>
-                    </li>
-                  )}
+                  <li>
+                    <a
+                      href="#pricing"
+                      className="hover:text-white transition-colors"
+                    >
+                      Pricing
+                    </a>
+                  </li>
                   <li>
                     <a
                       href="#faq"
