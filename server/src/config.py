@@ -111,7 +111,7 @@ def get_client() -> AsyncIOMotorClient:
 
 def get_db():
     """Get the ShowYourBrand database."""
-    return get_client().ShowYourBrand
+    return get_client()["showyourbrand"]
 
 
 async def close_db() -> None:

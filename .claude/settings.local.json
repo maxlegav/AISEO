@@ -117,7 +117,8 @@
       "Bash(cd:*)",
       "Bash(/Users/chocomushrooms/AISEO/server/server-venv/bin/pip install:*)",
       "Bash(/Users/chocomushrooms/AISEO/server/server-venv/bin/python3:*)",
-      "Bash(pip3 list:*)"
+      "Bash(pip3 list:*)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

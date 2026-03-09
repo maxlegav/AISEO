@@ -10,7 +10,6 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
-  Star,
   Mail,
   Twitter ,
   Linkedin,
@@ -270,39 +269,6 @@ const PricingCard = ({
         </Button>
       </Link>
     )}
-  </div>
-);
-
-// Testimonial Card Component with Initial Letter
-const TestimonialCard = ({
-  quote,
-  author,
-  role,
-  initial,
-}: {
-  quote: string;
-  author: string;
-  role: string;
-  initial: string;
-}) => (
-  <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-    <div className="flex gap-1 mb-5">
-      {[...Array(5)].map((_, i) => (
-        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-      ))}
-    </div>
-    <p className="text-gray-700 text-lg leading-relaxed mb-6">
-      &ldquo;{quote}&rdquo;
-    </p>
-    <div className="flex items-center gap-4">
-      <div className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-semibold text-lg">{initial}</span>
-      </div>
-      <div>
-        <div className="font-semibold text-gray-900">{author}</div>
-        <div className="text-sm text-gray-500">{role}</div>
-      </div>
-    </div>
   </div>
 );
 
@@ -666,55 +632,33 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
                 <h2 className="font-heading text-4xl md:text-6xl font-medium text-gray-900 mb-6">
-                  Your competitors are already
-                  <br />
+                  Your competitors are already {' '}
                   <span className="italic text-purple-600">
                     winning AI search
                   </span>
                 </h2>
                 <p className="text-gray-600 mb-10 leading-relaxed text-lg">
-                  Every day, millions of potential customers ask AI for
-                  recommendations. If your brand isn&apos;t being cited,
-                  you&apos;re losing deals to competitors who are. We show you
-                  exactly where you stand—and how to fix it.
+                  Millions ask AI for recommendations daily. If you&apos;re not cited, you&apos;re losing deals. We show you where you stand—and how to fix it.
                 </p>
 
-                <div className="space-y-8">
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        See What AI Says About You
-                      </h4>
-                      <p className="text-gray-600">
-                        Real queries. Real responses. Know exactly how ChatGPT,
-                        Claude, and Perplexity describe your brand.
-                      </p>
-                    </div>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
+                    <p className="text-gray-900 text-lg">
+                      See how AI describes your brand across engines
+                    </p>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        Outrank Your Competition
-                      </h4>
-                      <p className="text-gray-600">
-                        Discover which competitors are getting recommended
-                        instead of you—and steal their playbook.
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
+                    <p className="text-gray-900 text-lg">
+                      Find which competitors outrank you—and why
+                    </p>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        Actionable Fixes in Minutes
-                      </h4>
-                      <p className="text-gray-600">
-                        Copy-paste schema markup, optimized FAQs, and content
-                        suggestions you can implement today.
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
+                    <p className="text-gray-900 text-lg">
+                      Get copy-paste fixes you can implement today
+                    </p>
                   </div>
                 </div>
               </div>
@@ -902,41 +846,6 @@ export default function Home() {
             </p>
           </div>
         </section>}
-
-        {/* Testimonials Section */}
-        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
-          <div className="container mx-auto max-w-5xl">
-            <div className="text-center mb-12">
-              <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
-                Trusted by our beta-Testers
-              </h2>
-              <p className="text-gray-600">
-                See what early adopters are saying
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <TestimonialCard
-                quote="We ran a GEO audit for a client and discovered they were completely invisible on Perplexity. After implementing the recommendations, they saw a 40% increase in AI referral traffic in just 2 weeks."
-                author="Sarah J."
-                role="Founder, Digital Marketing Agency"
-                initial="S"
-              />
-              <TestimonialCard
-                quote="Our SaaS was getting mentioned by ChatGPT for the wrong features. ShowYourBrand showed us exactly what to fix. Now we're the #1 recommendation in our niche for 3 out of 4 AI engines."
-                author="Marc D."
-                role="CTO, B2B SaaS Platform"
-                initial="M"
-              />
-              <TestimonialCard
-                quote="As an e-commerce brand, we didn't realize AI search was sending traffic to our competitors. The competitor gap analysis was eye-opening. ROI paid for itself in the first week."
-                author="Elena R."
-                role="Head of Growth, E-commerce Brand"
-                initial="E"
-              />
-            </div>
-          </div>
-        </section>
 
         {/* FAQ Section */}
         <section id="faq" className="py-16 px-4">
