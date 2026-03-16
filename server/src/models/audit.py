@@ -216,6 +216,46 @@ class GoogleReviewsResult(BaseModel):
     processingTimeMs: int = 0
 
 
+class DetectedIssue(BaseModel):
+    """A single issue detected by the deterministic issue detector."""
+
+    id: str                       # e.g. "no_robots_txt"
+    type: str                     # technical | schema | meta | content | accessibility
+    severity: str                 # critical | high | medium | low
+    title: str
+    description: str
+    aiImpact: str | None = None
+    source: str = "detector"      # "scanner" or "detector"
+
+
+class IssuesSummary(BaseModel):
+    """Aggregated counts by severity."""
+
+    criticalCount: int = 0
+    highCount: int = 0
+    mediumCount: int = 0
+    lowCount: int = 0
+    totalCount: int = 0
+
+
+class PromptGap(BaseModel):
+    """A prompt where the business is not mentioned — a gap in AI visibility."""
+
+    promptId: int
+    question: str
+    level: int                    # 1-5
+    category: str                 # discovery, comparison, etc.
+    mentionRate: float = 0.0
+
+
+class PromptGapsSummary(BaseModel):
+    """Summary of prompt gap analysis."""
+
+    totalGaps: int = 0
+    prioritizedCount: int = 0
+    weakestCategories: list[str] = []
+
+
 class ResultsBlob(BaseModel):
     """All audit data that lives inside the `results` field in MongoDB.
 
@@ -239,6 +279,12 @@ class ResultsBlob(BaseModel):
 
     citationStats: CitationStats | None = None
     citationVisibilityScore: float | None = None  # 0-100
+
+    issues: list[DetectedIssue] = []
+    issuesSummary: IssuesSummary | None = None
+    promptGaps: list[PromptGap] = []
+    promptGapsSummary: PromptGapsSummary | None = None
+    llmsTxtContent: str | None = None
 
     discoverabilityThreshold: DiscoverabilityThreshold | None = None
     competitorResults: list[CompetitorResult] = []

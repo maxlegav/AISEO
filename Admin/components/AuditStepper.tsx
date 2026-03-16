@@ -10,8 +10,9 @@ import {
 export type AuditStatus =
   | "pending"
   | "generating"
-  | "processing" // legacy → generating
+  | "processing" // legacy → generating or auditing (depends on context)
   | "questions_review"
+  | "awaiting_prompt_approval" // backend equivalent of questions_review
   | "auditing"
   | "audit_review"
   | "review_pending" // legacy → audit_review
@@ -39,8 +40,9 @@ function getStepIndex(status: AuditStatus): number {
   const mapping: Record<string, number> = {
     pending: 0,
     generating: 1,
-    processing: 1, // legacy
+    processing: 1, // legacy (context-dependent, but stepper defaults to Phase 1)
     questions_review: 2,
+    awaiting_prompt_approval: 2, // backend equivalent
     auditing: 3,
     audit_review: 4,
     review_pending: 4, // legacy
@@ -127,9 +129,12 @@ export default function AuditStepper({ status }: AuditStepperProps) {
   );
 }
 
-/** Normalized display status (maps legacy) */
-export function normalizeStatus(status: string): AuditStatus {
-  if (status === "processing") return "generating";
+/** Normalized display status (maps legacy/backend statuses) */
+export function normalizeStatus(status: string, hasPrompts?: boolean): AuditStatus {
+  if (status === "processing") {
+    return hasPrompts ? "auditing" : "generating";
+  }
+  if (status === "awaiting_prompt_approval") return "questions_review";
   if (status === "review_pending") return "audit_review";
   return status as AuditStatus;
 }
@@ -141,6 +146,7 @@ export function statusLabel(status: string): string {
     generating: "Generating",
     processing: "Generating",
     questions_review: "Questions Review",
+    awaiting_prompt_approval: "Questions Review",
     auditing: "Auditing",
     audit_review: "Audit Review",
     review_pending: "Audit Review",
@@ -158,6 +164,7 @@ export function statusColor(status: string): string {
     generating: "bg-blue-500",
     processing: "bg-blue-500",
     questions_review: "bg-amber-500",
+    awaiting_prompt_approval: "bg-amber-500",
     auditing: "bg-indigo-500",
     audit_review: "bg-yellow-500",
     review_pending: "bg-yellow-500",

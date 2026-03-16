@@ -310,6 +310,18 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
     )
     geo_score = calculate_geo_score(engine_score, html_scanner_score, citation_visibility_score)
 
+    # 6.5 Phase A: Detect issues (deterministic, $0)
+    from services.issue_detector import detect_issues
+    detected_issues, issues_summary = detect_issues(
+        html_result, cat_scores, lvl_scores, engine_score, threshold,
+    )
+    logger.info(f"[{audit_id}] Phase A: {issues_summary.totalCount} issues detected")
+
+    # 6.6 Phase B: Extract prompt gaps (deterministic, $0)
+    from services.prompt_gap_extractor import extract_prompt_gaps
+    prompt_gaps, prompt_gaps_summary = extract_prompt_gaps(prompt_results, cat_scores)
+    logger.info(f"[{audit_id}] Phase B: {prompt_gaps_summary.totalGaps} gaps, {prompt_gaps_summary.prioritizedCount} prioritized")
+
     # 7. Score competitors
     logger.info(f"[{audit_id}] Scoring {len(request.competitorNames)} competitors...")
     competitor_results = []
@@ -317,11 +329,12 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         comp_result = score_competitor(prompt_results, comp_name, comp_url)
         competitor_results.append(comp_result)
 
-    # 7b. Generate LLM hijack prompt (non-blocking)
-    logger.info(f"[{audit_id}] Generating LLM hijack prompt...")
-    try:
+    # 7b. Generate LLM hijack prompt + llms.txt in parallel (non-blocking)
+    logger.info(f"[{audit_id}] Generating LLM hijack prompt + llms.txt...")
+
+    async def _gen_hijack():
         from services.llm_hijack_generator import generate_llm_hijack_prompt
-        llm_hijack_prompt = await generate_llm_hijack_prompt(
+        return await generate_llm_hijack_prompt(
             snapshot=snapshot,
             category_scores=cat_scores,
             level_scores=lvl_scores,
@@ -330,9 +343,28 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
             competitor_results=competitor_results,
             html_scan=html_result,
         )
-    except Exception as e:
-        logger.warning(f"[{audit_id}] LLM hijack generation failed (non-blocking): {e}")
+
+    async def _gen_llms_txt():
+        from services.llms_txt_generator import generate_llms_txt
+        lang = request.language if hasattr(request, "language") and request.language else "fr"
+        return await generate_llms_txt(snapshot, language=lang)
+
+    hijack_task = asyncio.create_task(_gen_hijack())
+    llms_txt_task = asyncio.create_task(_gen_llms_txt())
+
+    gen_results = await asyncio.gather(hijack_task, llms_txt_task, return_exceptions=True)
+
+    if isinstance(gen_results[0], BaseException):
+        logger.warning(f"[{audit_id}] LLM hijack generation failed (non-blocking): {gen_results[0]}")
         llm_hijack_prompt = None
+    else:
+        llm_hijack_prompt = gen_results[0]
+
+    if isinstance(gen_results[1], BaseException):
+        logger.warning(f"[{audit_id}] llms.txt generation failed (non-blocking): {gen_results[1]}")
+        llms_txt_content = None
+    else:
+        llms_txt_content = gen_results[1]
 
     # 8. Calculate totals
     processing_time = int((time.time() - start_time) * 1000)
@@ -358,6 +390,11 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         googleReviews=google_reviews_result,
         citationStats=citation_stats,
         citationVisibilityScore=citation_visibility_score,
+        issues=detected_issues,
+        issuesSummary=issues_summary,
+        promptGaps=prompt_gaps,
+        promptGapsSummary=prompt_gaps_summary,
+        llmsTxtContent=llms_txt_content,
         discoverabilityThreshold=threshold,
         competitorResults=competitor_results,
         llmHijackPrompt=llm_hijack_prompt,

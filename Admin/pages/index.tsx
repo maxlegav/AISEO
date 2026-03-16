@@ -30,8 +30,15 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  if(!stats || !stats.audits)
+    return(
+      <>
+        Loading...
+      </>
+    )
+
   const awaitingAction =
-    (stats?.audits.questions_review ?? 0) + (stats?.audits.audit_review ?? 0);
+    (stats.audits.questions_review ?? 0) + (stats.audits.audit_review ?? 0);
 
   return (
     <AdminLayout title="Dashboard">

@@ -48,9 +48,9 @@ export default async function handler(
     return res.status(404).json({ error: "Audit not found" });
   }
 
-  if (audit.status !== "questions_review") {
+  if (audit.status !== "questions_review" && audit.status !== "awaiting_prompt_approval") {
     return res.status(400).json({
-      error: `Cannot edit questions for audit with status "${audit.status}". Only "questions_review" audits can have questions edited.`,
+      error: `Cannot edit questions for audit with status "${audit.status}". Only "questions_review" or "awaiting_prompt_approval" audits can have questions edited.`,
     });
   }
 
