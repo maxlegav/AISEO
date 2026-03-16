@@ -694,6 +694,86 @@ def call_ollama_api(
 
 
 # ============================================================================
+# CLAUDE CODE CLI (local — uses Claude subscription, no API cost)
+# ============================================================================
+
+def call_claude_code_cli(
+    api_key: str,
+    message: str,
+    model: str,
+    **kwargs,
+) -> Dict[str, Any]:
+    """
+    Call Claude via the local Claude Code CLI (claude -p).
+
+    Uses the user's Claude subscription instead of Anthropic API credits.
+    api_key and model are ignored — the CLI uses the logged-in session.
+    """
+    import shutil
+    import subprocess
+
+    claude_bin = shutil.which("claude")
+    if not claude_bin:
+        return {
+            "success": False,
+            "response": None,
+            "conversation_history": [],
+            "metadata": {},
+            "citations": [],
+            "error": "claude CLI not found in PATH — run `npm install -g @anthropic-ai/claude-code`",
+        }
+
+    try:
+        import os as _os
+        # Unset CLAUDECODE to allow spawning claude from inside a Claude Code session
+        env = {k: v for k, v in _os.environ.items() if k != "CLAUDECODE"}
+        result = subprocess.run(
+            [claude_bin, "-p", message, "--dangerously-skip-permissions"],
+            capture_output=True,
+            text=True,
+            timeout=180,
+            env=env,
+        )
+        if result.returncode == 0:
+            response_text = result.stdout.strip()
+            return {
+                "success": True,
+                "response": response_text,
+                "conversation_history": [],
+                "metadata": {"model": "claude-code-local"},
+                "citations": [],
+                "error": None,
+            }
+        error_msg = result.stderr.strip() or f"Exit code {result.returncode}"
+        return {
+            "success": False,
+            "response": None,
+            "conversation_history": [],
+            "metadata": {},
+            "citations": [],
+            "error": f"Claude CLI error: {error_msg}",
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            "success": False,
+            "response": None,
+            "conversation_history": [],
+            "metadata": {},
+            "citations": [],
+            "error": "Claude CLI timeout after 180s",
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "response": None,
+            "conversation_history": [],
+            "metadata": {},
+            "citations": [],
+            "error": f"Claude CLI subprocess error: {e}",
+        }
+
+
+# ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
 

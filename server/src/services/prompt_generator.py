@@ -18,7 +18,7 @@ from collections import Counter
 import config as app_config
 from models.audit import GeneratedPrompt
 from models.business import AuditRequest, LocalityTier
-from utils.dbal.ai_api_wrapper import call_openai_api, call_ollama_api
+from utils.dbal.ai_api_wrapper import call_openai_api, call_ollama_api, call_claude_code_cli
 
 logger = logging.getLogger(__name__)
 
@@ -373,6 +373,12 @@ async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
         model = app_config.OLLAMA_MODEL
         caller_kwargs = {"base_url": app_config.OLLAMA_BASE_URL, "max_tokens": 8000, "temperature": 0.7}
         logger.info(f"Prompt generation using local Ollama model: {model}")
+    elif app_config.CLAUDE_CODE_LOCAL_MODE:
+        api_key = "claude-code-local"
+        caller = call_claude_code_cli
+        model = "claude-code-local"
+        caller_kwargs = {}
+        logger.info("Prompt generation using local claude CLI (subscription)")
     else:
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:

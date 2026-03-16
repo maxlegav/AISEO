@@ -19,12 +19,14 @@ from utils.dbal.ai_api_wrapper import (
     call_perplexity_api,
     call_google_api,
     call_ollama_api,
+    call_claude_code_cli,
 )
 from config import (
     AI_ENGINES,
     MIN_ENGINES_REQUIRED,
     AUDIT_TIMEOUT_SECONDS,
     LOCAL_AI_MODE,
+    CLAUDE_CODE_LOCAL_MODE,
     MOCK_AI,
     OLLAMA_MODEL,
     OLLAMA_BASE_URL,
@@ -99,6 +101,15 @@ elif LOCAL_AI_MODE:
     ]
     # Set dummy key so execute_engine()'s os.getenv check passes
     os.environ.setdefault("_LOCAL_AI_DUMMY_KEY", "ollama-local")
+
+elif CLAUDE_CODE_LOCAL_MODE:
+    # Single engine: routes all calls to local claude CLI (uses subscription, no API cost)
+    ENGINES = [
+        {"name": "claude_code", "caller": call_claude_code_cli, "model": "claude-code-local", "key_env": "_CLAUDE_CODE_DUMMY_KEY"}
+    ]
+    os.environ.setdefault("_CLAUDE_CODE_DUMMY_KEY", "claude-code-local")
+    logger.info("CLAUDE CODE LOCAL MODE — 1 engine via `claude -p` CLI")
+
 else:
     ENGINES = [
         {

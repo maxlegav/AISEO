@@ -27,6 +27,9 @@ LOCAL_AI_MODE = os.getenv("USE_LOCAL_AI", "false").lower() in ("true", "1", "yes
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:4b")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 
+# Claude Code local mode — uses `claude -p` CLI (no API cost, uses subscription)
+CLAUDE_CODE_LOCAL_MODE = os.getenv("USE_CLAUDE_CODE_LOCAL", "false").lower() in ("true", "1", "yes")
+
 MOCK_AI = os.getenv("MOCK_AI", "false").lower() in ("true", "1", "yes")
 MOCK_GSC = os.getenv("MOCK_GSC", "false").lower() in ("true", "1", "yes")
 
@@ -41,6 +44,9 @@ elif LOCAL_AI_MODE:
     logger.info(
         f"LOCAL AI MODE — all engines routed to Ollama ({OLLAMA_MODEL})"
     )
+elif CLAUDE_CODE_LOCAL_MODE:
+    MIN_ENGINES_REQUIRED = 1
+    logger.info("CLAUDE CODE LOCAL MODE — all engines routed to local claude CLI (uses subscription)")
 else:
     MIN_ENGINES_REQUIRED = int(os.getenv("MIN_ENGINES_REQUIRED", "2"))
 
@@ -70,7 +76,7 @@ DISCOVERABILITY_THRESHOLD = 0.25
 # Required environment variables
 # ---------------------------------------------------------------------------
 
-if MOCK_AI or LOCAL_AI_MODE:
+if MOCK_AI or LOCAL_AI_MODE or CLAUDE_CODE_LOCAL_MODE:
     REQUIRED_ENV_VARS = [
         "MONGODB_URI",
         "PROCESSING_SERVICE_API_KEY",
