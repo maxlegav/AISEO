@@ -289,6 +289,8 @@ class ResultsBlob(BaseModel):
     discoverabilityThreshold: DiscoverabilityThreshold | None = None
     competitorResults: list[CompetitorResult] = []
     llmHijackPrompt: str | None = None
+    faqSchema: dict | None = None  # AI-generated FAQ schema (FAQPage JSON-LD + entries + meta)
+    competitorComparison: dict | None = None  # Head-to-head competitor comparison (prompts + AI analysis)
 
     originalRequest: dict = {}  # Stored so Phase 2 can reconstruct AuditRequest without the HTTP call
 

@@ -330,7 +330,7 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         competitor_results.append(comp_result)
 
     # 7b. Generate LLM hijack prompt + llms.txt in parallel (non-blocking)
-    logger.info(f"[{audit_id}] Generating LLM hijack prompt + llms.txt...")
+    logger.info(f"[{audit_id}] Generating LLM hijack prompt + llms.txt + FAQ schema + competitor comparison...")
 
     async def _gen_hijack():
         from services.llm_hijack_generator import generate_llm_hijack_prompt
@@ -349,10 +349,34 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         lang = request.language if hasattr(request, "language") and request.language else "fr"
         return await generate_llms_txt(snapshot, language=lang)
 
+    async def _gen_faq_schema():
+        from services.faq_schema_generator import generate_faq_schema
+        lang = request.language if hasattr(request, "language") and request.language else "fr"
+        return await generate_faq_schema(
+            snapshot=snapshot,
+            prompt_gaps=prompt_gaps,
+            category_scores=cat_scores,
+            html_scan=html_result,
+            language=lang,
+        )
+
+    async def _gen_competitor_comparison():
+        from services.competitor_comparison import generate_competitor_comparison
+        lang = request.language if hasattr(request, "language") and request.language else "fr"
+        return await generate_competitor_comparison(
+            snapshot=snapshot,
+            competitor_names=request.competitorNames,
+            competitor_urls=request.competitorUrls,
+            category_scores=cat_scores,
+            language=lang,
+        )
+
     hijack_task = asyncio.create_task(_gen_hijack())
     llms_txt_task = asyncio.create_task(_gen_llms_txt())
+    faq_schema_task = asyncio.create_task(_gen_faq_schema())
+    competitor_comparison_task = asyncio.create_task(_gen_competitor_comparison())
 
-    gen_results = await asyncio.gather(hijack_task, llms_txt_task, return_exceptions=True)
+    gen_results = await asyncio.gather(hijack_task, llms_txt_task, faq_schema_task, competitor_comparison_task, return_exceptions=True)
 
     if isinstance(gen_results[0], BaseException):
         logger.warning(f"[{audit_id}] LLM hijack generation failed (non-blocking): {gen_results[0]}")
@@ -365,6 +389,18 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         llms_txt_content = None
     else:
         llms_txt_content = gen_results[1]
+
+    if isinstance(gen_results[2], BaseException):
+        logger.warning(f"[{audit_id}] FAQ schema generation failed (non-blocking): {gen_results[2]}")
+        faq_schema_result = None
+    else:
+        faq_schema_result = gen_results[2]
+
+    if isinstance(gen_results[3], BaseException):
+        logger.warning(f"[{audit_id}] Competitor comparison failed (non-blocking): {gen_results[3]}")
+        competitor_comparison_result = None
+    else:
+        competitor_comparison_result = gen_results[3]
 
     # 8. Calculate totals
     processing_time = int((time.time() - start_time) * 1000)
@@ -398,6 +434,8 @@ async def _phase2_execute_audit(audit_id: str, oid: ObjectId):
         discoverabilityThreshold=threshold,
         competitorResults=competitor_results,
         llmHijackPrompt=llm_hijack_prompt,
+        faqSchema=faq_schema_result,
+        competitorComparison=competitor_comparison_result,
         enginesUsed=engines_used,
         enginesSucceeded=engines_succeeded,
         totalPromptsProcessed=len(prompts),
