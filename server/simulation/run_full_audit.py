@@ -576,6 +576,11 @@ def _write_audit_to_mongo(business_doc: dict, audit_id: ObjectId, geo_score: flo
     client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=15000, connectTimeoutMS=15000)
     try:
         db = client.showyourbrand
+        # Delete previous business+audits for this slug to allow re-runs
+        old_biz = db.businesses.find_one({"userId": business_doc["userId"], "slug": business_doc["slug"]})
+        if old_biz:
+            db.audits.delete_many({"businessId": old_biz["_id"]})
+            db.businesses.delete_one({"_id": old_biz["_id"]})
         biz_result = db.businesses.insert_one(business_doc)
         business_id = biz_result.inserted_id
 

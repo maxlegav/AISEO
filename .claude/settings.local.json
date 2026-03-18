@@ -142,7 +142,8 @@
       "Bash(mkdir -p /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video && cd /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video && npm init -y 2>&1 | tail -3)",
       "Bash(mkdir -p /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video/out && npx remotion studio src/index.ts --help 2>&1 | head -5)",
       "Bash(git fetch:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(say:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
