@@ -1,3 +1,4 @@
+import React from "react";
 import {
   AbsoluteFill,
   interpolate,
@@ -9,671 +10,752 @@ import {
   staticFile,
   Img,
 } from "remotion";
+import { loadFont as loadCormorant } from "@remotion/google-fonts/CormorantGaramond";
+import { loadFont as loadInter } from "@remotion/google-fonts/Inter";
+import {
+  OpenAILogo, ClaudeLogo, GeminiLogo, PerplexityLogo, GrokLogo,
+} from "./Logos";
 
-// ─── Timing (frames @ 30fps) ───────────────────────────────────────────────
-// Scene 1 — Logo reveal:       0 → 60   (2s)
-// Scene 2 — ChatGPT query:    60 → 180  (4s)
-// Scene 3 — AI response card: 180 → 450 (9s)
-// Scene 4 — CTA outro:        450 → 540 (3s)
+// ─── Fonts ─────────────────────────────────────────────────────────────────
+const { fontFamily: serif } = loadCormorant("normal", {
+  weights: ["600", "700"],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
+const { fontFamily: sans } = loadInter("normal", {
+  weights: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
 
-// ─── Colors ───────────────────────────────────────────────────────────────
+// ─── Colors ────────────────────────────────────────────────────────────────
+const NAVY   = "#1E293B";
+const GRAY   = "#64748B";
+const GRAY_L = "#94A3B8";
 const PURPLE = "#7C3AED";
-const LIGHT_PURPLE = "#EDE9FE";
-const DARK = "#1E293B";
-const WHITE = "#FFFFFF";
-const GRAY_100 = "#F3F4F6";
-const GRAY_200 = "#E5E7EB";
-const GRAY_400 = "#9CA3AF";
-const GRAY_600 = "#4B5563";
-const GREEN = "#22C55E";
+const WHITE  = "#FFFFFF";
+const TEAL   = "#14B8A6";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
-function useSpring(frame: number, delay = 0, config = { damping: 18, stiffness: 90 }) {
-  const { fps } = useVideoConfig();
-  return spring({ frame: frame - delay, fps, config });
-}
+// ─── Transition constants ──────────────────────────────────────────────────
+const FADE    = 8;
+const OVERLAP = 6;
 
-function fadeIn(frame: number, start: number, duration = 15) {
-  return interpolate(frame, [start, start + duration], [0, 1], {
+// ─── Helpers ───────────────────────────────────────────────────────────────
+const fi = (frame: number, a: number, b: number, from = 0, to = 1) =>
+  interpolate(frame, [a, b], [from, to], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-}
 
-function slideUp(frame: number, start: number, distance = 30) {
-  const { fps } = useVideoConfig();
-  const progress = spring({ frame: frame - start, fps, config: { damping: 20, stiffness: 100 } });
-  return interpolate(progress, [0, 1], [distance, 0]);
-}
+const fadeInOut = (frame: number, total: number, len = FADE) =>
+  Math.min(fi(frame, 0, len), fi(frame, total - len, total, 1, 0));
 
-// ─── Typewriter component ─────────────────────────────────────────────────
-const Typewriter: React.FC<{ text: string; startFrame: number; charsPerFrame?: number }> = ({
-  text,
-  startFrame,
-  charsPerFrame = 0.7,
-}) => {
+const ease = Easing.out(Easing.cubic);
+const floatY = (frame: number, amp = 5, period = 100) =>
+  Math.sin((frame / period) * Math.PI * 2) * amp;
+
+// ─── Persistent gradient background ────────────────────────────────────────
+const BG: React.FC = () => {
   const frame = useCurrentFrame();
-  const elapsed = Math.max(0, frame - startFrame);
-  const chars = Math.floor(elapsed * charsPerFrame);
-  const displayed = text.slice(0, chars);
-  const showCursor = chars < text.length;
-
   return (
-    <span>
-      {displayed}
-      {showCursor && (
-        <span
+    <AbsoluteFill
+      style={{
+        background:
+          "linear-gradient(135deg, #C4B5FD 0%, #E9D5FF 30%, #FBCFE8 65%, #FED7AA 100%)",
+      }}
+    >
+      {[
+        { x: -80,  y: 80,   s: 600, c: "rgba(196,181,253,0.45)", ph: 0  },
+        { x: 2000, y: 950,  s: 700, c: "rgba(251,207,232,0.35)", ph: 40 },
+        { x: 960,  y: -100, s: 500, c: "rgba(253,230,138,0.22)", ph: 20 },
+      ].map((b, i) => (
+        <div
+          key={i}
           style={{
-            display: "inline-block",
-            width: 2,
-            height: "1em",
-            backgroundColor: DARK,
-            marginLeft: 2,
-            verticalAlign: "text-bottom",
-            opacity: Math.floor(frame / 10) % 2 === 0 ? 1 : 0,
+            position: "absolute",
+            left: b.x,
+            top: b.y + Math.sin(((frame + b.ph) / 120) * Math.PI * 2) * 18,
+            width: b.s,
+            height: b.s,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${b.c} 0%, transparent 70%)`,
+            transform: "translate(-50%,-50%)",
           }}
         />
-      )}
-    </span>
+      ))}
+    </AbsoluteFill>
   );
 };
 
-// ─── AI Loading dots ──────────────────────────────────────────────────────
-const LoadingDots: React.FC<{ frame: number }> = ({ frame }) => {
+// ─── Brushstroke underline ─────────────────────────────────────────────────
+const Brush: React.FC<{ frame: number; start: number; w: number }> = ({
+  frame, start, w,
+}) => {
+  const L = w * 1.07;
+  const prog = interpolate(frame, [start, start + 28], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: ease,
+  });
   return (
-    <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "16px 20px" }}>
-      {[0, 1, 2].map((i) => {
-        const bounce = Math.sin((frame / 8 + i * 0.8) * Math.PI);
-        return (
-          <div
-            key={i}
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              backgroundColor: GRAY_400,
-              transform: `translateY(${bounce * -5}px)`,
-              opacity: 0.5 + bounce * 0.4,
-            }}
-          />
-        );
-      })}
-    </div>
+    <svg
+      width={w + 20} height={26}
+      viewBox={`0 0 ${w + 20} 26`}
+      style={{
+        position: "absolute", bottom: -16, left: -10,
+        overflow: "visible", pointerEvents: "none",
+      }}
+    >
+      <path
+        d={`M6,18 Q${(w + 20) * 0.28},5 ${(w + 20) * 0.52},15 Q${(w + 20) * 0.76},22 ${w + 14},10`}
+        fill="none" stroke={PURPLE} strokeWidth={6}
+        strokeLinecap="round"
+        strokeDasharray={L} strokeDashoffset={L * (1 - prog)}
+        opacity={0.85}
+      />
+    </svg>
   );
 };
 
-// ─── Stat row in the card ─────────────────────────────────────────────────
-const StatRow: React.FC<{
-  emoji: string;
+// ──────────────────────────────────────────────────────────────────────────
+// SCENE 1 — Questions
+// ──────────────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  "How can my brand appear on AI search?",
+  "How can I be found in ChatGPT answers?",
+  "Best tool for AI search optimization?",
+  "How can I boost digital brand visibility?",
+];
+
+const CLICK_FRAME  = 105;
+const FADEOUT_START = 128;
+const FADEOUT_END   = 148;
+
+const AskPill: React.FC<{
   text: string;
   frame: number;
-  delay: number;
-}> = ({ emoji, text, frame, delay }) => {
+  appearAt: number;
+  width: number;
+  isLast: boolean;
+}> = ({ text, frame, appearAt, width, isLast }) => {
   const { fps } = useVideoConfig();
-  const progress = spring({ frame: frame - delay, fps, config: { damping: 18, stiffness: 100 } });
-  const opacity = interpolate(frame, [delay, delay + 15], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const translateX = interpolate(progress, [0, 1], [-20, 0]);
+
+  const sp = spring({ frame: frame - appearAt, fps, config: { damping: 22, stiffness: 90 } });
+  const y  = interpolate(sp, [0, 1], [40, 0]);
+  const op = fi(frame, appearAt, appearAt + 12) *
+             fi(frame, FADEOUT_START, FADEOUT_END, 1, 0);
+
+  const chars = Math.floor(Math.max(0, frame - appearAt - 8) * 1.5);
+  const shown = text.slice(0, chars);
+  const cursor = chars < text.length && frame < CLICK_FRAME;
+
+  const pressProgress = isLast
+    ? interpolate(frame, [CLICK_FRAME, CLICK_FRAME + 6, CLICK_FRAME + 14], [1, 0.94, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.out(Easing.quad),
+      })
+    : 1;
+
+  const arrowGlow = isLast ? fi(frame, CLICK_FRAME, CLICK_FRAME + 20) : 0;
+  const rippleOp  = isLast ? fi(frame, CLICK_FRAME + 4, CLICK_FRAME + 28, 0.6, 0) : 0;
+  const rippleScale = isLast ? fi(frame, CLICK_FRAME + 4, CLICK_FRAME + 28, 0.4, 2.2) : 0;
+  const isTyped = chars >= text.length;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-        opacity,
-        transform: `translateX(${translateX}px)`,
-        padding: "6px 0",
-      }}
-    >
-      <span style={{ fontSize: 24 }}>{emoji}</span>
-      <span style={{ fontSize: 22, color: GRAY_600, fontFamily: "sans-serif" }}>{text}</span>
-    </div>
-  );
-};
+    <div style={{ position: "relative", opacity: op, transform: `translateY(${y}px)` }}>
+      {/* ripple */}
+      <div style={{
+        position: "absolute", right: 6, top: "50%",
+        width: 62, height: 62, borderRadius: "50%", background: NAVY,
+        transform: `translate(0, -50%) scale(${rippleScale})`,
+        opacity: rippleOp, pointerEvents: "none",
+      }} />
 
-// ─── AI Engine Badge ──────────────────────────────────────────────────────
-const AIBadge: React.FC<{ name: string; color: string; frame: number; delay: number }> = ({
-  name,
-  color,
-  frame,
-  delay,
-}) => {
-  const { fps } = useVideoConfig();
-  const progress = spring({ frame: frame - delay, fps, config: { damping: 22, stiffness: 120 } });
-  const scale = interpolate(progress, [0, 1], [0.6, 1]);
-  const opacity = interpolate(frame, [delay, delay + 10], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        backgroundColor: color + "18",
-        border: `1.5px solid ${color}40`,
+      <div style={{
+        width,
+        background: "rgba(255,255,255,0.84)",
+        backdropFilter: "blur(16px)",
         borderRadius: 100,
-        padding: "6px 16px",
-        transform: `scale(${scale})`,
-        opacity,
-      }}
-    >
-      <div
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          backgroundColor: color,
-        }}
-      />
-      <span style={{ fontSize: 18, color, fontWeight: 600, fontFamily: "sans-serif" }}>{name}</span>
+        padding: "26px 36px",
+        display: "flex", alignItems: "center", gap: 20,
+        boxShadow: isLast && frame >= CLICK_FRAME
+          ? `0 8px 48px rgba(124,58,237,0.28), 0 2px 8px rgba(0,0,0,0.05)`
+          : "0 8px 32px rgba(124,58,237,0.10), 0 2px 8px rgba(0,0,0,0.05)",
+        border: "1.5px solid rgba(255,255,255,0.9)",
+        transform: `scale(${pressProgress})`,
+      }}>
+        {/* + icon */}
+        <div style={{
+          width: 52, height: 52, borderRadius: "50%", background: "#F1F5F9",
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        }}>
+          <span style={{ fontSize: 28, color: NAVY, fontWeight: 300, lineHeight: 1 }}>+</span>
+        </div>
+
+        {/* text */}
+        <span style={{ flex: 1, fontSize: 28, fontFamily: sans, color: NAVY, lineHeight: 1.3 }}>
+          {shown}
+          {cursor && (
+            <span style={{
+              display: "inline-block", width: 2, height: "1em",
+              background: NAVY, marginLeft: 3, verticalAlign: "text-bottom",
+              opacity: Math.floor(frame / 8) % 2 === 0 ? 1 : 0,
+            }} />
+          )}
+        </span>
+
+        {/* arrow */}
+        <div style={{
+          width: 54, height: 54, borderRadius: "50%",
+          background: isTyped ? NAVY : "#CBD5E1",
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          boxShadow: arrowGlow > 0
+            ? `0 0 ${20 * arrowGlow}px ${8 * arrowGlow}px rgba(124,58,237,0.5)`
+            : "none",
+        }}>
+          <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+            <path d="M12 4l8 8-8 8M20 12H4" stroke="white" strokeWidth={2.5}
+              strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
     </div>
   );
 };
 
-// ─── Scene 1: Logo Reveal ─────────────────────────────────────────────────
-const SceneLogoReveal: React.FC = () => {
+const SceneQuestions: React.FC = () => {
   const frame = useCurrentFrame();
-
-  const logoScale = spring({ frame, fps: 30, config: { damping: 20, stiffness: 80 } });
-  const logoOpacity = fadeIn(frame, 0, 20);
-  const taglineOpacity = fadeIn(frame, 25, 20);
-  const taglineY = interpolate(frame, [25, 45], [20, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
+  const TOTAL = 165;
+  const sceneOp = fi(frame, TOTAL - FADE, TOTAL, 1, 0);
 
   return (
-    <AbsoluteFill
-      style={{
-        background: "linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 28,
-      }}
-    >
-      {/* Logo */}
-      <div
-        style={{
-          opacity: logoOpacity,
-          transform: `scale(${logoScale})`,
-          display: "flex",
-          alignItems: "center",
-          gap: 20,
-        }}
-      >
-        <Img
-          src={staticFile("syb_logo_transparent.png")}
-          style={{ width: 80, height: 80, objectFit: "contain" }}
+    <AbsoluteFill style={{
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      gap: 30, opacity: sceneOp,
+    }}>
+      {QUESTIONS.map((q, i) => (
+        <AskPill
+          key={i}
+          text={q}
+          frame={frame}
+          appearAt={i * 24}
+          width={920 - i * 10}
+          isLast={i === QUESTIONS.length - 1}
         />
-        <span
-          style={{
-            fontSize: 60,
-            fontWeight: 700,
-            color: DARK,
-            fontFamily: "sans-serif",
-            letterSpacing: -1,
-          }}
-        >
-          ShowYourBrand
-        </span>
-      </div>
-
-      {/* Tagline */}
-      <div
-        style={{
-          opacity: taglineOpacity,
-          transform: `translateY(${taglineY}px)`,
-          fontSize: 28,
-          color: GRAY_600,
-          fontFamily: "sans-serif",
-          fontStyle: "italic",
-        }}
-      >
-        The GEO platform to dominate AI search
-      </div>
+      ))}
     </AbsoluteFill>
   );
 };
 
-// ─── Scene 2: ChatGPT Query ────────────────────────────────────────────────
-const SceneChatQuery: React.FC = () => {
-  const frame = useCurrentFrame();
-
-  const QUERY = "What's the best platform to optimize my brand visibility on AI search?";
-
-  const windowOpacity = fadeIn(frame, 0, 20);
-  const windowScale = interpolate(
-    spring({ frame, fps: 30, config: { damping: 22, stiffness: 90 } }),
-    [0, 1],
-    [0.96, 1]
-  );
-
-  return (
-    <AbsoluteFill
-      style={{
-        background: "linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {/* Browser window */}
-      <div
-        style={{
-          width: 1280,
-          backgroundColor: WHITE,
-          borderRadius: 16,
-          boxShadow: "0 40px 120px rgba(0,0,0,0.18)",
-          overflow: "hidden",
-          opacity: windowOpacity,
-          transform: `scale(${windowScale})`,
-        }}
-      >
-        {/* Browser chrome */}
-        <div
-          style={{
-            backgroundColor: "#F9FAFB",
-            borderBottom: `1px solid ${GRAY_200}`,
-            padding: "14px 20px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          <div style={{ display: "flex", gap: 8 }}>
-            {["#FF5F57", "#FFBD2E", "#28C840"].map((c, i) => (
-              <div key={i} style={{ width: 14, height: 14, borderRadius: "50%", backgroundColor: c }} />
-            ))}
-          </div>
-          <div
-            style={{
-              flex: 1,
-              backgroundColor: GRAY_100,
-              borderRadius: 8,
-              padding: "6px 14px",
-              fontSize: 15,
-              color: GRAY_600,
-              fontFamily: "sans-serif",
-              maxWidth: 500,
-            }}
-          >
-            chatgpt.com
-          </div>
-        </div>
-
-        {/* Chat area */}
-        <div style={{ padding: "40px 80px 32px", minHeight: 480 }}>
-          {/* ChatGPT top bar */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 40,
-            }}
-          >
-            <span style={{ fontSize: 22, fontWeight: 700, fontFamily: "sans-serif", color: DARK }}>
-              ChatGPT
-            </span>
-            <span style={{ fontSize: 16, color: GRAY_400, fontFamily: "sans-serif" }}>4o</span>
-          </div>
-
-          {/* User message */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              marginBottom: 32,
-              opacity: fadeIn(frame, 10, 15),
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "#F4F4F5",
-                borderRadius: "20px 20px 4px 20px",
-                padding: "14px 22px",
-                maxWidth: 740,
-                fontSize: 22,
-                fontFamily: "sans-serif",
-                color: DARK,
-                lineHeight: 1.5,
-              }}
-            >
-              <Typewriter text={QUERY} startFrame={15} charsPerFrame={1.2} />
-            </div>
-          </div>
-
-          {/* Loading indicator */}
-          <div style={{ opacity: fadeIn(frame, 60, 10) }}>
-            <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-              <div
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: "50%",
-                  backgroundColor: "#10A37F",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <span style={{ fontSize: 18, color: WHITE, fontWeight: 700 }}>G</span>
-              </div>
-              <LoadingDots frame={frame - 60} />
-            </div>
-          </div>
-        </div>
-
-        {/* Input bar */}
-        <div
-          style={{
-            borderTop: `1px solid ${GRAY_200}`,
-            padding: "16px 80px",
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              backgroundColor: GRAY_100,
-              borderRadius: 100,
-              padding: "14px 24px",
-              fontSize: 18,
-              color: GRAY_400,
-              fontFamily: "sans-serif",
-            }}
-          >
-            Message ChatGPT
-          </div>
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
-};
-
-// ─── Scene 3: AI Response with ShowYourBrand Card ─────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
+// SCENE 2 — AI Response
+// ──────────────────────────────────────────────────────────────────────────
 const SceneAIResponse: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const TOTAL = 120;
+  const op = fadeInOut(frame, TOTAL);
 
-  const RESPONSE_TEXT = "Based on current GEO tools, here's the top recommendation:";
+  const cardSp = spring({ frame, fps, config: { damping: 22, stiffness: 75 } });
+  const cardY  = interpolate(cardSp, [0, 1], [36, 0]);
+  const cardFloat = floatY(frame, 4, 110);
 
-  const windowOpacity = 1;
+  const dotAnim = Math.floor(frame / 12) % 3;
 
-  // Response text appears first
-  const responseOpacity = fadeIn(frame, 0, 15);
+  const thinkOp  = Math.min(fi(frame, 4, 16), fi(frame, 30, 42, 1, 0));
+  const respOp   = fi(frame, 42, 58);
 
-  // Card slides up after response text
-  const cardSpring = spring({ frame: frame - 30, fps: 30, config: { damping: 22, stiffness: 80 } });
-  const cardOpacity = fadeIn(frame, 30, 20);
-  const cardY = interpolate(cardSpring, [0, 1], [40, 0]);
+  const logoOp   = fi(frame, 46, 60);
+  const logoSp   = spring({ frame: frame - 46, fps, config: { damping: 16, stiffness: 120 } });
+  const logoSc   = interpolate(logoSp, [0, 1], [0.7, 1]);
+  const titleOp  = fi(frame, 52, 64);
+  const subOp    = fi(frame, 60, 72);
+  const divOp    = fi(frame, 68, 78);
+  const iconsOp  = fi(frame, 74, 88);
 
   return (
-    <AbsoluteFill
-      style={{
-        background: "linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          width: 1280,
-          backgroundColor: WHITE,
-          borderRadius: 16,
-          boxShadow: "0 40px 120px rgba(0,0,0,0.18)",
-          overflow: "hidden",
-        }}
-      >
+    <AbsoluteFill style={{
+      display: "flex", alignItems: "center", justifyContent: "center", opacity: op,
+    }}>
+      <div style={{ transform: "scale(1.18)", transformOrigin: "center center" }}>
+      <div style={{
+        width: 1100,
+        background: WHITE,
+        borderRadius: 28,
+        boxShadow: "0 28px 80px rgba(124,58,237,0.14)",
+        overflow: "hidden",
+        transform: `translateY(${cardY + cardFloat}px)`,
+        border: "1.5px solid rgba(255,255,255,0.9)",
+      }}>
         {/* Browser chrome */}
-        <div
-          style={{
-            backgroundColor: "#F9FAFB",
-            borderBottom: `1px solid ${GRAY_200}`,
-            padding: "14px 20px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          <div style={{ display: "flex", gap: 8 }}>
-            {["#FF5F57", "#FFBD2E", "#28C840"].map((c, i) => (
-              <div key={i} style={{ width: 14, height: 14, borderRadius: "50%", backgroundColor: c }} />
+        <div style={{
+          background: "#F8FAFC", borderBottom: "1px solid #E2E8F0",
+          padding: "16px 24px", display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <div style={{ display: "flex", gap: 7 }}>
+            {["#FF5F57","#FFBD2E","#28C840"].map((c,i) => (
+              <div key={i} style={{ width: 14, height: 14, borderRadius: "50%", background: c }}/>
             ))}
           </div>
-          <div
-            style={{
-              flex: 1,
-              backgroundColor: GRAY_100,
-              borderRadius: 8,
-              padding: "6px 14px",
-              fontSize: 15,
-              color: GRAY_600,
-              fontFamily: "sans-serif",
-              maxWidth: 500,
-            }}
-          >
-            chatgpt.com
+          <div style={{
+            background: "#EEF2FF", borderRadius: 8, padding: "7px 18px",
+            fontSize: 16, fontFamily: sans, color: GRAY, flex: 1, maxWidth: 340,
+          }}>
+            ask.ai
           </div>
         </div>
 
-        {/* Chat area */}
-        <div style={{ padding: "32px 80px 20px" }}>
-          {/* User message (small, already sent) */}
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 28 }}>
-            <div
-              style={{
-                backgroundColor: "#F4F4F5",
-                borderRadius: "20px 20px 4px 20px",
-                padding: "10px 18px",
-                fontSize: 17,
-                fontFamily: "sans-serif",
-                color: GRAY_400,
-              }}
-            >
-              What&apos;s the best platform to optimize my brand visibility on AI search?
+        {/* Chat body */}
+        <div style={{ padding: "40px 64px 32px" }}>
+          {/* User bubble */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
+            <div style={{
+              background: "#F1F5F9", borderRadius: "18px 18px 4px 18px",
+              padding: "16px 26px", maxWidth: 620,
+              fontSize: 24, fontFamily: sans, color: NAVY, lineHeight: 1.5,
+            }}>
+              How can I boost digital brand visibility?
             </div>
           </div>
 
-          {/* AI response */}
-          <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-            {/* ChatGPT avatar */}
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: "50%",
-                backgroundColor: "#10A37F",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                marginTop: 2,
-              }}
-            >
-              <span style={{ fontSize: 18, color: WHITE, fontWeight: 700 }}>G</span>
-            </div>
+          {/* AI row */}
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start", minHeight: 90 }}>
+            {/* Avatar */}
+            <div style={{
+              width: 44, height: 44, borderRadius: "50%",
+              background: "linear-gradient(135deg, #C4B5FD, #FBCFE8)",
+              flexShrink: 0, marginTop: 3,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 22,
+            }}>✦</div>
 
             <div style={{ flex: 1 }}>
-              {/* Response text */}
-              <div
-                style={{
-                  fontSize: 20,
-                  fontFamily: "sans-serif",
-                  color: DARK,
-                  lineHeight: 1.6,
-                  marginBottom: 20,
-                  opacity: responseOpacity,
-                }}
-              >
-                {RESPONSE_TEXT}
+              {/* Loading dots */}
+              <div style={{ display: "flex", gap: 8, alignItems: "center", opacity: thinkOp, padding: "12px 0" }}>
+                {[0,1,2].map(i => (
+                  <div key={i} style={{
+                    width: 12, height: 12, borderRadius: "50%", background: GRAY_L,
+                    transform: `translateY(${dotAnim === i ? -5 : 0}px)`,
+                    opacity: dotAnim === i ? 1 : 0.4,
+                  }}/>
+                ))}
               </div>
 
-              {/* ShowYourBrand Card */}
-              <div
-                style={{
-                  opacity: cardOpacity,
-                  transform: `translateY(${cardY}px)`,
-                  backgroundColor: WHITE,
-                  border: `2px solid ${LIGHT_PURPLE}`,
-                  borderRadius: 16,
-                  padding: "28px 32px",
-                  boxShadow: "0 4px 24px rgba(124,58,237,0.10)",
-                  display: "flex",
-                  gap: 40,
-                }}
-              >
-                {/* Left: logo + title + stats */}
-                <div style={{ flex: 1 }}>
-                  {/* Logo + Name */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 14,
-                      marginBottom: 10,
-                      opacity: fadeIn(frame, 35, 15),
-                    }}
-                  >
-                    <Img
-                      src={staticFile("syb_logo_transparent.png")}
-                      style={{ width: 44, height: 44, objectFit: "contain" }}
-                    />
-                    <span
-                      style={{
-                        fontSize: 30,
-                        fontWeight: 700,
-                        color: DARK,
-                        fontFamily: "sans-serif",
-                      }}
-                    >
+              {/* Response card */}
+              <div style={{ opacity: respOp }}>
+                {/* Logo + Brand name */}
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 20,
+                  marginBottom: 18,
+                  opacity: logoOp,
+                  transform: `scale(${logoSc})`,
+                  transformOrigin: "left center",
+                }}>
+                  <Img
+                    src={staticFile("logopdp.jpg")}
+                    style={{ width: 72, height: 72, borderRadius: 18, objectFit: "cover",
+                      boxShadow: "0 4px 16px rgba(124,58,237,0.2)" }}
+                  />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{
+                      fontSize: 40, fontWeight: 700, fontFamily: sans, color: NAVY, letterSpacing: -0.5,
+                    }}>
                       ShowYourBrand
                     </span>
+                    <span style={{ fontSize: 15, fontFamily: sans, color: GRAY_L, letterSpacing: 1 }}>
+                      GEO PLATFORM
+                    </span>
                   </div>
-
-                  {/* Tagline */}
-                  <div
-                    style={{
-                      fontSize: 18,
-                      fontStyle: "italic",
-                      color: GRAY_600,
-                      fontFamily: "sans-serif",
-                      marginBottom: 22,
-                      opacity: fadeIn(frame, 45, 15),
-                    }}
-                  >
-                    The #1 GEO platform to appear in AI search results
-                  </div>
-
-                  <div
-                    style={{
-                      height: 1,
-                      backgroundColor: GRAY_200,
-                      marginBottom: 16,
-                      opacity: fadeIn(frame, 50, 15),
-                    }}
-                  />
-
-                  {/* Stats */}
-                  <StatRow emoji="⚡" text="100+ AI prompts tested per audit" frame={frame} delay={55} />
-                  <StatRow emoji="🤖" text="4 AI engines: ChatGPT, Claude, Perplexity, DeepSeek" frame={frame} delay={75} />
-                  <StatRow emoji="📊" text="GEO Health Score 0–100%" frame={frame} delay={95} />
-                  <StatRow emoji="🏆" text="Competitor visibility comparison" frame={frame} delay={115} />
-                  <StatRow emoji="🔴" text="87% of brands are invisible to AI" frame={frame} delay={135} />
                 </div>
 
-                {/* Right: GEO Score visual */}
-                <div
-                  style={{
-                    width: 260,
-                    flexShrink: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 16,
-                    opacity: fadeIn(frame, 60, 20),
-                  }}
-                >
-                  {/* Score ring */}
-                  <div
-                    style={{
-                      backgroundColor: LIGHT_PURPLE,
-                      borderRadius: 16,
-                      padding: "24px 16px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 56,
-                        fontWeight: 800,
-                        color: PURPLE,
-                        fontFamily: "sans-serif",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {Math.round(
-                        interpolate(frame, [60, 130], [0, 73], {
-                          extrapolateLeft: "clamp",
-                          extrapolateRight: "clamp",
-                          easing: Easing.out(Easing.cubic),
-                        })
-                      )}
-                      <span style={{ fontSize: 28, color: GRAY_400 }}>%</span>
-                    </div>
-                    <div style={{ fontSize: 16, color: GRAY_600, fontFamily: "sans-serif", marginTop: 4 }}>
-                      GEO Health Score
-                    </div>
-                    <div style={{ fontSize: 14, color: "#F97316", fontFamily: "sans-serif", marginTop: 4, fontWeight: 600 }}>
-                      Room for improvement →
-                    </div>
-                  </div>
+                {/* Subtitle */}
+                <p style={{
+                  fontSize: 26, fontFamily: sans, fontStyle: "italic",
+                  color: GRAY, lineHeight: 1.5, margin: "0 0 24px 0",
+                  opacity: subOp,
+                }}>
+                  The first GEO platform for AI search visibility
+                </p>
 
-                  {/* AI engines badges */}
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
-                    <AIBadge name="ChatGPT" color="#10A37F" frame={frame} delay={80} />
-                    <AIBadge name="Claude" color="#D97706" frame={frame} delay={95} />
-                    <AIBadge name="Perplexity" color={PURPLE} frame={frame} delay={110} />
-                    <AIBadge name="DeepSeek" color="#2563EB" frame={frame} delay={125} />
-                  </div>
+                {/* Divider */}
+                <div style={{
+                  height: 1, background: "#E2E8F0", marginBottom: 22, opacity: divOp,
+                }}/>
+
+                {/* Action icons */}
+                <div style={{ display: "flex", gap: 26, alignItems: "center", opacity: iconsOp }}>
+                  {[
+                    <svg key="c" width={22} height={22} viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke={GRAY_L} strokeWidth={2}/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke={GRAY_L} strokeWidth={2}/></svg>,
+                    <svg key="u" width={22} height={22} viewBox="0 0 24 24" fill="none"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z" stroke={GRAY_L} strokeWidth={2}/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" stroke={GRAY_L} strokeWidth={2}/></svg>,
+                    <svg key="d" width={22} height={22} viewBox="0 0 24 24" fill="none"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z" stroke={GRAY_L} strokeWidth={2}/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17" stroke={GRAY_L} strokeWidth={2}/></svg>,
+                    <svg key="e" width={22} height={22} viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke={GRAY_L} strokeWidth={2}/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke={GRAY_L} strokeWidth={2}/></svg>,
+                    <svg key="r" width={22} height={22} viewBox="0 0 24 24" fill="none"><polyline points="23 4 23 10 17 10" stroke={GRAY_L} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke={GRAY_L} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/></svg>,
+                  ]}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Input bar */}
-        <div
-          style={{
-            borderTop: `1px solid ${GRAY_200}`,
-            padding: "14px 80px",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              backgroundColor: GRAY_100,
-              borderRadius: 100,
-              padding: "12px 24px",
-              fontSize: 17,
-              color: GRAY_400,
-              fontFamily: "sans-serif",
-            }}
-          >
-            Message ChatGPT
+        {/* Ask anything bar */}
+        <div style={{ borderTop: "1px solid #F1F5F9", padding: "18px 64px" }}>
+          <div style={{
+            background: "#F8FAFC", borderRadius: 100, padding: "16px 26px",
+            display: "flex", alignItems: "center", gap: 14, border: "1px solid #E2E8F0",
+          }}>
+            <span style={{ fontSize: 20, color: GRAY_L, fontFamily: sans }}>+ Ask anything</span>
+            <div style={{ flex: 1 }}/>
+            <div style={{
+              width: 40, height: 40, borderRadius: "50%", background: NAVY,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                <path d="M12 4l8 8-8 8M20 12H4" stroke="white" strokeWidth={2.5}
+                  strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ──────────────────────────────────────────────────────────────────────────
+// SCENE 3 — Brand Reveal
+// ──────────────────────────────────────────────────────────────────────────
+const SceneBrandReveal: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const TOTAL = 150;
+  const op = fadeInOut(frame, TOTAL);
+
+  const logoSp = spring({ frame, fps, config: { damping: 18, stiffness: 70 } });
+  const logoSc = interpolate(logoSp, [0, 1], [0.6, 1]);
+  const logoOp = fi(frame, 0, 18);
+
+  const nameOp = fi(frame, 18, 32);
+  const nameY  = interpolate(frame, [18, 32], [20, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease });
+
+  const headOp = fi(frame, 28, 44);
+  const headY  = interpolate(frame, [28, 44], [18, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease });
+
+  const features = [
+    { icon: "⚡", text: "100 AI prompts tested per audit" },
+    { icon: "🤖", text: "ChatGPT · Claude · Perplexity · DeepSeek" },
+    { icon: "📊", text: "GEO Health Score 0–100%" },
+    { icon: "🏆", text: "Competitor visibility analysis" },
+  ];
+
+  const logoFloat = floatY(frame, 6, 110);
+  const BRAND_W = 400;
+
+  return (
+    <AbsoluteFill style={{
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      gap: 36, opacity: op,
+    }}>
+      {/* Logo + name badge */}
+      <div style={{
+        opacity: logoOp, transform: `scale(${logoSc}) translateY(${logoFloat}px)`,
+        display: "flex", alignItems: "center", gap: 28,
+        background: "rgba(255,255,255,0.78)", backdropFilter: "blur(16px)",
+        borderRadius: 140, padding: "18px 48px 18px 20px",
+        boxShadow: "0 16px 56px rgba(124,58,237,0.18)",
+        border: "2px solid rgba(255,255,255,0.9)",
+      }}>
+        <Img
+          src={staticFile("logopdp.jpg")}
+          style={{ width: 120, height: 120, borderRadius: 120, objectFit: "cover",
+            boxShadow: "0 8px 24px rgba(124,58,237,0.22)" }}
+        />
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <span style={{ fontSize: 64, fontWeight: 700, fontFamily: sans, color: NAVY, letterSpacing: -1, lineHeight: 1 }}>
+            ShowYourBrand
+          </span>
+          <span style={{ fontSize: 18, fontFamily: sans, color: GRAY, letterSpacing: 1.5 }}>
+            GENERATIVE ENGINE OPTIMIZATION
+          </span>
+        </div>
+      </div>
+
+      {/* spacer */}
+      <div style={{ opacity: nameOp, transform: `translateY(${nameY}px)`, height: 0 }} />
+
+      {/* Headline */}
+      <div style={{ opacity: headOp, transform: `translateY(${headY}px)`, textAlign: "center" }}>
+        <div style={{
+          fontSize: 88, fontFamily: serif, fontWeight: 600, color: NAVY,
+          letterSpacing: -0.5, display: "flex", alignItems: "baseline",
+          gap: 24, justifyContent: "center",
+        }}>
+          <span>Mention your</span>
+          <span style={{ position: "relative", display: "inline-block" }}>
+            Brand
+            <Brush frame={frame} start={42} w={BRAND_W} />
+          </span>
+          <span>on AI</span>
+        </div>
+      </div>
+
+      {/* Feature pills */}
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center", maxWidth: 1200 }}>
+        {features.map((f, i) => {
+          const { fps: vfps } = useVideoConfig();
+          const delay = 52 + i * 12;
+          const fsp = spring({ frame: frame - delay, fps: vfps, config: { damping: 20, stiffness: 100 } });
+          const fop = fi(frame, delay, delay + 14);
+          const fsc = interpolate(fsp, [0, 1], [0.8, 1]);
+          return (
+            <div key={i} style={{
+              opacity: fop, transform: `scale(${fsc})`,
+              background: "rgba(255,255,255,0.75)", backdropFilter: "blur(12px)",
+              borderRadius: 100, padding: "14px 28px",
+              display: "flex", alignItems: "center", gap: 12,
+              boxShadow: "0 4px 16px rgba(124,58,237,0.10)",
+              border: "1.5px solid rgba(255,255,255,0.9)",
+            }}>
+              <span style={{ fontSize: 24 }}>{f.icon}</span>
+              <span style={{ fontSize: 22, fontFamily: sans, color: NAVY, fontWeight: 500 }}>{f.text}</span>
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ──────────────────────────────────────────────────────────────────────────
+// SCENE 4 — AI Carousel
+// ──────────────────────────────────────────────────────────────────────────
+const aiLogos: { name: string; Logo: React.FC<{ size?: number }> }[] = [
+  { name: "Perplexity", Logo: PerplexityLogo },
+  { name: "Grok",       Logo: GrokLogo       },
+  { name: "OpenAI",     Logo: OpenAILogo     },
+  { name: "Claude",     Logo: ClaudeLogo     },
+  { name: "Gemini",     Logo: GeminiLogo     },
+];
+
+const SceneCarousel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const TOTAL = 75;
+  const op = fadeInOut(frame, TOTAL);
+  const pillFloat = floatY(frame, 5, 100);
+  const titleOp = fi(frame, 5, 20);
+
+  return (
+    <AbsoluteFill style={{
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      gap: 52, opacity: op,
+    }}>
+      <div style={{ transform: "scale(1.25)", transformOrigin: "center center", display: "flex", flexDirection: "column", alignItems: "center", gap: 52 }}>
+      <div style={{
+        fontSize: 26, fontFamily: sans, color: GRAY, fontWeight: 600,
+        letterSpacing: 2, textTransform: "uppercase", opacity: titleOp,
+      }}>
+        BE MENTIONED BY:
+      </div>
+
+      <div style={{
+        background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)",
+        borderRadius: 100, padding: "32px 72px",
+        display: "flex", alignItems: "center", gap: 72,
+        boxShadow: "0 16px 56px rgba(124,58,237,0.13)",
+        border: "1.5px solid rgba(255,255,255,0.9)",
+        transform: `translateY(${pillFloat}px)`,
+      }}>
+        {aiLogos.map((logo, i) => {
+          const delay = i * 9 + 14;
+          const lsp = spring({ frame: frame - delay, fps, config: { damping: 18, stiffness: 100 } });
+          const lsc = interpolate(lsp, [0, 1], [0.6, 1]);
+          const lop = fi(frame, delay, delay + 12);
+          return (
+            <div key={logo.name} style={{
+              display: "flex", alignItems: "center", gap: 14,
+              opacity: lop, transform: `scale(${lsc})`,
+            }}>
+              <logo.Logo size={48} />
+              <span style={{ fontSize: 28, fontWeight: 700, fontFamily: sans, color: NAVY }}>{logo.name}</span>
+            </div>
+          );
+        })}
+      </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ──────────────────────────────────────────────────────────────────────────
+// SCENE 5 — Dashboard
+// ──────────────────────────────────────────────────────────────────────────
+const SceneDashboard: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const TOTAL = 120;
+  const op = fadeInOut(frame, TOTAL);
+
+  const cardSp = spring({ frame, fps, config: { damping: 22, stiffness: 78 } });
+  const cardY  = interpolate(cardSp, [0, 1], [40, 0]);
+  const cardFloat = floatY(frame, 4, 120);
+
+  const score    = Math.round(fi(frame, 10, 80, 0, 100));
+  const mentions = Math.round(fi(frame, 15, 80, 0, 544));
+  const arcProgress = score / 100;
+
+  const platforms = [
+    { icon: "G", color: "#4285F4", name: "Google AI Mode", val: 96,  delta: +12 },
+    { icon: "✦", color: "#10A37F", name: "ChatGPT",        val: 449, delta: -9  },
+    { icon: "✦", color: "#4285F4", name: "Gemini",         val: 96,  delta: +12 },
+  ];
+
+  const headerOp = fi(frame, 5, 18);
+
+  return (
+    <AbsoluteFill style={{
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      opacity: op,
+    }}>
+      {/* scale up card */}
+      <div style={{ transform: "scale(1.35)", transformOrigin: "center center" }}>
+        <div style={{
+          width: 1000, background: WHITE, borderRadius: 28,
+          boxShadow: "0 24px 80px rgba(124,58,237,0.14)",
+          overflow: "hidden",
+          transform: `translateY(${cardY + cardFloat}px)`,
+          border: "1.5px solid rgba(255,255,255,0.9)",
+        }}>
+          {/* Header */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 14,
+            padding: "22px 36px 18px",
+            borderBottom: "1px solid #F1F5F9",
+            opacity: headerOp,
+          }}>
+            <Img
+              src={staticFile("logopdp.jpg")}
+              style={{ width: 42, height: 42, borderRadius: 10, objectFit: "cover" }}
+            />
+            <span style={{ fontSize: 22, fontWeight: 700, fontFamily: sans, color: NAVY }}>
+              ShowYourBrand
+            </span>
+            <div style={{
+              marginLeft: "auto", fontSize: 14, fontFamily: sans, color: GRAY_L,
+              background: "#F1F5F9", borderRadius: 100, padding: "5px 14px",
+            }}>
+              AI Visibility
+            </div>
+          </div>
+
+          {/* Main content */}
+          <div style={{ padding: "22px 36px 26px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+
+            {/* Big centered gauge */}
+            <svg width={560} height={310} viewBox="0 0 560 310">
+              <path d="M60,270 A220,220 0 0 1 500,270"
+                fill="none" stroke="#E2E8F0" strokeWidth={30} strokeLinecap="round"/>
+              <path d="M60,270 A220,220 0 0 1 500,270"
+                fill="none"
+                stroke="url(#gaugeGrad)"
+                strokeWidth={30}
+                strokeLinecap="round"
+                strokeDasharray={Math.PI * 220}
+                strokeDashoffset={Math.PI * 220 * (1 - arcProgress)}
+              />
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#C4B5FD"/>
+                  <stop offset="50%" stopColor={TEAL}/>
+                  <stop offset="100%" stopColor="#10B981"/>
+                </linearGradient>
+              </defs>
+              {score > 0 && (() => {
+                const angle = Math.PI - arcProgress * Math.PI;
+                const nx = 280 + 220 * Math.cos(angle);
+                const ny = 270 - 220 * Math.sin(angle);
+                return <circle cx={nx} cy={ny} r={16} fill={TEAL} stroke={WHITE} strokeWidth={5}/>;
+              })()}
+              <text x={280} y={236} textAnchor="middle" fontSize={108}
+                fontWeight={800} fontFamily={sans} fill={NAVY}>{score}</text>
+              <text x={280} y={284} textAnchor="middle" fontSize={26}
+                fontFamily={sans} fill={GRAY}>/100</text>
+            </svg>
+
+            {/* Badge */}
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 12, marginTop: -28,
+              background: "#ECFDF5", borderRadius: 100, padding: "10px 28px",
+            }}>
+              <div style={{ width: 12, height: 12, borderRadius: "50%", background: TEAL }}/>
+              <span style={{ fontSize: 24, fontWeight: 700, fontFamily: sans, color: "#065F46" }}>
+                {score >= 90 ? "Excellent" : score >= 80 ? "Great" : "Good"}
+              </span>
+            </div>
+
+            {/* Mentions + platforms */}
+            <div style={{
+              display: "flex", gap: 52, alignItems: "flex-start",
+              width: "100%", padding: "18px 0 0",
+              borderTop: "1px solid #F1F5F9",
+            }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 180 }}>
+                <span style={{ fontSize: 16, fontFamily: sans, color: GRAY, fontWeight: 600 }}>Mentions</span>
+                <span style={{ fontSize: 50, fontWeight: 800, fontFamily: sans, color: "#3B82F6", lineHeight: 1 }}>
+                  {mentions.toLocaleString()}
+                </span>
+              </div>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+                {platforms.map((p, i) => {
+                  const rowOp = fi(frame, 55 + i * 10, 68 + i * 10);
+                  const rowX  = interpolate(frame, [55 + i * 10, 70 + i * 10], [20, 0], {
+                    extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease,
+                  });
+                  return (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", gap: 12,
+                      opacity: rowOp, transform: `translateX(${rowX}px)`,
+                    }}>
+                      <div style={{
+                        width: 30, height: 30, borderRadius: "50%", background: p.color + "22",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 15, fontWeight: 700, color: p.color, flexShrink: 0,
+                      }}>{p.icon}</div>
+                      <span style={{ flex: 1, fontSize: 18, fontFamily: sans, color: NAVY }}>{p.name}</span>
+                      <span style={{ fontSize: 18, fontWeight: 700, fontFamily: sans, color: NAVY }}>{p.val}</span>
+                      <span style={{ fontSize: 16, fontWeight: 600, fontFamily: sans, color: p.delta > 0 ? "#10B981" : "#EF4444" }}>
+                        {p.delta > 0 ? `+${p.delta}` : p.delta}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Ask anything */}
+          <div style={{ borderTop: "1px solid #F1F5F9", padding: "16px 36px" }}>
+            <div style={{
+              background: "#F8FAFC", borderRadius: 100, padding: "14px 24px",
+              display: "flex", alignItems: "center", gap: 14, border: "1px solid #E2E8F0",
+            }}>
+              <span style={{ fontSize: 18, color: GRAY_L, fontFamily: sans }}>+ Ask anything</span>
+              <div style={{ flex: 1 }}/>
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%", background: NAVY,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4l8 8-8 8M20 12H4" stroke="white" strokeWidth={2.5}
+                    strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -681,200 +763,108 @@ const SceneAIResponse: React.FC = () => {
   );
 };
 
-// ─── Scene 4: CTA Outro ────────────────────────────────────────────────────
-const SceneCTAOutro: React.FC = () => {
+// ──────────────────────────────────────────────────────────────────────────
+// SCENE 6 — CTA
+// ──────────────────────────────────────────────────────────────────────────
+const SceneCTA: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const TOTAL = 150;
+  const op = fadeInOut(frame, TOTAL);
 
-  const logoProgress = spring({ frame, fps, config: { damping: 20, stiffness: 80 } });
-  const logoScale = interpolate(logoProgress, [0, 1], [0.8, 1]);
-  const logoOpacity = fadeIn(frame, 0, 20);
+  const logoSp = spring({ frame, fps, config: { damping: 20, stiffness: 72 } });
+  const logoSc = interpolate(logoSp, [0, 1], [0.8, 1]);
+  const logoOp = fi(frame, 0, 16);
 
-  const headlineOpacity = fadeIn(frame, 20, 20);
-  const headlineY = interpolate(frame, [20, 40], [30, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
+  const ctaOp  = fi(frame, 28, 42);
+  const ctaSp  = spring({ frame: frame - 28, fps, config: { damping: 18, stiffness: 90 } });
+  const ctaSc  = interpolate(ctaSp, [0, 1], [0.85, 1]);
+  const urlOp  = fi(frame, 42, 56);
 
-  const subOpacity = fadeIn(frame, 35, 20);
-  const urlOpacity = fadeIn(frame, 55, 20);
+  const pulse     = 0.8 + Math.sin((frame / 22) * Math.PI) * 0.2;
+  const logoFloat = floatY(frame, 6, 100);
 
-  const ctaProgress = spring({ frame: frame - 50, fps, config: { damping: 18, stiffness: 80 } });
-  const ctaScale = interpolate(ctaProgress, [0, 1], [0.85, 1]);
-  const ctaOpacity = fadeIn(frame, 50, 20);
-
-  // Pulsing glow on CTA
-  const pulse = Math.sin((frame / 20) * Math.PI) * 0.15 + 0.85;
+  const BRAND_W = 380;
 
   return (
-    <AbsoluteFill
-      style={{
-        background: "linear-gradient(135deg, #1E293B 0%, #312E81 60%, #1E293B 100%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 32,
-      }}
-    >
-      {/* Decorative blobs */}
-      <div
-        style={{
-          position: "absolute",
-          top: -100,
-          left: -100,
-          width: 500,
-          height: 500,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: -100,
-          right: -100,
-          width: 600,
-          height: 600,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* Logo */}
-      <div
-        style={{
-          opacity: logoOpacity,
-          transform: `scale(${logoScale})`,
-          display: "flex",
-          alignItems: "center",
-          gap: 18,
-          position: "relative",
-        }}
-      >
-        <Img
-          src={staticFile("syb_logo_transparent.png")}
-          style={{
-            width: 72,
-            height: 72,
-            objectFit: "contain",
-            filter: "brightness(0) invert(1)",
-          }}
-        />
-        <span
-          style={{
-            fontSize: 52,
-            fontWeight: 700,
-            color: WHITE,
-            fontFamily: "sans-serif",
-            letterSpacing: -1,
-          }}
-        >
-          ShowYourBrand
-        </span>
+    <AbsoluteFill style={{
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      gap: 40, opacity: op,
+    }}>
+      <div style={{ transform: "scale(1.2)", transformOrigin: "center center", display: "flex", flexDirection: "column", alignItems: "center", gap: 40 }}>
+      {/* Logo badge */}
+      <div style={{
+        opacity: logoOp,
+        transform: `scale(${logoSc}) translateY(${logoFloat}px)`,
+        display: "flex", alignItems: "center", gap: 26,
+        background: "rgba(255,255,255,0.78)", backdropFilter: "blur(16px)",
+        borderRadius: 140, padding: "16px 52px 16px 20px",
+        boxShadow: "0 16px 56px rgba(124,58,237,0.20)",
+        border: "2px solid rgba(255,255,255,0.9)",
+      }}>
+        <Img src={staticFile("logopdp.jpg")} style={{
+          width: 112, height: 112, borderRadius: 112, objectFit: "cover",
+          boxShadow: "0 8px 24px rgba(124,58,237,0.22)",
+        }}/>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <span style={{ fontSize: 60, fontWeight: 700, fontFamily: sans, color: NAVY, letterSpacing: -1, lineHeight: 1 }}>
+            ShowYourBrand
+          </span>
+          <span style={{ fontSize: 18, fontFamily: sans, color: GRAY, letterSpacing: 1.5 }}>
+            GENERATIVE ENGINE OPTIMIZATION
+          </span>
+        </div>
       </div>
 
       {/* Headline */}
-      <div
-        style={{
-          opacity: headlineOpacity,
-          transform: `translateY(${headlineY}px)`,
-          fontSize: 48,
-          fontWeight: 700,
-          color: WHITE,
-          fontFamily: "sans-serif",
-          textAlign: "center",
-          lineHeight: 1.2,
-          maxWidth: 960,
-        }}
-      >
-        Make your brand visible
-        <br />
-        <span style={{ color: "#C4B5FD" }}>in every AI answer</span>
+      <div style={{ opacity: fi(frame, 24, 38), textAlign: "center" }}>
+        <div style={{
+          fontSize: 88, fontFamily: serif, fontWeight: 600, color: NAVY, letterSpacing: -0.5,
+          display: "flex", alignItems: "baseline", gap: 24, justifyContent: "center",
+        }}>
+          <span>Mention your</span>
+          <span style={{ position: "relative", display: "inline-block" }}>
+            Brand
+            <Brush frame={frame} start={34} w={BRAND_W} />
+          </span>
+          <span>on AI</span>
+        </div>
       </div>
 
-      {/* Sub */}
-      <div
-        style={{
-          opacity: subOpacity,
-          fontSize: 24,
-          color: "#94A3B8",
-          fontFamily: "sans-serif",
-          textAlign: "center",
-          maxWidth: 700,
-          lineHeight: 1.6,
-        }}
-      >
-        58% of consumers now search on ChatGPT, Claude or Perplexity.
-        <br />
-        If AI doesn't mention you —{" "}
-        <strong style={{ color: WHITE }}>you don't exist.</strong>
-      </div>
-
-      {/* CTA Button */}
-      <div
-        style={{
-          opacity: ctaOpacity,
-          transform: `scale(${ctaScale})`,
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: WHITE,
-            color: DARK,
-            borderRadius: 100,
-            padding: "20px 56px",
-            fontSize: 26,
-            fontWeight: 700,
-            fontFamily: "sans-serif",
-            boxShadow: `0 0 ${40 * pulse}px ${20 * pulse}px rgba(196,181,253,0.35)`,
-            letterSpacing: -0.5,
-          }}
-        >
-          Start your free GEO audit →
+      {/* CTA pill */}
+      <div style={{ opacity: ctaOp, transform: `scale(${ctaSc})` }}>
+        <div style={{
+          background: NAVY, color: WHITE, borderRadius: 100, padding: "24px 64px",
+          fontSize: 32, fontWeight: 700, fontFamily: sans,
+          boxShadow: `0 0 ${32 * pulse}px ${12 * pulse}px rgba(124,58,237,0.24)`,
+          display: "flex", alignItems: "center", gap: 14,
+        }}>
+          <span style={{ fontSize: 26 }}>✉️</span>
+          Join the Waitlist — it&apos;s free
         </div>
       </div>
 
       {/* URL */}
-      <div
-        style={{
-          opacity: urlOpacity,
-          fontSize: 20,
-          color: "#64748B",
-          fontFamily: "sans-serif",
-          letterSpacing: 1,
-        }}
-      >
-        showyourbrand.com
+      <div style={{ opacity: urlOp, fontSize: 26, fontFamily: sans, color: GRAY, letterSpacing: 0.5 }}>
+        showyourbrand.vercel.app
+      </div>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ─── Main video ────────────────────────────────────────────────────────────
-export const SYBVideo: React.FC = () => {
-  return (
-    <AbsoluteFill>
-      {/* Scene 1: Logo reveal (0 → 60) */}
-      <Sequence from={0} durationInFrames={60}>
-        <SceneLogoReveal />
-      </Sequence>
-
-      {/* Scene 2: ChatGPT query (60 → 180) */}
-      <Sequence from={60} durationInFrames={120}>
-        <SceneChatQuery />
-      </Sequence>
-
-      {/* Scene 3: AI response card (180 → 450) */}
-      <Sequence from={180} durationInFrames={270}>
-        <SceneAIResponse />
-      </Sequence>
-
-      {/* Scene 4: CTA outro (450 → 540) */}
-      <Sequence from={450} durationInFrames={90}>
-        <SceneCTAOutro />
-      </Sequence>
-    </AbsoluteFill>
-  );
-};
+// ──────────────────────────────────────────────────────────────────────────
+// Main composition
+// ──────────────────────────────────────────────────────────────────────────
+export const SYBVideo: React.FC = () => (
+  <AbsoluteFill>
+    <BG />
+    <Sequence from={0}   durationInFrames={165}><SceneQuestions    /></Sequence>
+    <Sequence from={159} durationInFrames={120}><SceneAIResponse   /></Sequence>
+    <Sequence from={273} durationInFrames={150}><SceneBrandReveal  /></Sequence>
+    <Sequence from={417} durationInFrames={75} ><SceneCarousel     /></Sequence>
+    <Sequence from={486} durationInFrames={120}><SceneDashboard    /></Sequence>
+    <Sequence from={600} durationInFrames={150}><SceneCTA          /></Sequence>
+  </AbsoluteFill>
+);

@@ -573,6 +573,28 @@ export default function Home() {
           </a>
         </section>
 
+        {/* Video Demo Section */}
+        <section className="px-4 py-16 md:py-20 lg:min-h-screen lg:flex lg:flex-col lg:items-center lg:justify-center">
+          <div className="container mx-auto max-w-5xl">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-4 md:mb-6">
+                See it in action
+              </h2>
+              
+            </div>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/50">
+              <video
+                className="w-full aspect-video object-cover"
+                controls
+                playsInline
+                preload="metadata"
+              >
+                <source src="/syb-final-HQ.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </section>
+
         {/* The GEO Advantage Section - Aggressive Marketing */}
         <section id="features" className="px-4 py-16 md:py-20 lg:min-h-screen lg:flex lg:flex-col lg:items-center lg:justify-center">
           <div className="container mx-auto max-w-7xl">

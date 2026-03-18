@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "remotion studio src/index.ts",
-    "build": "remotion render src/index.ts SYBVideo out/syb-video.mp4"
+    "build": "remotion render src/index.ts SYBVideo out/syb-video-HQ.mp4",
+    "build:web": "remotion render src/index.ts SYBVideo out/syb-video-web.mp4 --image-format=jpeg --crf=18"
   },
   "keywords": [],
   "author": "",
