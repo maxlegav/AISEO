@@ -1,6 +1,6 @@
-import { ExternalLink, Eye } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import type { AuditDoc, AuditResults } from "./auditTypes";
-import { scoreColor, scoreLabel, scoreBarClass, scoreTextClass, LEVEL_COLORS } from "./auditHelpers";
+import { scoreColor, scoreLabel, scoreBarClass, scoreTextClass } from "./auditHelpers";
 
 // ─── Score Ring ───────────────────────────────────────────────────────────────
 
@@ -57,15 +57,16 @@ function SubScoreBar({
   );
 }
 
-// ─── Stat pill ────────────────────────────────────────────────────────────────
+// ─── Stat card ────────────────────────────────────────────────────────────────
 
-function StatPill({
-  value, label, color,
-}: { value: string | number; label: string; color: string }) {
+function StatCard({
+  value, label, description, color,
+}: { value: string | number; label: string; description: string; color: string }) {
   return (
-    <div className={`flex flex-col items-center px-5 py-3 rounded-2xl border ${color}`}>
-      <span className="text-2xl font-bold tabular-nums leading-none">{value}</span>
-      <span className="text-[11px] font-medium mt-1 text-center leading-tight opacity-80">{label}</span>
+    <div className={`flex flex-col px-5 py-4 rounded-2xl border ${color}`}>
+      <span className="text-2xl font-bold tabular-nums leading-none mb-1">{value}</span>
+      <span className="text-xs font-semibold mb-0.5">{label}</span>
+      <span className="text-[11px] opacity-60 leading-tight">{description}</span>
     </div>
   );
 }
@@ -103,10 +104,37 @@ export default function AuditHero({ audit, results }: AuditHeroProps) {
     : null;
 
   const criticalCount = issuesSummary?.criticalCount ?? 0;
+  const highCount = issuesSummary?.highCount ?? 0;
+  const totalIssues = issuesSummary?.totalCount ?? 0;
   const gapCount = promptGapsSummary?.totalGaps ?? 0;
+  const totalActions = totalIssues + gapCount;
   const citationRate = citationStats
     ? Math.round(citationStats.targetCitationRate * 100)
     : null;
+  const promptsTotal = results.totalPromptsProcessed ?? 100;
+  const promptsCited = citationStats
+    ? Math.round(citationStats.targetCitationRate * promptsTotal)
+    : null;
+
+  // Discoverability in plain language
+  const discLabel = isInvisible
+    ? "Invisible"
+    : discLevel === 1
+    ? "Broad queries"
+    : discLevel === 2
+    ? "Niche queries"
+    : discLevel === 3
+    ? "Specific queries"
+    : "Branded only";
+  const discDescription = isInvisible
+    ? "Not cited by any AI engine on tested queries"
+    : discLevel === 1
+    ? "AI cites you even on generic industry questions"
+    : discLevel === 2
+    ? "AI cites you on category-specific questions"
+    : discLevel === 3
+    ? "AI cites you only on targeted questions"
+    : "AI cites you mainly when your brand is mentioned";
 
   return (
     <div className="space-y-4 mb-6">
@@ -191,86 +219,81 @@ export default function AuditHero({ audit, results }: AuditHeroProps) {
         </div>
       </div>
 
-      {/* Stat pills row */}
+      {/* Stat cards row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatPill
-          value={criticalCount}
-          label="Critical issues"
-          color={criticalCount > 0
-            ? "bg-red-50 border-red-200 text-red-700"
-            : "bg-emerald-50 border-emerald-200 text-emerald-700"}
+        <StatCard
+          value={totalActions > 0 ? totalActions : "✓"}
+          label={totalActions > 0 ? "Actions to take" : "All good"}
+          description={
+            totalActions === 0
+              ? "No issues or gaps detected"
+              : criticalCount > 0
+              ? `${criticalCount} urgent · ${highCount} important · ${gapCount} gap${gapCount !== 1 ? "s" : ""}`
+              : `${totalIssues} issue${totalIssues !== 1 ? "s" : ""} · ${gapCount} unanswered question${gapCount !== 1 ? "s" : ""}`
+          }
+          color={
+            totalActions === 0
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : criticalCount > 0
+              ? "bg-red-50 border-red-200 text-red-700"
+              : "bg-orange-50 border-orange-200 text-orange-700"
+          }
         />
-        <StatPill
-          value={gapCount}
-          label="Prompt gaps"
-          color={gapCount > 0
-            ? "bg-orange-50 border-orange-200 text-orange-700"
-            : "bg-emerald-50 border-emerald-200 text-emerald-700"}
-        />
-        <StatPill
+        <StatCard
           value={citationRate != null ? `${citationRate}%` : "—"}
           label="Citation rate"
-          color={citationRate != null && citationRate >= 20
-            ? "bg-blue-50 border-blue-200 text-blue-700"
-            : "bg-gray-50 border-gray-200 text-gray-700"}
+          description={
+            citationRate == null
+              ? "No citation data available"
+              : citationRate >= 40
+              ? "AI often cites you in responses"
+              : citationRate >= 15
+              ? "AI occasionally cites you"
+              : "AI rarely cites you — key focus area"
+          }
+          color={
+            citationRate == null
+              ? "bg-gray-50 border-gray-200 text-gray-600"
+              : citationRate >= 40
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : citationRate >= 15
+              ? "bg-blue-50 border-blue-200 text-blue-700"
+              : "bg-red-50 border-red-200 text-red-700"
+          }
         />
-        <StatPill
-          value={isInvisible ? "None" : `L${discLevel}`}
-          label="Discoverability"
-          color={isInvisible
-            ? "bg-red-50 border-red-200 text-red-700"
-            : discLevel! <= 2
-            ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-            : "bg-orange-50 border-orange-200 text-orange-700"}
+        <StatCard
+          value={promptsCited != null ? `${promptsCited}/${promptsTotal}` : "—"}
+          label="Prompts cited"
+          description={
+            promptsCited == null
+              ? "No prompt data available"
+              : `out of ${promptsTotal} tested questions, AI cited you in ${promptsCited}`
+          }
+          color={
+            promptsCited == null
+              ? "bg-gray-50 border-gray-200 text-gray-600"
+              : promptsCited >= promptsTotal * 0.4
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : promptsCited >= promptsTotal * 0.15
+              ? "bg-blue-50 border-blue-200 text-blue-700"
+              : "bg-orange-50 border-orange-200 text-orange-700"
+          }
+        />
+        <StatCard
+          value={discLabel}
+          label="AI Discovery"
+          description={discDescription}
+          color={
+            isInvisible
+              ? "bg-red-50 border-red-200 text-red-700"
+              : discLevel! <= 2
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : discLevel! <= 3
+              ? "bg-yellow-50 border-yellow-200 text-yellow-700"
+              : "bg-orange-50 border-orange-200 text-orange-700"
+          }
         />
       </div>
-
-      {/* Discoverability banner */}
-      {discoverability && (
-        <div className={`rounded-2xl px-6 py-4 border flex items-center gap-4 flex-wrap ${
-          isInvisible
-            ? "bg-red-50 border-red-200"
-            : discLevel! <= 2
-            ? "bg-emerald-50 border-emerald-200"
-            : discLevel! <= 3
-            ? "bg-yellow-50 border-yellow-200"
-            : "bg-orange-50 border-orange-200"
-        }`}>
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-            isInvisible ? "bg-red-100" : "bg-white/70"
-          }`}>
-            <Eye className={`w-4 h-4 ${
-              isInvisible ? "text-red-500" : discLevel! <= 2 ? "text-emerald-600" : "text-orange-500"
-            }`} />
-          </div>
-          <div className="flex-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">
-              Discoverability Threshold
-            </p>
-            <p className={`text-sm font-semibold ${isInvisible ? "text-red-700" : "text-gray-900"}`}>
-              {isInvisible ? "Invisible — not found by any AI engine" : `Visible at Level ${discLevel} — ${discoverability.description}`}
-            </p>
-          </div>
-
-          {/* Level ladder */}
-          {!isInvisible && (
-            <div className="flex items-center gap-1.5 shrink-0">
-              {[1, 2, 3, 4, 5].map((l) => (
-                <div
-                  key={l}
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold ${
-                    l <= discLevel!
-                      ? LEVEL_COLORS[l - 1] + " text-white"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
-                >
-                  {l}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

@@ -10,9 +10,10 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
-  Mail,
-  Twitter ,
+  Calendar,
+  Twitter,
   Linkedin,
+  Mail,
   Eye,
   Target,
   Zap,
@@ -54,14 +55,6 @@ const cmsLogos = [
   { name: "Webflow", logo: "/logos/webflow-svgrepo-com.svg" },
 ];
 
-// Trust badge initials for the counter
-const trustAvatars = [
-  { letter: "S", bg: "bg-gray-800" },
-  { letter: "M", bg: "bg-gray-600" },
-  { letter: "A", bg: "bg-gray-700" },
-  { letter: "L", bg: "bg-gray-500" },
-  { letter: "T", bg: "bg-gray-900" },
-];
 
 // Animated AI Model Marquee with real logos
 const AIModelMarquee = () => (
@@ -185,7 +178,7 @@ const PricingCard = ({
   features: string[];
   highlighted?: boolean;
   ctaText: string;
-  ctaLink: string;
+  ctaLink?: string;
   onCtaClick?: () => void;
 }) => (
   <div
@@ -255,7 +248,7 @@ const PricingCard = ({
       >
         {ctaText}
       </Button>
-    ) : (
+    ) : ctaLink ? (
       <Link href={ctaLink} className="block mt-auto">
         <Button
           className={`w-full h-12 rounded-xl font-semibold transition-all ${
@@ -268,7 +261,7 @@ const PricingCard = ({
           {ctaText}
         </Button>
       </Link>
-    )}
+    ) : null}
   </div>
 );
 
@@ -292,62 +285,12 @@ const HandDrawnUnderline = () => (
   </svg>
 );
 
-const SubscriberCounter = ({ count, dark = false }: { count: number; dark?: boolean }) => {
-  const baseCount = 0;
-  const totalCount = baseCount + (count || 0); // 50 + nombre réel en BDD
-  const displayCount = `${totalCount}+`;
-
-  return (
-    <div className="flex items-center justify-center gap-3 mt-4">
-      {
-        totalCount > 50 ?
-        <>
-        <div className="flex -space-x-2">
-        {trustAvatars.map((avatar, i) => (
-          <div
-            key={i}
-            className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs font-semibold ${
-              dark
-                ? "bg-white/20 border-white/30 text-white"
-                : `${avatar.bg} border-white text-white`
-            }`}
-          >
-            {avatar.letter}
-          </div>
-        ))}
-      </div>
-      <p className={`text-sm font-medium ${dark ? "text-gray-300" : "text-gray-700"}`}>
-        <span className={`font-bold ${dark ? "text-white" : "text-gray-900"}`}>{displayCount}</span>{" "}
-        already joined the waitlist, be one of them
-      </p>
-      </> :
-      <>
-        <p>Be amoung the first to be visible in AI search !</p>
-      </>
-      }
-    </div>
-  );
-};
-
-const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
 
 export default function Home() {
   const { openWaitlistModal } = useWaitlistModalStore();
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
-  const [subscriberCount, setSubscriberCount] = useState(0);
   const mainRef = useRef<HTMLElement>(null);
   const isScrolling = useRef(false);
-
-  useEffect(() => {
-    fetch("/api/waitlist/count")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.data?.count) {
-          setSubscriberCount(data.data.count);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   // Fullpage section scroll
   useEffect(() => {
@@ -551,14 +494,13 @@ export default function Home() {
 
             {/* Bottom: CTA pinned to bottom */}
             <div className="max-w-xl mx-auto">
-              <SubscriberCounter count={subscriberCount} />
               <div className="flex justify-center mt-4">
                 <Button
                   onClick={openWaitlistModal}
                   className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
                 >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Join the Waitlist
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book a Free Call
                 </Button>
               </div>
             </div>
@@ -812,7 +754,6 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        { isProduction &&
         <section id="pricing" className="py-16 md:py-20 px-4">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-10 md:mb-14">
@@ -823,7 +764,7 @@ export default function Home() {
                 Choose the plan that fits your needs. Cancel anytime.
               </p>
             </div>
-          
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               <PricingCard
                 title="BASIC"
@@ -840,9 +781,8 @@ export default function Home() {
                   "Content optimization tips",
                   "Email support (48h response)",
                 ]}
-                ctaText="Join the Waitlist"
-                ctaLink="/waitlist"
-                onCtaClick={openWaitlistModal}
+                ctaText="Get Started"
+                ctaLink="/signup?plan=basic"
               />
               <PricingCard
                 title="PRO"
@@ -862,9 +802,8 @@ export default function Home() {
                   "Priority email support (24h)",
                 ]}
                 highlighted={true}
-                ctaText="Join the Waitlist"
-                ctaLink="/waitlist"
-                onCtaClick={openWaitlistModal}
+                ctaText="Get Started"
+                ctaLink="/signup?plan=pro"
               />
               <div className="md:col-span-2 lg:col-span-1 flex flex-col">
                 <PricingCard
@@ -885,9 +824,8 @@ export default function Home() {
                     "Dedicated account manager",
                     "+€35 per extra audit beyond 20",
                   ]}
-                  ctaText="Join the Waitlist"
-                  ctaLink="/waitlist"
-                  onCtaClick={openWaitlistModal}
+                  ctaText="Get Started"
+                  ctaLink="/signup?plan=premium"
                 />
               </div>
             </div>
@@ -903,10 +841,9 @@ export default function Home() {
               to access your dashboard
             </p>
           </div>
-        </section>}
+        </section>
 
         {/* Testimonials Section */}
-        {isProduction && 
         <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
@@ -918,7 +855,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </section>}
+        </section>
 
         {/* FAQ Section */}
         <section id="faq" className="py-16 px-4">
@@ -971,14 +908,13 @@ export default function Home() {
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">
-              <SubscriberCounter count={subscriberCount} dark />
               <div className="flex justify-center mt-4">
                 <Button
                   onClick={openWaitlistModal}
                   className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold"
                 >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Join the Waitlist
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book a Free Call
                 </Button>
               </div>
             </div>
@@ -1040,14 +976,14 @@ export default function Home() {
                       Features
                     </a>
                   </li>
-                  {isProduction && <li>
+                  <li>
                     <a
                       href="#pricing"
                       className="hover:text-white transition-colors"
                     >
                       Pricing
                     </a>
-                  </li>}
+                  </li>
                   <li>
                     <a
                       href="#faq"
@@ -1064,16 +1000,14 @@ export default function Home() {
                       Blog
                     </Link>
                   </li>
-                  {isProduction && (
-                    <li>
-                      <Link
-                        href="/login"
-                        className="hover:text-white transition-colors"
-                      >
-                        Login
-                      </Link>
-                    </li>
-                  )}
+                  <li>
+                    <Link
+                      href="/login"
+                      className="hover:text-white transition-colors"
+                    >
+                      Login
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
