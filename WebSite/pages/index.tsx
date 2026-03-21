@@ -781,8 +781,8 @@ export default function Home() {
                   "Content optimization tips",
                   "Email support (48h response)",
                 ]}
-                ctaText="Get Started"
-                ctaLink="/signup?plan=basic"
+                ctaText="Book a Call"
+                onCtaClick={openWaitlistModal}
               />
               <PricingCard
                 title="PRO"
@@ -802,8 +802,8 @@ export default function Home() {
                   "Priority email support (24h)",
                 ]}
                 highlighted={true}
-                ctaText="Get Started"
-                ctaLink="/signup?plan=pro"
+                ctaText="Book a Call"
+                onCtaClick={openWaitlistModal}
               />
               <div className="md:col-span-2 lg:col-span-1 flex flex-col">
                 <PricingCard
@@ -824,8 +824,8 @@ export default function Home() {
                     "Dedicated account manager",
                     "+€35 per extra audit beyond 20",
                   ]}
-                  ctaText="Get Started"
-                  ctaLink="/signup?plan=premium"
+                  ctaText="Book a Call"
+                  onCtaClick={openWaitlistModal}
                 />
               </div>
             </div>
