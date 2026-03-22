@@ -291,6 +291,25 @@ export default function Home() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
   const mainRef = useRef<HTMLElement>(null);
   const isScrolling = useRef(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Auto-play video when scrolled into view
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
 
   // Fullpage section scroll
   useEffect(() => {
@@ -526,9 +545,11 @@ export default function Home() {
             </div>
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/50">
               <video
+                ref={videoRef}
                 className="w-full aspect-video object-cover"
                 controls
                 playsInline
+                muted
                 preload="metadata"
               >
                 <source src="/syb-final-HQ.mp4" type="video/mp4" />
@@ -772,13 +793,14 @@ export default function Home() {
                 oldPrice="€299"
                 period="one-time"
                 features={[
-                  "1 complete GEO audit",
-                  "ChatGPT analysis (GPT-4o)",
-                  "1 competitor comparison",
-                  "100 AI prompt testing",
-                  "Full PDF report with insights",
-                  "HTML & schema.org scan",
-                  "Content optimization tips",
+                  "1 complete GEO visibility audit",
+                  "ChatGPT (GPT-4o) AI citation analysis",
+                  "GEO Health Score (0–100) with breakdown",
+                  "100 AI prompts tested in your category",
+                  "1 competitor benchmark",
+                  "Technical HTML & Schema.org audit",
+                  "Content gap & missing FAQ identification",
+                  "Full PDF report with prioritized fixes",
                   "Email support (48h response)",
                 ]}
                 ctaText="Book a Call"
@@ -790,16 +812,17 @@ export default function Home() {
                 oldPrice="€599"
                 period="one-time"
                 features={[
-                  "1 complete GEO audit",
-                  "All 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)",
-                  "5 competitor comparisons",
-                  "100 AI prompt testing",
-                  "Full PDF report + executive summary",
-                  "HTML & schema.org deep scan",
-                  "AI-optimized FAQ generation",
-                  "Priority action plan (ranked by impact)",
-                  "Dashboard with full history",
-                  "Priority email support (24h)",
+                  "1 complete GEO visibility audit",
+                  "4 AI engines: ChatGPT, Claude, Perplexity & DeepSeek",
+                  "GEO Health Score + competitor gap analysis",
+                  "100 AI prompts tested in your category",
+                  "5 competitor benchmarks",
+                  "Technical HTML & Schema.org deep scan",
+                  "AI-optimized FAQ & content snippets to add",
+                  "Priority action plan ranked by ROI impact",
+                  "PDF report + executive summary (shareable)",
+                  "Dashboard with progress history",
+                  "Priority support (24h)",
                 ]}
                 highlighted={true}
                 ctaText="Book a Call"
@@ -807,20 +830,20 @@ export default function Home() {
               />
               <div className="md:col-span-2 lg:col-span-1 flex flex-col">
                 <PricingCard
-                  title="PREMIUM FOR AGENCIES"
+                  title="AGENCY"
                   price="€799"
                   oldPrice="€1,199"
                   period="mo"
                   features={[
-                    "20 audits per month included",
+                    "20 client GEO audits per month",
                     "All 4 AI engines per audit",
-                    "Unlimited competitor comparisons",
-                    "100 AI prompt testing per audit",
-                    "White-label PDF reports (your branding)",
-                    "Bulk audit management dashboard",
-                    "Client-ready executive summaries",
-                    "Schema markup & FAQ auto-generation",
-                    "Monthly GEO trend reports",
+                    "Unlimited competitor benchmarks",
+                    "White-label PDF reports with your branding",
+                    "Agency dashboard to manage all clients",
+                    "Automated client-ready executive reports",
+                    "Schema.org & FAQ code snippets to deploy",
+                    "Monthly GEO evolution tracking per client",
+                    "Resell audits at your own price",
                     "Dedicated account manager",
                     "+€35 per extra audit beyond 20",
                   ]}
@@ -848,11 +871,49 @@ export default function Home() {
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
-                Trusted by our beta-Testers
+                Trusted by our beta-testers
               </h2>
               <p className="text-gray-600">
                 See what early adopters are saying
               </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  name: "Thomas R.",
+                  role: "Founder, SaaS B2B",
+                  avatar: "T",
+                  bg: "bg-purple-600",
+                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why — and fixed it in a week. Our citation rate on ChatGPT doubled.",
+                },
+                {
+                  name: "Sophie M.",
+                  role: "CEO, Marketing Agency",
+                  avatar: "S",
+                  bg: "bg-pink-500",
+                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports — I just present them. It's a game changer for the agency.",
+                },
+                {
+                  name: "Antoine L.",
+                  role: "Head of Growth, E-commerce",
+                  avatar: "A",
+                  bg: "bg-slate-700",
+                  quote: "The competitor comparison blew my mind. I could see exactly which pages our competitors had that were getting cited by Perplexity and we didn't. Incredibly actionable.",
+                },
+              ].map((t) => (
+                <div key={t.name} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4">
+                  <p className="text-gray-700 leading-relaxed text-sm flex-1">&ldquo;{t.quote}&rdquo;</p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 ${t.bg}`}>
+                      {t.avatar}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">{t.name}</div>
+                      <div className="text-gray-500 text-xs">{t.role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
