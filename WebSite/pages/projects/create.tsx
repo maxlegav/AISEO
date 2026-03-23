@@ -14,6 +14,7 @@ import {
   Plus,
   X,
   Loader2,
+  MapPin,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,6 +22,7 @@ import { useLanguage } from "@/components/LanguageContext";
 
 const STEPS = [
   { key: "domain", icon: Globe },
+  { key: "location", icon: MapPin },
   { key: "category", icon: Briefcase },
   { key: "description", icon: FileText },
   { key: "subUrls", icon: Link2 },
@@ -31,7 +33,7 @@ const STEPS = [
 export default function CreateProjectPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -44,6 +46,10 @@ export default function CreateProjectPage() {
   const [description, setDescription] = useState("");
   const [subUrls, setSubUrls] = useState<string[]>([""]);
   const [competitorUrls, setCompetitorUrls] = useState<string[]>([""]);
+  const [competitorNames, setCompetitorNames] = useState<string[]>([""]);
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -85,11 +91,13 @@ export default function CreateProjectPage() {
       case 0:
         return name.trim().length > 0 && primaryUrl.trim().length > 0;
       case 1:
-        return category.trim().length > 0;
+        return true; // Location is optional
       case 2:
+        return category.trim().length > 0;
       case 3:
       case 4:
       case 5:
+      case 6:
         return true;
       default:
         return false;
@@ -105,6 +113,9 @@ export default function CreateProjectPage() {
       const cleanCompetitorUrls = competitorUrls.filter(
         (u) => u.trim().length > 0,
       );
+      const cleanCompetitorNames = competitorNames.filter(
+        (n) => n.trim().length > 0,
+      );
 
       // Step 1: Create the business
       const businessRes = await fetch("/api/businesses/create", {
@@ -117,6 +128,7 @@ export default function CreateProjectPage() {
           description: description.trim() || undefined,
           subUrls: cleanSubUrls,
           competitorUrls: cleanCompetitorUrls,
+          competitorNames: cleanCompetitorNames,
         }),
       });
 
@@ -145,7 +157,11 @@ export default function CreateProjectPage() {
           description: business.description || business.category,
           subUrls: business.subUrls || [],
           competitorUrls: business.competitorUrls || [],
-          language: "fr",
+          competitorNames: cleanCompetitorNames,
+          language,
+          city: city.trim() || undefined,
+          country: country.trim() || undefined,
+          neighborhood: neighborhood.trim() || undefined,
         }),
       });
       // Note: we don't fail if audit creation errors — the project is already created
@@ -253,8 +269,54 @@ export default function CreateProjectPage() {
             </div>
           )}
 
-          {/* Step 1: Category */}
+          {/* Step 1: Location */}
           {step === 1 && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {String(t("wizard.city"))}
+                </label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
+                  placeholder={String(t("wizard.cityPlaceholder"))}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {String(t("wizard.country"))}
+                </label>
+                <input
+                  type="text"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
+                  placeholder={String(t("wizard.countryPlaceholder"))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {String(t("wizard.neighborhood"))}{" "}
+                  <span className="text-xs text-gray-400">
+                    ({String(t("wizard.optional"))})
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
+                  placeholder={String(t("wizard.neighborhoodPlaceholder"))}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Category */}
+          {step === 2 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {String(t("project.category"))}
@@ -270,8 +332,8 @@ export default function CreateProjectPage() {
             </div>
           )}
 
-          {/* Step 2: Description */}
-          {step === 2 && (
+          {/* Step 3: Description */}
+          {step === 3 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {String(t("project.description"))}
@@ -291,8 +353,8 @@ export default function CreateProjectPage() {
             </div>
           )}
 
-          {/* Step 3: Sub-URLs */}
-          {step === 3 && (
+          {/* Step 4: Sub-URLs */}
+          {step === 4 && (
             <div className="space-y-3">
               {subUrls.map((url, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -325,42 +387,64 @@ export default function CreateProjectPage() {
             </div>
           )}
 
-          {/* Step 4: Competitors */}
-          {step === 4 && (
+          {/* Step 5: Competitors */}
+          {step === 5 && (
             <div className="space-y-3">
               <p className="text-sm text-gray-500 mb-3">
                 {String(t("wizard.competitorLimit"))}
               </p>
               {competitorUrls.map((url, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={url}
-                    onChange={(e) =>
-                      updateUrl(
-                        i,
-                        e.target.value,
-                        competitorUrls,
-                        setCompetitorUrls,
-                      )
-                    }
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
-                    placeholder="https://competitor.com"
-                  />
-                  {competitorUrls.length > 1 && (
-                    <button
-                      onClick={() =>
-                        removeUrl(i, competitorUrls, setCompetitorUrls)
-                      }
-                      className="text-gray-400 hover:text-red-500"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  )}
+                <div key={i} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 flex gap-2">
+                      <input
+                        type="text"
+                        value={competitorNames[i] || ""}
+                        onChange={(e) =>
+                          updateUrl(
+                            i,
+                            e.target.value,
+                            competitorNames,
+                            setCompetitorNames,
+                          )
+                        }
+                        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
+                        placeholder={String(t("wizard.competitorNamePlaceholder"))}
+                      />
+                      <input
+                        type="text"
+                        value={url}
+                        onChange={(e) =>
+                          updateUrl(
+                            i,
+                            e.target.value,
+                            competitorUrls,
+                            setCompetitorUrls,
+                          )
+                        }
+                        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
+                        placeholder="https://competitor.com"
+                      />
+                    </div>
+                    {competitorUrls.length > 1 && (
+                      <button
+                        onClick={() => {
+                          removeUrl(i, competitorUrls, setCompetitorUrls);
+                          removeUrl(i, competitorNames, setCompetitorNames);
+                        }}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
               <button
-                onClick={() => addUrl(competitorUrls, setCompetitorUrls)}
+                onClick={() => {
+                  addUrl(competitorUrls, setCompetitorUrls);
+                  addUrl(competitorNames, setCompetitorNames);
+                }}
                 className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
               >
                 <Plus className="w-4 h-4" />
@@ -369,8 +453,8 @@ export default function CreateProjectPage() {
             </div>
           )}
 
-          {/* Step 5: Confirmation */}
-          {step === 5 && (
+          {/* Step 6: Confirmation */}
+          {step === 6 && (
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                 <div>
@@ -385,6 +469,18 @@ export default function CreateProjectPage() {
                   </span>
                   <p className="font-medium text-gray-900">{primaryUrl}</p>
                 </div>
+                {(city.trim() || country.trim() || neighborhood.trim()) && (
+                  <div>
+                    <span className="text-xs text-gray-500 uppercase">
+                      {String(t("wizard.location"))}
+                    </span>
+                    <p className="font-medium text-gray-900">
+                      {[neighborhood.trim(), city.trim(), country.trim()]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <span className="text-xs text-gray-500 uppercase">
                     {String(t("project.category"))}
@@ -422,7 +518,9 @@ export default function CreateProjectPage() {
                       .filter((u) => u.trim())
                       .map((url, i) => (
                         <p key={i} className="text-sm text-gray-700">
-                          {url}
+                          {competitorNames[i]?.trim()
+                            ? `${competitorNames[i].trim()} — ${url}`
+                            : url}
                         </p>
                       ))}
                   </div>
@@ -456,7 +554,7 @@ export default function CreateProjectPage() {
               {String(t("common.back"))}
             </button>
 
-            {step < 5 ? (
+            {step < 6 ? (
               <Button
                 onClick={() => setStep(step + 1)}
                 disabled={!canProceed()}

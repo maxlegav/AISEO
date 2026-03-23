@@ -37,7 +37,11 @@ export default async function handler(
       description,
       subUrls,
       competitorUrls,
+      competitorNames,
       language,
+      city,
+      country,
+      neighborhood,
     } = req.body;
 
     if (!businessId || !businessName || !businessUrl || !category) {
@@ -85,7 +89,10 @@ export default async function handler(
         language: language || 'fr',
         subUrls: subUrls || [],
         competitorUrls: competitorUrls || [],
-        competitorNames: [],
+        competitorNames: competitorNames || [],
+        ...(city ? { city } : {}),
+        ...(country ? { country } : {}),
+        ...(neighborhood ? { neighborhood } : {}),
       };
 
       fetch(`${processingUrl}/audit`, {
