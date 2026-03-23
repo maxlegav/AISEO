@@ -143,7 +143,19 @@
       "Bash(mkdir -p /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video/out && npx remotion studio src/index.ts --help 2>&1 | head -5)",
       "Bash(git fetch:*)",
       "Bash(git merge:*)",
-      "Bash(say:*)"
+      "Bash(node_modules/.bin/remotion render:*)",
+      "Bash(sleep 20 && jobs -l 2>/dev/null; ls -lh out/ 2>/dev/null)",
+      "Bash(while ! ls /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video/out/syb-video-HQ.mp4 2>/dev/null; do sleep 5; done && ls -lh /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video/out/)",
+      "Bash(while ! ls /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video/out/syb-final-HQ.mp4 2>/dev/null; do\n  sleep 8\n  ps aux | grep -q \"remotion render\" | grep -v grep && echo \"...en cours\" || echo \"terminé\"\ndone && ls -lh /Users/maxlemoinegavoille/Desktop/Projets/AISEO/video/out/)",
+      "Bash(cat /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/api/audits/\\\\[auditId\\\\].ts 2>/dev/null || find /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/api/audits -name \"*.ts\" | head -20)",
+      "Bash(cd /Users/maxlemoinegavoille/Desktop/Projets/AISEO/server && python simulation/run_audit_from_answers.py 2>&1 | tail -50)",
+      "Bash(python simulation/run_audit_from_answers.py 2>&1)",
+      "Bash(git -C /Users/maxlemoinegavoille/Desktop/Projets/AISEO status --short)",
+      "Bash(head -50 /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/\\\\[username\\\\]/audits/\\\\[auditId\\\\].tsx)",
+      "Bash(grep -n \"ActionPlan\\\\|promptGaps\\\\|categoryScores\\\\|htmlScan\\\\|businessSnapshot\" /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/[username]/audits/[auditId].tsx)",
+      "Bash(grep -n \"CompetitorComparison\\\\|DeepDive\\\\|ActionPlan\\\\|GeoQuickWins\\\\|id=\"\"\" /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/[username]/audits/[auditId].tsx)",
+      "Bash(grep -n \"Section 4\\\\|Section 5\\\\|id=\\\\\"deep-dive\\\\\"\\\\|id=\\\\\"competitors\\\\\"\\\\|Deep Dive\\\\|Competitor\" /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/[username]/audits/[auditId].tsx)",
+      "Bash(git log:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

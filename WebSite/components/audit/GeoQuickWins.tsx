@@ -33,12 +33,13 @@ function CopyButton({ text }: { text: string }) {
 interface GeoQuickWinsProps {
   llmsTxtContent: string | null;
   llmHijackPrompt: string | null;
+  faqSchemaContent?: string | null;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt }: GeoQuickWinsProps) {
-  if (!llmsTxtContent && !llmHijackPrompt) return null;
+export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt, faqSchemaContent }: GeoQuickWinsProps) {
+  if (!llmsTxtContent && !llmHijackPrompt && !faqSchemaContent) return null;
 
   return (
     <div id="quick-wins" className="mb-6">
@@ -67,7 +68,7 @@ export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt }: GeoQui
               </div>
               <CopyButton text={llmsTxtContent} />
             </div>
-            <pre className="text-xs text-gray-700 p-5 overflow-auto max-h-56 leading-relaxed whitespace-pre-wrap font-mono">
+            <pre className="text-xs text-gray-700 p-5 overflow-auto max-h-56 overscroll-contain leading-relaxed whitespace-pre-wrap font-mono">
               {llmsTxtContent}
             </pre>
           </div>
@@ -85,8 +86,26 @@ export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt }: GeoQui
               </div>
               <CopyButton text={llmHijackPrompt} />
             </div>
-            <pre className="text-xs text-green-300 bg-gray-900 p-5 overflow-auto max-h-56 leading-relaxed whitespace-pre-wrap font-mono">
+            <pre className="text-xs text-green-300 bg-gray-900 p-5 overflow-auto max-h-56 overscroll-contain leading-relaxed whitespace-pre-wrap font-mono">
               {llmHijackPrompt}
+            </pre>
+          </div>
+        )}
+
+        {/* FAQ Schema */}
+        {faqSchemaContent && (
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">FAQ Schema</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">
+                  Add to your page <code className="text-orange-500">&lt;head&gt;</code> — answers all uncited questions
+                </p>
+              </div>
+              <CopyButton text={faqSchemaContent} />
+            </div>
+            <pre className="text-xs text-gray-700 p-5 overflow-auto max-h-64 overscroll-contain leading-relaxed whitespace-pre-wrap font-mono">
+              {faqSchemaContent}
             </pre>
           </div>
         )}

@@ -191,7 +191,16 @@ export default function AuditDetailPage() {
   const snap = r.businessSnapshot;
   const geoScore = audit.geoScore ?? 0;
 
-  const hasQuickWins = !!(llmsTxtContent || llmHijackPrompt);
+  const faqSchemaContent: string | null = promptGaps.length > 0
+    ? `<script type="application/ld+json">\n{\n  "@context": "https://schema.org",\n  "@type": "FAQPage",\n  "mainEntity": [\n${
+        promptGaps.map((gap) => {
+          const answer = `${snap?.name ?? "We"} — [fill in your specific answer to this question]. Add details about ${gap.category === "comparison" ? "how you compare to alternatives" : gap.category === "reputation" ? "your credentials and track record" : gap.category === "trust" ? "your guarantees and certifications" : "your products and services"}.`;
+          return `    {\n      "@type": "Question",\n      "name": ${JSON.stringify(gap.question)},\n      "acceptedAnswer": {\n        "@type": "Answer",\n        "text": ${JSON.stringify(answer)}\n      }\n    }`;
+        }).join(",\n")
+      }\n  ]\n}\n</script>`
+    : null;
+
+  const hasQuickWins = !!(llmsTxtContent || llmHijackPrompt || faqSchemaContent);
 
   return (
     <DashboardLayout activeMenu="audits">
@@ -221,28 +230,54 @@ export default function AuditDetailPage() {
       <AuditHero audit={audit} results={r} />
 
       {/* ── Section 2: Action Plan ─────────────────────────────────────────── */}
-      <ActionPlan issues={issues} promptGaps={promptGaps} hasQuickWins={hasQuickWins} />
+      <ActionPlan
+        issues={issues}
+        promptGaps={promptGaps}
+        hasQuickWins={hasQuickWins}
+        categoryScores={categoryScores}
+        htmlKeywords={(htmlScan as { keywords?: { word: string; count: number; tfidf?: number }[] } | null)?.keywords ?? []}
+        businessSnapshot={snap ? {
+          name: snap.name,
+          category: snap.category,
+          description: snap.description,
+          primaryUrl: snap.primaryUrl,
+          targetKeywords: snap.targetKeywords,
+        } : undefined}
+        auditId={audit._id}
+      />
 
       {/* ── Section 3: GEO Quick Wins ──────────────────────────────────────── */}
-      <GeoQuickWins llmsTxtContent={llmsTxtContent} llmHijackPrompt={llmHijackPrompt} />
+      <GeoQuickWins llmsTxtContent={llmsTxtContent} llmHijackPrompt={llmHijackPrompt} faqSchemaContent={faqSchemaContent} />
 
-      {/* ── Section 4: Competitor Comparison ──────────────────────────────── */}
-      <CompetitorComparison
-        competitors={competitors}
-        geoScore={geoScore}
-        businessName={audit.businessName}
-      />
+      {/* ── Section 4: Deep Dive ───────────────────────────────────────────── */}
+      <div id="deep-dive">
+        <DeepDive
+          promptResults={promptResults}
+          htmlScan={htmlScan}
+          citationStats={citationStats}
+          categoryScores={categoryScores}
+          levelScores={levelScores}
+          engines={engines}
+          htmlScore={r.htmlScannerScore ?? null}
+          businessSnapshot={snap ? {
+            name: snap.name,
+            category: snap.category,
+            description: snap.description,
+            primaryUrl: snap.primaryUrl,
+            targetKeywords: snap.targetKeywords,
+          } : undefined}
+          promptGaps={promptGaps}
+        />
+      </div>
 
-      {/* ── Section 5: Deep Dive ───────────────────────────────────────────── */}
-      <DeepDive
-        promptResults={promptResults}
-        htmlScan={htmlScan}
-        citationStats={citationStats}
-        categoryScores={categoryScores}
-        levelScores={levelScores}
-        engines={engines}
-        htmlScore={r.htmlScannerScore ?? null}
-      />
+      {/* ── Section 5: Competitor Comparison ──────────────────────────────── */}
+      <div id="competitors">
+        <CompetitorComparison
+          competitors={competitors}
+          geoScore={geoScore}
+          businessName={audit.businessName}
+        />
+      </div>
 
       {/* ── Business Snapshot ──────────────────────────────────────────────── */}
       {snap && (snap.category || snap.description || (snap.targetKeywords && snap.targetKeywords.length > 0)) && (

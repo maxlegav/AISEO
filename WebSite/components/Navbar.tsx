@@ -6,8 +6,6 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWaitlistModalStore } from "@/stores";
 
-const isProduction = process.env.NEXT_PUBLIC_APP_STATE === "production";
-
 const navLinks = [
   { label: "Features", href: "/#features", anchor: "#features" },
   { label: "Process", href: "/#process", anchor: "#process" },
@@ -47,11 +45,6 @@ export default function Navbar() {
               const isActive =
                 !link.anchor && router.pathname.startsWith(link.href);
               const El = isHome && link.anchor ? "a" : Link;
-              if(link.label==="Pricing" && !isProduction){
-                return (
-                  <></>
-                )
-              }
               return (
                 <El
                   key={link.label}
@@ -70,16 +63,17 @@ export default function Navbar() {
 
           {/* Desktop right actions */}
           <div className="ml-auto hidden md:flex items-center gap-2">
-            <Button variant="ghost" className="text-sm font-medium" onClick={openWaitlistModal}>
-              Join Waitlist
+            <Link href="/login">
+              <Button variant="ghost" className="text-sm font-medium">
+                Login
+              </Button>
+            </Link>
+            <Button
+              onClick={openWaitlistModal}
+              className="text-sm font-semibold rounded-full bg-[#1E293B] hover:bg-[#334155] text-white px-5"
+            >
+              Book a Call
             </Button>
-            {isProduction && (
-              <Link href="/login">
-                <Button variant="ghost" className="text-sm font-medium">
-                  Login
-                </Button>
-              </Link>
-            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -121,15 +115,13 @@ export default function Navbar() {
               className="w-full rounded-full bg-[#1E293B] hover:bg-[#334155] text-white font-semibold"
               onClick={() => { openWaitlistModal(); setMobileOpen(false); }}
             >
-              Join Waitlist
+              Book a Call
             </Button>
-            {isProduction && (
-              <Link href="/login" onClick={() => setMobileOpen(false)}>
-                <Button variant="ghost" className="w-full text-sm font-medium">
-                  Login
-                </Button>
-              </Link>
-            )}
+            <Link href="/login" onClick={() => setMobileOpen(false)}>
+              <Button variant="ghost" className="w-full text-sm font-medium">
+                Login
+              </Button>
+            </Link>
           </div>
         </div>
       )}
