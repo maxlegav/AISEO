@@ -8,8 +8,6 @@ import { FcGoogle } from "react-icons/fc";
 import {
   ArrowLeft,
   ArrowRight,
-  Globe,
-  Sparkles,
   BarChart3,
   Megaphone,
   UserPlus,
@@ -18,21 +16,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import config from "@/config";
-
-// Business categories (reused from landing page)
-const BUSINESS_CATEGORIES = [
-  "E-commerce / Retail",
-  "SaaS / Technology",
-  "Marketing Agency",
-  "Finance / Insurance",
-  "Healthcare",
-  "Real Estate",
-  "Education",
-  "Travel / Hospitality",
-  "Food & Restaurant",
-  "Professional Services",
-  "Other",
-];
 
 // SEO experience levels
 const SEO_EXPERIENCE_LEVELS = [
@@ -66,8 +49,6 @@ const REFERRAL_SOURCES = [
 
 // Step icons for the progress indicator
 const STEP_CONFIG = [
-  { icon: Globe, label: "Domain" },
-  { icon: Sparkles, label: "Industry" },
   { icon: BarChart3, label: "Experience" },
   { icon: Megaphone, label: "Referral" },
   { icon: UserPlus, label: "Account" },
@@ -157,9 +138,8 @@ export default function SignupPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  // Onboarding data (steps 1-4)
-  const [domain, setDomain] = useState("");
-  const [activity, setActivity] = useState("");
+  // Onboarding data (steps 1-2)
+  const [domain, setDomain] = useState(""); // set from query param only
   const [seoExperience, setSeoExperience] = useState<
     "beginner" | "intermediate" | "expert" | ""
   >("");
@@ -173,7 +153,7 @@ export default function SignupPage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const totalSteps = 6;
+  const totalSteps = 4;
   const [initialRouted, setInitialRouted] = useState(false);
 
   // Handle query params on mount
@@ -225,9 +205,9 @@ export default function SignupPage() {
       const hasOnboardingData = typeof window !== "undefined" && !!localStorage.getItem("signupOnboardingData");
 
       if (hasOnboardingData) {
-        // Came from signup page (filled steps 1-4 before clicking Google at step 5)
+        // Came from signup page (filled steps 1-2 before clicking Google at step 3)
         sendOnboardingData();
-        setStep(6);
+        setStep(4);
       } else {
         // Came from login page - start onboarding from step 1
         setStep(1);
@@ -238,7 +218,7 @@ export default function SignupPage() {
     // Authenticated user with a plan parameter (e.g. from landing page CTA)
     if (selectedPlan) {
       setInitialRouted(true);
-      setStep(6);
+      setStep(4);
       return;
     }
 
@@ -250,16 +230,12 @@ export default function SignupPage() {
   const canProceed = () => {
     switch (step) {
       case 1:
-        return domain.trim().length > 0 && domain.includes(".");
-      case 2:
-        return activity.length > 0;
-      case 3:
         return seoExperience.length > 0;
-      case 4:
+      case 2:
         return referral.length > 0;
-      case 5:
+      case 3:
         return true; // Validated on submit
-      case 6:
+      case 4:
         return true;
       default:
         return false;
@@ -268,11 +244,10 @@ export default function SignupPage() {
 
   const handleNext = () => {
     if (step < totalSteps && canProceed()) {
-      // Already authenticated (OAuth): skip step 5 (account creation), save onboarding and go to step 6
-      if (step === 4 && status === "authenticated") {
+      // Already authenticated (OAuth): skip step 3 (account creation), save onboarding and go to step 4
+      if (step === 2 && status === "authenticated") {
         const onboardingData: Record<string, string> = {};
         if (domain) onboardingData.onboardingDomain = domain;
-        if (activity) onboardingData.onboardingActivity = activity;
         if (seoExperience) onboardingData.onboardingSeoExperience = seoExperience;
         if (referral) onboardingData.onboardingReferral = referral;
 
@@ -282,7 +257,7 @@ export default function SignupPage() {
           body: JSON.stringify(onboardingData),
         }).catch(console.error);
 
-        setStep(6);
+        setStep(4);
         return;
       }
       setStep(step + 1);
@@ -291,9 +266,9 @@ export default function SignupPage() {
 
   const handleBack = () => {
     if (step <= 1) return;
-    // Already authenticated (OAuth): skip step 5 when going back from step 6
-    if (step === 6 && status === "authenticated") {
-      setStep(4);
+    // Already authenticated (OAuth): skip step 3 when going back from step 4
+    if (step === 4 && status === "authenticated") {
+      setStep(2);
       return;
     }
     setStep(step - 1);
@@ -339,7 +314,6 @@ export default function SignupPage() {
           email,
           password,
           onboardingDomain: domain || undefined,
-          onboardingActivity: activity || undefined,
           onboardingSeoExperience: seoExperience || undefined,
           onboardingReferral: referral || undefined,
         }),
@@ -394,15 +368,15 @@ export default function SignupPage() {
             }
           } catch (error) {
             console.error("Checkout error:", error);
-            // Fallback to step 6 if checkout fails
-            setStep(6);
+            // Fallback to step 4 if checkout fails
+            setStep(4);
             return;
           }
         }
       }
 
       // No plan selected - advance to pricing step
-      setStep(6);
+      setStep(4);
     } catch (error: any) {
       console.error("Signup error:", error);
       setAuthError(error.message || "An unexpected error occurred.");
@@ -419,7 +393,6 @@ export default function SignupPage() {
     if (typeof window !== "undefined") {
       const onboardingData: Record<string, string> = {};
       if (domain) onboardingData.onboardingDomain = domain;
-      if (activity) onboardingData.onboardingActivity = activity;
       if (seoExperience) onboardingData.onboardingSeoExperience = seoExperience;
       if (referral) onboardingData.onboardingReferral = referral;
 
@@ -570,75 +543,8 @@ export default function SignupPage() {
 
         {/* Step content */}
         <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/50">
-          {/* Step 1: Domain */}
+          {/* Step 1: SEO Experience */}
           {step === 1 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Globe className="w-8 h-8 text-purple-600" />
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  What is your domain name?
-                </h2>
-                <p className="text-gray-600">
-                  Enter the website URL you want to optimize for AI visibility
-                </p>
-              </div>
-              <div>
-                <Label
-                  htmlFor="domain"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Website URL
-                </Label>
-                <Input
-                  id="domain"
-                  type="url"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && canProceed() && handleNext()}
-                  placeholder="https://example.com"
-                  className="mt-2 h-12 rounded-xl"
-                  autoFocus
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Activity/Industry */}
-          {step === 2 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-8 h-8 text-pink-600" />
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  What&apos;s your industry?
-                </h2>
-                <p className="text-gray-600">
-                  This helps us generate relevant AI prompts for your audit
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {BUSINESS_CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setActivity(category)}
-                    className={`p-3 text-sm rounded-xl border-2 transition-all text-left ${
-                      activity === category
-                        ? "border-purple-500 bg-purple-50 text-purple-700"
-                        : "border-gray-200 hover:border-gray-300 text-gray-700"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: SEO Experience */}
-          {step === 3 && (
             <div className="space-y-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -686,8 +592,8 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Step 4: Referral */}
-          {step === 4 && (
+          {/* Step 2: Referral */}
+          {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -718,8 +624,8 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Step 5: Account Creation */}
-          {step === 5 && (
+          {/* Step 3: Account Creation */}
+          {step === 3 && (
             <div className="space-y-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -852,8 +758,8 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Step 6: Pricing */}
-          {step === 6 && (
+          {/* Step 4: Pricing */}
+          {step === 4 && (
             <div className="space-y-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -908,8 +814,8 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Navigation (steps 1-4 only, step 5 has its own submit, step 6 has plan buttons) */}
-          {step <= 4 && (
+          {/* Navigation (steps 1-2 only, step 3 has its own submit, step 4 has plan buttons) */}
+          {step <= 2 && (
             <div className="flex items-center justify-between mt-8">
               {step > 1 ? (
                 <Button
@@ -934,8 +840,8 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Back button for step 5 */}
-          {step === 5 && (
+          {/* Back button for step 3 */}
+          {step === 3 && (
             <div className="mt-4">
               <Button
                 variant="ghost"
@@ -948,8 +854,8 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Back button for step 6 (pricing) */}
-          {step === 6 && (
+          {/* Back button for step 4 (pricing) */}
+          {step === 4 && (
             <div className="mt-4">
               <Button
                 variant="ghost"
@@ -964,7 +870,7 @@ export default function SignupPage() {
         </div>
 
         {/* Terms */}
-        {step === 5 && (
+        {step === 3 && (
           <p className="mt-4 text-center text-xs text-gray-500">
             By creating an account, you agree to our{" "}
             <Link href="/terms" className="underline hover:text-[#1E293B]">
