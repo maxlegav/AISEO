@@ -25,6 +25,9 @@ export interface AuditDocument extends mongoose.Document {
   reviewedBy?: string | null;
   questionsEditedAt?: Date | null;
   questionsEditedBy?: string | null;
+  // Sharing
+  shareToken?: string | null;
+  sharedAt?: Date | null;
 }
 
 const AuditSchema = new Schema<AuditDocument>(
@@ -66,6 +69,9 @@ const AuditSchema = new Schema<AuditDocument>(
     reviewedBy: { type: String, default: null },
     questionsEditedAt: { type: Date, default: null },
     questionsEditedBy: { type: String, default: null },
+    // Sharing (raw token stored — 64-char random hex, 256-bit entropy)
+    shareToken: { type: String, default: null, index: true, sparse: true },
+    sharedAt: { type: Date, default: null },
   },
   {
     timestamps: false,

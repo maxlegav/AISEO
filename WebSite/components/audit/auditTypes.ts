@@ -156,4 +156,6 @@ export interface AuditDoc {
   completedAt?: string;
   error?: string;
   results?: AuditResults;
+  shareToken?: string | null;
+  sharedAt?: string | null;
 }

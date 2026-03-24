@@ -4,6 +4,8 @@ import { authOptions } from '../auth/[...nextauth]';
 import mongoose from 'mongoose';
 import Audit from '@/models/Audit';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
+import { sendAuditLaunchedAdminEmail } from '@/lib/email';
+import config from '@/config';
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -110,6 +112,19 @@ export default async function handler(
         '[Audit] PROCESSING_SERVICE_API_KEY not configured — audit created in DB but not triggered'
       );
     }
+
+    // Fire-and-forget: notify admin
+    sendAuditLaunchedAdminEmail({
+      businessName,
+      businessUrl,
+      category,
+      userName: session.user.name ?? session.user.email ?? 'Unknown',
+      userEmail: session.user.email ?? '',
+      auditId,
+      adminUrl: `${config.siteUrl}/admin/audits`,
+    }).catch((err: Error) => {
+      console.error('[Audit] Failed to send admin notification:', err.message);
+    });
 
     return res.status(201).json({
       success: true,

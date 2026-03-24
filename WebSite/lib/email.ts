@@ -3,6 +3,8 @@ import { render } from "@react-email/render";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import PasswordResetEmail from "@/emails/PasswordResetEmail";
 import SubscriptionConfirmationEmail from "@/emails/SubscriptionConfirmationEmail";
+import AuditNotificationAdminEmail from "@/emails/AuditNotificationAdminEmail";
+import AuditCompletedClientEmail from "@/emails/AuditCompletedClientEmail";
 
 // Initialize Resend client
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -141,6 +143,60 @@ export async function sendSubscriptionConfirmationEmail(
     subject,
     html,
   });
+}
+
+/**
+ * Notify admin that a new audit was launched and needs prompt validation.
+ * Called right after the audit document is created in create.ts.
+ */
+export async function sendAuditLaunchedAdminEmail(params: {
+  businessName: string;
+  businessUrl: string;
+  category: string;
+  userName: string;
+  userEmail: string;
+  auditId: string;
+  adminUrl: string;
+}): Promise<EmailResult> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("[Email] ADMIN_EMAIL not configured, skipping admin audit notification");
+    return { success: false, error: "ADMIN_EMAIL not configured" };
+  }
+
+  const html = await render(AuditNotificationAdminEmail(params));
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `[SYB] New audit to validate — ${params.businessName}`,
+    html,
+  });
+}
+
+/**
+ * Notify client that their audit is completed and ready to view.
+ * Called when admin marks the audit as completed.
+ */
+export async function sendAuditCompletedClientEmail(params: {
+  email: string;
+  userName: string;
+  businessName: string;
+  geoScore: number;
+  auditUrl: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, businessName, geoScore, auditUrl, language = "fr" } = params;
+
+  const subject =
+    language === "fr"
+      ? `Votre audit GEO pour ${businessName} est prêt`
+      : `Your GEO audit for ${businessName} is ready`;
+
+  const html = await render(
+    AuditCompletedClientEmail({ userName, businessName, geoScore, auditUrl, language })
+  );
+
+  return sendEmail({ to: email, subject, html });
 }
 
 /**
