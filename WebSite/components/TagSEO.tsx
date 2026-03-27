@@ -13,7 +13,7 @@ const defaults = {
     title: `${config.appName} — GEO Audit: Appear in ChatGPT, Claude & Perplexity`,
     description:
       'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers.',
-    image: `${config.siteUrl}/og-image.png`,
+    image: `${config.siteUrl}/og-homepage.jpeg`,
     url: `${config.siteUrl}/`,
   },
 };
