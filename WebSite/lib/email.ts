@@ -3,6 +3,8 @@ import { render } from "@react-email/render";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import PasswordResetEmail from "@/emails/PasswordResetEmail";
 import SubscriptionConfirmationEmail from "@/emails/SubscriptionConfirmationEmail";
+import AuditStartedClientEmail from "@/emails/AuditStartedClientEmail";
+import AuditStartedAdminEmail from "@/emails/AuditStartedAdminEmail";
 import AuditNotificationAdminEmail from "@/emails/AuditNotificationAdminEmail";
 import AuditCompletedClientEmail from "@/emails/AuditCompletedClientEmail";
 
@@ -10,7 +12,7 @@ import AuditCompletedClientEmail from "@/emails/AuditCompletedClientEmail";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email sender configuration
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@ShowYourBrand.com";
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@showyourbrand.app";
 
 export interface SendEmailParams {
   to: string;
@@ -141,6 +143,60 @@ export async function sendSubscriptionConfirmationEmail(
   return sendEmail({
     to: email,
     subject,
+    html,
+  });
+}
+
+/**
+ * Notify client that their audit has started.
+ * Called right after the audit document is created.
+ */
+export async function sendAuditStartedClientEmail(params: {
+  email: string;
+  userName: string;
+  businessName: string;
+  businessUrl: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, businessName, businessUrl, language = "fr" } = params;
+
+  const subject =
+    language === "fr"
+      ? `Votre audit GEO a démarré — ${businessName}`
+      : `Your GEO audit has started — ${businessName}`;
+
+  const html = await render(
+    AuditStartedClientEmail({ userName, businessName, businessUrl, language })
+  );
+
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
+ * Notify admin internally that a new audit was just launched.
+ * Called right after the audit document is created.
+ */
+export async function sendAuditStartedAdminEmail(params: {
+  userName: string;
+  userEmail: string;
+  businessName: string;
+  businessUrl: string;
+  category: string;
+  auditId: string;
+  subscriptionTier: string;
+  adminUrl: string;
+}): Promise<EmailResult> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("[Email] ADMIN_EMAIL not configured, skipping admin audit started notification");
+    return { success: false, error: "ADMIN_EMAIL not configured" };
+  }
+
+  const html = await render(AuditStartedAdminEmail(params));
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `[SYB] 🚀 Audit launched — ${params.businessName} (${params.userEmail})`,
     html,
   });
 }

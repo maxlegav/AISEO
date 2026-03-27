@@ -1,12 +1,12 @@
 ---
-title: "Is Your Brand Invisible to AI? Take This 10-Point GIO Self-Audit"
+title: "Is Your Brand Invisible to AI? Take This 10-Point GEO Self-Audit"
 excerpt: "Before investing in any optimization strategy, you need to know where you stand today. This 10-point self-audit will help you identify the biggest gaps in your current AI visibility. Work through each point honestly and see where you stand."
 date: "2026-01-17"
 category: "GEO Audit"
 readTime: "8 min read"
 ---
 
-Before investing in any optimization strategy, you need to know where you stand today. This 10-point self-audit will help you identify the biggest gaps in your current AI visibility — and understand what a professional GIO audit can reveal that this self-assessment can't.
+Before investing in any optimization strategy, you need to know where you stand today. This 10-point self-audit will help you identify the biggest gaps in your current AI visibility — and understand what a professional GEO audit can reveal that this self-assessment can't.
 
 Work through each point honestly. Score yourself **0** (not done), **1** (partially done), or **2** (fully done). Then see the scoring guide at the end.
 
@@ -134,7 +134,7 @@ Ask ChatGPT the same queries you tested in Point 9, and note how your top two co
 
 | Score | What it means |
 |---|---|
-| **0–8 points** | Significant gaps. AI visibility is likely minimal and your competitors are pulling ahead. A professional GIO audit is the fastest way to understand all gaps and prioritize fixes. |
+| **0–8 points** | Significant gaps. AI visibility is likely minimal and your competitors are pulling ahead. A professional GEO audit is the fastest way to understand all gaps and prioritize fixes. |
 | **9–14 points** | Foundation exists but optimization opportunities are substantial. You're visible to some extent but not maximizing your AI presence or sentiment. |
 | **15–20 points** | Strong foundation. A professional audit would help identify specific areas of competitive disadvantage and the marginal improvements that drive disproportionate results. |
 
@@ -144,7 +144,7 @@ Ask ChatGPT the same queries you tested in Point 9, and note how your top two co
 
 This checklist tells you the obvious signals. What it doesn't tell you: how exactly AI describes your brand in 100 different prompts, across ChatGPT, Claude, Perplexity, and Gemini simultaneously. It doesn't analyze the sentiment of your mentions at scale. It doesn't tell you which specific sources AI is drawing on when it talks about your brand. It doesn't benchmark you against your top competitors across every relevant query type.
 
-**Show Your Brand's GIO audit** does all of this. We send 100 carefully designed prompts across multiple AI platforms. We scan your technical configuration completely — robots.txt, llms.txt, HTML structure, schema markup. We deliver a report organized by impact priority: what's working, what's broken, and what to fix first.
+**Show Your Brand's GEO audit** does all of this. We send 100 carefully designed prompts across multiple AI platforms. We scan your technical configuration completely — robots.txt, llms.txt, HTML structure, schema markup. We deliver a report organized by impact priority: what's working, what's broken, and what to fix first.
 
 If this self-audit revealed even two or three gaps, a professional audit will reveal the full picture. And the full picture is what lets you invest your optimization effort where it actually matters.
 

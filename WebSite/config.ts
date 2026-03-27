@@ -12,11 +12,11 @@ const config = {
     "GEO (Generative Engine Optimization) audit platform - Make businesses visible in AI search engines",
 
   // Domain (TODO: Story 1.2 - set actual domain)
-  domainName: "ShowYourBrand.com",
+  domainName: "ShowYourBrand.app",
 
   // Live site URL — reads from NEXT_PUBLIC_SITE_URL env var (set in Vercel dashboard)
   // Falls back to the current Vercel deployment URL
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://showyourbrand.vercel.app",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://showyourbrand.app",
 
   // Stripe Configuration - ShowYourBrand Pricing
   stripe: {

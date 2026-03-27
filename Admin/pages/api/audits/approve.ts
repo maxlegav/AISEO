@@ -158,7 +158,7 @@ export default async function handler(
         );
 
       if (user?.email) {
-        const websiteUrl = process.env.WEBSITE_URL ?? "https://showyourbrand.com";
+        const websiteUrl = process.env.WEBSITE_URL ?? "https://showyourbrand.app";
         const lang = (user.language === "en" ? "en" : "fr") as "en" | "fr";
         const auditUrl = user.username
           ? `${websiteUrl}/${user.username}/audits/${auditId}`

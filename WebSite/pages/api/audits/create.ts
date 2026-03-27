@@ -4,7 +4,7 @@ import { authOptions } from '../auth/[...nextauth]';
 import mongoose from 'mongoose';
 import Audit from '@/models/Audit';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
-import { sendAuditLaunchedAdminEmail } from '@/lib/email';
+import { sendAuditStartedClientEmail, sendAuditStartedAdminEmail, sendAuditLaunchedAdminEmail } from '@/lib/email';
 import config from '@/config';
 
 const connectDB = async () => {
@@ -113,13 +113,44 @@ export default async function handler(
       );
     }
 
+    // Fire-and-forget: notify client that audit has started
+    const userEmail = session.user.email ?? '';
+    const userName = session.user.name ?? session.user.email ?? 'Unknown';
+    const userLanguage = (session.user as { language?: string }).language === 'en' ? 'en' : 'fr';
+
+    if (userEmail) {
+      sendAuditStartedClientEmail({
+        email: userEmail,
+        userName,
+        businessName,
+        businessUrl,
+        language: userLanguage,
+      }).catch((err: Error) => {
+        console.error('[Audit] Failed to send client started email:', err.message);
+      });
+    }
+
+    // Fire-and-forget: notify admin internally that audit was launched
+    sendAuditStartedAdminEmail({
+      userName,
+      userEmail,
+      businessName,
+      businessUrl,
+      category,
+      auditId,
+      subscriptionTier: (session.user as { subscriptionTier?: string }).subscriptionTier ?? 'none',
+      adminUrl: `${config.siteUrl}/admin/audits`,
+    }).catch((err: Error) => {
+      console.error('[Audit] Failed to send admin started email:', err.message);
+    });
+
     // Fire-and-forget: notify admin
     sendAuditLaunchedAdminEmail({
       businessName,
       businessUrl,
       category,
-      userName: session.user.name ?? session.user.email ?? 'Unknown',
-      userEmail: session.user.email ?? '',
+      userName,
+      userEmail,
       auditId,
       adminUrl: `${config.siteUrl}/admin/audits`,
     }).catch((err: Error) => {
