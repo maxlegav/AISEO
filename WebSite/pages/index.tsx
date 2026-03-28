@@ -159,9 +159,10 @@ const FAQItem = ({
   </div>
 );
 
-// Pricing Card Component - With strikethrough old price
+// Pricing Card Component
 const PricingCard = ({
   title,
+  subtitle,
   price,
   oldPrice,
   period,
@@ -172,8 +173,9 @@ const PricingCard = ({
   onCtaClick,
 }: {
   title: string;
+  subtitle: string;
   price: string;
-  oldPrice: string;
+  oldPrice?: string;
   period: string;
   features: string[];
   highlighted?: boolean;
@@ -182,7 +184,7 @@ const PricingCard = ({
   onCtaClick?: () => void;
 }) => (
   <div
-    className={`relative rounded-3xl p-8 transition-all duration-300 flex flex-col h-full ${
+    className={`relative rounded-3xl p-7 transition-all duration-300 flex flex-col h-full ${
       highlighted
         ? "bg-[#1E293B] text-white shadow-2xl shadow-slate-500/25 scale-[1.02]"
         : "bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg"
@@ -195,14 +197,15 @@ const PricingCard = ({
         </span>
       </div>
     )}
-    <div
-      className={`text-sm font-semibold mb-4 ${highlighted ? "text-white" : "text-gray-900"}`}
-    >
+    <div className={`text-xs font-bold tracking-widest mb-1 ${highlighted ? "text-pink-400" : "text-violet-600"}`}>
       {title}
+    </div>
+    <div className={`text-sm mb-4 ${highlighted ? "text-gray-400" : "text-gray-500"}`}>
+      {subtitle}
     </div>
     <div className="flex items-baseline gap-2 mb-1">
       <span
-        className={`text-5xl font-semibold ${highlighted ? "text-white" : "text-gray-900"}`}
+        className={`text-4xl font-semibold ${highlighted ? "text-white" : "text-gray-900"}`}
       >
         {price}
       </span>
@@ -210,23 +213,23 @@ const PricingCard = ({
         /{period}
       </span>
     </div>
-    <div className="mb-6">
-      <span
-        className={`text-lg line-through ${highlighted ? "text-gray-400" : "text-gray-400"}`}
-      >
-        {oldPrice}/{period}
-      </span>
-      <span
-        className={`text-xs ml-2 font-semibold ${highlighted ? "text-green-400" : "text-green-600"}`}
-      >
-        LAUNCH PRICE
-      </span>
+    <div className="mb-5 h-6">
+      {oldPrice ? (
+        <>
+          <span className={`text-sm line-through ${highlighted ? "text-gray-500" : "text-gray-400"}`}>
+            {oldPrice}
+          </span>
+          <span className={`text-xs ml-2 font-semibold ${highlighted ? "text-green-400" : "text-green-600"}`}>
+            LAUNCH PRICE
+          </span>
+        </>
+      ) : null}
     </div>
-    <ul className="space-y-3 mb-8 flex-1">
+    <ul className="space-y-2.5 mb-7 flex-1">
       {features.map((feature, i) => (
         <li key={i} className="flex items-start gap-3">
           <Check
-            className={`w-5 h-5 mt-0.5 flex-shrink-0 ${highlighted ? "text-green-400" : "text-green-500"}`}
+            className={`w-4 h-4 mt-0.5 flex-shrink-0 ${highlighted ? "text-green-400" : "text-green-500"}`}
           />
           <span
             className={`text-sm ${highlighted ? "text-gray-200" : "text-gray-600"}`}
@@ -400,12 +403,12 @@ export default function Home() {
     {
       question: "Can I export the reports?",
       answer:
-        "Yes! All plans include PDF export functionality. You'll receive a comprehensive report with executive summary, detailed findings, competitor analysis, and actionable recommendations that you can share with your team or clients.",
+        "Yes! All plans give you access to your audit dashboard with a shareable link. Pro and Agency subscribers get a permanent dashboard with full history. Agency plans include white-label sharing so your clients see your branding.",
     },
     {
       question: "Which AI models do you analyze?",
       answer:
-        "We analyze your visibility across the 4 major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, and DeepSeek. Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
+        "We analyze your visibility across the 4 major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, and Gemini (Google). Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
     },
     {
       question: "How often should I run an audit?",
@@ -415,7 +418,7 @@ export default function Home() {
     {
       question: "Do you offer white-label reports for agencies?",
       answer:
-        "Yes! Our Premium plan includes fully customizable white-label reports with your branding. You can add your logo, colors, and custom messaging to present professional GEO audits to your clients under your own brand.",
+        "Yes! Our Agency plan includes fully customizable white-label dashboards with your branding. You can add your logo, colors, and share a custom link with your clients — they see your agency, not ShowYourBrand.",
     },
   ];
 
@@ -424,7 +427,7 @@ export default function Home() {
       <TagSEO
         canonicalSlug=""
         title="ShowYourBrand | GEO Audit: Appear in ChatGPT, Claude & Perplexity"
-        description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers."
+        description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & Gemini. Get your GEO score and an action plan to appear in AI answers."
         keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
         og={{
           title: "ShowYourBrand | Appear in AI Search Results",
@@ -776,81 +779,88 @@ export default function Home() {
 
         {/* Pricing Section */}
         <section id="pricing" className="py-16 md:py-20 px-4">
-          <div className="container mx-auto max-w-5xl">
+          <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-10 md:mb-14">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
                 Simple, transparent pricing
               </h2>
               <p className="text-gray-600">
-                Choose the plan that fits your needs. Cancel anytime.
+                One audit to test. A subscription to track. An agency plan to scale.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
+              <PricingCard
+                title="DATA"
+                subtitle="For developers & SEO experts"
+                price="€29"
+                period="one-time"
+                features={[
+                  "1 GEO audit — 4 AI engines",
+                  "Raw JSON export of all results",
+                  "GEO Health Score & category breakdown",
+                  "100 prompts tested, 3 competitors",
+                  "HTML scanner raw results",
+                  "Permanent data access via API",
+                ]}
+                ctaText="Get the data"
+                onCtaClick={openWaitlistModal}
+              />
               <PricingCard
                 title="STARTER"
+                subtitle="Test your AI visibility"
                 price="€79"
                 oldPrice="€129"
                 period="one-time"
                 features={[
-                  "1 complete GEO visibility audit",
-                  "ChatGPT (GPT-4o) AI citation analysis",
+                  "1 complete GEO audit",
+                  "4 AI engines: ChatGPT, Claude, Perplexity & Gemini",
                   "GEO Health Score (0–100) with breakdown",
-                  "100 AI prompts tested in your category",
-                  "1 competitor benchmark",
+                  "100 AI prompts in your category",
+                  "3 competitor benchmarks",
                   "Technical HTML & Schema.org audit",
-                  "Content gap & missing FAQ identification",
-                  "Full PDF report with prioritized fixes",
-                  "Email support (48h response)",
+                  "Prioritized action plan",
+                  "Dashboard access (30 days)",
                 ]}
-                ctaText="Book a Call"
+                ctaText="Start audit"
                 onCtaClick={openWaitlistModal}
               />
               <PricingCard
                 title="PRO"
-                price="€399"
-                oldPrice="€599"
-                period="one-time"
-                features={[
-                  "1 complete GEO visibility audit",
-                  "4 AI engines: ChatGPT, Claude, Perplexity & DeepSeek",
-                  "GEO Health Score + competitor gap analysis",
-                  "100 AI prompts tested in your category",
-                  "5 competitor benchmarks",
-                  "Technical HTML & Schema.org deep scan",
-                  "AI-optimized FAQ & content snippets to add",
-                  "Priority action plan ranked by ROI impact",
-                  "PDF report + executive summary (shareable)",
-                  "Dashboard with progress history",
-                  "Priority support (24h)",
-                ]}
+                subtitle="Track your monthly progress"
+                price="€59"
+                period="mo"
                 highlighted={true}
+                features={[
+                  "1 automatic audit per month",
+                  "4 AI engines + monthly comparison",
+                  "Month-over-month score delta",
+                  "Fixed vs new issues tracking",
+                  "Prompt-level gain / loss tracking",
+                  "3 competitor benchmarks",
+                  "Permanent dashboard + full history",
+                  "Regression alerts by email",
+                ]}
+                ctaText="Start tracking"
+                onCtaClick={openWaitlistModal}
+              />
+              <PricingCard
+                title="AGENCY"
+                subtitle="For marketing agencies"
+                price="€599"
+                period="mo"
+                features={[
+                  "15 client audits per month",
+                  "All Pro features per client",
+                  "Multi-client dashboard",
+                  "White-label shareable reports",
+                  "3 competitor benchmarks per client",
+                  "Resell at your own price",
+                  "Dedicated account manager",
+                ]}
                 ctaText="Book a Call"
                 onCtaClick={openWaitlistModal}
               />
-              <div className="md:col-span-2 lg:col-span-1 flex flex-col">
-                <PricingCard
-                  title="AGENCY"
-                  price="€799"
-                  oldPrice="€1,199"
-                  period="mo"
-                  features={[
-                    "20 client GEO audits per month",
-                    "All 4 AI engines per audit",
-                    "Unlimited competitor benchmarks",
-                    "White-label PDF reports with your branding",
-                    "Agency dashboard to manage all clients",
-                    "Automated client-ready executive reports",
-                    "Schema.org & FAQ code snippets to deploy",
-                    "Monthly GEO evolution tracking per client",
-                    "Resell audits at your own price",
-                    "Dedicated account manager",
-                    "+€35 per extra audit beyond 20",
-                  ]}
-                  ctaText="Book a Call"
-                  onCtaClick={openWaitlistModal}
-                />
-              </div>
             </div>
 
             <p className="mt-8 text-center text-sm text-gray-600">

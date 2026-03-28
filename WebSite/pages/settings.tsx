@@ -406,16 +406,16 @@ export default function SettingsPage() {
 
         {/* Pricing cards */}
         <div className="grid md:grid-cols-2 gap-4">
-          {/* Basic */}
+          {/* Starter */}
           <div className="relative border border-gray-200/80 rounded-xl p-6 bg-white/60 hover:shadow-md transition-all">
-            <h4 className="text-lg font-semibold text-gray-900 mb-1">{config.stripe.basic.name}</h4>
+            <h4 className="text-lg font-semibold text-gray-900 mb-1">{config.stripe.starter.name}</h4>
             <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-3xl font-bold text-gray-900">{config.stripe.basic.price}€</span>
-              <span className="text-sm text-gray-400 line-through">{config.stripe.basic.oldPrice}€</span>
+              <span className="text-3xl font-bold text-gray-900">{config.stripe.starter.price}€</span>
+              <span className="text-sm text-gray-400 line-through">{config.stripe.starter.oldPrice}€</span>
             </div>
             <p className="text-xs text-gray-500 mb-4">{String(t("settings.perAudit"))}</p>
             <ul className="space-y-2 mb-6">
-              {config.stripe.basic.features.slice(0, 4).map((f, i) => (
+              {config.stripe.starter.features.slice(0, 4).map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                   {f.name}
@@ -423,11 +423,11 @@ export default function SettingsPage() {
               ))}
             </ul>
             <Button
-              onClick={() => handleBuyAudit(config.stripe.basic.priceId, "basic")}
-              disabled={buyingTier === "basic" || !config.stripe.basic.priceId}
+              onClick={() => handleBuyAudit(config.stripe.starter.priceId, "starter")}
+              disabled={buyingTier === "starter" || !config.stripe.starter.priceId}
               className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full"
             >
-              {buyingTier === "basic" ? (
+              {buyingTier === "starter" ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 String(t("settings.buyNow"))
@@ -444,7 +444,7 @@ export default function SettingsPage() {
             <h4 className="text-lg font-semibold text-gray-900 mb-1">{config.stripe.pro.name}</h4>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="text-3xl font-bold text-gray-900">{config.stripe.pro.price}€</span>
-              <span className="text-sm text-gray-400 line-through">{config.stripe.pro.oldPrice}€</span>
+              <span className="text-xs text-gray-500 ml-1">/mo</span>
             </div>
             <p className="text-xs text-gray-500 mb-4">{String(t("settings.perAudit"))}</p>
             <ul className="space-y-2 mb-6">

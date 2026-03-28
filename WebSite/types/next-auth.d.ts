@@ -13,7 +13,7 @@ declare module "next-auth" {
       email: string;
       image?: string;
       username?: string;
-      subscriptionTier?: 'none' | 'basic' | 'pro' | 'premium';
+      subscriptionTier?: 'none' | 'data' | 'starter' | 'pro' | 'agency';
       subscriptionStatus?: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
       auditCredits?: number;
       language?: 'en' | 'fr';
@@ -31,7 +31,7 @@ declare module "next-auth" {
     image?: string;
     username?: string;
     company?: string;
-    subscriptionTier?: 'none' | 'basic' | 'pro' | 'premium';
+    subscriptionTier?: 'none' | 'data' | 'starter' | 'pro' | 'agency';
     subscriptionStatus?: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
     auditCredits?: number;
     language?: 'en' | 'fr';
@@ -46,7 +46,7 @@ declare module "next-auth/jwt" {
     id: string;
     displayName?: string;
     username?: string;
-    subscriptionTier?: 'none' | 'basic' | 'pro' | 'premium';
+    subscriptionTier?: 'none' | 'data' | 'starter' | 'pro' | 'agency';
     subscriptionStatus?: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
     auditCredits?: number;
     language?: 'en' | 'fr';

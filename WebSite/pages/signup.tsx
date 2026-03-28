@@ -342,9 +342,10 @@ export default function SignupPage() {
       if (selectedPlan) {
         // Map plan to priceId
         const planToPriceId: Record<string, { priceId: string; mode: "payment" | "subscription" }> = {
-          basic: { priceId: config.stripe.basic.priceId, mode: "payment" },
-          pro: { priceId: config.stripe.pro.priceId, mode: "payment" },
-          premium: { priceId: config.stripe.premium.priceId, mode: "subscription" },
+          data: { priceId: config.stripe.data.priceId, mode: "payment" },
+          starter: { priceId: config.stripe.starter.priceId, mode: "payment" },
+          pro: { priceId: config.stripe.pro.priceId, mode: "subscription" },
+          agency: { priceId: config.stripe.agency.priceId, mode: "subscription" },
         };
 
         const planConfig = planToPriceId[selectedPlan];
@@ -773,40 +774,47 @@ export default function SignupPage() {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 items-center">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
                 <PlanCard
-                  name={config.stripe.basic.name}
-                  price={`\u20AC${config.stripe.basic.price}`}
+                  name={config.stripe.data.name}
+                  price={`\u20AC${config.stripe.data.price}`}
                   period="one-time"
-                  features={config.stripe.basic.features.map((f) => f.name)}
+                  features={config.stripe.data.features.map((f) => f.name)}
                   onSelect={() =>
-                    handleSelectPlan(config.stripe.basic.priceId, "payment")
+                    handleSelectPlan(config.stripe.data.priceId, "payment")
+                  }
+                  isLoading={isLoading}
+                />
+                <PlanCard
+                  name={config.stripe.starter.name}
+                  price={`\u20AC${config.stripe.starter.price}`}
+                  period="one-time"
+                  features={config.stripe.starter.features.map((f) => f.name)}
+                  onSelect={() =>
+                    handleSelectPlan(config.stripe.starter.priceId, "payment")
                   }
                   isLoading={isLoading}
                 />
                 <PlanCard
                   name={config.stripe.pro.name}
                   price={`\u20AC${config.stripe.pro.price}`}
-                  period="one-time"
+                  period="mo"
                   features={config.stripe.pro.features.map((f) => f.name)}
                   highlighted
                   onSelect={() =>
-                    handleSelectPlan(config.stripe.pro.priceId, "payment")
+                    handleSelectPlan(config.stripe.pro.priceId, "subscription")
                   }
                   isLoading={isLoading}
                 />
                 <PlanCard
-                  name={config.stripe.premium.name}
-                  price={`\u20AC${config.stripe.premium.price}`}
+                  name={config.stripe.agency.name}
+                  price={`\u20AC${config.stripe.agency.price}`}
                   period="mo"
-                  features={config.stripe.premium.features
+                  features={config.stripe.agency.features
                     .slice(0, 4)
                     .map((f) => f.name)}
                   onSelect={() =>
-                    handleSelectPlan(
-                      config.stripe.premium.priceId,
-                      "subscription"
-                    )
+                    handleSelectPlan(config.stripe.agency.priceId, "subscription")
                   }
                   isLoading={isLoading}
                 />

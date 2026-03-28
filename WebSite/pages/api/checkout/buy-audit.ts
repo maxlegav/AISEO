@@ -42,8 +42,8 @@ export default async function handler(
 
     // Validate priceId is one of our known prices
     const validPriceIds = [
-      config.stripe.basic.priceId,
-      config.stripe.pro.priceId,
+      config.stripe.data.priceId,
+      config.stripe.starter.priceId,
     ];
     if (!validPriceIds.includes(priceId)) {
       throw new ApiError(ErrorType.VALIDATION, 'Invalid price ID');
@@ -57,7 +57,7 @@ export default async function handler(
     }
 
     // Determine tier from priceId
-    const tier = priceId === config.stripe.pro.priceId ? 'pro' : 'basic';
+    const tier = priceId === config.stripe.data.priceId ? 'data' : 'starter';
 
     // Get or create Stripe customer
     let stripeCustomerId = user.stripeCustomerId;

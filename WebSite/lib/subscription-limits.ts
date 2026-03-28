@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Business from '@/models/Business';
 import User from '@/models/User';
 
-export type SubscriptionTier = 'none' | 'basic' | 'pro' | 'premium';
+export type SubscriptionTier = 'none' | 'data' | 'starter' | 'pro' | 'agency';
 
 export interface TierLimits {
   projects: number;
@@ -11,10 +11,11 @@ export interface TierLimits {
 }
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
-  none: { projects: 0, competitors: 0, canCompareHistory: false },
-  basic: { projects: 1, competitors: 1, canCompareHistory: false },
-  pro: { projects: 1, competitors: 5, canCompareHistory: true },
-  premium: { projects: 10, competitors: Infinity, canCompareHistory: true },
+  none:    { projects: 0,  competitors: 0, canCompareHistory: false },
+  data:    { projects: 1,  competitors: 3, canCompareHistory: false },
+  starter: { projects: 1,  competitors: 3, canCompareHistory: false },
+  pro:     { projects: 1,  competitors: 3, canCompareHistory: true  },
+  agency:  { projects: 15, competitors: 3, canCompareHistory: true  },
 };
 
 export function getLimits(tier: SubscriptionTier): TierLimits {

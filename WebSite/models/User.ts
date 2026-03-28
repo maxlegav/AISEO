@@ -16,7 +16,7 @@ export interface UserDocument extends mongoose.Document {
   stripeCustomerId?: string;
 
   // Subscription Status
-  subscriptionTier: 'none' | 'basic' | 'pro' | 'premium';
+  subscriptionTier: 'none' | 'data' | 'starter' | 'pro' | 'agency';
   subscriptionStatus: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive';
   subscriptionId?: string;
   subscriptionEndDate?: Date;
@@ -77,7 +77,7 @@ const UserSchema = new Schema<UserDocument>(
     // Subscription Status
     subscriptionTier: {
       type: String,
-      enum: ['none', 'basic', 'pro', 'premium'],
+      enum: ['none', 'data', 'starter', 'pro', 'agency'],
       default: 'none'
     },
     subscriptionStatus: {
