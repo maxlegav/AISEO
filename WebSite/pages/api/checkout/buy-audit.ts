@@ -44,6 +44,7 @@ export default async function handler(
     const validPriceIds = [
       config.stripe.data.priceId,
       config.stripe.starter.priceId,
+      config.stripe.agencyExtraAudit.priceId,
     ];
     if (!validPriceIds.includes(priceId)) {
       throw new ApiError(ErrorType.VALIDATION, 'Invalid price ID');
@@ -57,7 +58,11 @@ export default async function handler(
     }
 
     // Determine tier from priceId
-    const tier = priceId === config.stripe.data.priceId ? 'data' : 'starter';
+    const tier = priceId === config.stripe.data.priceId
+      ? 'data'
+      : priceId === config.stripe.agencyExtraAudit.priceId
+        ? 'agency'
+        : 'starter';
 
     // Get or create Stripe customer
     let stripeCustomerId = user.stripeCustomerId;

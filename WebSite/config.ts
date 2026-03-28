@@ -108,6 +108,21 @@ const config = {
         { name: "Dedicated account manager" },
       ],
     },
+    // Agency Extra Audit: €50 one-shot — additional audit beyond monthly credits
+    agencyExtraAudit: {
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_AGENCY_EXTRA || "",
+      name: "Extra Audit",
+      price: 50,
+      currency: "EUR",
+      mode: "payment",
+      outputMode: "full",
+      features: [
+        { name: "1 additional GEO audit" },
+        { name: "All 4 AI engines included" },
+        { name: "Full dashboard + history access" },
+        { name: "3 competitor benchmarks" },
+      ],
+    },
   },
 
   // Email Configuration (using Resend)
