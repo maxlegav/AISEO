@@ -788,9 +788,9 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               <PricingCard
-                title="BASIC"
-                price="€199"
-                oldPrice="€299"
+                title="STARTER"
+                price="€79"
+                oldPrice="€129"
                 period="one-time"
                 features={[
                   "1 complete GEO visibility audit",

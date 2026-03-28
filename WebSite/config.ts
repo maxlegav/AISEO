@@ -20,12 +20,12 @@ const config = {
 
   // Stripe Configuration - ShowYourBrand Pricing
   stripe: {
-    // Basic One-Shot: €199 (ChatGPT only, 1 competitor, no history)
-    basic: {
-      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_BASIC || "",
-      name: "Basic",
-      price: 199,
-      oldPrice: 299,
+    // Starter One-Shot: €79 (all 4 engines, 3 competitors, 30-day dashboard)
+    starter: {
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER || "",
+      name: "Starter",
+      price: 79,
+      oldPrice: 129,
       currency: "EUR",
       mode: "payment", // one-shot
       features: [
