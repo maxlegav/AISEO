@@ -628,147 +628,90 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Infrastructure Section */}
+        {/* ROI & Results Section */}
         <section
           id="process"
           className="px-4 py-16 md:py-20 lg:min-h-screen bg-white/50 backdrop-blur-sm lg:flex lg:flex-col lg:items-center lg:justify-center"
         >
-          <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-              <div>
-                <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-medium text-gray-900 mb-4 md:mb-6">
-                  Your competitors are already
-                  <br />
-                  <span className="italic text-purple-600">
-                    winning AI search
-                  </span>
-                </h2>
-                <p className="text-gray-600 mb-8 md:mb-10 leading-relaxed text-base md:text-lg">
-                  Every day, millions of potential customers ask AI for
-                  recommendations. If your brand isn&apos;t being cited,
-                  you&apos;re losing deals to competitors who are. We show you
-                  exactly where you stand and how to fix it.
-                </p>
-
-                <div className="space-y-6 md:space-y-8">
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        See What AI Says About You
-                      </h4>
-                      <p className="text-gray-600">
-                        Real queries. Real responses. Know exactly how ChatGPT,
-                        Claude, and Perplexity describe your brand.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        Outrank Your Competition
-                      </h4>
-                      <p className="text-gray-600">
-                        Discover which competitors are getting recommended
-                        instead of you, and steal their playbook.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
-                    <p className="text-gray-900 text-lg">
-                      Get copy-paste fixes you can implement today
-                    </p>
-                  </div>
-                </div>
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-6">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-green-700 text-xs font-semibold tracking-wide">MEASURED RESULTS</span>
               </div>
+              <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-4">
+                AI visitors don&apos;t browse. They buy.
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
+                When an AI recommends your brand, the user already has their answer — and your brand is it.
+                That&apos;s why AI-referred traffic converts fundamentally differently than any other channel.
+              </p>
+            </div>
 
-              {/* Right column - Visualization */}
-              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 overflow-hidden">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-sm text-gray-500 font-medium">
-                      Live AI Analysis
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full">
-                    Your Brand
-                  </span>
+            {/* Big stats row */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
+              {[
+                { value: "3×", label: "higher conversion rate", sub: "vs. Google organic traffic" },
+                { value: "+284%", label: "avg. increase in AI citations", sub: "after GEO optimization" },
+                { value: "87%", label: "of brands are invisible", sub: "to AI search engines today" },
+                { value: "58%", label: "of consumers use AI", sub: "instead of Google to find products" },
+              ].map((stat) => (
+                <div key={stat.value} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100">
+                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                  <div className="text-sm font-semibold text-gray-700 mb-1">{stat.label}</div>
+                  <div className="text-xs text-gray-400">{stat.sub}</div>
                 </div>
+              ))}
+            </div>
 
-                <div className="text-center mb-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl">
-                  <div className="text-6xl font-bold text-gray-900 mb-1">
-                    73<span className="text-3xl text-gray-400">%</span>
+            {/* Anonymous case study */}
+            <div className="bg-[#1E293B] rounded-3xl p-8 md:p-12 text-white">
+              <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 mb-6">
+                    <span className="text-xs text-gray-300 font-medium">CASE STUDY — B2B SaaS, Project Management</span>
                   </div>
-                  <div className="text-base text-gray-600">GEO Health Score</div>
-                  <div className="text-sm text-orange-500 mt-1 font-medium">
-                    Room for improvement
-                  </div>
+                  <h3 className="font-heading text-2xl md:text-3xl font-medium mb-4">
+                    From invisible to recommended in 6 weeks
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed mb-6">
+                    A SaaS founder ran their first GEO audit and discovered their brand appeared in 0 out of 100 AI prompts
+                    — while two competitors were cited consistently. After 6 weeks of targeted optimizations based on the
+                    ShowYourBrand action plan, their AI visibility transformed completely.
+                  </p>
+                  <p className="text-gray-400 text-sm italic">
+                    &ldquo;I didn&apos;t realize how different AI optimization was from SEO. The audit showed me exactly which pages
+                    were killing my chances. Six weeks later, ChatGPT mentions us in every relevant query.&rdquo;
+                  </p>
+                  <p className="text-gray-500 text-xs mt-3">— Anonymous, Founder & CEO (name withheld at request)</p>
                 </div>
-
-                <div className="space-y-4 mb-8">
-                  <div className="text-sm text-gray-500 uppercase tracking-wider mb-3">
-                    vs. Top Competitors
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base text-gray-700 w-28 truncate">
-                      You
-                    </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-purple-500 h-full rounded-full"
-                        style={{ width: "73%" }}
-                      />
+                <div className="space-y-4">
+                  {[
+                    { label: "GEO Health Score", before: "18/100", after: "74/100", color: "bg-purple-500", pct: 74 },
+                    { label: "AI citations per 100 queries", before: "0", after: "12", color: "bg-green-500", pct: 85 },
+                    { label: "Competitor gap closed", before: "−47 pts", after: "+5 pts", color: "bg-pink-500", pct: 90 },
+                  ].map((row) => (
+                    <div key={row.label} className="bg-white/5 rounded-xl p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-300">{row.label}</span>
+                        <div className="flex gap-3 text-sm">
+                          <span className="text-gray-500 line-through">{row.before}</span>
+                          <span className="text-white font-semibold">{row.after}</span>
+                        </div>
+                      </div>
+                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div className={`h-full ${row.color} rounded-full`} style={{ width: `${row.pct}%` }} />
+                      </div>
                     </div>
-                    <span className="text-base font-semibold text-gray-900 w-12 text-right">
-                      73%
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base text-gray-500 w-28 truncate">
-                      Competitor A
-                    </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-green-400 h-full rounded-full"
-                        style={{ width: "89%" }}
-                      />
+                  ))}
+                  <div className="grid grid-cols-2 gap-3 mt-2">
+                    <div className="bg-green-500/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-green-400">+340%</div>
+                      <div className="text-xs text-gray-400 mt-1">ChatGPT mentions</div>
                     </div>
-                    <span className="text-base font-semibold text-green-600 w-12 text-right">
-                      89%
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base text-gray-500 w-28 truncate">
-                      Competitor B
-                    </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-blue-400 h-full rounded-full"
-                        style={{ width: "81%" }}
-                      />
-                    </div>
-                    <span className="text-base font-semibold text-gray-900 w-12 text-right">
-                      81%
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
-                  <div className="text-center py-4 bg-red-50 rounded-xl">
-                    <div className="text-xl font-bold text-red-600">12</div>
-                    <div className="text-sm text-gray-600">
-                      Missing Citations
-                    </div>
-                  </div>
-                  <div className="text-center py-4 bg-green-50 rounded-xl">
-                    <div className="text-xl font-bold text-green-600">
-                      +340%
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Potential Traffic
+                    <div className="bg-purple-500/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-purple-400">6 weeks</div>
+                      <div className="text-xs text-gray-400 mt-1">to full visibility</div>
                     </div>
                   </div>
                 </div>
@@ -924,95 +867,6 @@ export default function Home() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ROI & Results Section */}
-        <section className="py-16 md:py-20 px-4 bg-white/60 backdrop-blur-sm">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-green-700 text-xs font-semibold tracking-wide">MEASURED RESULTS</span>
-              </div>
-              <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium text-gray-900 mb-4">
-                AI visitors don&apos;t browse. They buy.
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
-                When an AI recommends your brand, the user already has their answer — and your brand is it.
-                That&apos;s why AI-referred traffic converts fundamentally differently than any other channel.
-              </p>
-            </div>
-
-            {/* Big stats row */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
-              {[
-                { value: "3×", label: "higher conversion rate", sub: "vs. Google organic traffic" },
-                { value: "+284%", label: "avg. increase in AI citations", sub: "after GEO optimization" },
-                { value: "87%", label: "of brands are invisible", sub: "to AI search engines today" },
-                { value: "58%", label: "of consumers use AI", sub: "instead of Google to find products" },
-              ].map((stat) => (
-                <div key={stat.value} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100">
-                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                  <div className="text-sm font-semibold text-gray-700 mb-1">{stat.label}</div>
-                  <div className="text-xs text-gray-400">{stat.sub}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Anonymous case study */}
-            <div className="bg-[#1E293B] rounded-3xl p-8 md:p-12 text-white">
-              <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-                <div>
-                  <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 mb-6">
-                    <span className="text-xs text-gray-300 font-medium">CASE STUDY — B2B SaaS, Project Management</span>
-                  </div>
-                  <h3 className="font-heading text-2xl md:text-3xl font-medium mb-4">
-                    From invisible to recommended in 6 weeks
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed mb-6">
-                    A SaaS founder ran their first GEO audit and discovered their brand appeared in 0 out of 100 AI prompts
-                    — while two competitors were cited consistently. After 6 weeks of targeted optimizations based on the
-                    ShowYourBrand action plan, their AI visibility transformed completely.
-                  </p>
-                  <p className="text-gray-400 text-sm italic">
-                    &ldquo;I didn&apos;t realize how different AI optimization was from SEO. The audit showed me exactly which pages
-                    were killing my chances. Six weeks later, ChatGPT mentions us in every relevant query.&rdquo;
-                  </p>
-                  <p className="text-gray-500 text-xs mt-3">— Anonymous, Founder & CEO (name withheld at request)</p>
-                </div>
-                <div className="space-y-4">
-                  {[
-                    { label: "GEO Health Score", before: "18/100", after: "74/100", color: "bg-purple-500", pct: 74 },
-                    { label: "AI citations per 100 queries", before: "0", after: "12", color: "bg-green-500", pct: 85 },
-                    { label: "Competitor gap closed", before: "−47 pts", after: "+5 pts", color: "bg-pink-500", pct: 90 },
-                  ].map((row) => (
-                    <div key={row.label} className="bg-white/5 rounded-xl p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-300">{row.label}</span>
-                        <div className="flex gap-3 text-sm">
-                          <span className="text-gray-500 line-through">{row.before}</span>
-                          <span className="text-white font-semibold">{row.after}</span>
-                        </div>
-                      </div>
-                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className={`h-full ${row.color} rounded-full`} style={{ width: `${row.pct}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                  <div className="grid grid-cols-2 gap-3 mt-2">
-                    <div className="bg-green-500/20 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-green-400">+340%</div>
-                      <div className="text-xs text-gray-400 mt-1">ChatGPT mentions</div>
-                    </div>
-                    <div className="bg-purple-500/20 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-bold text-purple-400">6 weeks</div>
-                      <div className="text-xs text-gray-400 mt-1">to full visibility</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </section>
