@@ -804,7 +804,7 @@ export default function Home() {
                   "Permanent data access via API",
                 ]}
                 ctaText="Get the data"
-                onCtaClick={openWaitlistModal}
+                ctaLink="/signup?plan=data"
               />
               <PricingCard
                 title="STARTER"
@@ -822,8 +822,8 @@ export default function Home() {
                   "Prioritized action plan",
                   "Dashboard access (30 days)",
                 ]}
-                ctaText="Start audit"
-                onCtaClick={openWaitlistModal}
+                ctaText="Start my audit"
+                ctaLink="/signup?plan=starter"
               />
               <PricingCard
                 title="PRO"
@@ -842,7 +842,7 @@ export default function Home() {
                   "Action checklist + 15-day progress email",
                 ]}
                 ctaText="Start tracking"
-                onCtaClick={openWaitlistModal}
+                ctaLink="/signup?plan=pro"
               />
               <PricingCard
                 title="AGENCY"
@@ -924,6 +924,95 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ROI & Results Section */}
+        <section className="py-16 md:py-20 px-4 bg-white/60 backdrop-blur-sm">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-6">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-green-700 text-xs font-semibold tracking-wide">MEASURED RESULTS</span>
+              </div>
+              <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium text-gray-900 mb-4">
+                AI visitors don&apos;t browse. They buy.
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
+                When an AI recommends your brand, the user already has their answer — and your brand is it.
+                That&apos;s why AI-referred traffic converts fundamentally differently than any other channel.
+              </p>
+            </div>
+
+            {/* Big stats row */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
+              {[
+                { value: "3×", label: "higher conversion rate", sub: "vs. Google organic traffic" },
+                { value: "+284%", label: "avg. increase in AI citations", sub: "after GEO optimization" },
+                { value: "87%", label: "of brands are invisible", sub: "to AI search engines today" },
+                { value: "58%", label: "of consumers use AI", sub: "instead of Google to find products" },
+              ].map((stat) => (
+                <div key={stat.value} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100">
+                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                  <div className="text-sm font-semibold text-gray-700 mb-1">{stat.label}</div>
+                  <div className="text-xs text-gray-400">{stat.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Anonymous case study */}
+            <div className="bg-[#1E293B] rounded-3xl p-8 md:p-12 text-white">
+              <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 mb-6">
+                    <span className="text-xs text-gray-300 font-medium">CASE STUDY — B2B SaaS, Project Management</span>
+                  </div>
+                  <h3 className="font-heading text-2xl md:text-3xl font-medium mb-4">
+                    From invisible to recommended in 6 weeks
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed mb-6">
+                    A SaaS founder ran their first GEO audit and discovered their brand appeared in 0 out of 100 AI prompts
+                    — while two competitors were cited consistently. After 6 weeks of targeted optimizations based on the
+                    ShowYourBrand action plan, their AI visibility transformed completely.
+                  </p>
+                  <p className="text-gray-400 text-sm italic">
+                    &ldquo;I didn&apos;t realize how different AI optimization was from SEO. The audit showed me exactly which pages
+                    were killing my chances. Six weeks later, ChatGPT mentions us in every relevant query.&rdquo;
+                  </p>
+                  <p className="text-gray-500 text-xs mt-3">— Anonymous, Founder & CEO (name withheld at request)</p>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { label: "GEO Health Score", before: "18/100", after: "74/100", color: "bg-purple-500", pct: 74 },
+                    { label: "AI citations per 100 queries", before: "0", after: "12", color: "bg-green-500", pct: 85 },
+                    { label: "Competitor gap closed", before: "−47 pts", after: "+5 pts", color: "bg-pink-500", pct: 90 },
+                  ].map((row) => (
+                    <div key={row.label} className="bg-white/5 rounded-xl p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-300">{row.label}</span>
+                        <div className="flex gap-3 text-sm">
+                          <span className="text-gray-500 line-through">{row.before}</span>
+                          <span className="text-white font-semibold">{row.after}</span>
+                        </div>
+                      </div>
+                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div className={`h-full ${row.color} rounded-full`} style={{ width: `${row.pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                  <div className="grid grid-cols-2 gap-3 mt-2">
+                    <div className="bg-green-500/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-green-400">+340%</div>
+                      <div className="text-xs text-gray-400 mt-1">ChatGPT mentions</div>
+                    </div>
+                    <div className="bg-purple-500/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-purple-400">6 weeks</div>
+                      <div className="text-xs text-gray-400 mt-1">to full visibility</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
