@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 import { Schema, models, model } from "mongoose";
 
+export interface IssueChecklistItem {
+  issueId: string;
+  done: boolean;
+  doneAt?: Date | null;
+}
+
 export interface AuditDocument extends mongoose.Document {
   userId: mongoose.Types.ObjectId;
   businessId: mongoose.Types.ObjectId;
@@ -28,6 +34,11 @@ export interface AuditDocument extends mongoose.Document {
   // Sharing
   shareToken?: string | null;
   sharedAt?: Date | null;
+  // History tracking
+  previousAuditId?: mongoose.Types.ObjectId | null;
+  issueChecklist?: IssueChecklistItem[];
+  // Email tracking
+  checklistSummaryEmailSentAt?: Date | null;
 }
 
 const AuditSchema = new Schema<AuditDocument>(
@@ -72,6 +83,18 @@ const AuditSchema = new Schema<AuditDocument>(
     // Sharing (raw token stored — 64-char random hex, 256-bit entropy)
     shareToken: { type: String, default: null, index: true, sparse: true },
     sharedAt: { type: Date, default: null },
+    // History: link to the previous audit for the same business
+    previousAuditId: { type: Schema.Types.ObjectId, ref: "Audit", default: null },
+    // Email: track when checklist summary email was sent (avoids duplicate sends)
+    checklistSummaryEmailSentAt: { type: Date, default: null },
+    // Checklist: user marks which issues have been addressed
+    issueChecklist: [
+      {
+        issueId: { type: String, required: true },
+        done: { type: Boolean, default: false },
+        doneAt: { type: Date, default: null },
+      },
+    ],
   },
   {
     timestamps: false,

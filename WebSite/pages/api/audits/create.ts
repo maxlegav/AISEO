@@ -59,6 +59,31 @@ export default async function handler(
 
     await connectDB();
 
+    // Find the most recent completed audit for this business (for history tracking)
+    const previousAudit = await Audit.findOne({
+      businessId: new mongoose.Types.ObjectId(businessId),
+      userId: new mongoose.Types.ObjectId(session.user.id),
+      status: 'completed',
+    })
+      .sort({ createdAt: -1 })
+      .select('_id issueChecklist results')
+      .lean();
+
+    // Collect issue types the user has already addressed (for AI context)
+    const completedIssueTypes: string[] = [];
+    if (previousAudit?.issueChecklist && previousAudit.issueChecklist.length > 0) {
+      const prevResults = previousAudit.results as { issues?: { id: string; type: string }[] } | null;
+      const prevIssues = prevResults?.issues ?? [];
+      const doneIds = new Set(
+        previousAudit.issueChecklist
+          .filter((c) => c.done)
+          .map((c) => c.issueId)
+      );
+      for (const issue of prevIssues) {
+        if (doneIds.has(issue.id)) completedIssueTypes.push(issue.type);
+      }
+    }
+
     const audit = await Audit.create({
       userId: new mongoose.Types.ObjectId(session.user.id),
       businessId: new mongoose.Types.ObjectId(businessId),
@@ -70,6 +95,7 @@ export default async function handler(
       results: {},
       createdAt: new Date(),
       completedAt: null,
+      previousAuditId: previousAudit ? previousAudit._id : null,
     });
 
     const auditId = audit._id.toString();
@@ -95,6 +121,9 @@ export default async function handler(
         ...(city ? { city } : {}),
         ...(country ? { country } : {}),
         ...(neighborhood ? { neighborhood } : {}),
+        // History context for the processing server
+        ...(previousAudit ? { previousAuditId: previousAudit._id.toString() } : {}),
+        ...(completedIssueTypes.length > 0 ? { completedIssueTypes } : {}),
       };
 
       fetch(`${processingUrl}/audit`, {

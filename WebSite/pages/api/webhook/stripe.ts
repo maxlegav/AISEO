@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import mongoose from 'mongoose';
 import User from '@/models/User';
 import Subscription from '@/models/Subscription';
-import { sendSubscriptionConfirmationEmail } from '@/lib/email';
+import { sendSubscriptionConfirmationEmail, sendAuditCreditAvailableEmail } from '@/lib/email';
 import appConfig from '@/config';
 
 // Initialize Stripe
@@ -250,6 +250,37 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log('[Stripe Webhook] Payment failed for user:', user._id);
 }
 
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+  // Only handle subscription renewals (not initial checkout — that's handled by checkout.session.completed)
+  if (invoice.billing_reason !== 'subscription_cycle') return;
+
+  await connectDB();
+
+  const customerId = invoice.customer as string;
+  const user = await User.findOne({ stripeCustomerId: customerId });
+  if (!user) return;
+
+  // Only credit Pro/Agency subscriptions
+  const tier = user.subscriptionTier;
+  if (tier !== 'pro' && tier !== 'agency') return;
+
+  // Add 1 audit credit on renewal
+  const creditsToAdd = tier === 'agency' ? appConfig.stripe.agency.auditsPerMonth : 1;
+  user.auditCredits = (user.auditCredits || 0) + creditsToAdd;
+  await user.save();
+
+  // Send "your credit is available" email
+  sendAuditCreditAvailableEmail({
+    email: user.email,
+    userName: user.name,
+    language: user.language || 'fr',
+  }).catch((err: Error) => {
+    console.error('[Stripe Webhook] Failed to send credit available email:', err.message);
+  });
+
+  console.log(`[Stripe Webhook] Monthly credit added for user ${user._id} (${tier}): +${creditsToAdd}`);
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -299,8 +330,7 @@ export default async function handler(
         break;
 
       case 'invoice.payment_succeeded':
-        // Log successful payment (receipt is sent by Stripe)
-        console.log('[Stripe Webhook] Invoice payment succeeded:', (event.data.object as Stripe.Invoice).id);
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
         break;
 
       case 'invoice.payment_failed':

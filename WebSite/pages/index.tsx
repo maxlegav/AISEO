@@ -839,7 +839,7 @@ export default function Home() {
                   "Prompt-level gain / loss tracking",
                   "3 competitor benchmarks",
                   "Permanent dashboard + full history",
-                  "Regression alerts by email",
+                  "Action checklist + 15-day progress email",
                 ]}
                 ctaText="Start tracking"
                 onCtaClick={openWaitlistModal}

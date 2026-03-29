@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import {
   ArrowLeft, Loader2, Clock, XCircle, RefreshCw, CheckCircle2,
-  Share2, Copy, Check, X,
+  Share2, Copy, Check, X, Download,
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useLanguage } from "@/components/LanguageContext";
@@ -12,6 +12,9 @@ import ActionPlan from "@/components/audit/ActionPlan";
 import GeoQuickWins from "@/components/audit/GeoQuickWins";
 import CompetitorComparison from "@/components/audit/CompetitorComparison";
 import DeepDive from "@/components/audit/DeepDive";
+import AuditComparison from "@/components/audit/AuditComparison";
+import IssueChecklist from "@/components/audit/IssueChecklist";
+import ProGate from "@/components/ui/ProGate";
 import type { AuditDoc, IssueItem, PromptGapItem } from "@/components/audit/auditTypes";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -266,11 +269,20 @@ export default function AuditDetailPage() {
             {audit.businessName ?? "Audit"}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {String(t("audit.status.completed"))}
           </div>
+          <a
+            href={audit ? `/api/audits/${audit._id}/export-json` : "#"}
+            download
+            className="flex items-center gap-1.5 text-xs text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full transition-colors"
+            title="Télécharger les données brutes JSON"
+          >
+            <Download className="w-3.5 h-3.5" />
+            JSON
+          </a>
           <button
             onClick={handleShare}
             disabled={shareLoading}
@@ -326,6 +338,18 @@ export default function AuditDetailPage() {
       {/* ── Section 1: Hero ────────────────────────────────────────────────── */}
       <AuditHero audit={audit} results={r} />
 
+      {/* ── Comparison vs previous audit (Pro/Agency only) ───────────────── */}
+      {(session?.user?.subscriptionTier === 'pro' || session?.user?.subscriptionTier === 'agency') ? (
+        audit.previousAuditId && (
+          <div className="mb-4">
+            <AuditComparison
+              previousAuditId={audit.previousAuditId}
+              currentAudit={{ geoScore: audit.geoScore, results: audit.results }}
+            />
+          </div>
+        )
+      ) : null}
+
       {/* ── Section 2: Action Plan ─────────────────────────────────────────── */}
       <ActionPlan
         issues={issues}
@@ -374,6 +398,24 @@ export default function AuditDetailPage() {
           geoScore={geoScore}
           businessName={audit.businessName}
         />
+      </div>
+
+      {/* ── Issue Checklist (Pro/Agency only) ─────────────────────────────── */}
+      <div className="mb-4">
+        {(session?.user?.subscriptionTier === 'pro' || session?.user?.subscriptionTier === 'agency') ? (
+          issues.length > 0 && (
+            <IssueChecklist
+              auditId={audit._id}
+              issues={issues}
+              initialChecklist={audit.issueChecklist ?? []}
+            />
+          )
+        ) : (
+          <ProGate
+            feature="Suivi des actions & checklist"
+            description="Cochez les problèmes résolus et recevez un résumé par email 15 jours après votre audit."
+          />
+        )}
       </div>
 
       {/* ── Business Snapshot ──────────────────────────────────────────────── */}
