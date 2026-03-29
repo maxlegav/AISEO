@@ -512,19 +512,22 @@ export default function Home() {
                 analyze, and optimize your brand&apos;s presence across all major
                 AI models.
               </p>
+              <AIModelMarquee />
+            </div>
 
-              {/* Social proof */}
+            {/* Social proof + CTA pinned to bottom */}
+            <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
-                  {[
-                    { letter: "S", bg: "bg-purple-500" },
-                    { letter: "T", bg: "bg-pink-500" },
-                    { letter: "A", bg: "bg-slate-600" },
-                    { letter: "M", bg: "bg-violet-500" },
-                    { letter: "C", bg: "bg-orange-500" },
-                  ].map((a) => (
-                    <div key={a.letter} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-semibold ${a.bg}`}>
-                      {a.letter}
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-gray-200">
+                      <Image
+                        src={`/avatars/user-${i}.jpg`}
+                        alt={`Early user ${i}`}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   ))}
                 </div>
@@ -538,20 +541,13 @@ export default function Home() {
                 </div>
               </div>
 
-              <AIModelMarquee />
-            </div>
-
-            {/* Bottom: CTA pinned to bottom */}
-            <div className="max-w-xl mx-auto">
-              <div className="flex justify-center mt-4">
-                <Button
-                  onClick={openWaitlistModal}
-                  className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book a Free Call
-                </Button>
-              </div>
+              <Button
+                onClick={openWaitlistModal}
+                className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Book a Free Call
+              </Button>
             </div>
           </div>
 
@@ -659,11 +655,11 @@ export default function Home() {
                 </h2>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
                   Traditional SEO brings people who are still comparing options.
-                  Someone who found you through a ChatGPT answer has already validated the choice — the AI did it for them.
+                  Someone who found you through a ChatGPT answer has already validated the choice. The AI did it for them.
                   They&apos;re not browsing. They arrived with intent.
                 </p>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg">
-                  The problem: most brands have no idea whether they&apos;re being mentioned — or silently skipped.
+                  The problem: most brands have no idea whether they&apos;re being mentioned, or silently skipped.
                   GEO is the only way to find out, and to fix it.
                 </p>
               </div>
@@ -687,39 +683,45 @@ export default function Home() {
             <div className="bg-[#1E293B] rounded-3xl p-8 md:p-12 text-white">
               <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
                 <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-5">B2B SaaS — Project Management</p>
-                  <h3 className="font-heading text-2xl md:text-3xl font-medium mb-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-5">B2B SaaS · Project Management</p>
+                  <h3 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium mb-5 leading-tight">
                     0 mentions. Then 12 per 100 queries. In 6 weeks.
                   </h3>
                   <p className="text-gray-400 leading-relaxed mb-5 text-sm md:text-base">
-                    The first audit showed the brand wasn&apos;t cited once across 100 prompts — two competitors
-                    were mentioned on nearly every relevant query. The issue wasn&apos;t content volume;
-                    it was missing schema markup, no structured FAQ, and a features page written for
-                    humans instead of indexed by AI.
+                    First audit: GEO score 18/100. Not cited once across 100 prompts while two competitors
+                    showed up on every relevant query. The action plan flagged 3 critical issues: missing
+                    Organization schema, no FAQ structured data, and a features page the HTML scanner
+                    rated 4/10 for AI readability. Six weeks and 11 fixes later, the second audit
+                    returned a score of 74/100.
                   </p>
                   <p className="text-gray-300 text-sm italic leading-relaxed">
                     &ldquo;I thought we had a good website. The audit showed exactly why ChatGPT
-                    ignored us — and what to change. Six weeks later we show up on every prompt
+                    ignored us and what to change. Six weeks later we show up on every prompt
                     where we used to be invisible.&rdquo;
                   </p>
                   <p className="text-gray-600 text-xs mt-3">Founder, anonymous at their request</p>
                 </div>
                 <div className="space-y-3">
+                  {/* Audit 1 vs Audit 2 */}
+                  <div className="grid grid-cols-3 text-xs text-gray-500 px-1 mb-1">
+                    <span>Metric</span>
+                    <span className="text-center">Audit 1</span>
+                    <span className="text-center">Audit 2</span>
+                  </div>
                   {[
-                    { label: "GEO score", before: "18", after: "74", unit: "/100", color: "bg-purple-500", pct: 74 },
-                    { label: "Citations per 100 prompts", before: "0", after: "12", unit: "", color: "bg-green-500", pct: 85 },
-                    { label: "Gap vs. top competitor", before: "−47 pts", after: "+5 pts", unit: "", color: "bg-pink-400", pct: 90 },
+                    { label: "GEO Health Score", before: "18/100", after: "74/100", color: "bg-purple-500", pct: 74 },
+                    { label: "Citations / 100 prompts", before: "0", after: "12", color: "bg-green-500", pct: 85 },
+                    { label: "vs. top competitor", before: "−47 pts", after: "+5 pts", color: "bg-pink-400", pct: 90 },
+                    { label: "Critical issues open", before: "9", after: "1", color: "bg-orange-400", pct: 15 },
                   ].map((row) => (
-                    <div key={row.label} className="bg-white/5 rounded-xl p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-400">{row.label}</span>
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-600 line-through">{row.before}{row.unit}</span>
-                          <span className="text-white font-semibold">{row.after}{row.unit}</span>
-                        </div>
+                    <div key={row.label} className="bg-white/5 rounded-xl p-3">
+                      <div className="grid grid-cols-3 items-center mb-2">
+                        <span className="text-xs text-gray-400">{row.label}</span>
+                        <span className="text-xs text-gray-600 line-through text-center">{row.before}</span>
+                        <span className="text-sm text-white font-semibold text-center">{row.after}</span>
                       </div>
                       <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className={`h-full ${row.color} rounded-full`} style={{ width: `${row.pct}%` }} />
+                        <div className={`h-full ${row.color} rounded-full transition-all`} style={{ width: `${row.pct}%` }} />
                       </div>
                     </div>
                   ))}
@@ -729,8 +731,8 @@ export default function Home() {
                       <div className="text-xs text-gray-500 mt-1">ChatGPT mentions</div>
                     </div>
                     <div className="flex-1 bg-white/5 rounded-xl p-4 text-center">
-                      <div className="text-xl font-bold text-purple-400">6 weeks</div>
-                      <div className="text-xs text-gray-500 mt-1">to get there</div>
+                      <div className="text-xl font-bold text-purple-400">11 fixes</div>
+                      <div className="text-xs text-gray-500 mt-1">from the action plan</div>
                     </div>
                   </div>
                 </div>
