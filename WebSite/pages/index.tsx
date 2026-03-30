@@ -519,14 +519,15 @@ export default function Home() {
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
-                  {[1, 2, 3, 4, 5].map((i) => (
+                  {[12, 32, 47, 65, 1].map((i, idx) => (
                     <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-gray-200">
                       <Image
-                        src={`/avatars/user-${i}.jpg`}
-                        alt={`Early user ${i}`}
+                        src={`https://i.pravatar.cc/64?img=${i}`}
+                        alt={`Early user ${idx + 1}`}
                         width={32}
                         height={32}
                         className="w-full h-full object-cover"
+                        unoptimized
                       />
                     </div>
                   ))}
@@ -537,7 +538,7 @@ export default function Home() {
                       <Star key={i} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">Used by 120+ brands in early access</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Used by 40+ brands in early access</p>
                 </div>
               </div>
 
@@ -895,16 +896,7 @@ export default function Home() {
               />
             </div>
 
-            <p className="mt-8 text-center text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="font-semibold text-[#1E293B] hover:text-slate-700 underline"
-              >
-                Log in
-              </Link>{" "}
-              to access your dashboard
-            </p>
+            
 
             <p className="mt-3 text-center text-sm text-gray-500">
               Need a custom plan for your agency?{" "}
