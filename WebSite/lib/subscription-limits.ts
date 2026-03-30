@@ -13,8 +13,8 @@ export interface TierLimits {
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   none: { projects: 0, competitors: 0, canCompareHistory: false },
   basic: { projects: 1, competitors: 1, canCompareHistory: false },
-  pro: { projects: 1, competitors: 5, canCompareHistory: true },
-  premium: { projects: 10, competitors: Infinity, canCompareHistory: true },
+  pro: { projects: 1, competitors: 3, canCompareHistory: true },
+  premium: { projects: 10, competitors: 3, canCompareHistory: true },
 };
 
 export function getLimits(tier: SubscriptionTier): TierLimits {
@@ -68,8 +68,8 @@ export async function canCreateProject(userId: string | mongoose.Types.ObjectId)
     return {
       allowed: false,
       reason: credits > 0
-        ? `You have used all your available slots (${limits.projects} from your ${tier} plan + ${credits} audit credit(s)). Purchase more credits or upgrade your plan.`
-        : `You have reached the maximum of ${limits.projects} project(s) for your ${tier} plan. Upgrade or purchase audit credits to create more.`,
+        ? `You have ${currentCount} active project(s) and no remaining audit credits. Purchase more credits or upgrade your plan to create a new project.`
+        : `You have reached the limit of ${limits.projects} project(s) on the ${tier} plan. Upgrade your plan or purchase audit credits to create more.`,
       errorCode: 'UPGRADE_REQUIRED',
       currentCount,
       maxCount: maxProjects,

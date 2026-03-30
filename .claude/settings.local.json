@@ -155,7 +155,18 @@
       "Bash(grep -n \"ActionPlan\\\\|promptGaps\\\\|categoryScores\\\\|htmlScan\\\\|businessSnapshot\" /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/[username]/audits/[auditId].tsx)",
       "Bash(grep -n \"CompetitorComparison\\\\|DeepDive\\\\|ActionPlan\\\\|GeoQuickWins\\\\|id=\"\"\" /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/[username]/audits/[auditId].tsx)",
       "Bash(grep -n \"Section 4\\\\|Section 5\\\\|id=\\\\\"deep-dive\\\\\"\\\\|id=\\\\\"competitors\\\\\"\\\\|Deep Dive\\\\|Competitor\" /Users/maxlemoinegavoille/Desktop/Projets/AISEO/WebSite/pages/[username]/audits/[auditId].tsx)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(kubectl config:*)",
+      "Bash(kubectl get:*)",
+      "Bash(kubectl delete:*)",
+      "Bash(kubectl create:*)",
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl describe:*)",
+      "Bash(docker buildx:*)",
+      "Bash(docker login:*)",
+      "Bash(docker push:*)",
+      "Bash(kubectl rollout:*)",
+      "Bash(kubectl logs:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

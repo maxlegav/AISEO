@@ -27,8 +27,8 @@ export type SetUsernameInput = z.infer<typeof SetUsernameSchema>;
 export const CreateBusinessSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100).trim(),
   primaryUrl: z.string().min(1, 'URL is required').trim(),
-  subUrls: z.array(z.string().min(1)).max(20).default([]),
-  competitorUrls: z.array(z.string().min(1)).max(10).default([]),
+  subUrls: z.array(z.string().min(1)).max(3).default([]),
+  competitorUrls: z.array(z.string().min(1)).max(3).default([]),
   category: z.string().min(1, 'Category is required').max(100).trim(),
   description: z.string().max(500).trim().optional(),
 });
@@ -40,8 +40,8 @@ export type CreateBusinessInput = z.infer<typeof CreateBusinessSchema>;
 export const UpdateBusinessSchema = z.object({
   name: z.string().min(1).max(100).trim().optional(),
   primaryUrl: z.string().min(1).trim().optional(),
-  subUrls: z.array(z.string().min(1)).max(20).optional(),
-  competitorUrls: z.array(z.string().min(1)).max(10).optional(),
+  subUrls: z.array(z.string().min(1)).max(3).optional(),
+  competitorUrls: z.array(z.string().min(1)).max(3).optional(),
   category: z.string().min(1).max(100).trim().optional(),
   description: z.string().max(500).trim().optional(),
 });

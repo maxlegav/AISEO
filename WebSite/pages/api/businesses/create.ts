@@ -64,6 +64,22 @@ export default async function handler(
     const currentCount = check.currentCount ?? 0;
     const usesCreditSlot = currentCount >= tierLimit && (user!.auditCredits || 0) > 0;
 
+    // Atomically deduct audit credit BEFORE creating the business to prevent race conditions.
+    // Two parallel requests can't both pass the check and consume the same credit.
+    if (usesCreditSlot) {
+      const deducted = await User.findOneAndUpdate(
+        { _id: session.user.id, auditCredits: { $gte: 1 } },
+        { $inc: { auditCredits: -1 } },
+        { new: true },
+      );
+      if (!deducted) {
+        throw new ApiError(
+          ErrorType.AUTHORIZATION,
+          'No audit credits remaining. Purchase more credits or upgrade your plan.',
+        );
+      }
+    }
+
     // Create business (slug auto-generated from name via pre-validate hook)
     const business = new Business({
       ...result.data,
@@ -83,14 +99,13 @@ export default async function handler(
           attempt++;
           business.slug = `${originalSlug}-${attempt}`;
         } else {
+          // Refund the credit if business creation fails
+          if (usesCreditSlot) {
+            await User.findByIdAndUpdate(session.user.id, { $inc: { auditCredits: 1 } });
+          }
           throw err;
         }
       }
-    }
-
-    // Deduct audit credit if this project uses a credit slot
-    if (usesCreditSlot) {
-      await User.findByIdAndUpdate(session.user.id, { $inc: { auditCredits: -1 } });
     }
 
     return res.status(201).json({

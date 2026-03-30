@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 
 export default function DashboardPage() {
@@ -20,8 +20,14 @@ export default function DashboardPage() {
         // Auto-generate username for users who don't have one
         setGeneratingUsername(true);
         fetch("/api/user/auto-generate-username", { method: "POST" })
-          .then((res) => res.json())
-          .then(async (data) => {
+          .then(async (res) => {
+            if (res.status === 401) {
+              // Session expired or invalid — force sign out and redirect to login
+              await signOut({ redirect: false });
+              router.replace("/login?callbackUrl=/dashboard");
+              return;
+            }
+            const data = await res.json();
             if (data.success) {
               await update();
               router.replace(`/${data.data.username}`);

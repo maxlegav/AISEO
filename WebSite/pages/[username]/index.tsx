@@ -437,7 +437,16 @@ export default function UserProfilePage() {
       }
 
       if (creditsData.success) {
-        setAuditCredits(creditsData.auditCredits ?? 0);
+        // Show available project slots, not raw credits.
+        // Available = (tier project limit + credits) - active projects
+        const tierProjectLimits: Record<string, number> = {
+          none: 0, basic: 1, pro: 1, premium: 10,
+        };
+        const tierLimit = tierProjectLimits[creditsData.subscriptionTier || 'none'] ?? 0;
+        const rawCredits = creditsData.auditCredits ?? 0;
+        const activeProjects = projectsData.success ? (projectsData.data as unknown[]).length : 0;
+        const availableSlots = Math.max(0, tierLimit + rawCredits - activeProjects);
+        setAuditCredits(availableSlots);
       }
     } catch (err) {
       console.error("Failed to fetch data:", err);
@@ -507,12 +516,12 @@ export default function UserProfilePage() {
           </p>
         </div>
         <div className="flex items-center gap-3 mt-2">
-          {/* Audit credits badge */}
+          {/* Available audits badge */}
           {auditCredits !== null && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-white/60 rounded-full text-sm text-gray-600 shadow-sm">
               <Zap className="w-3.5 h-3.5 text-orange-500" />
               <span className="font-medium text-gray-800">{auditCredits}</span>
-              <span className="text-gray-400">{String(t("settings.auditCreditsRemaining"))}</span>
+              <span className="text-gray-400">{String(t("dashboard.auditsAvailable"))}</span>
             </div>
           )}
           <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-white/60">

@@ -80,6 +80,7 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user, account: _account }) {
@@ -90,15 +91,24 @@ export const authOptions: NextAuthOptions = {
       // Always refresh user data from DB to keep session in sync
       // (e.g. after Stripe webhook updates subscription)
       if (token.id) {
-        await connectDB();
-        const dbUser = await User.findById(token.id);
-        if (dbUser) {
-          token.displayName = dbUser.displayName;
-          token.username = dbUser.username;
-          token.subscriptionTier = dbUser.subscriptionTier;
-          token.subscriptionStatus = dbUser.subscriptionStatus;
-          token.auditCredits = dbUser.auditCredits;
-          token.language = dbUser.language;
+        try {
+          await connectDB();
+          const dbUser = await User.findById(token.id);
+          if (dbUser) {
+            token.displayName = dbUser.displayName;
+            token.username = dbUser.username;
+            token.subscriptionTier = dbUser.subscriptionTier;
+            token.subscriptionStatus = dbUser.subscriptionStatus;
+            token.auditCredits = dbUser.auditCredits;
+            token.language = dbUser.language;
+          } else {
+            // User no longer exists in DB — invalidate session
+            return { ...token, id: "" as string };
+          }
+        } catch (error) {
+          // DB error — keep existing token data so session doesn't break
+          // on transient MongoDB issues. The token retains its last-known values.
+          console.error("[NextAuth] JWT callback DB error:", error);
         }
       }
 

@@ -254,6 +254,7 @@ function AuditStateCard({
 export default function ProjectDetailPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { language } = useLanguage();
   const { username, projectSlug } = router.query;
   const [project, setProject] = useState<Business | null>(null);
   const [audit, setAudit] = useState<Audit | null>(null);
@@ -352,7 +353,7 @@ export default function ProjectDetailPage() {
 
   const handleRetry = async () => {
     if (!project) return;
-    await fetch("/api/audits/create", {
+    const res = await fetch("/api/audits/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -364,9 +365,14 @@ export default function ProjectDetailPage() {
         description: project.description || project.category,
         subUrls: project.subUrls || [],
         competitorUrls: project.competitorUrls || [],
-        language: "fr",
+        language: language || "fr",
       }),
     });
+    const data = await res.json();
+    if (!data.success) {
+      alert(data.message || "Unable to retry audit.");
+      return;
+    }
     // Refetch
     if (typeof projectSlug === "string") {
       setLoading(true);

@@ -104,6 +104,17 @@ export default function CreateProjectPage() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (step < 6 && canProceed()) {
+        setStep(step + 1);
+      } else if (step === 6 && !submitting) {
+        handleSubmit();
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     setSubmitting(true);
     setError("");
@@ -223,7 +234,7 @@ export default function CreateProjectPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 shadow-sm">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-white/60 shadow-sm" onKeyDown={handleKeyDown}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-amber-100 rounded-xl flex items-center justify-center">
               <StepIcon className="w-5 h-5 text-orange-600" />
@@ -377,13 +388,15 @@ export default function CreateProjectPage() {
                   )}
                 </div>
               ))}
-              <button
-                onClick={() => addUrl(subUrls, setSubUrls)}
-                className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
-              >
-                <Plus className="w-4 h-4" />
-                {String(t("wizard.addUrl"))}
-              </button>
+              {subUrls.length < 3 && (
+                <button
+                  onClick={() => addUrl(subUrls, setSubUrls)}
+                  className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  {String(t("wizard.addUrl"))}
+                </button>
+              )}
             </div>
           )}
 
@@ -440,16 +453,18 @@ export default function CreateProjectPage() {
                   </div>
                 </div>
               ))}
-              <button
-                onClick={() => {
-                  addUrl(competitorUrls, setCompetitorUrls);
-                  addUrl(competitorNames, setCompetitorNames);
-                }}
-                className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
-              >
-                <Plus className="w-4 h-4" />
-                {String(t("wizard.addCompetitor"))}
-              </button>
+              {competitorUrls.length < 3 && (
+                <button
+                  onClick={() => {
+                    addUrl(competitorUrls, setCompetitorUrls);
+                    addUrl(competitorNames, setCompetitorNames);
+                  }}
+                  className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  {String(t("wizard.addCompetitor"))}
+                </button>
+              )}
             </div>
           )}
 
@@ -538,7 +553,7 @@ export default function CreateProjectPage() {
                   href="/settings"
                   className="mt-2 inline-flex items-center gap-1 text-orange-600 font-medium hover:underline"
                 >
-                  {String(t("nav.settings"))} →
+                  {String(t("wizard.upgradeOrBuyCredits"))} →
                 </Link>
               )}
             </div>

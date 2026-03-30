@@ -10,6 +10,14 @@ import {
   ChevronDown,
   Zap,
   LogOut,
+  MessageSquarePlus,
+  Bug,
+  Lightbulb,
+  Wrench,
+  HelpCircle,
+  Loader2,
+  CheckCircle2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,6 +34,200 @@ interface ProjectItem {
   slug: string;
 }
 
+type FeedbackType = "bug" | "feature" | "improvement" | "other";
+
+const feedbackTypeIcons = {
+  bug: Bug,
+  feature: Lightbulb,
+  improvement: Wrench,
+  other: HelpCircle,
+};
+
+/* ─── Feedback Modal ─── */
+function FeedbackModal({ onClose }: { onClose: () => void }) {
+  const { t } = useLanguage();
+  const [type, setType] = useState<FeedbackType>("feature");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const typeOptions: { value: FeedbackType; labelKey: string }[] = [
+    { value: "feature", labelKey: "feedback.type.feature" },
+    { value: "bug", labelKey: "feedback.type.bug" },
+    { value: "improvement", labelKey: "feedback.type.improvement" },
+    { value: "other", labelKey: "feedback.type.other" },
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !description.trim() || submitting) return;
+
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/feedback/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          title: title.trim(),
+          description: description.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSubmitted(true);
+      } else {
+        setError(data.message || "Something went wrong");
+      }
+    } catch {
+      setError("Network error, please try again");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-5 pb-0">
+          <div className="flex items-center gap-2">
+            <MessageSquarePlus className="w-5 h-5 text-orange-500" />
+            <h3 className="text-lg font-semibold text-gray-900">
+              {String(t("feedback.title"))}
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-sm text-gray-500 px-6 mt-1">
+          {String(t("feedback.subtitle"))}
+        </p>
+
+        {/* Body */}
+        <div className="p-6">
+          {submitted ? (
+            <div className="flex flex-col items-center py-6">
+              <CheckCircle2 className="w-12 h-12 text-green-500 mb-3" />
+              <p className="text-lg font-medium text-gray-900 mb-1">
+                {String(t("feedback.submitSuccess"))}
+              </p>
+              <p className="text-sm text-gray-500 mb-5">
+                {String(t("feedback.submitSuccessDesc"))}
+              </p>
+              <button
+                onClick={onClose}
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors underline"
+              >
+                {String(t("common.cancel"))}
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Type selector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {String(t("feedback.typeLabel"))}
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {typeOptions.map((opt) => {
+                    const Icon = feedbackTypeIcons[opt.value];
+                    const isActive = type === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setType(opt.value)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                          isActive
+                            ? "bg-gray-900 text-white shadow-sm"
+                            : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {String(t(opt.labelKey))}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label htmlFor="fb-title" className="block text-sm font-medium text-gray-700 mb-1">
+                  {String(t("feedback.titleLabel"))}
+                </label>
+                <input
+                  id="fb-title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={String(t("feedback.titlePlaceholder"))}
+                  className="w-full px-3.5 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-gray-900 text-sm"
+                  maxLength={200}
+                  autoFocus
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label htmlFor="fb-desc" className="block text-sm font-medium text-gray-700 mb-1">
+                  {String(t("feedback.descriptionLabel"))}
+                </label>
+                <textarea
+                  id="fb-desc"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={String(t("feedback.descriptionPlaceholder"))}
+                  rows={4}
+                  className="w-full px-3.5 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-gray-900 text-sm resize-none"
+                  maxLength={2000}
+                />
+              </div>
+
+              {error && <p className="text-sm text-red-500">{error}</p>}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  {String(t("common.cancel"))}
+                </button>
+                <button
+                  type="submit"
+                  disabled={!title.trim() || !description.trim() || submitting}
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-medium rounded-lg px-5 py-2 disabled:opacity-50 flex items-center gap-2 transition-all"
+                >
+                  {submitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <MessageSquarePlus className="w-3.5 h-3.5" />
+                      {String(t("feedback.submit"))}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Dashboard Layout ─── */
 export default function DashboardLayout({
   children,
   activeMenu = "dashboard",
@@ -33,25 +235,32 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const { t } = useLanguage();
-  const [auditCredits, setAuditCredits] = useState(0);
+  const [availableSlots, setAvailableSlots] = useState(0);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch audit credits
-  useEffect(() => {
-    if (status === "authenticated") {
-      setAuditCredits(session?.user?.auditCredits || 0);
-    }
-  }, [status, session]);
-
-  // Fetch projects for dropdown
+  // Fetch projects + compute available audit slots
   useEffect(() => {
     if (status !== "authenticated") return;
-    fetch("/api/businesses/list")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) setProjects(data.data);
+
+    Promise.all([
+      fetch("/api/businesses/list").then((r) => r.json()),
+      fetch("/api/user/check-subscription").then((r) => r.json()),
+    ])
+      .then(([projectsData, creditsData]) => {
+        if (projectsData.success) setProjects(projectsData.data);
+
+        if (creditsData.success) {
+          const tierProjectLimits: Record<string, number> = {
+            none: 0, basic: 1, pro: 1, premium: 10,
+          };
+          const tierLimit = tierProjectLimits[creditsData.subscriptionTier || "none"] ?? 0;
+          const rawCredits = creditsData.auditCredits ?? 0;
+          const activeProjects = projectsData.success ? (projectsData.data as unknown[]).length : 0;
+          setAvailableSlots(Math.max(0, tierLimit + rawCredits - activeProjects));
+        }
       })
       .catch(() => {});
   }, [status]);
@@ -114,6 +323,9 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100 flex">
+      {/* Feedback Modal */}
+      {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
+
       {/* Sidebar */}
       <aside className="w-52 flex flex-col py-5 shrink-0">
         {/* Logo */}
@@ -158,7 +370,7 @@ export default function DashboardLayout({
             </span>
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-2">
-            {auditCredits}
+            {availableSlots}
           </p>
           <Link
             href="/settings#subscription"
@@ -233,7 +445,10 @@ export default function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-4">
-              <button className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+              <button
+                onClick={() => setFeedbackOpen(true)}
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
                 {String(t("dashboard.feedback"))}
               </button>
               <Link href="/projects/create">

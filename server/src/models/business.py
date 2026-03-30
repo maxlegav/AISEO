@@ -50,7 +50,7 @@ class AuditRequest(BaseModel):
 
     # Business details (optional — enriches prompt quality)
     subUrls: list[str] = []  # Sub-pages to analyze (e.g., /blog, /shop)
-    competitorUrls: list[str] = []  # Competitor URLs (max 5)
+    competitorUrls: list[str] = []  # Competitor URLs (max 3)
     competitorNames: list[str] = []  # Competitor brand names
     targetKeywords: list[str] = []  # SEO target keywords
     uniqueSellingPoints: list[str] = []  # What makes the business special

@@ -148,6 +148,7 @@ export const translations: Translations = {
     "dashboard.viewAllAudits": "Voir tous les audits",
     "dashboard.noAuditsYet": "Aucun audit pour le moment",
     "dashboard.projectsDescription": "Gérez vos emplacements commerciaux et suivez leur performance de visibilité GEO sur différents marchés.",
+    "dashboard.auditsAvailable": "audit(s) disponible(s)",
     "dashboard.createNewProject": "Créer un nouveau projet",
     "dashboard.startTracking": "Commencer le suivi d'une entreprise",
     "dashboard.visibilityScore": "Score de visibilité",
@@ -239,6 +240,7 @@ export const translations: Translations = {
     "wizard.competitorNamePlaceholder": "Ex: Ahrefs, SEMrush...",
     "wizard.competitorUrl": "URL du concurrent",
     "wizard.location": "Localisation",
+    "wizard.upgradeOrBuyCredits": "Améliorer votre plan ou acheter des crédits",
 
     // Settings
     "settings.profile": "Profil",
@@ -301,6 +303,22 @@ export const translations: Translations = {
     "audit.headings": "Structure titres",
     "audit.altText": "Textes alt",
     "audit.keywords": "Mots-clés",
+
+    // Feedback
+    "feedback.title": "Feedback",
+    "feedback.subtitle": "Partagez vos idées, signalez des bugs ou demandez de nouvelles fonctionnalités",
+    "feedback.typeLabel": "Type",
+    "feedback.type.bug": "Bug",
+    "feedback.type.feature": "Fonctionnalité",
+    "feedback.type.improvement": "Amélioration",
+    "feedback.type.other": "Autre",
+    "feedback.titleLabel": "Titre",
+    "feedback.titlePlaceholder": "Résumez votre feedback en une phrase...",
+    "feedback.descriptionLabel": "Description",
+    "feedback.descriptionPlaceholder": "Décrivez votre feedback en détail...",
+    "feedback.submit": "Envoyer",
+    "feedback.submitSuccess": "Merci pour votre feedback !",
+    "feedback.submitSuccessDesc": "Nous y répondrons rapidement.",
 
     // Forms
     "form.email": "Email",
@@ -471,6 +489,7 @@ export const translations: Translations = {
     "dashboard.viewAllAudits": "View All Audits",
     "dashboard.noAuditsYet": "No audits yet",
     "dashboard.projectsDescription": "Manage your business locations and track their GEO visibility performance across different markets.",
+    "dashboard.auditsAvailable": "audit(s) available",
     "dashboard.createNewProject": "Create New Project",
     "dashboard.startTracking": "Start tracking a new business",
     "dashboard.visibilityScore": "Visibility Score",
@@ -562,6 +581,7 @@ export const translations: Translations = {
     "wizard.competitorNamePlaceholder": "E.g. Ahrefs, SEMrush...",
     "wizard.competitorUrl": "Competitor URL",
     "wizard.location": "Location",
+    "wizard.upgradeOrBuyCredits": "Upgrade your plan or buy credits",
 
     // Settings
     "settings.profile": "Profile",
@@ -624,6 +644,22 @@ export const translations: Translations = {
     "audit.headings": "Heading Structure",
     "audit.altText": "Alt Text",
     "audit.keywords": "Keywords",
+
+    // Feedback
+    "feedback.title": "Feedback",
+    "feedback.subtitle": "Share your ideas, report bugs, or request new features",
+    "feedback.typeLabel": "Type",
+    "feedback.type.bug": "Bug",
+    "feedback.type.feature": "Feature Request",
+    "feedback.type.improvement": "Improvement",
+    "feedback.type.other": "Other",
+    "feedback.titleLabel": "Title",
+    "feedback.titlePlaceholder": "Summarize your feedback in one sentence...",
+    "feedback.descriptionLabel": "Description",
+    "feedback.descriptionPlaceholder": "Describe your feedback in detail...",
+    "feedback.submit": "Submit",
+    "feedback.submitSuccess": "Thank you for your feedback!",
+    "feedback.submitSuccessDesc": "We'll review it soon.",
 
     // Forms
     "form.email": "Email",

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import mongoose from 'mongoose';
 import Audit from '@/models/Audit';
+import Business from '@/models/Business';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
 
 const connectDB = async () => {
@@ -55,7 +56,52 @@ export default async function handler(
       throw new ApiError(ErrorType.VALIDATION, 'Invalid businessId format');
     }
 
+    // Enforce max 3 sub-URLs and 3 competitors
+    const MAX_ITEMS = 3;
+    if (Array.isArray(subUrls) && subUrls.length > MAX_ITEMS) {
+      throw new ApiError(ErrorType.VALIDATION, `Maximum ${MAX_ITEMS} sub-URLs allowed`);
+    }
+    if (Array.isArray(competitorUrls) && competitorUrls.length > MAX_ITEMS) {
+      throw new ApiError(ErrorType.VALIDATION, `Maximum ${MAX_ITEMS} competitors allowed`);
+    }
+
     await connectDB();
+
+    // Verify the user owns this business
+    const business = await Business.findOne({
+      _id: businessId,
+      userId: session.user.id,
+      deletedAt: null,
+    });
+    if (!business) {
+      throw new ApiError(ErrorType.AUTHORIZATION, 'Business not found or access denied');
+    }
+
+    // Prevent duplicate audits: block if there's already an active audit for this business
+    const activeAudit = await Audit.findOne({
+      businessId: new mongoose.Types.ObjectId(businessId),
+      userId: new mongoose.Types.ObjectId(session.user.id),
+      status: { $in: ['pending', 'processing', 'awaiting_prompt_approval', 'questions_review', 'auditing', 'review_pending'] },
+    });
+    if (activeAudit) {
+      throw new ApiError(
+        ErrorType.VALIDATION,
+        'An audit is already in progress for this project'
+      );
+    }
+
+    // Limit retries: max 3 total audits per business (1 initial + 2 retries)
+    const MAX_AUDITS_PER_BUSINESS = 3;
+    const totalAudits = await Audit.countDocuments({
+      businessId: new mongoose.Types.ObjectId(businessId),
+      userId: new mongoose.Types.ObjectId(session.user.id),
+    });
+    if (totalAudits >= MAX_AUDITS_PER_BUSINESS) {
+      throw new ApiError(
+        ErrorType.VALIDATION,
+        'Maximum retry limit reached for this project. Please contact support or create a new project.'
+      );
+    }
 
     const audit = await Audit.create({
       userId: new mongoose.Types.ObjectId(session.user.id),
