@@ -419,7 +419,7 @@ export default function Home() {
     {
       question: "Do you offer white-label reports for agencies?",
       answer:
-        "Yes! Our Agency plan includes fully customizable white-label dashboards with your branding. You can add your logo, colors, and share a custom link with your clients — they see your agency, not ShowYourBrand.",
+        "Yes! Our Agency plan includes fully customizable white-label dashboards with your branding. You can add your logo, colors, and share a custom link with your clients  they see your agency, not ShowYourBrand.",
     },
   ];
 
@@ -592,7 +592,7 @@ export default function Home() {
                 GEO is the new SEO.
               </h2>
               <p className="text-gray-600 max-w-2xl lg:max-w-3xl mx-auto text-base md:text-lg lg:text-xl">
-                When someone asks ChatGPT for a recommendation, they get one answer — not ten blue links.
+                When someone asks ChatGPT for a recommendation, they get one answer  not ten blue links.
                 Either your brand is mentioned, or a competitor is. There is no page 2.
               </p>
             </div>
@@ -607,7 +607,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   We run 100 real prompts across ChatGPT, Claude, Perplexity and Gemini.
-                  You get the word-for-word responses — not estimates, not scores, the actual text.
+                  You get the word-for-word responses  not estimates, not scores, the actual text.
                 </p>
               </div>
 
@@ -620,7 +620,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   When AI skips your brand, it names someone else. We tell you which competitors,
-                  on which prompts, and what specifically puts them ahead — content structure,
+                  on which prompts, and what specifically puts them ahead  content structure,
                   schema, backlinks from cited sources.
                 </p>
               </div>
@@ -683,7 +683,7 @@ export default function Home() {
             <div className="bg-[#0F172A] rounded-3xl overflow-hidden text-white">
               <div className="grid md:grid-cols-2">
 
-                {/* Left — Story */}
+                {/* Left  Story */}
                 <div className="p-8 md:p-12 flex flex-col justify-center">
                   <p className="text-xs text-gray-500 uppercase tracking-widest mb-6">B2B SaaS · Project Management</p>
 
@@ -722,7 +722,7 @@ export default function Home() {
                   <p className="text-gray-600 text-xs">Founder, anonymous at their request</p>
                 </div>
 
-                {/* Right — Dashboard mockup */}
+                {/* Right  Dashboard mockup */}
                 <div className="bg-[#1E293B] p-6 md:p-8 flex flex-col gap-4">
 
                   {/* Header */}
@@ -826,7 +826,7 @@ export default function Home() {
                 oldPrice="€49"
                 period="one-time"
                 features={[
-                  "1 GEO audit — 4 AI engines",
+                  "1 GEO audit  4 AI engines",
                   "Raw JSON export of all results",
                   "GEO Health Score & category breakdown",
                   "100 prompts tested, 3 competitors",
@@ -926,14 +926,14 @@ export default function Home() {
                   role: "Founder, SaaS B2B",
                   avatar: "T",
                   bg: "bg-purple-600",
-                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why — and fixed it in a week. Our citation rate on ChatGPT doubled.",
+                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why  and fixed it in a week. Our citation rate on ChatGPT doubled.",
                 },
                 {
                   name: "Sophie M.",
                   role: "CEO, Marketing Agency",
                   avatar: "S",
                   bg: "bg-pink-500",
-                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports — I just present them. It's a game changer for the agency.",
+                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports  I just present them. It's a game changer for the agency.",
                 },
                 {
                   name: "Antoine L.",
