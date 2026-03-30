@@ -905,6 +905,17 @@ export default function Home() {
               </Link>{" "}
               to access your dashboard
             </p>
+
+            <p className="mt-3 text-center text-sm text-gray-500">
+              Need a custom plan for your agency?{" "}
+              <button
+                onClick={openWaitlistModal}
+                className="font-semibold text-[#1E293B] hover:text-slate-700 underline"
+              >
+                Book a call with us
+              </button>{" "}
+              and we&apos;ll tailor the right solution.
+            </p>
           </div>
         </section>
 
