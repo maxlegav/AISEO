@@ -680,61 +680,126 @@ export default function Home() {
             </div>
 
             {/* Case study */}
-            <div className="bg-[#1E293B] rounded-3xl p-8 md:p-12 text-white">
-              <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-5">B2B SaaS · Project Management</p>
-                  <h3 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium mb-5 leading-tight">
-                    0 mentions. Then 12 per 100 queries. In 6 weeks.
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed mb-5 text-sm md:text-base">
-                    First audit: GEO score 18/100. Not cited once across 100 prompts while two competitors
-                    showed up on every relevant query. The action plan flagged 3 critical issues: missing
-                    Organization schema, no FAQ structured data, and a features page the HTML scanner
-                    rated 4/10 for AI readability. Six weeks and 11 fixes later, the second audit
-                    returned a score of 74/100.
+            <div className="bg-[#0F172A] rounded-3xl overflow-hidden text-white">
+              <div className="grid md:grid-cols-2">
+
+                {/* Left — Story */}
+                <div className="p-8 md:p-12 flex flex-col justify-center">
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-6">B2B SaaS · Project Management</p>
+
+                  {/* Before */}
+                  <div className="mb-6">
+                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Before</span>
+                    <h3 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium mt-2 leading-tight text-gray-300">
+                      Invisible.<br />Cited 0 times.<br />Losing to 2 competitors.
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-3 leading-relaxed">
+                      GEO score 18/100. Not mentioned once across 100 AI prompts.
+                      Two competitors cited on every relevant query.
+                      The HTML scanner rated their features page 4/10 for AI readability.
+                    </p>
+                  </div>
+
+                  {/* Arrow */}
+                  <div className="text-2xl text-gray-600 mb-6">↓</div>
+
+                  {/* After */}
+                  <div className="mb-8">
+                    <span className="text-xs font-bold text-green-400 uppercase tracking-wider">After 6 weeks</span>
+                    <h3 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium mt-2 leading-tight">
+                      74/100.<br />12 citations.<br />Ahead of the pack.
+                    </h3>
+                    <p className="text-gray-400 text-sm mt-3 leading-relaxed">
+                      11 fixes from the action plan: Organization schema, FAQ structured data,
+                      features page rewrite. Second audit returned 74/100.
+                    </p>
+                  </div>
+
+                  <p className="text-gray-400 text-sm italic leading-relaxed border-l-2 border-gray-700 pl-4 mb-3">
+                    &ldquo;The audit showed exactly why ChatGPT ignored us. Six weeks later
+                    we show up on every prompt where we used to be invisible.&rdquo;
                   </p>
-                  <p className="text-gray-300 text-sm italic leading-relaxed">
-                    &ldquo;I thought we had a good website. The audit showed exactly why ChatGPT
-                    ignored us and what to change. Six weeks later we show up on every prompt
-                    where we used to be invisible.&rdquo;
-                  </p>
-                  <p className="text-gray-600 text-xs mt-3">Founder, anonymous at their request</p>
+                  <p className="text-gray-600 text-xs">Founder, anonymous at their request</p>
                 </div>
-                <div className="space-y-3">
-                  {/* Audit 1 vs Audit 2 */}
-                  <div className="grid grid-cols-3 text-xs text-gray-500 px-1 mb-1">
-                    <span>Metric</span>
-                    <span className="text-center">Audit 1</span>
-                    <span className="text-center">Audit 2</span>
+
+                {/* Right — Dashboard mockup */}
+                <div className="bg-[#1E293B] p-6 md:p-8 flex flex-col gap-4">
+
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-gray-400 font-medium">GEO Dashboard · Audit 2 of 2</span>
+                    <span className="text-xs text-green-400 font-semibold">↑ +56 pts</span>
                   </div>
-                  {[
-                    { label: "GEO Health Score", before: "18/100", after: "74/100", color: "bg-purple-500", pct: 74 },
-                    { label: "Citations / 100 prompts", before: "0", after: "12", color: "bg-green-500", pct: 85 },
-                    { label: "vs. top competitor", before: "−47 pts", after: "+5 pts", color: "bg-pink-400", pct: 90 },
-                    { label: "Critical issues open", before: "9", after: "1", color: "bg-orange-400", pct: 15 },
-                  ].map((row) => (
-                    <div key={row.label} className="bg-white/5 rounded-xl p-3">
-                      <div className="grid grid-cols-3 items-center mb-2">
-                        <span className="text-xs text-gray-400">{row.label}</span>
-                        <span className="text-xs text-gray-600 line-through text-center">{row.before}</span>
-                        <span className="text-sm text-white font-semibold text-center">{row.after}</span>
-                      </div>
-                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className={`h-full ${row.color} rounded-full transition-all`} style={{ width: `${row.pct}%` }} />
+
+                  {/* GEO Score */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-gray-400">GEO Health Score</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600 line-through">18/100</span>
+                        <span className="text-lg font-bold text-white">74/100</span>
                       </div>
                     </div>
-                  ))}
-                  <div className="flex gap-3 pt-1">
-                    <div className="flex-1 bg-white/5 rounded-xl p-4 text-center">
-                      <div className="text-xl font-bold text-green-400">+340%</div>
-                      <div className="text-xs text-gray-500 mt-1">ChatGPT mentions</div>
-                    </div>
-                    <div className="flex-1 bg-white/5 rounded-xl p-4 text-center">
-                      <div className="text-xl font-bold text-purple-400">11 fixes</div>
-                      <div className="text-xs text-gray-500 mt-1">from the action plan</div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-purple-500 rounded-full" style={{ width: "74%" }} />
                     </div>
                   </div>
+
+                  {/* Citations */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-gray-400">Citations / 100 prompts</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600 line-through">0</span>
+                        <span className="text-lg font-bold text-white">12</span>
+                      </div>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 rounded-full" style={{ width: "85%" }} />
+                    </div>
+                  </div>
+
+                  {/* Competitor comparison */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <span className="text-xs text-gray-400 block mb-3">vs. Competitors</span>
+                    <div className="space-y-2.5">
+                      {[
+                        { name: "You", score: 74, color: "bg-purple-500", bold: true },
+                        { name: "Competitor A", score: 79, color: "bg-gray-500", bold: false },
+                        { name: "Competitor B", score: 68, color: "bg-gray-500", bold: false },
+                        { name: "Competitor C", score: 55, color: "bg-gray-500", bold: false },
+                      ].map((c) => (
+                        <div key={c.name} className="flex items-center gap-3">
+                          <span className={`text-xs w-24 flex-shrink-0 ${c.bold ? "text-white font-semibold" : "text-gray-500"}`}>{c.name}</span>
+                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className={`h-full ${c.color} rounded-full`} style={{ width: `${c.score}%` }} />
+                          </div>
+                          <span className={`text-xs w-8 text-right ${c.bold ? "text-white font-semibold" : "text-gray-600"}`}>{c.score}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action plan */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <span className="text-xs text-gray-400 block mb-3">Action Plan</span>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Add Organization schema markup", priority: "Critical", color: "text-red-400", dot: "bg-red-500", done: true },
+                        { label: "Implement FAQ structured data", priority: "Critical", color: "text-red-400", dot: "bg-red-500", done: true },
+                        { label: "Rewrite features page for AI", priority: "High", color: "text-orange-400", dot: "bg-orange-500", done: true },
+                        { label: "Add author markup to blog posts", priority: "Medium", color: "text-yellow-400", dot: "bg-yellow-500", done: false },
+                        { label: "Update meta descriptions", priority: "Low", color: "text-gray-500", dot: "bg-gray-600", done: false },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center gap-3">
+                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.dot}`} />
+                          <span className={`text-xs flex-1 ${item.done ? "line-through text-gray-600" : "text-gray-300"}`}>{item.label}</span>
+                          <span className={`text-xs font-medium flex-shrink-0 ${item.color}`}>{item.priority}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -758,6 +823,7 @@ export default function Home() {
                 title="DATA"
                 subtitle="For developers & SEO experts"
                 price="€29"
+                oldPrice="€49"
                 period="one-time"
                 features={[
                   "1 GEO audit — 4 AI engines",
@@ -793,6 +859,7 @@ export default function Home() {
                 title="PRO"
                 subtitle="Track your monthly progress"
                 price="€59"
+                oldPrice="€99"
                 period="mo"
                 highlighted={true}
                 features={[
@@ -812,6 +879,7 @@ export default function Home() {
                 title="AGENCY"
                 subtitle="For marketing agencies"
                 price="€599"
+                oldPrice="€999"
                 period="mo"
                 features={[
                   "15 client audits per month",
