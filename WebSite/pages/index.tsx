@@ -17,6 +17,7 @@ import {
   Eye,
   Target,
   Zap,
+  Star,
 } from "lucide-react";
 
 // AI Models with their actual logo files
@@ -159,9 +160,10 @@ const FAQItem = ({
   </div>
 );
 
-// Pricing Card Component - With strikethrough old price
+// Pricing Card Component
 const PricingCard = ({
   title,
+  subtitle,
   price,
   oldPrice,
   period,
@@ -172,8 +174,9 @@ const PricingCard = ({
   onCtaClick,
 }: {
   title: string;
+  subtitle: string;
   price: string;
-  oldPrice: string;
+  oldPrice?: string;
   period: string;
   features: string[];
   highlighted?: boolean;
@@ -182,7 +185,7 @@ const PricingCard = ({
   onCtaClick?: () => void;
 }) => (
   <div
-    className={`relative rounded-3xl p-8 transition-all duration-300 flex flex-col h-full ${
+    className={`relative rounded-3xl p-7 transition-all duration-300 flex flex-col h-full ${
       highlighted
         ? "bg-[#1E293B] text-white shadow-2xl shadow-slate-500/25 scale-[1.02]"
         : "bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg"
@@ -195,14 +198,15 @@ const PricingCard = ({
         </span>
       </div>
     )}
-    <div
-      className={`text-sm font-semibold mb-4 ${highlighted ? "text-white" : "text-gray-900"}`}
-    >
+    <div className={`text-xs font-bold tracking-widest mb-1 ${highlighted ? "text-pink-400" : "text-violet-600"}`}>
       {title}
+    </div>
+    <div className={`text-sm mb-4 ${highlighted ? "text-gray-400" : "text-gray-500"}`}>
+      {subtitle}
     </div>
     <div className="flex items-baseline gap-2 mb-1">
       <span
-        className={`text-5xl font-semibold ${highlighted ? "text-white" : "text-gray-900"}`}
+        className={`text-4xl font-semibold ${highlighted ? "text-white" : "text-gray-900"}`}
       >
         {price}
       </span>
@@ -210,23 +214,23 @@ const PricingCard = ({
         /{period}
       </span>
     </div>
-    <div className="mb-6">
-      <span
-        className={`text-lg line-through ${highlighted ? "text-gray-400" : "text-gray-400"}`}
-      >
-        {oldPrice}/{period}
-      </span>
-      <span
-        className={`text-xs ml-2 font-semibold ${highlighted ? "text-green-400" : "text-green-600"}`}
-      >
-        LAUNCH PRICE
-      </span>
+    <div className="mb-5 h-6">
+      {oldPrice ? (
+        <>
+          <span className={`text-sm line-through ${highlighted ? "text-gray-500" : "text-gray-400"}`}>
+            {oldPrice}
+          </span>
+          <span className={`text-xs ml-2 font-semibold ${highlighted ? "text-green-400" : "text-green-600"}`}>
+            LAUNCH PRICE
+          </span>
+        </>
+      ) : null}
     </div>
-    <ul className="space-y-3 mb-8 flex-1">
+    <ul className="space-y-2.5 mb-7 flex-1">
       {features.map((feature, i) => (
         <li key={i} className="flex items-start gap-3">
           <Check
-            className={`w-5 h-5 mt-0.5 flex-shrink-0 ${highlighted ? "text-green-400" : "text-green-500"}`}
+            className={`w-4 h-4 mt-0.5 flex-shrink-0 ${highlighted ? "text-green-400" : "text-green-500"}`}
           />
           <span
             className={`text-sm ${highlighted ? "text-gray-200" : "text-gray-600"}`}
@@ -400,12 +404,12 @@ export default function Home() {
     {
       question: "Can I export the reports?",
       answer:
-        "Yes! All plans include PDF export functionality. You'll receive a comprehensive report with executive summary, detailed findings, competitor analysis, and actionable recommendations that you can share with your team or clients.",
+        "Yes! All plans give you access to your audit dashboard with a shareable link. Pro and Agency subscribers get a permanent dashboard with full history. Agency plans include white-label sharing so your clients see your branding.",
     },
     {
       question: "Which AI models do you analyze?",
       answer:
-        "We analyze your visibility across the 4 major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, and DeepSeek. Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
+        "We analyze your visibility across the 4 major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, and Gemini (Google). Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
     },
     {
       question: "How often should I run an audit?",
@@ -415,7 +419,7 @@ export default function Home() {
     {
       question: "Do you offer white-label reports for agencies?",
       answer:
-        "Yes! Our Premium plan includes fully customizable white-label reports with your branding. You can add your logo, colors, and custom messaging to present professional GEO audits to your clients under your own brand.",
+        "Yes! Our Agency plan includes fully customizable white-label dashboards with your branding. You can add your logo, colors, and share a custom link with your clients — they see your agency, not ShowYourBrand.",
     },
   ];
 
@@ -424,14 +428,14 @@ export default function Home() {
       <TagSEO
         canonicalSlug=""
         title="ShowYourBrand | GEO Audit: Appear in ChatGPT, Claude & Perplexity"
-        description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers."
+        description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & Gemini. Get your GEO score and an action plan to appear in AI answers."
         keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
         og={{
           title: "ShowYourBrand | Appear in AI Search Results",
           description:
             "Is your brand cited by ChatGPT, Claude or Perplexity? Test 100 AI prompts, get your GEO score and a clear action plan. Start your free audit today.",
-          image: `https://showyourbrand.vercel.app/og-image.png`,
-          url: "https://showyourbrand.vercel.app/",
+          image: `https://showyourbrand.app/og-homepage.jpeg`,
+          url: "https://showyourbrand.app/",
         }}
       />
       <TagSchema />
@@ -511,17 +515,39 @@ export default function Home() {
               <AIModelMarquee />
             </div>
 
-            {/* Bottom: CTA pinned to bottom */}
-            <div className="max-w-xl mx-auto">
-              <div className="flex justify-center mt-4">
-                <Button
-                  onClick={openWaitlistModal}
-                  className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book a Free Call
-                </Button>
+            {/* Social proof + CTA pinned to bottom */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-gray-200">
+                      <Image
+                        src={`/avatars/user-${i}.jpg`}
+                        alt={`Early user ${i}`}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">Used by 120+ brands in early access</p>
+                </div>
               </div>
+
+              <Button
+                onClick={openWaitlistModal}
+                className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Book a Free Call
+              </Button>
             </div>
           </div>
 
@@ -558,24 +584,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* The GEO Advantage Section - Aggressive Marketing */}
+        {/* Features Section */}
         <section id="features" className="px-4 py-16 md:py-20 lg:min-h-screen lg:flex lg:flex-col lg:items-center lg:justify-center">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-8 md:mb-12">
-              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-red-700 text-xs sm:text-sm font-semibold">
-                  YOUR CUSTOMERS HAVE ALREADY SWITCHED TO AI SEARCH
-                </span>
-              </div>
               <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-4 md:mb-6">
-                Google is dying. AI is the new search.
+                GEO is the new SEO.
               </h2>
               <p className="text-gray-600 max-w-2xl lg:max-w-3xl mx-auto text-base md:text-lg lg:text-xl">
-                58% of consumers now use ChatGPT, Perplexity, or Claude instead
-                of Google to find products and services. If AI doesn&apos;t
-                mention your brand, <strong>you don&apos;t exist</strong> for
-                these customers.
+                When someone asks ChatGPT for a recommendation, they get one answer — not ten blue links.
+                Either your brand is mentioned, or a competitor is. There is no page 2.
               </p>
             </div>
 
@@ -585,12 +603,11 @@ export default function Home() {
                   <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
-                  Be the brand AI recommends
+                  See what 4 AI models actually say about you
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  <strong>87% of brands are invisible</strong> to AI. When users
-                  ask &ldquo;the best tool for...&rdquo;, AI names you, or your
-                  competitor.
+                  We run 100 real prompts across ChatGPT, Claude, Perplexity and Gemini.
+                  You get the word-for-word responses — not estimates, not scores, the actual text.
                 </p>
               </div>
 
@@ -599,12 +616,12 @@ export default function Home() {
                   <Target className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
-                  Crush your competitors
+                  Find out who's being cited instead of you
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  See which competitors AI recommends instead of you. Understand{" "}
-                  <strong>why they rank higher</strong>, then steal their
-                  playbook.
+                  When AI skips your brand, it names someone else. We tell you which competitors,
+                  on which prompts, and what specifically puts them ahead — content structure,
+                  schema, backlinks from cited sources.
                 </p>
               </div>
 
@@ -613,161 +630,176 @@ export default function Home() {
                   <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
-                  10x more qualified traffic
+                  A fix list, not a report
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  AI users have <strong>3x higher purchase intent</strong> than
-                  Google users. One AI mention drives more revenue than 1,000
-                  clicks.
+                  Every issue comes with a specific action: schema markup to add,
+                  a paragraph to rewrite, a page to restructure. Prioritized by impact.
+                  No PDF to interpret, no consultant needed.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Infrastructure Section */}
+        {/* ROI & Results Section */}
         <section
           id="process"
           className="px-4 py-16 md:py-20 lg:min-h-screen bg-white/50 backdrop-blur-sm lg:flex lg:flex-col lg:items-center lg:justify-center"
         >
-          <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start mb-12">
               <div>
-                <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-medium text-gray-900 mb-4 md:mb-6">
-                  Your competitors are already
-                  <br />
-                  <span className="italic text-purple-600">
-                    winning AI search
-                  </span>
+                <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-gray-900 mb-5">
+                  Visitors from AI already trust you.
                 </h2>
-                <p className="text-gray-600 mb-8 md:mb-10 leading-relaxed text-base md:text-lg">
-                  Every day, millions of potential customers ask AI for
-                  recommendations. If your brand isn&apos;t being cited,
-                  you&apos;re losing deals to competitors who are. We show you
-                  exactly where you stand and how to fix it.
+                <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
+                  Traditional SEO brings people who are still comparing options.
+                  Someone who found you through a ChatGPT answer has already validated the choice. The AI did it for them.
+                  They&apos;re not browsing. They arrived with intent.
                 </p>
+                <p className="text-gray-600 leading-relaxed text-base md:text-lg">
+                  The problem: most brands have no idea whether they&apos;re being mentioned, or silently skipped.
+                  GEO is the only way to find out, and to fix it.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { value: "3×", label: "higher conversion rate", sub: "AI-referred vs. organic search" },
+                  { value: "58%", label: "of product searches", sub: "now start on an AI, not Google" },
+                  { value: "87%", label: "of brands cited zero times", sub: "across 100 AI prompts in their category" },
+                  { value: "1 mention", label: "in an AI answer", sub: "can outperform thousands of SEO clicks" },
+                ].map((stat) => (
+                  <div key={stat.value} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                    <div className="text-xs font-semibold text-gray-700 mb-1">{stat.label}</div>
+                    <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                <div className="space-y-6 md:space-y-8">
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        See What AI Says About You
-                      </h4>
-                      <p className="text-gray-600">
-                        Real queries. Real responses. Know exactly how ChatGPT,
-                        Claude, and Perplexity describe your brand.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        Outrank Your Competition
-                      </h4>
-                      <p className="text-gray-600">
-                        Discover which competitors are getting recommended
-                        instead of you, and steal their playbook.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Check className="w-6 h-6 text-green-500 flex-shrink-0" />
-                    <p className="text-gray-900 text-lg">
-                      Get copy-paste fixes you can implement today
+            {/* Case study */}
+            <div className="bg-[#0F172A] rounded-3xl overflow-hidden text-white">
+              <div className="grid md:grid-cols-2">
+
+                {/* Left — Story */}
+                <div className="p-8 md:p-12 flex flex-col justify-center">
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-6">B2B SaaS · Project Management</p>
+
+                  {/* Before */}
+                  <div className="mb-6">
+                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Before</span>
+                    <h3 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium mt-2 leading-tight text-gray-300">
+                      Invisible.<br />Cited 0 times.<br />Losing to 2 competitors.
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-3 leading-relaxed">
+                      GEO score 18/100. Not mentioned once across 100 AI prompts.
+                      Two competitors cited on every relevant query.
+                      The HTML scanner rated their features page 4/10 for AI readability.
                     </p>
                   </div>
-                </div>
-              </div>
 
-              {/* Right column - Visualization */}
-              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 overflow-hidden">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-sm text-gray-500 font-medium">
-                      Live AI Analysis
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full">
-                    Your Brand
-                  </span>
-                </div>
+                  {/* Arrow */}
+                  <div className="text-2xl text-gray-600 mb-6">↓</div>
 
-                <div className="text-center mb-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl">
-                  <div className="text-6xl font-bold text-gray-900 mb-1">
-                    73<span className="text-3xl text-gray-400">%</span>
+                  {/* After */}
+                  <div className="mb-8">
+                    <span className="text-xs font-bold text-green-400 uppercase tracking-wider">After 6 weeks</span>
+                    <h3 className="font-heading text-3xl md:text-4xl lg:text-5xl font-medium mt-2 leading-tight">
+                      74/100.<br />12 citations.<br />Ahead of the pack.
+                    </h3>
+                    <p className="text-gray-400 text-sm mt-3 leading-relaxed">
+                      11 fixes from the action plan: Organization schema, FAQ structured data,
+                      features page rewrite. Second audit returned 74/100.
+                    </p>
                   </div>
-                  <div className="text-base text-gray-600">GEO Health Score</div>
-                  <div className="text-sm text-orange-500 mt-1 font-medium">
-                    Room for improvement
-                  </div>
+
+                  <p className="text-gray-400 text-sm italic leading-relaxed border-l-2 border-gray-700 pl-4 mb-3">
+                    &ldquo;The audit showed exactly why ChatGPT ignored us. Six weeks later
+                    we show up on every prompt where we used to be invisible.&rdquo;
+                  </p>
+                  <p className="text-gray-600 text-xs">Founder, anonymous at their request</p>
                 </div>
 
-                <div className="space-y-4 mb-8">
-                  <div className="text-sm text-gray-500 uppercase tracking-wider mb-3">
-                    vs. Top Competitors
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base text-gray-700 w-28 truncate">
-                      You
-                    </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-purple-500 h-full rounded-full"
-                        style={{ width: "73%" }}
-                      />
-                    </div>
-                    <span className="text-base font-semibold text-gray-900 w-12 text-right">
-                      73%
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base text-gray-500 w-28 truncate">
-                      Competitor A
-                    </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-green-400 h-full rounded-full"
-                        style={{ width: "89%" }}
-                      />
-                    </div>
-                    <span className="text-base font-semibold text-green-600 w-12 text-right">
-                      89%
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base text-gray-500 w-28 truncate">
-                      Competitor B
-                    </span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-blue-400 h-full rounded-full"
-                        style={{ width: "81%" }}
-                      />
-                    </div>
-                    <span className="text-base font-semibold text-gray-900 w-12 text-right">
-                      81%
-                    </span>
-                  </div>
-                </div>
+                {/* Right — Dashboard mockup */}
+                <div className="bg-[#1E293B] p-6 md:p-8 flex flex-col gap-4">
 
-                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
-                  <div className="text-center py-4 bg-red-50 rounded-xl">
-                    <div className="text-xl font-bold text-red-600">12</div>
-                    <div className="text-sm text-gray-600">
-                      Missing Citations
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-gray-400 font-medium">GEO Dashboard · Audit 2 of 2</span>
+                    <span className="text-xs text-green-400 font-semibold">↑ +56 pts</span>
+                  </div>
+
+                  {/* GEO Score */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-gray-400">GEO Health Score</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600 line-through">18/100</span>
+                        <span className="text-lg font-bold text-white">74/100</span>
+                      </div>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-purple-500 rounded-full" style={{ width: "74%" }} />
                     </div>
                   </div>
-                  <div className="text-center py-4 bg-green-50 rounded-xl">
-                    <div className="text-xl font-bold text-green-600">
-                      +340%
+
+                  {/* Citations */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-gray-400">Citations / 100 prompts</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600 line-through">0</span>
+                        <span className="text-lg font-bold text-white">12</span>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      Potential Traffic
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 rounded-full" style={{ width: "85%" }} />
                     </div>
                   </div>
+
+                  {/* Competitor comparison */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <span className="text-xs text-gray-400 block mb-3">vs. Competitors</span>
+                    <div className="space-y-2.5">
+                      {[
+                        { name: "You", score: 74, color: "bg-purple-500", bold: true },
+                        { name: "Competitor A", score: 79, color: "bg-gray-500", bold: false },
+                        { name: "Competitor B", score: 68, color: "bg-gray-500", bold: false },
+                        { name: "Competitor C", score: 55, color: "bg-gray-500", bold: false },
+                      ].map((c) => (
+                        <div key={c.name} className="flex items-center gap-3">
+                          <span className={`text-xs w-24 flex-shrink-0 ${c.bold ? "text-white font-semibold" : "text-gray-500"}`}>{c.name}</span>
+                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className={`h-full ${c.color} rounded-full`} style={{ width: `${c.score}%` }} />
+                          </div>
+                          <span className={`text-xs w-8 text-right ${c.bold ? "text-white font-semibold" : "text-gray-600"}`}>{c.score}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action plan */}
+                  <div className="bg-[#0F172A] rounded-2xl p-5">
+                    <span className="text-xs text-gray-400 block mb-3">Action Plan</span>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Add Organization schema markup", priority: "Critical", color: "text-red-400", dot: "bg-red-500", done: true },
+                        { label: "Implement FAQ structured data", priority: "Critical", color: "text-red-400", dot: "bg-red-500", done: true },
+                        { label: "Rewrite features page for AI", priority: "High", color: "text-orange-400", dot: "bg-orange-500", done: true },
+                        { label: "Add author markup to blog posts", priority: "Medium", color: "text-yellow-400", dot: "bg-yellow-500", done: false },
+                        { label: "Update meta descriptions", priority: "Low", color: "text-gray-500", dot: "bg-gray-600", done: false },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center gap-3">
+                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.dot}`} />
+                          <span className={`text-xs flex-1 ${item.done ? "line-through text-gray-600" : "text-gray-300"}`}>{item.label}</span>
+                          <span className={`text-xs font-medium flex-shrink-0 ${item.color}`}>{item.priority}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -776,81 +808,91 @@ export default function Home() {
 
         {/* Pricing Section */}
         <section id="pricing" className="py-16 md:py-20 px-4">
-          <div className="container mx-auto max-w-5xl">
+          <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-10 md:mb-14">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
                 Simple, transparent pricing
               </h2>
               <p className="text-gray-600">
-                Choose the plan that fits your needs. Cancel anytime.
+                One audit to test. A subscription to track. An agency plan to scale.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
               <PricingCard
-                title="BASIC"
-                price="€199"
-                oldPrice="€299"
+                title="DATA"
+                subtitle="For developers & SEO experts"
+                price="€29"
+                oldPrice="€49"
                 period="one-time"
                 features={[
-                  "1 complete GEO visibility audit",
-                  "ChatGPT (GPT-4o) AI citation analysis",
-                  "GEO Health Score (0–100) with breakdown",
-                  "100 AI prompts tested in your category",
-                  "1 competitor benchmark",
-                  "Technical HTML & Schema.org audit",
-                  "Content gap & missing FAQ identification",
-                  "Full PDF report with prioritized fixes",
-                  "Email support (48h response)",
+                  "1 GEO audit — 4 AI engines",
+                  "Raw JSON export of all results",
+                  "GEO Health Score & category breakdown",
+                  "100 prompts tested, 3 competitors",
+                  "HTML scanner raw results",
+                  "Permanent data access via API",
                 ]}
-                ctaText="Book a Call"
-                onCtaClick={openWaitlistModal}
+                ctaText="Get the data"
+                ctaLink="/signup?plan=data"
+              />
+              <PricingCard
+                title="STARTER"
+                subtitle="Test your AI visibility"
+                price="€79"
+                oldPrice="€129"
+                period="one-time"
+                features={[
+                  "1 complete GEO audit",
+                  "4 AI engines: ChatGPT, Claude, Perplexity & Gemini",
+                  "GEO Health Score (0–100) with breakdown",
+                  "100 AI prompts in your category",
+                  "3 competitor benchmarks",
+                  "Technical HTML & Schema.org audit",
+                  "Prioritized action plan",
+                  "Dashboard access (30 days)",
+                ]}
+                ctaText="Start my audit"
+                ctaLink="/signup?plan=starter"
               />
               <PricingCard
                 title="PRO"
-                price="€399"
-                oldPrice="€599"
-                period="one-time"
-                features={[
-                  "1 complete GEO visibility audit",
-                  "4 AI engines: ChatGPT, Claude, Perplexity & DeepSeek",
-                  "GEO Health Score + competitor gap analysis",
-                  "100 AI prompts tested in your category",
-                  "5 competitor benchmarks",
-                  "Technical HTML & Schema.org deep scan",
-                  "AI-optimized FAQ & content snippets to add",
-                  "Priority action plan ranked by ROI impact",
-                  "PDF report + executive summary (shareable)",
-                  "Dashboard with progress history",
-                  "Priority support (24h)",
-                ]}
+                subtitle="Track your monthly progress"
+                price="€59"
+                oldPrice="€99"
+                period="mo"
                 highlighted={true}
+                features={[
+                  "1 automatic audit per month",
+                  "4 AI engines + monthly comparison",
+                  "Month-over-month score delta",
+                  "Fixed vs new issues tracking",
+                  "Prompt-level gain / loss tracking",
+                  "3 competitor benchmarks",
+                  "Permanent dashboard + full history",
+                  "Action checklist + 15-day progress email",
+                ]}
+                ctaText="Start tracking"
+                ctaLink="/signup?plan=pro"
+              />
+              <PricingCard
+                title="AGENCY"
+                subtitle="For marketing agencies"
+                price="€599"
+                oldPrice="€999"
+                period="mo"
+                features={[
+                  "15 client audits per month",
+                  "All Pro features per client",
+                  "Multi-client dashboard",
+                  "White-label shareable reports",
+                  "3 competitor benchmarks per client",
+                  "Resell at your own price",
+                  "Dedicated account manager",
+                ]}
                 ctaText="Book a Call"
                 onCtaClick={openWaitlistModal}
               />
-              <div className="md:col-span-2 lg:col-span-1 flex flex-col">
-                <PricingCard
-                  title="AGENCY"
-                  price="€799"
-                  oldPrice="€1,199"
-                  period="mo"
-                  features={[
-                    "20 client GEO audits per month",
-                    "All 4 AI engines per audit",
-                    "Unlimited competitor benchmarks",
-                    "White-label PDF reports with your branding",
-                    "Agency dashboard to manage all clients",
-                    "Automated client-ready executive reports",
-                    "Schema.org & FAQ code snippets to deploy",
-                    "Monthly GEO evolution tracking per client",
-                    "Resell audits at your own price",
-                    "Dedicated account manager",
-                    "+€35 per extra audit beyond 20",
-                  ]}
-                  ctaText="Book a Call"
-                  onCtaClick={openWaitlistModal}
-                />
-              </div>
             </div>
 
             <p className="mt-8 text-center text-sm text-gray-600">

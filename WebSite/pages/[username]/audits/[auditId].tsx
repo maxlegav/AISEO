@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import {
   ArrowLeft, Loader2, Clock, XCircle, RefreshCw, CheckCircle2,
+  Share2, Copy, Check, X, Download,
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useLanguage } from "@/components/LanguageContext";
@@ -11,6 +12,9 @@ import ActionPlan from "@/components/audit/ActionPlan";
 import GeoQuickWins from "@/components/audit/GeoQuickWins";
 import CompetitorComparison from "@/components/audit/CompetitorComparison";
 import DeepDive from "@/components/audit/DeepDive";
+import AuditComparison from "@/components/audit/AuditComparison";
+import IssueChecklist from "@/components/audit/IssueChecklist";
+import ProGate from "@/components/ui/ProGate";
 import type { AuditDoc, IssueItem, PromptGapItem } from "@/components/audit/auditTypes";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -36,6 +40,12 @@ export default function AuditDetailPage() {
   const [loading, setLoading] = useState(true);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Share state
+  const [shareModal, setShareModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   /* Auth guard */
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/login"); return; }
@@ -45,6 +55,45 @@ export default function AuditDetailPage() {
       session.user.username !== username
     ) router.push(`/${session.user.username}`);
   }, [status, session, username, router]);
+
+  const handleShare = async () => {
+    if (!audit) return;
+    if (audit.shareToken) {
+      // Already shared — reuse existing URL
+      const url = `${window.location.origin}/share/${audit.shareToken}`;
+      setShareUrl(url);
+      setShareModal(true);
+      return;
+    }
+    setShareLoading(true);
+    try {
+      const res = await fetch(`/api/audits/${audit._id}/share`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setShareUrl(data.data.shareUrl);
+        setAudit((prev) => prev ? { ...prev, shareToken: data.data.shareToken } : prev);
+        setShareModal(true);
+      }
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleRevokeShare = async () => {
+    if (!audit) return;
+    await fetch(`/api/audits/${audit._id}/share`, { method: 'DELETE' });
+    setAudit((prev) => prev ? { ...prev, shareToken: null } : prev);
+    setShareUrl(null);
+    setShareModal(false);
+  };
 
   const fetchAudit = useCallback(async (id: string) => {
     try {
@@ -220,14 +269,86 @@ export default function AuditDetailPage() {
             {audit.businessName ?? "Audit"}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          {String(t("audit.status.completed"))}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            {String(t("audit.status.completed"))}
+          </div>
+          <a
+            href={audit ? `/api/audits/${audit._id}/export-json` : "#"}
+            download
+            className="flex items-center gap-1.5 text-xs text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full transition-colors"
+            title="Télécharger les données brutes JSON"
+          >
+            <Download className="w-3.5 h-3.5" />
+            JSON
+          </a>
+          <button
+            onClick={handleShare}
+            disabled={shareLoading}
+            className="flex items-center gap-1.5 text-xs text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full transition-colors disabled:opacity-50"
+          >
+            {shareLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5" />}
+            Share report
+          </button>
         </div>
       </div>
 
+      {/* ── Share Modal ───────────────────────────────────────────────────── */}
+      {shareModal && shareUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Share this report</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Anyone with this link can view the report — no login required.</p>
+              </div>
+              <button onClick={() => setShareModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-4">
+              <span className="text-xs text-gray-600 truncate flex-1">{shareUrl}</span>
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-700 shrink-0"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handleRevokeShare}
+                className="text-xs text-red-500 hover:text-red-600 underline"
+              >
+                Revoke link
+              </button>
+              <button
+                onClick={() => setShareModal(false)}
+                className="text-xs text-gray-500 hover:text-gray-700 bg-gray-100 px-4 py-2 rounded-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Section 1: Hero ────────────────────────────────────────────────── */}
       <AuditHero audit={audit} results={r} />
+
+      {/* ── Comparison vs previous audit (Pro/Agency only) ───────────────── */}
+      {(session?.user?.subscriptionTier === 'pro' || session?.user?.subscriptionTier === 'agency') ? (
+        audit.previousAuditId && (
+          <div className="mb-4">
+            <AuditComparison
+              previousAuditId={audit.previousAuditId}
+              currentAudit={{ geoScore: audit.geoScore, results: audit.results }}
+            />
+          </div>
+        )
+      ) : null}
 
       {/* ── Section 2: Action Plan ─────────────────────────────────────────── */}
       <ActionPlan
@@ -277,6 +398,24 @@ export default function AuditDetailPage() {
           geoScore={geoScore}
           businessName={audit.businessName}
         />
+      </div>
+
+      {/* ── Issue Checklist (Pro/Agency only) ─────────────────────────────── */}
+      <div className="mb-4">
+        {(session?.user?.subscriptionTier === 'pro' || session?.user?.subscriptionTier === 'agency') ? (
+          issues.length > 0 && (
+            <IssueChecklist
+              auditId={audit._id}
+              issues={issues}
+              initialChecklist={audit.issueChecklist ?? []}
+            />
+          )
+        ) : (
+          <ProGate
+            feature="Suivi des actions & checklist"
+            description="Cochez les problèmes résolus et recevez un résumé par email 15 jours après votre audit."
+          />
+        )}
       </div>
 
       {/* ── Business Snapshot ──────────────────────────────────────────────── */}

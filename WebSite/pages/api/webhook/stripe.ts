@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import mongoose from 'mongoose';
 import User from '@/models/User';
 import Subscription from '@/models/Subscription';
-import { sendSubscriptionConfirmationEmail } from '@/lib/email';
+import { sendSubscriptionConfirmationEmail, sendAuditCreditAvailableEmail } from '@/lib/email';
 import appConfig from '@/config';
 
 // Initialize Stripe
@@ -26,19 +26,21 @@ const connectDB = async () => {
 };
 
 // Map price IDs to tiers
-const getTierFromPriceId = (priceId: string): 'basic' | 'pro' | 'premium' => {
-  if (priceId === appConfig.stripe.basic.priceId) return 'basic';
+const getTierFromPriceId = (priceId: string): 'data' | 'starter' | 'pro' | 'agency' => {
+  if (priceId === appConfig.stripe.data.priceId) return 'data';
+  if (priceId === appConfig.stripe.starter.priceId) return 'starter';
   if (priceId === appConfig.stripe.pro.priceId) return 'pro';
-  if (priceId === appConfig.stripe.premium.priceId) return 'premium';
-  return 'basic'; // Default fallback
+  if (priceId === appConfig.stripe.agency.priceId) return 'agency';
+  return 'starter'; // Default fallback
 };
 
 // Get amount from tier (in cents)
 const getAmountFromTier = (tier: string): number => {
   switch (tier) {
-    case 'basic': return appConfig.stripe.basic.price * 100;
+    case 'data': return appConfig.stripe.data.price * 100;
+    case 'starter': return appConfig.stripe.starter.price * 100;
     case 'pro': return appConfig.stripe.pro.price * 100;
-    case 'premium': return appConfig.stripe.premium.price * 100;
+    case 'agency': return appConfig.stripe.agency.price * 100;
     default: return 0;
   }
 };
@@ -61,9 +63,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
-  // Handle one-shot purchase (Basic or Pro)
+  // Handle one-shot purchase (Data or Starter)
   if (session.mode === 'payment') {
-    const purchaseTier = (tier as 'basic' | 'pro') || 'basic';
+    const purchaseTier = (tier as 'data' | 'starter') || 'starter';
 
     // Add audit credit and update subscription tier
     user.auditCredits = (user.auditCredits || 0) + 1;
@@ -73,11 +75,12 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     await user.save();
 
     // Create purchase record for one-shot audit
+    const oneShotPriceId = purchaseTier === 'data' ? appConfig.stripe.data.priceId : appConfig.stripe.starter.priceId;
     await Subscription.create({
       userId: user._id,
       stripeSubscriptionId: session.payment_intent as string,
       stripeCustomerId: customerId,
-      stripePriceId: purchaseTier === 'pro' ? appConfig.stripe.pro.priceId : appConfig.stripe.basic.priceId,
+      stripePriceId: oneShotPriceId,
       tier: purchaseTier,
       status: 'active',
       currentPeriodStart: new Date(),
@@ -115,7 +118,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   // Update user
   user.stripeCustomerId = customerId;
   user.subscriptionId = subscriptionId;
-  user.subscriptionTier = subscriptionTier as 'none' | 'basic' | 'pro' | 'premium';
+  user.subscriptionTier = subscriptionTier as 'none' | 'data' | 'starter' | 'pro' | 'agency';
   user.subscriptionStatus = 'active';
   user.subscriptionEndDate = new Date(stripeSubscription.current_period_end * 1000);
   await user.save();
@@ -180,7 +183,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const status = statusMap[subscription.status] || 'inactive';
 
   // Update user
-  user.subscriptionTier = tier as 'none' | 'basic' | 'pro' | 'premium';
+  user.subscriptionTier = tier as 'none' | 'data' | 'starter' | 'pro' | 'agency';
   user.subscriptionStatus = status;
   user.subscriptionEndDate = new Date(subscription.current_period_end * 1000);
   await user.save();
@@ -247,6 +250,37 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log('[Stripe Webhook] Payment failed for user:', user._id);
 }
 
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+  // Only handle subscription renewals (not initial checkout — that's handled by checkout.session.completed)
+  if (invoice.billing_reason !== 'subscription_cycle') return;
+
+  await connectDB();
+
+  const customerId = invoice.customer as string;
+  const user = await User.findOne({ stripeCustomerId: customerId });
+  if (!user) return;
+
+  // Only credit Pro/Agency subscriptions
+  const tier = user.subscriptionTier;
+  if (tier !== 'pro' && tier !== 'agency') return;
+
+  // Add 1 audit credit on renewal
+  const creditsToAdd = tier === 'agency' ? appConfig.stripe.agency.auditsPerMonth : 1;
+  user.auditCredits = (user.auditCredits || 0) + creditsToAdd;
+  await user.save();
+
+  // Send "your credit is available" email
+  sendAuditCreditAvailableEmail({
+    email: user.email,
+    userName: user.name,
+    language: user.language || 'fr',
+  }).catch((err: Error) => {
+    console.error('[Stripe Webhook] Failed to send credit available email:', err.message);
+  });
+
+  console.log(`[Stripe Webhook] Monthly credit added for user ${user._id} (${tier}): +${creditsToAdd}`);
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -296,8 +330,7 @@ export default async function handler(
         break;
 
       case 'invoice.payment_succeeded':
-        // Log successful payment (receipt is sent by Stripe)
-        console.log('[Stripe Webhook] Invoice payment succeeded:', (event.data.object as Stripe.Invoice).id);
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
         break;
 
       case 'invoice.payment_failed':

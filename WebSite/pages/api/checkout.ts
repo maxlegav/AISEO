@@ -22,9 +22,10 @@ const connectDB = async () => {
 
 // Map price IDs to tiers
 const getTierFromPriceId = (priceId: string): string => {
-  if (priceId === config.stripe.basic.priceId) return 'basic';
+  if (priceId === config.stripe.data.priceId) return 'data';
+  if (priceId === config.stripe.starter.priceId) return 'starter';
   if (priceId === config.stripe.pro.priceId) return 'pro';
-  if (priceId === config.stripe.premium.priceId) return 'premium';
+  if (priceId === config.stripe.agency.priceId) return 'agency';
   return 'unknown';
 };
 

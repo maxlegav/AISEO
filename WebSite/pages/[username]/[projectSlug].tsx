@@ -16,6 +16,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AuditHistory, { type HistoryPoint } from "@/components/audit/AuditHistory";
+import ProGate from "@/components/ui/ProGate";
 
 interface Business {
   _id: string;
@@ -258,6 +260,7 @@ export default function ProjectDetailPage() {
   const { username, projectSlug } = router.query;
   const [project, setProject] = useState<Business | null>(null);
   const [audit, setAudit] = useState<Audit | null>(null);
+  const [history, setHistory] = useState<HistoryPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -296,6 +299,13 @@ export default function ProjectDetailPage() {
           const auditData = await auditRes.json();
           if (auditData.success && auditData.data.length > 0) {
             setAudit(auditData.data[0]); // already sorted by createdAt desc
+
+            // Fetch audit history for the chart (max 12 completed)
+            fetch(`/api/audits/history?businessId=${found._id}`)
+              .then((r) => r.json())
+              .then((d) => { if (d.success) setHistory(d.data as HistoryPoint[]); })
+              .catch(() => null);
+
             return auditData.data[0] as Audit;
           }
         }
@@ -437,6 +447,24 @@ export default function ProjectDetailPage() {
         onRetry={handleRetry}
         onDelete={audit ? handleDeleteAudit : undefined}
       />
+
+      {/* Audit History — Pro/Agency only */}
+      <div className="mt-6">
+        {session?.user?.subscriptionTier === 'pro' || session?.user?.subscriptionTier === 'agency' ? (
+          history.length > 0 && (
+            <AuditHistory
+              history={history}
+              username={typeof username === "string" ? username : ""}
+              currentAuditId={audit?._id}
+            />
+          )
+        ) : (
+          <ProGate
+            feature="Historique des audits"
+            description="Suivez l'évolution de votre GEO Score sur 12 mois, comparez vos audits et visualisez votre progression."
+          />
+        )}
+      </div>
     </DashboardLayout>
   );
 }

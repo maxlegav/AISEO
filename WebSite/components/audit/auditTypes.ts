@@ -146,6 +146,12 @@ export interface AuditResults {
   llmHijackPrompt?: string | null;
 }
 
+export interface ChecklistItem {
+  issueId: string;
+  done: boolean;
+  doneAt?: string | null;
+}
+
 export interface AuditDoc {
   _id: string;
   businessId?: string;
@@ -156,4 +162,8 @@ export interface AuditDoc {
   completedAt?: string;
   error?: string;
   results?: AuditResults;
+  shareToken?: string | null;
+  sharedAt?: string | null;
+  previousAuditId?: string | null;
+  issueChecklist?: ChecklistItem[];
 }

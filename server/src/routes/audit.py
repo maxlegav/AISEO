@@ -487,10 +487,39 @@ async def _run_audit_background(audit_id: str, oid: ObjectId, request: AuditRequ
             logger.critical(f"[{audit_id}] Could not write failed status: {db_err}")
 
 
+async def _notify_audit_ready(audit_id: str) -> None:
+    """Fire-and-forget: notify the Next.js webhook that an audit is ready for review."""
+    import os
+    import httpx
+
+    webhook_url = os.getenv("AUDIT_WEBHOOK_URL")
+    webhook_secret = os.getenv("AUDIT_WEBHOOK_SECRET")
+
+    if not webhook_url or not webhook_secret:
+        logger.info(f"[{audit_id}] AUDIT_WEBHOOK_URL/SECRET not configured — skipping notification")
+        return
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                f"{webhook_url}/api/webhook/audit-ready",
+                json={"auditId": audit_id},
+                headers={"Authorization": f"Bearer {webhook_secret}"},
+            )
+            if resp.status_code == 200:
+                logger.info(f"[{audit_id}] Admin notified via webhook (audit-ready)")
+            else:
+                logger.warning(f"[{audit_id}] Webhook returned {resp.status_code}: {resp.text[:200]}")
+    except Exception as exc:
+        logger.warning(f"[{audit_id}] Failed to notify webhook: {exc}")
+
+
 async def _run_phase2_background(audit_id: str, oid: ObjectId):
     """Phase 2 background wrapper: execute AI queries, score, write final results."""
     try:
         await _phase2_execute_audit(audit_id, oid)
+        # Notify Next.js that the audit is ready for admin review
+        await _notify_audit_ready(audit_id)
     except Exception as e:
         logger.error(f"[{audit_id}] Phase 2 (AI execution) failed: {e}", exc_info=True)
         try:

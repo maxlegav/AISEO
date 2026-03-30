@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import Audit from '@/models/Audit';
 import Business from '@/models/Business';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
+import { sendAuditStartedClientEmail, sendAuditStartedAdminEmail, sendAuditLaunchedAdminEmail } from '@/lib/email';
+import config from '@/config';
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -67,40 +69,29 @@ export default async function handler(
 
     await connectDB();
 
-    // Verify the user owns this business
-    const business = await Business.findOne({
-      _id: businessId,
-      userId: session.user.id,
-      deletedAt: null,
-    });
-    if (!business) {
-      throw new ApiError(ErrorType.AUTHORIZATION, 'Business not found or access denied');
-    }
-
-    // Prevent duplicate audits: block if there's already an active audit for this business
-    const activeAudit = await Audit.findOne({
+    // Find the most recent completed audit for this business (for history tracking)
+    const previousAudit = await Audit.findOne({
       businessId: new mongoose.Types.ObjectId(businessId),
       userId: new mongoose.Types.ObjectId(session.user.id),
-      status: { $in: ['pending', 'processing', 'awaiting_prompt_approval', 'questions_review', 'auditing', 'review_pending'] },
-    });
-    if (activeAudit) {
-      throw new ApiError(
-        ErrorType.VALIDATION,
-        'An audit is already in progress for this project'
-      );
-    }
+      status: 'completed',
+    })
+      .sort({ createdAt: -1 })
+      .select('_id issueChecklist results')
+      .lean();
 
-    // Limit retries: max 3 total audits per business (1 initial + 2 retries)
-    const MAX_AUDITS_PER_BUSINESS = 3;
-    const totalAudits = await Audit.countDocuments({
-      businessId: new mongoose.Types.ObjectId(businessId),
-      userId: new mongoose.Types.ObjectId(session.user.id),
-    });
-    if (totalAudits >= MAX_AUDITS_PER_BUSINESS) {
-      throw new ApiError(
-        ErrorType.VALIDATION,
-        'Maximum retry limit reached for this project. Please contact support or create a new project.'
+    // Collect issue types the user has already addressed (for AI context)
+    const completedIssueTypes: string[] = [];
+    if (previousAudit?.issueChecklist && previousAudit.issueChecklist.length > 0) {
+      const prevResults = previousAudit.results as { issues?: { id: string; type: string }[] } | null;
+      const prevIssues = prevResults?.issues ?? [];
+      const doneIds = new Set(
+        previousAudit.issueChecklist
+          .filter((c) => c.done)
+          .map((c) => c.issueId)
       );
+      for (const issue of prevIssues) {
+        if (doneIds.has(issue.id)) completedIssueTypes.push(issue.type);
+      }
     }
 
     const audit = await Audit.create({
@@ -114,6 +105,7 @@ export default async function handler(
       results: {},
       createdAt: new Date(),
       completedAt: null,
+      previousAuditId: previousAudit ? previousAudit._id : null,
     });
 
     const auditId = audit._id.toString();
@@ -139,6 +131,9 @@ export default async function handler(
         ...(city ? { city } : {}),
         ...(country ? { country } : {}),
         ...(neighborhood ? { neighborhood } : {}),
+        // History context for the processing server
+        ...(previousAudit ? { previousAuditId: previousAudit._id.toString() } : {}),
+        ...(completedIssueTypes.length > 0 ? { completedIssueTypes } : {}),
       };
 
       fetch(`${processingUrl}/audit`, {
@@ -156,6 +151,50 @@ export default async function handler(
         '[Audit] PROCESSING_SERVICE_API_KEY not configured — audit created in DB but not triggered'
       );
     }
+
+    // Fire-and-forget: notify client that audit has started
+    const userEmail = session.user.email ?? '';
+    const userName = session.user.name ?? session.user.email ?? 'Unknown';
+    const userLanguage = (session.user as { language?: string }).language === 'en' ? 'en' : 'fr';
+
+    if (userEmail) {
+      sendAuditStartedClientEmail({
+        email: userEmail,
+        userName,
+        businessName,
+        businessUrl,
+        language: userLanguage,
+      }).catch((err: Error) => {
+        console.error('[Audit] Failed to send client started email:', err.message);
+      });
+    }
+
+    // Fire-and-forget: notify admin internally that audit was launched
+    sendAuditStartedAdminEmail({
+      userName,
+      userEmail,
+      businessName,
+      businessUrl,
+      category,
+      auditId,
+      subscriptionTier: (session.user as { subscriptionTier?: string }).subscriptionTier ?? 'none',
+      adminUrl: `${config.siteUrl}/admin/audits`,
+    }).catch((err: Error) => {
+      console.error('[Audit] Failed to send admin started email:', err.message);
+    });
+
+    // Fire-and-forget: notify admin
+    sendAuditLaunchedAdminEmail({
+      businessName,
+      businessUrl,
+      category,
+      userName,
+      userEmail,
+      auditId,
+      adminUrl: `${config.siteUrl}/admin/audits`,
+    }).catch((err: Error) => {
+      console.error('[Audit] Failed to send admin notification:', err.message);
+    });
 
     return res.status(201).json({
       success: true,

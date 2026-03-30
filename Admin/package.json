@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "lucide-react": "^0.438.0",
     "mongodb": "^5.9.2",
     "next": "^16.1.4",
@@ -17,9 +18,9 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hot-toast": "^2.4.1",
+    "resend": "^6.9.4",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7",
-    "clsx": "^2.1.1"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "20.17.31",

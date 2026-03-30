@@ -247,7 +247,7 @@ export default function BlogPostPage({ post, content }: Props) {
               <div className="mx-8 md:mx-12 mb-10 rounded-2xl bg-gradient-to-br from-[#1E293B] to-[#334155] p-8 text-center">
                 <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 mb-4">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-white/80 text-xs font-semibold tracking-wide">GIO AUDIT</span>
+                  <span className="text-white/80 text-xs font-semibold tracking-wide">GEO AUDIT</span>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">
                   Ready to see how AI describes your brand?

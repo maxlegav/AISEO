@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { ObjectId } from "mongodb";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { getDb } from "@/lib/db";
+import { sendAuditCompletedClientEmail } from "@/lib/email";
 
 /**
  * Multi-step approval endpoint.
@@ -59,7 +60,7 @@ export default async function handler(
 
   const audit = await db
     .collection("audits")
-    .findOne({ _id: oid }, { projection: { status: 1 } });
+    .findOne({ _id: oid }, { projection: { status: 1, userId: 1, businessName: 1, geoScore: 1 } });
 
   if (!audit) {
     return res.status(404).json({ error: "Audit not found" });
@@ -144,6 +145,41 @@ export default async function handler(
     { _id: oid },
     { $set: updateFields }
   );
+
+  // Send client notification email when audit is delivered
+  if (newStatus === "completed" && audit.userId) {
+    try {
+      const userOid = new ObjectId(audit.userId.toString());
+      const user = await db
+        .collection("users")
+        .findOne(
+          { _id: userOid },
+          { projection: { email: 1, name: 1, username: 1, language: 1 } }
+        );
+
+      if (user?.email) {
+        const websiteUrl = process.env.WEBSITE_URL ?? "https://showyourbrand.app";
+        const lang = (user.language === "en" ? "en" : "fr") as "en" | "fr";
+        const auditUrl = user.username
+          ? `${websiteUrl}/${user.username}/audits/${auditId}`
+          : `${websiteUrl}/dashboard`;
+
+        sendAuditCompletedClientEmail({
+          to: user.email,
+          userName: user.name ?? "there",
+          businessName: audit.businessName ?? "your website",
+          geoScore: audit.geoScore ?? 0,
+          auditUrl,
+          language: lang,
+        }).catch((err: Error) => {
+          console.error("[Email] Failed to send audit completed email:", err.message);
+        });
+      }
+    } catch (err) {
+      // Non-blocking — don't fail the approval if email errors
+      console.error("[Email] Error fetching user for completion email:", err);
+    }
+  }
 
   return res.status(200).json({
     success: true,

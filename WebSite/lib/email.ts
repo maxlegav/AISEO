@@ -3,12 +3,18 @@ import { render } from "@react-email/render";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import PasswordResetEmail from "@/emails/PasswordResetEmail";
 import SubscriptionConfirmationEmail from "@/emails/SubscriptionConfirmationEmail";
+import AuditStartedClientEmail from "@/emails/AuditStartedClientEmail";
+import AuditStartedAdminEmail from "@/emails/AuditStartedAdminEmail";
+import AuditNotificationAdminEmail from "@/emails/AuditNotificationAdminEmail";
+import AuditCompletedClientEmail from "@/emails/AuditCompletedClientEmail";
+import AuditCreditAvailableEmail from "@/emails/AuditCreditAvailableEmail";
+import ChecklistSummaryEmail from "@/emails/ChecklistSummaryEmail";
 
 // Initialize Resend client
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email sender configuration
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@ShowYourBrand.com";
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@showyourbrand.app";
 
 export interface SendEmailParams {
   to: string;
@@ -141,6 +147,155 @@ export async function sendSubscriptionConfirmationEmail(
     subject,
     html,
   });
+}
+
+/**
+ * Notify client that their audit has started.
+ * Called right after the audit document is created.
+ */
+export async function sendAuditStartedClientEmail(params: {
+  email: string;
+  userName: string;
+  businessName: string;
+  businessUrl: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, businessName, businessUrl, language = "fr" } = params;
+
+  const subject =
+    language === "fr"
+      ? `Votre audit GEO a démarré — ${businessName}`
+      : `Your GEO audit has started — ${businessName}`;
+
+  const html = await render(
+    AuditStartedClientEmail({ userName, businessName, businessUrl, language })
+  );
+
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
+ * Notify admin internally that a new audit was just launched.
+ * Called right after the audit document is created.
+ */
+export async function sendAuditStartedAdminEmail(params: {
+  userName: string;
+  userEmail: string;
+  businessName: string;
+  businessUrl: string;
+  category: string;
+  auditId: string;
+  subscriptionTier: string;
+  adminUrl: string;
+}): Promise<EmailResult> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("[Email] ADMIN_EMAIL not configured, skipping admin audit started notification");
+    return { success: false, error: "ADMIN_EMAIL not configured" };
+  }
+
+  const html = await render(AuditStartedAdminEmail(params));
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `[SYB] 🚀 Audit launched — ${params.businessName} (${params.userEmail})`,
+    html,
+  });
+}
+
+/**
+ * Notify admin that a new audit was launched and needs prompt validation.
+ * Called right after the audit document is created in create.ts.
+ */
+export async function sendAuditLaunchedAdminEmail(params: {
+  businessName: string;
+  businessUrl: string;
+  category: string;
+  userName: string;
+  userEmail: string;
+  auditId: string;
+  adminUrl: string;
+}): Promise<EmailResult> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("[Email] ADMIN_EMAIL not configured, skipping admin audit notification");
+    return { success: false, error: "ADMIN_EMAIL not configured" };
+  }
+
+  const html = await render(AuditNotificationAdminEmail(params));
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `[SYB] New audit to validate — ${params.businessName}`,
+    html,
+  });
+}
+
+/**
+ * Notify client that their audit is completed and ready to view.
+ * Called when admin marks the audit as completed.
+ */
+export async function sendAuditCompletedClientEmail(params: {
+  email: string;
+  userName: string;
+  businessName: string;
+  geoScore: number;
+  auditUrl: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, businessName, geoScore, auditUrl, language = "fr" } = params;
+
+  const subject =
+    language === "fr"
+      ? `Votre audit GEO pour ${businessName} est prêt`
+      : `Your GEO audit for ${businessName} is ready`;
+
+  const html = await render(
+    AuditCompletedClientEmail({ userName, businessName, geoScore, auditUrl, language })
+  );
+
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
+ * Notify Pro user their monthly audit credit is available (subscription renewal).
+ */
+export async function sendAuditCreditAvailableEmail(params: {
+  email: string;
+  userName: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, language = "fr" } = params;
+  const subject =
+    language === "fr"
+      ? "Votre crédit d'audit mensuel est disponible — ShowYourBrand"
+      : "Your monthly audit credit is available — ShowYourBrand";
+  const html = await render(AuditCreditAvailableEmail({ userName, language }));
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
+ * Send 15-day checklist progress summary to Pro users.
+ */
+export async function sendChecklistSummaryEmail(params: {
+  email: string;
+  userName: string;
+  businessName: string;
+  geoScore: number;
+  doneItems: { title: string; severity: "critical" | "high" | "medium" | "low"; done: boolean }[];
+  pendingItems: { title: string; severity: "critical" | "high" | "medium" | "low"; done: boolean }[];
+  auditUrl: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, businessName, geoScore, doneItems, pendingItems, auditUrl, language = "fr" } = params;
+  const subject =
+    language === "fr"
+      ? `Bilan de vos actions GEO — ${businessName}`
+      : `GEO action progress summary — ${businessName}`;
+  const html = await render(
+    ChecklistSummaryEmail({ userName, businessName, geoScore, doneItems, pendingItems, auditUrl, language })
+  );
+  return sendEmail({ to: email, subject, html });
 }
 
 /**

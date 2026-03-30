@@ -36,7 +36,7 @@ npm run lint         # Run ESLint
 **UI:** Tailwind CSS + Shadcn/ui (copy-paste components)
 **Database:** MongoDB 5.9.2+ with Mongoose 7.4.4+
 **Auth:** NextAuth 4.24.11+ (JWT strategy, 30-day sessions, Google OAuth + Credentials)
-**Payments:** Stripe 13.2.0+ (Basic €50/mo, Pro €150/mo, Premium €300/mo, One-shot €299)
+**Payments:** Stripe 13.2.0+ (4-tier: Data €29 one-shot, Starter €79 one-shot, Pro €59/mo, Agency €599/mo + Agency Extra Audit €50 one-shot)
 **Email:** Resend (NOT Mailgun)
 **State:** Zustand 4.x (to be configured in Epic 1)
 **Validation:** Zod 3.x at API layer + Mongoose at DB layer
@@ -57,8 +57,12 @@ npm run lint         # Run ESLint
   image?: string,
   emailVerified?: Date,
   language: 'en' | 'fr',
-  subscriptionTier: 'none' | 'basic' | 'pro' | 'premium',
+  subscriptionTier: 'none' | 'data' | 'starter' | 'pro' | 'agency',
+  subscriptionStatus: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive',
+  subscriptionId?: string,
+  subscriptionEndDate?: Date,
   stripeCustomerId?: string,
+  auditCredits: number, // one-shot credit counter
   createdAt: Date,
   updatedAt: Date
 }
@@ -230,7 +234,7 @@ const AuditSchema = new Schema({
 3. **HTML Scanner** - Schema.org detection, meta tags, headings, alt text, top 30 keywords (TF-IDF)
 4. **AI-Optimized Content Suggestions** - FAQ generation, schema snippets, alt text, priority system (🔴🟠🟢)
 5. **Comprehensive Report Generation** - PDF with executive summary + technical details
-6. **Subscription Management** - Stripe integration (Basic/Pro/Premium + one-shot)
+6. **Subscription Management** - Stripe integration (4 tiers: Data €29 / Starter €79 / Pro €59/mo / Agency €599/mo + Agency Extra €50)
 7. **Internationalization** - English + French (next-i18next, easy to add languages)
 8. **Admin Interface** - Founder oversight, audit debugging, platform statistics
 
@@ -277,13 +281,14 @@ NEXTAUTH_SECRET=<generated secret>
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 
-# Stripe (4 price IDs)
+# Stripe (5 price IDs)
 STRIPE_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_STRIPE_PUBLIC_KEY=pk_test_...
-STRIPE_PRICE_ID_BASIC=price_...
-STRIPE_PRICE_ID_PRO=price_...
-STRIPE_PRICE_ID_PREMIUM=price_...
-STRIPE_PRICE_ID_ONE_SHOT=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_DATA=price_...       # €29 one-shot
+NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER=price_...    # €79 one-shot
+NEXT_PUBLIC_STRIPE_PRICE_ID_PRO=price_...        # €59/mo subscription
+NEXT_PUBLIC_STRIPE_PRICE_ID_AGENCY=price_...     # €599/mo subscription
+NEXT_PUBLIC_STRIPE_PRICE_ID_AGENCY_EXTRA=price_... # €50 extra audit (agency only)
 STRIPE_WEBHOOK_SECRET=whsec_...
 
 # Email
@@ -294,7 +299,7 @@ RESEND_FROM_EMAIL=noreply@domain.com
 OPENAI_API_KEY=sk-proj-...
 ANTHROPIC_API_KEY=sk-ant-...
 PERPLEXITY_API_KEY=pplx-...
-DEEPSEEK_API_KEY=sk-...
+GEMINI_API_KEY=...
 
 # Processing Service
 PROCESSING_SERVICE_API_KEY=<shared secret>
