@@ -57,20 +57,6 @@ function SubScoreBar({
   );
 }
 
-// ─── Stat card ────────────────────────────────────────────────────────────────
-
-function StatCard({
-  value, label, description, color,
-}: { value: string | number; label: string; description: string; color: string }) {
-  return (
-    <div className={`flex flex-col px-5 py-4 rounded-2xl border ${color}`}>
-      <span className="text-2xl font-bold tabular-nums leading-none mb-1">{value}</span>
-      <span className="text-xs font-semibold mb-0.5">{label}</span>
-      <span className="text-[11px] opacity-60 leading-tight">{description}</span>
-    </div>
-  );
-}
-
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface AuditHeroProps {
@@ -84,13 +70,7 @@ export default function AuditHero({ audit, results }: AuditHeroProps) {
   const geoScore = audit.geoScore ?? 0;
   const aiScore = results.auditEngineScore ?? null;
   const htmlScore = results.htmlScannerScore ?? null;
-  const discoverability = results.discoverabilityThreshold;
-  const discLevel = discoverability?.level ?? null;
-  const isInvisible = discLevel === null;
   const engines = results.enginesSucceeded ?? results.enginesUsed ?? [];
-  const issuesSummary = results.issuesSummary;
-  const promptGapsSummary = results.promptGapsSummary;
-  const citationStats = results.citationStats;
   const snap = results.businessSnapshot;
 
   const formattedDate = audit.completedAt
@@ -102,39 +82,6 @@ export default function AuditHero({ audit, results }: AuditHeroProps) {
   const processingMin = results.processingTimeMs
     ? (results.processingTimeMs / 60_000).toFixed(1)
     : null;
-
-  const criticalCount = issuesSummary?.criticalCount ?? 0;
-  const highCount = issuesSummary?.highCount ?? 0;
-  const totalIssues = issuesSummary?.totalCount ?? 0;
-  const gapCount = promptGapsSummary?.totalGaps ?? 0;
-  const totalActions = totalIssues + gapCount;
-  const citationRate = citationStats
-    ? Math.round(citationStats.targetCitationRate * 100)
-    : null;
-  const promptsTotal = results.totalPromptsProcessed ?? 100;
-  const promptsCited = citationStats
-    ? Math.round(citationStats.targetCitationRate * promptsTotal)
-    : null;
-
-  // Discoverability in plain language
-  const discLabel = isInvisible
-    ? "Invisible"
-    : discLevel === 1
-    ? "Broad queries"
-    : discLevel === 2
-    ? "Niche queries"
-    : discLevel === 3
-    ? "Specific queries"
-    : "Branded only";
-  const discDescription = isInvisible
-    ? "Not cited by any AI engine on tested queries"
-    : discLevel === 1
-    ? "AI cites you even on generic industry questions"
-    : discLevel === 2
-    ? "AI cites you on category-specific questions"
-    : discLevel === 3
-    ? "AI cites you only on targeted questions"
-    : "AI cites you mainly when your brand is mentioned";
 
   return (
     <div className="space-y-4 mb-6">
@@ -219,81 +166,6 @@ export default function AuditHero({ audit, results }: AuditHeroProps) {
         </div>
       </div>
 
-      {/* Stat cards row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
-          value={totalActions > 0 ? totalActions : "✓"}
-          label={totalActions > 0 ? "Actions to take" : "All good"}
-          description={
-            totalActions === 0
-              ? "No issues or gaps detected"
-              : criticalCount > 0
-              ? `${criticalCount} urgent · ${highCount} important · ${gapCount} gap${gapCount !== 1 ? "s" : ""}`
-              : `${totalIssues} issue${totalIssues !== 1 ? "s" : ""} · ${gapCount} unanswered question${gapCount !== 1 ? "s" : ""}`
-          }
-          color={
-            totalActions === 0
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-              : criticalCount > 0
-              ? "bg-red-50 border-red-200 text-red-700"
-              : "bg-orange-50 border-orange-200 text-orange-700"
-          }
-        />
-        <StatCard
-          value={citationRate != null ? `${citationRate}%` : "—"}
-          label="Citation rate"
-          description={
-            citationRate == null
-              ? "No citation data available"
-              : citationRate >= 40
-              ? "AI often cites you in responses"
-              : citationRate >= 15
-              ? "AI occasionally cites you"
-              : "AI rarely cites you — key focus area"
-          }
-          color={
-            citationRate == null
-              ? "bg-gray-50 border-gray-200 text-gray-600"
-              : citationRate >= 40
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-              : citationRate >= 15
-              ? "bg-blue-50 border-blue-200 text-blue-700"
-              : "bg-red-50 border-red-200 text-red-700"
-          }
-        />
-        <StatCard
-          value={promptsCited != null ? `${promptsCited}/${promptsTotal}` : "—"}
-          label="Prompts cited"
-          description={
-            promptsCited == null
-              ? "No prompt data available"
-              : `out of ${promptsTotal} tested questions, AI cited you in ${promptsCited}`
-          }
-          color={
-            promptsCited == null
-              ? "bg-gray-50 border-gray-200 text-gray-600"
-              : promptsCited >= promptsTotal * 0.4
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-              : promptsCited >= promptsTotal * 0.15
-              ? "bg-blue-50 border-blue-200 text-blue-700"
-              : "bg-orange-50 border-orange-200 text-orange-700"
-          }
-        />
-        <StatCard
-          value={discLabel}
-          label="AI Discovery"
-          description={discDescription}
-          color={
-            isInvisible
-              ? "bg-red-50 border-red-200 text-red-700"
-              : discLevel! <= 2
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-              : discLevel! <= 3
-              ? "bg-yellow-50 border-yellow-200 text-yellow-700"
-              : "bg-orange-50 border-orange-200 text-orange-700"
-          }
-        />
-      </div>
     </div>
   );
 }

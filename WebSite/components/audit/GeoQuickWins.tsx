@@ -58,7 +58,7 @@ export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt, faqSchem
 
         {/* llms.txt */}
         {llmsTxtContent && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 overflow-hidden">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <div>
                 <p className="text-sm font-semibold text-gray-900">llms.txt</p>
@@ -68,16 +68,18 @@ export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt, faqSchem
               </div>
               <CopyButton text={llmsTxtContent} />
             </div>
-            <pre className="text-xs text-gray-700 p-5 overflow-auto max-h-56 overscroll-contain leading-relaxed whitespace-pre-wrap font-mono">
-              {llmsTxtContent}
-            </pre>
+            <div className="scrollbar-visible overscroll-contain max-h-56 rounded-b-2xl">
+              <pre className="text-xs text-gray-700 p-5 leading-relaxed whitespace-pre-wrap font-mono">
+                {llmsTxtContent}
+              </pre>
+            </div>
           </div>
         )}
 
         {/* HTML GEO snippet */}
         {llmHijackPrompt && (
-          <div className="rounded-2xl overflow-hidden border border-gray-800">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700 bg-gray-900">
+          <div className="rounded-2xl border border-gray-800 flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700 bg-gray-900 rounded-t-2xl">
               <div>
                 <p className="text-sm font-semibold text-white">GEO HTML Snippet</p>
                 <p className="text-[11px] text-gray-400 mt-0.5">
@@ -86,15 +88,17 @@ export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt, faqSchem
               </div>
               <CopyButton text={llmHijackPrompt} />
             </div>
-            <pre className="text-xs text-green-300 bg-gray-900 p-5 overflow-auto max-h-56 overscroll-contain leading-relaxed whitespace-pre-wrap font-mono">
-              {llmHijackPrompt}
-            </pre>
+            <div className="scrollbar-visible scrollbar-visible-dark overscroll-contain max-h-56 bg-gray-900 rounded-b-2xl">
+              <pre className="text-xs text-green-300 p-5 leading-relaxed whitespace-pre-wrap font-mono">
+                {llmHijackPrompt}
+              </pre>
+            </div>
           </div>
         )}
 
         {/* FAQ Schema */}
         {faqSchemaContent && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 overflow-hidden">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <div>
                 <p className="text-sm font-semibold text-gray-900">FAQ Schema</p>
@@ -104,9 +108,11 @@ export default function GeoQuickWins({ llmsTxtContent, llmHijackPrompt, faqSchem
               </div>
               <CopyButton text={faqSchemaContent} />
             </div>
-            <pre className="text-xs text-gray-700 p-5 overflow-auto max-h-64 overscroll-contain leading-relaxed whitespace-pre-wrap font-mono">
-              {faqSchemaContent}
-            </pre>
+            <div className="scrollbar-visible overscroll-contain max-h-64 rounded-b-2xl">
+              <pre className="text-xs text-gray-700 p-5 leading-relaxed whitespace-pre-wrap font-mono">
+                {faqSchemaContent}
+              </pre>
+            </div>
           </div>
         )}
       </div>

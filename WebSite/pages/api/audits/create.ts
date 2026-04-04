@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import mongoose from 'mongoose';
 import Audit from '@/models/Audit';
-import Business from '@/models/Business';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
 import { sendAuditStartedClientEmail, sendAuditStartedAdminEmail, sendAuditLaunchedAdminEmail } from '@/lib/email';
 import config from '@/config';
