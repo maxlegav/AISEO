@@ -12,7 +12,6 @@ import {
   LayoutGrid,
   Building2,
   Loader2,
-  User,
   Clock,
   Trash2,
   Zap,
@@ -278,98 +277,16 @@ function ProjectCard({
   );
 }
 
-/* ─── Display Name Modal ─── */
-function DisplayNameModal({ onSave }: { onSave: (name: string) => void }) {
-  const { t } = useLanguage();
-  const [name, setName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || submitting) return;
-
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/user/set-display-name", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayName: name.trim() }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        onSave(data.data.displayName);
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-        <div className="p-8">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-orange-600" />
-            </div>
-            <h3 className="text-2xl font-heading font-medium text-gray-900 mb-2">
-              {String(t("displayName.title"))}
-            </h3>
-            <p className="text-gray-500 text-sm">
-              {String(t("displayName.subtitle"))}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <label
-              htmlFor="displayName"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              {String(t("displayName.label"))}
-            </label>
-            <input
-              id="displayName"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={String(t("displayName.placeholder"))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-gray-900 mb-6"
-              maxLength={50}
-              autoFocus
-            />
-            <Button
-              type="submit"
-              disabled={!name.trim() || submitting}
-              className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white h-12 text-base rounded-xl disabled:opacity-50"
-            >
-              {submitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                String(t("displayName.confirm"))
-              )}
-            </Button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ─── Page ─── */
 export default function UserProfilePage() {
-  const { data: session, status, update } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { username } = router.query;
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Business[]>([]);
   const [latestAudits, setLatestAudits] = useState<Map<string, LatestAudit>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [showDisplayNameModal, setShowDisplayNameModal] = useState(false);
-  const [localDisplayName, setLocalDisplayName] = useState<string | null>(null);
-  const [hasClosedModal, setHasClosedModal] = useState(false);
   const [auditCredits, setAuditCredits] = useState<number | null>(null);
 
   /* Auth redirects */
@@ -393,20 +310,7 @@ export default function UserProfilePage() {
     }
   }, [status, session, username, router]);
 
-  /* Display name popup */
-  useEffect(() => {
-    if (
-      status === "authenticated" &&
-      session?.user &&
-      !session.user.displayName &&
-      !localDisplayName &&
-      !hasClosedModal
-    ) {
-      setShowDisplayNameModal(true);
-    }
-  }, [status, session, localDisplayName, hasClosedModal]);
-
-  /* Fetch businesses + latest audits + credits */
+/* Fetch businesses + latest audits + credits */
   const fetchData = async () => {
     try {
       const [projectsRes, auditsRes, creditsRes] = await Promise.all([
@@ -493,18 +397,6 @@ export default function UserProfilePage() {
 
   return (
     <DashboardLayout activeMenu="dashboard">
-      {/* Display Name Popup */}
-      {showDisplayNameModal && (
-        <DisplayNameModal
-          onSave={async (name) => {
-            setLocalDisplayName(name);
-            setHasClosedModal(true);
-            setShowDisplayNameModal(false);
-            await update();
-          }}
-        />
-      )}
-
       {/* Page Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
