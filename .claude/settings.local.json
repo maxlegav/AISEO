@@ -173,7 +173,8 @@
       "Bash(grep:*)",
       "Bash(npx next:*)",
       "Bash(umask 077)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(kubectl replace:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
