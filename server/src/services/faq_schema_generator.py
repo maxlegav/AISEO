@@ -27,7 +27,7 @@ Your task is to generate FAQ Q&A pairs that a business can embed on their websit
 FAQPage JSON-LD schema to maximise visibility in AI search engines (ChatGPT, Claude, \
 Perplexity, Gemini).
 
-Generate between 5 and 8 FAQ entries following these rules:
+Generate exactly 15 FAQ entries following these rules:
 
 1. **Base questions on prompt gaps** — the provided list contains real questions that AI \
 engines could NOT answer about this business. Rephrase and answer them authoritatively.
@@ -71,7 +71,7 @@ def _build_user_prompt(
 
     # Prompt gaps — the questions AI couldn't answer
     if prompt_gaps:
-        gaps_to_use = prompt_gaps[:10]
+        gaps_to_use = prompt_gaps[:20]
         lines.append(f"\nPrompt gaps ({len(gaps_to_use)} questions AI could NOT answer):")
         for gap in gaps_to_use:
             lines.append(f"  - [{gap.category}] {gap.question}")
@@ -116,7 +116,7 @@ def _estimate_score_gain(entry_count: int, had_faq_schema: bool) -> int:
     """
     base = entry_count * 2
     bonus = 0 if had_faq_schema else 5
-    return min(base + bonus, 25)
+    return min(base + bonus, 35)
 
 
 def _build_result(
@@ -327,7 +327,7 @@ async def generate_faq_schema(
             logger.warning("FAQ schema generator: no valid Q&A entries after validation")
             return None
 
-        prompt_gaps_used = min(len(prompt_gaps), 10)
+        prompt_gaps_used = min(len(prompt_gaps), 20)
         output = _build_result(
             entries=validated,
             snapshot=snapshot,

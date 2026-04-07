@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Zap, ChevronDown, ChevronUp, FileText, AlertTriangle, Wrench, Copy, Check, ArrowDown } from "lucide-react";
-import type { IssueItem, PromptGapItem } from "./auditTypes";
+import type { IssueItem, PromptGapItem, SignalItem } from "./auditTypes";
 import { CATEGORY_META } from "./auditHelpers";
 
 // ─── Fix data ─────────────────────────────────────────────────────────────────
@@ -141,6 +141,20 @@ const HOW_TO_FIX: Record<string, FixData> = {
       "Create content answering broad category questions (L1-L2), not just branded queries",
       "Target the question 'What is the best [your category]?' type queries",
       "Build topical authority by covering your niche comprehensively",
+    ],
+  },
+  w3c_validation_errors: {
+    steps: [
+      "Run your page through the W3C validator at validator.w3.org",
+      "Fix critical errors first: unclosed tags, missing attributes, invalid nesting",
+      "Re-validate until errors reach zero — warnings are lower priority",
+    ],
+  },
+  broken_links: {
+    steps: [
+      "Identify the broken URLs listed in the Deep Dive section of this report",
+      "Update or remove links pointing to pages that no longer exist",
+      "Set up redirects (301) for any moved pages to preserve link equity",
     ],
   },
 };
@@ -570,11 +584,12 @@ interface ActionPlanProps {
   htmlKeywords?: { word: string; count: number; tfidf?: number }[];
   businessSnapshot?: { name?: string; category?: string; description?: string; primaryUrl?: string; targetKeywords?: string[] };
   auditId?: string;
+  signalItems?: SignalItem[];
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function ActionPlan({ issues, promptGaps, hasQuickWins, categoryScores, htmlKeywords, businessSnapshot, auditId }: ActionPlanProps) {
+export default function ActionPlan({ issues, promptGaps, hasQuickWins, categoryScores, htmlKeywords, businessSnapshot, auditId, signalItems = [] }: ActionPlanProps) {
   const storageKey = auditId ? `syb-done-${auditId}` : null;
   const [completed, setCompleted] = useState<Set<string>>(() => {
     if (typeof window === "undefined" || !storageKey) return new Set<string>();
@@ -595,8 +610,38 @@ export default function ActionPlan({ issues, promptGaps, hasQuickWins, categoryS
     });
   };
 
+  // Build set of existing issue IDs for deduplication
+  const existingIssueIds = new Set(issues.map((i) => i.id));
+
+  const isAlreadyCovered = (signal: SignalItem): boolean => {
+    if (existingIssueIds.has(signal.issueId)) return true;
+    if (signal.relatedIssueIds?.some((rid) => existingIssueIds.has(rid))) return true;
+    return false;
+  };
+
+  // Failing signals not already covered by an existing issue
+  const failingSignals: IssueItem[] = signalItems
+    .filter((s) => !s.pass && !isAlreadyCovered(s))
+    .map((s) => ({
+      id: s.issueId,
+      type: s.type,
+      severity: s.severity,
+      title: s.title,
+      description: s.description,
+      aiImpact: s.aiImpact,
+      source: "signal",
+    }));
+
+  // Passing signals
+  const passingSignals = signalItems.filter((s) => s.pass);
+
   const allItems: ActionItem[] = [
     ...issues.map((issue): ActionItem => ({
+      kind: "issue",
+      data: issue,
+      priority: issueToPriority(issue.severity),
+    })),
+    ...failingSignals.map((issue): ActionItem => ({
       kind: "issue",
       data: issue,
       priority: issueToPriority(issue.severity),
@@ -618,7 +663,7 @@ export default function ActionPlan({ issues, promptGaps, hasQuickWins, categoryS
 
   const gapContext: GapContext = { categoryScores, htmlKeywords, businessSnapshot };
 
-  if (totalCount === 0) return null;
+  if (totalCount === 0 && passingSignals.length === 0) return null;
 
   return (
     <DoneContext.Provider value={{ completed, toggleDone }}>
@@ -663,6 +708,34 @@ export default function ActionPlan({ issues, promptGaps, hasQuickWins, categoryS
           <PriorityGroup priority="urgent" items={byPriority.urgent} gapContext={gapContext} />
           <PriorityGroup priority="important" items={byPriority.important} gapContext={gapContext} />
           <PriorityGroup priority="optimize" items={byPriority.optimize} gapContext={gapContext} />
+
+          {passingSignals.length > 0 && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 overflow-hidden">
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg leading-none">🟢</span>
+                  <div>
+                    <span className="text-sm font-bold text-gray-900">DONE</span>
+                    <span className="ml-2 text-[11px] text-gray-500">Already in place — no action needed</span>
+                  </div>
+                  <span className="ml-auto px-2.5 py-0.5 rounded-full text-xs font-bold border bg-emerald-100 text-emerald-700 border-emerald-200">
+                    {passingSignals.length} passed
+                  </span>
+                </div>
+              </div>
+              <div className="px-4 pb-4 bg-white/60">
+                {passingSignals.map((signal) => (
+                  <div key={signal.id} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span className="text-sm text-gray-700">{signal.title}</span>
+                    </div>
+                    {signal.info && <span className="text-xs text-gray-400">{signal.info}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </DoneContext.Provider>

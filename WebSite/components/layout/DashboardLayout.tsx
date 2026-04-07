@@ -282,8 +282,21 @@ export default function DashboardLayout({
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/dashboard");
+      return;
     }
-  }, [status, router]);
+
+    // Subscription gate: block authenticated users without an active plan
+    // or remaining credits from accessing any dashboard page.
+    if (status === "authenticated") {
+      const hasActiveSubscription =
+        session?.user?.subscriptionStatus === "active" ||
+        (session?.user?.auditCredits ?? 0) > 0;
+
+      if (!hasActiveSubscription) {
+        router.replace("/signup?step=4");
+      }
+    }
+  }, [status, session, router]);
 
   if (status === "loading") {
     return (

@@ -43,6 +43,10 @@ from bs4 import BeautifulSoup
 from pymongo import MongoClient
 from bson import ObjectId
 
+# Allow imports from server/src/
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from utils.stopwords import get_stopwords
+
 # ─── Config ───────────────────────────────────────────────────────────────────
 
 MONGODB_URI = "mongodb+srv://automateitcontact:q1ziUY6sTrKPUexf@automateit.ljmnevl.mongodb.net/ShowYourBrand"
@@ -306,10 +310,8 @@ def run_html_scan(brand: dict) -> dict:
     # ── 10. Keywords (top 20 by frequency) ────────────────────────────────
     text = soup.get_text(separator=" ", strip=True).lower()
     words = re.findall(r"\b[a-zàâçéèêëîïôùûüÿœæ]{4,}\b", text)
-    stopwords = {"dans", "avec", "pour", "plus", "votre", "notre", "nous", "vous", "that", "this",
-                 "your", "with", "have", "from", "they", "what", "their", "will", "mais", "aussi",
-                 "tout", "tous", "très", "bien", "être", "plus", "aussi", "comme", "when", "than"}
-    filtered = [w for w in words if w not in stopwords]
+    _stopwords = get_stopwords("fr")
+    filtered = [w for w in words if w not in _stopwords]
     kw_counter = Counter(filtered)
     keywords = [{"word": w, "count": c} for w, c in kw_counter.most_common(20)]
     completeness["keywords"] = True

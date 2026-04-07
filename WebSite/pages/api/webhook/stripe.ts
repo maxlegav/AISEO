@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import mongoose from 'mongoose';
 import User from '@/models/User';
 import Subscription from '@/models/Subscription';
+import WebhookEvent from '@/models/WebhookEvent';
 import { sendSubscriptionConfirmationEmail, sendAuditCreditAvailableEmail } from '@/lib/email';
 import appConfig from '@/config';
 
@@ -25,13 +26,14 @@ const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URI!);
 };
 
-// Map price IDs to tiers
+// Map price IDs to tiers. Throws on unknown IDs so we never silently provision
+// the wrong tier when Stripe sends a price we don't recognise (review C2 / M1).
 const getTierFromPriceId = (priceId: string): 'data' | 'starter' | 'pro' | 'agency' => {
   if (priceId === appConfig.stripe.data.priceId) return 'data';
   if (priceId === appConfig.stripe.starter.priceId) return 'starter';
   if (priceId === appConfig.stripe.pro.priceId) return 'pro';
   if (priceId === appConfig.stripe.agency.priceId) return 'agency';
-  return 'starter'; // Default fallback
+  throw new Error(`[Stripe Webhook] Unknown priceId: ${priceId}`);
 };
 
 // Get amount from tier (in cents)
@@ -49,7 +51,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   await connectDB();
 
   const userId = session.metadata?.userId;
-  const tier = session.metadata?.tier || 'basic';
   const customerId = session.customer as string;
 
   if (!userId) {
@@ -63,22 +64,38 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
-  // Handle one-shot purchase (Data or Starter)
+  // Handle one-shot purchase (Data, Starter, or Agency Extra Audit).
+  // Resolve the tier from the *actual* line item price, not from session
+  // metadata, so we can never be tricked by a metadata override (C2).
   if (session.mode === 'payment') {
-    const purchaseTier = (tier as 'data' | 'starter') || 'starter';
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
+    const oneShotPriceId = lineItems.data[0]?.price?.id;
+    if (!oneShotPriceId) {
+      console.error('[Stripe Webhook] No line item price on one-shot session', session.id);
+      return;
+    }
+
+    // Agency Extra Audit grants a credit but does not change the user's tier.
+    const isAgencyExtra = oneShotPriceId === appConfig.stripe.agencyExtraAudit.priceId;
+    const purchaseTier: 'data' | 'starter' | 'agency' = isAgencyExtra
+      ? 'agency'
+      : getTierFromPriceId(oneShotPriceId) as 'data' | 'starter';
 
     // Add audit credit and update subscription tier
     user.auditCredits = (user.auditCredits || 0) + 1;
     user.stripeCustomerId = customerId;
-    user.subscriptionTier = purchaseTier;
-    user.subscriptionStatus = 'active';
+    if (!isAgencyExtra) {
+      user.subscriptionTier = purchaseTier;
+      user.subscriptionStatus = 'active';
+    }
     await user.save();
 
-    // Create purchase record for one-shot audit
-    const oneShotPriceId = purchaseTier === 'data' ? appConfig.stripe.data.priceId : appConfig.stripe.starter.priceId;
+    // Create purchase record for one-shot audit. Note: we store the
+    // payment_intent in its own dedicated field, NOT in stripeSubscriptionId
+    // (which is reserved for recurring sub_xxx ids — see review C4).
     await Subscription.create({
       userId: user._id,
-      stripeSubscriptionId: session.payment_intent as string,
+      stripePaymentIntentId: session.payment_intent as string,
       stripeCustomerId: customerId,
       stripePriceId: oneShotPriceId,
       tier: purchaseTier,
@@ -113,7 +130,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   // Get subscription details from Stripe
   const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
   const priceId = stripeSubscription.items.data[0]?.price.id;
-  const subscriptionTier = priceId ? getTierFromPriceId(priceId) : tier;
+  if (!priceId) {
+    console.error('[Stripe Webhook] No priceId on subscription', subscriptionId);
+    return;
+  }
+  const subscriptionTier = getTierFromPriceId(priceId);
 
   // Update user
   user.stripeCustomerId = customerId;
@@ -166,7 +187,11 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   }
 
   const priceId = subscription.items.data[0]?.price.id;
-  const tier = priceId ? getTierFromPriceId(priceId) : 'basic';
+  if (!priceId) {
+    console.error('[Stripe Webhook] No priceId on subscription update', subscription.id);
+    return;
+  }
+  const tier = getTierFromPriceId(priceId);
 
   // Map Stripe status to our status
   const statusMap: Record<string, 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive'> = {
@@ -315,30 +340,54 @@ export default async function handler(
       return res.status(400).json({ error: `Webhook signature verification failed: ${errorMessage}` });
     }
 
-    // Handle events
-    switch (event.type) {
-      case 'checkout.session.completed':
-        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
-        break;
+    // Idempotency guard (review C3): refuse to process the same event.id twice.
+    // Stripe retries deliveries, so handlers MUST be idempotent. We claim the
+    // event by inserting a row keyed on event.id; the unique index makes this
+    // race-safe. If processing fails we delete the row so the next retry can
+    // run again. If processing succeeds we leave the row in place forever.
+    await connectDB();
+    try {
+      await WebhookEvent.create({ eventId: event.id, type: event.type });
+    } catch (err: any) {
+      if (err && err.code === 11000) {
+        console.log('[Stripe Webhook] Duplicate event ignored:', event.id, event.type);
+        return res.status(200).json({ received: true, duplicate: true });
+      }
+      throw err;
+    }
 
-      case 'customer.subscription.updated':
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
-        break;
+    try {
+      // Handle events
+      switch (event.type) {
+        case 'checkout.session.completed':
+          await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+          break;
 
-      case 'customer.subscription.deleted':
-        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-        break;
+        case 'customer.subscription.updated':
+          await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+          break;
 
-      case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
-        break;
+        case 'customer.subscription.deleted':
+          await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+          break;
 
-      case 'invoice.payment_failed':
-        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-        break;
+        case 'invoice.payment_succeeded':
+          await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
+          break;
 
-      default:
-        console.log('[Stripe Webhook] Unhandled event type:', event.type);
+        case 'invoice.payment_failed':
+          await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+          break;
+
+        default:
+          console.log('[Stripe Webhook] Unhandled event type:', event.type);
+      }
+    } catch (handlerError) {
+      // Roll back the idempotency claim so Stripe's retry can re-process.
+      await WebhookEvent.deleteOne({ eventId: event.id }).catch((delErr) => {
+        console.error('[Stripe Webhook] Failed to release idempotency lock for', event.id, delErr);
+      });
+      throw handlerError;
     }
 
     return res.status(200).json({ received: true });

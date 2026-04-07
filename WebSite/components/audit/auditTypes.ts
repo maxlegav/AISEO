@@ -152,6 +152,19 @@ export interface ChecklistItem {
   doneAt?: string | null;
 }
 
+export interface SignalItem {
+  id: string;
+  pass: boolean;
+  issueId: string;
+  relatedIssueIds?: string[];
+  type: string;
+  severity: "critical" | "high" | "medium" | "low";
+  title: string;
+  description: string;
+  aiImpact: string;
+  info?: string;
+}
+
 export interface AuditDoc {
   _id: string;
   businessId?: string;

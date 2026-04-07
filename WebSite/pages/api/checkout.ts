@@ -20,13 +20,24 @@ const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URI!);
 };
 
-// Map price IDs to tiers
-const getTierFromPriceId = (priceId: string): string => {
+// Map price IDs to tiers. Throws on unknown price IDs to prevent provisioning
+// from arbitrary attacker-supplied price IDs (see review C2 / M1).
+type Tier = 'data' | 'starter' | 'pro' | 'agency';
+const getTierFromPriceId = (priceId: string): Tier => {
   if (priceId === config.stripe.data.priceId) return 'data';
   if (priceId === config.stripe.starter.priceId) return 'starter';
   if (priceId === config.stripe.pro.priceId) return 'pro';
   if (priceId === config.stripe.agency.priceId) return 'agency';
-  return 'unknown';
+  throw new ApiError(ErrorType.VALIDATION, 'Invalid price ID');
+};
+
+// Each tier is locked to a single Stripe mode. A request that mixes (e.g.)
+// the Pro priceId with `mode: 'payment'` is rejected.
+const EXPECTED_MODE: Record<Tier, 'subscription' | 'payment'> = {
+  data: 'payment',
+  starter: 'payment',
+  pro: 'subscription',
+  agency: 'subscription',
 };
 
 export default async function handler(
@@ -57,6 +68,19 @@ export default async function handler(
 
     const { priceId, mode } = validation.data;
 
+    // Whitelist the priceId against our configured tiers and reject any
+    // request whose mode does not match the tier's expected billing mode.
+    // This prevents an authenticated attacker from substituting a cheaper
+    // (or arbitrary) Stripe price and getting Pro/Starter access for the
+    // wrong amount. See review finding C2.
+    const tier = getTierFromPriceId(priceId);
+    if (mode !== EXPECTED_MODE[tier]) {
+      throw new ApiError(
+        ErrorType.VALIDATION,
+        `Tier "${tier}" requires mode "${EXPECTED_MODE[tier]}"`
+      );
+    }
+
     // Connect to DB and get user
     await connectDB();
     const user = await User.findById(session.user.id);
@@ -80,9 +104,6 @@ export default async function handler(
       user.stripeCustomerId = stripeCustomerId;
       await user.save();
     }
-
-    // Get tier from price ID
-    const tier = getTierFromPriceId(priceId);
 
     // Build checkout session parameters
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';

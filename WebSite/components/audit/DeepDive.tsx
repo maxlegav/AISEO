@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   FileSearch, Target,
-  Check, X, ChevronUp, ChevronDown,
 } from "lucide-react";
 import type {
   PromptResult, HtmlScan, CitationStats,
@@ -10,96 +9,7 @@ import type {
 import {
   CATEGORY_META, LEVEL_COLORS, LEVEL_TEXT, LEVEL_LABELS,
   pct, scoreTextClass,
-  getBool, getString, getNumber,
 } from "./auditHelpers";
-
-// ─── Signal Card ──────────────────────────────────────────────────────────────
-
-function SignalCard({
-  label,
-  pass,
-  info,
-  failWhy,
-  failFix,
-}: {
-  label: string;
-  pass: boolean | null | undefined;
-  info?: string;
-  failWhy?: string;
-  failFix?: string[];
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  if (pass === true) {
-    return (
-      <div className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-        <span className="text-sm text-gray-700">{label}</span>
-        <div className="flex items-center gap-2">
-          {info && <span className="text-xs text-gray-400">{info}</span>}
-          <Check className="w-4 h-4 text-emerald-500" />
-        </div>
-      </div>
-    );
-  }
-
-  if (pass == null) {
-    return (
-      <div className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-        <span className="text-sm text-gray-400">{label}</span>
-        <span className="text-xs text-gray-300">—</span>
-      </div>
-    );
-  }
-
-  // pass === false
-  return (
-    <div className="border-b border-gray-50 last:border-0">
-      <button
-        className="w-full flex items-center justify-between py-2.5 text-left rounded px-1 -mx-1 hover:bg-red-50/40 transition-colors"
-        onClick={() => setExpanded((v) => !v)}
-      >
-        <div className="flex items-center gap-2">
-          <X className="w-4 h-4 text-red-400 shrink-0" />
-          <span className="text-sm text-gray-700">{label}</span>
-          {info && <span className="text-xs text-gray-400">{info}</span>}
-        </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="text-[10px] text-red-400 font-semibold">Fix →</span>
-          {expanded ? (
-            <ChevronUp className="w-3.5 h-3.5 text-gray-400" />
-          ) : (
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-          )}
-        </div>
-      </button>
-
-      {expanded && (failWhy || (failFix && failFix.length > 0)) && (
-        <div className="pb-3 pl-5 space-y-2">
-          {failWhy && (
-            <div className="bg-orange-50 border border-orange-100 rounded-lg px-3 py-2.5">
-              <p className="text-xs text-orange-900 leading-relaxed">{failWhy}</p>
-            </div>
-          )}
-          {failFix && failFix.length > 0 && (
-            <div className="bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2.5">
-              <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide mb-2">How to fix</p>
-              <ol className="space-y-1.5">
-                {failFix.map((step, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-emerald-900">
-                    <span className="shrink-0 w-4 h-4 rounded-full bg-emerald-200 text-emerald-800 font-bold text-[10px] flex items-center justify-center mt-0.5">
-                      {i + 1}
-                    </span>
-                    <span className="leading-relaxed">{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── ═══════════════════════════════════════════════════════════ ──────────────
 // ─── TAB: SITE SIGNALS (HTML SCAN) ────────────────────────────────────────────
@@ -109,12 +19,22 @@ const STOP_WORDS = new Set([
   // French
   "les", "des", "une", "est", "pour", "que", "qui", "dans", "avec", "sur",
   "par", "plus", "son", "ses", "leur", "cette", "tout", "mais", "aussi",
-  "comme", "bien", "très", "plus", "avoir", "être", "faire", "notre",
-  "votre", "nous", "vous", "ils", "elle", "nous", "même", "sans", "tous",
+  "comme", "bien", "très", "avoir", "être", "faire", "notre",
+  "votre", "nous", "vous", "ils", "elle", "même", "sans", "tous",
+  "sont", "vraiment", "autre", "autres", "peut", "entre", "depuis", "fait",
+  "encore", "donc", "avant", "après", "chez", "sous", "vers", "alors",
+  "quand", "dont", "quelque", "chaque", "toujours", "jamais", "pendant",
+  "selon", "cela", "ceci", "ceux", "elles", "leurs", "aucun", "plusieurs",
+  "certains", "beaucoup", "assez", "trop", "plutôt", "seulement", "ainsi",
+  "cependant", "pourtant", "ensuite", "enfin", "faut", "doit", "font",
+  "sera", "seront", "toute", "toutes", "malgré", "contre",
   // English
   "the", "and", "for", "are", "was", "with", "this", "that", "from",
   "have", "not", "been", "its", "they", "their", "your", "our", "about",
-  "will", "more", "when", "there", "which", "than", "into",
+  "will", "more", "when", "there", "which", "than", "into", "also",
+  "just", "only", "very", "much", "most", "some", "other", "each",
+  "would", "could", "should", "does", "were", "these", "those", "what",
+  "make", "made", "such", "many", "well", "back", "still", "really",
 ]);
 
 function HtmlScanTab({
@@ -126,21 +46,6 @@ function HtmlScanTab({
   businessSnapshot?: { name?: string; category?: string; description?: string; primaryUrl?: string; targetKeywords?: string[] };
   promptGaps?: { promptId: number; question: string; level: number; category: string; mentionRate: number }[];
 }) {
-  const schema = htmlScan.schemaOrg ?? {};
-  const meta = htmlScan.metaTags ?? {};
-  const robots = htmlScan.robotsTxtAnalysis ?? {};
-  const sitemap = htmlScan.sitemapAnalysis ?? {};
-  const llmsTxt = htmlScan.llmsTxtAnalysis ?? {};
-  const headings = htmlScan.headingStructure ?? {};
-  const altText = htmlScan.imageAltText ?? {};
-
-  const description = getString(meta, "description") ?? "";
-  const hasGoodDescription = description.length >= 100;
-  const h1Count = getNumber(headings, "h1Count") ?? getNumber(headings, "h1");
-  const missingAlt = getNumber(altText, "missing") ?? getNumber(altText, "withoutAlt") ?? getNumber(altText, "without_alt") ?? 0;
-  const totalImages = getNumber(altText, "total") ?? 0;
-  const altCompliance = totalImages > 0 ? ((totalImages - missingAlt) / totalImages) >= 0.9 : null;
-
   // Filtered keywords: remove stop words, short words, numbers
   const filteredKeywords = (htmlScan.keywords ?? [])
     .filter((kw) => kw.word.length >= 4 && !STOP_WORDS.has(kw.word.toLowerCase()) && !/^\d+$/.test(kw.word))
@@ -181,101 +86,6 @@ function HtmlScanTab({
 
   return (
     <div className="space-y-6">
-      {/* Signals */}
-      <div>
-        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Site health signals</h4>
-        <p className="text-xs text-gray-400 mb-3">Click any ✗ item to see why it matters and how to fix it</p>
-        <div className="bg-white rounded-xl border border-gray-100 px-4">
-          <SignalCard
-            label="robots.txt — AI crawlers allowed"
-            pass={getBool(robots, "exists") ?? getBool(robots, "found")}
-            failWhy="Without robots.txt, AI crawlers like GPTBot and ClaudeBot don't know they're allowed to crawl your site. They may skip it entirely, preventing you from appearing in AI-generated responses."
-            failFix={[
-              "Create a robots.txt file at your domain root (yoursite.com/robots.txt)",
-              "Explicitly allow AI crawlers — the ready-to-use file is in the Action Plan above",
-            ]}
-          />
-          <SignalCard
-            label="llms.txt — AI context file"
-            pass={getBool(llmsTxt, "exists") ?? getBool(llmsTxt, "found")}
-            failWhy="llms.txt is the AI equivalent of robots.txt — it tells AI engines what your site is about in plain language. Without it, AI models have no structured source of truth about your business."
-            failFix={[
-              "Your llms.txt file is already generated — find it in the GEO Quick Wins section",
-              "Upload it to your domain root: yoursite.com/llms.txt",
-            ]}
-          />
-          <SignalCard
-            label="sitemap.xml"
-            pass={getBool(sitemap, "exists") ?? getBool(sitemap, "found")}
-            failWhy="A sitemap helps both search engines and AI crawlers discover all pages on your site. Without it, important pages about your services may never be indexed."
-            failFix={[
-              "Generate a sitemap.xml with your CMS (WordPress, Shopify, Webflow have built-in options)",
-              "Or use a free tool: xml-sitemaps.com",
-              "Upload to yoursite.com/sitemap.xml and submit in Google Search Console",
-            ]}
-          />
-          <SignalCard
-            label="FAQPage schema markup"
-            pass={getBool(schema, "hasFAQ")}
-            failWhy="FAQPage schema lets AI engines read your Q&A content directly and cite it in responses. It's one of the highest-impact signals for appearing in AI answers to user questions."
-            failFix={[
-              "Your GEO HTML Snippet (in Quick Wins above) already includes FAQ schema — copy and add it to your page's <head>",
-              "For individual gaps, use the FAQ templates in the Action Plan section",
-            ]}
-          />
-          <SignalCard
-            label="Organization schema markup"
-            pass={getBool(schema, "hasOrganization")}
-            failWhy="Organization schema gives AI engines structured facts about your business: name, description, URL, contact info. Without it, they have to guess — and may describe your business inaccurately."
-            failFix={[
-              'Add Organization JSON-LD to your homepage <head> (see template in Action Plan)',
-              "Include: name, description, url, and sameAs (your LinkedIn, Twitter, etc.)",
-            ]}
-          />
-          <SignalCard
-            label="Meta description (100+ chars)"
-            pass={hasGoodDescription}
-            info={description ? `${description.length} chars` : undefined}
-            failWhy={`Your current meta description ${description ? `is only ${description.length} characters — too short` : "is missing"}. AI engines often cite the meta description verbatim when recommending a site. A short or missing one means they improvise, and may describe your business incorrectly.`}
-            failFix={[
-              "Write a 150–160 character meta description for your homepage",
-              "Include: what you do, who you serve, your main differentiator",
-              'Add it in your <head>: <meta name="description" content="Your description here" />',
-            ]}
-          />
-          {h1Count !== null && (
-            <SignalCard
-              label="Single H1 heading"
-              pass={h1Count === 1}
-              info={`${h1Count} found`}
-              failWhy={
-                h1Count === 0
-                  ? "No H1 tag found. The H1 is the strongest signal of what a page is about — both for search engines and AI crawlers. Without it, your page's main topic is unclear."
-                  : `${h1Count} H1 tags found (should be exactly 1). Multiple H1s confuse both search engines and AI crawlers about your page's main topic.`
-              }
-              failFix={[
-                "Ensure each page has exactly one <h1> tag describing the page's main topic",
-                "Use <h2> for sections, <h3> for subsections — never skip heading levels",
-                "The H1 should clearly state what the business does (not just the brand name)",
-              ]}
-            />
-          )}
-          {totalImages > 0 && (
-            <SignalCard
-              label="Image alt text (90%+ coverage)"
-              pass={altCompliance}
-              info={`${totalImages - missingAlt}/${totalImages} images`}
-              failWhy={`${missingAlt} image${missingAlt > 1 ? "s are" : " is"} missing alt text. Images without alt text are invisible to AI engines. Alt text provides semantic context that helps AI understand your content, products, and services.`}
-              failFix={[
-                "Add descriptive alt text to all images: describe what's in the image",
-                'For products: alt="Blue ceramic mug 350ml". For team photos: alt="John, CEO at [Company]"',
-                'For purely decorative images: use alt="" (empty, not missing)',
-              ]}
-            />
-          )}
-        </div>
-      </div>
-
       {/* Keywords */}
       {(filteredKeywords.length > 0 || missingKeywords.length > 0) && (
         <div className="space-y-5">

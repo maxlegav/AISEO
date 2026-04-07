@@ -13,9 +13,8 @@ import GeoQuickWins from "@/components/audit/GeoQuickWins";
 import CompetitorComparison from "@/components/audit/CompetitorComparison";
 import DeepDive from "@/components/audit/DeepDive";
 import AuditComparison from "@/components/audit/AuditComparison";
-import IssueChecklist from "@/components/audit/IssueChecklist";
-import ProGate from "@/components/ui/ProGate";
-import type { AuditDoc, IssueItem, PromptGapItem } from "@/components/audit/auditTypes";
+import type { AuditDoc, IssueItem, PromptGapItem, HtmlScan } from "@/components/audit/auditTypes";
+import { buildSignalItems } from "@/components/audit/auditHelpers";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -250,6 +249,7 @@ export default function AuditDetailPage() {
     : null;
 
   const hasQuickWins = !!(llmsTxtContent || llmHijackPrompt || faqSchemaContent);
+  const signalItems = htmlScan ? buildSignalItems(htmlScan as HtmlScan) : [];
 
   return (
     <DashboardLayout activeMenu="audits">
@@ -365,6 +365,7 @@ export default function AuditDetailPage() {
           targetKeywords: snap.targetKeywords,
         } : undefined}
         auditId={audit._id}
+        signalItems={signalItems}
       />
 
       {/* ── Section 3: GEO Quick Wins ──────────────────────────────────────── */}
@@ -398,24 +399,6 @@ export default function AuditDetailPage() {
           geoScore={geoScore}
           businessName={audit.businessName}
         />
-      </div>
-
-      {/* ── Issue Checklist (Pro/Agency only) ─────────────────────────────── */}
-      <div className="mb-4">
-        {(session?.user?.subscriptionTier === 'pro' || session?.user?.subscriptionTier === 'agency') ? (
-          issues.length > 0 && (
-            <IssueChecklist
-              auditId={audit._id}
-              issues={issues}
-              initialChecklist={audit.issueChecklist ?? []}
-            />
-          )
-        ) : (
-          <ProGate
-            feature="Suivi des actions & checklist"
-            description="Cochez les problèmes résolus et recevez un résumé par email 15 jours après votre audit."
-          />
-        )}
       </div>
 
       {/* ── Business Snapshot ──────────────────────────────────────────────── */}

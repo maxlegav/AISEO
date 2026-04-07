@@ -131,7 +131,7 @@ const PlanCard = ({
 
 export default function SignupPage() {
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -222,10 +222,22 @@ export default function SignupPage() {
       return;
     }
 
+    // Authenticated user without an active subscription must pick a plan
+    // before being allowed into the dashboard.
+    const hasActiveSubscription =
+      session?.user?.subscriptionStatus === "active" ||
+      (session?.user?.auditCredits ?? 0) > 0;
+
+    if (!hasActiveSubscription) {
+      setInitialRouted(true);
+      setStep(4);
+      return;
+    }
+
     // Authenticated user with no special flow - go to dashboard
     setInitialRouted(true);
     router.push("/dashboard");
-  }, [status, router, selectedPlan, initialRouted, sendOnboardingData]);
+  }, [status, session, router, selectedPlan, initialRouted, sendOnboardingData]);
 
   const canProceed = () => {
     switch (step) {

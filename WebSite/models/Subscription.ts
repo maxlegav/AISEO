@@ -2,10 +2,13 @@ import mongoose, { Schema, Document, models, model } from 'mongoose';
 
 export interface ISubscription extends Document {
   userId: mongoose.Types.ObjectId;
-  stripeSubscriptionId: string;
+  // Set for recurring subscriptions (Pro / Agency).
+  stripeSubscriptionId?: string;
+  // Set for one-shot purchases (Data / Starter / Agency Extra).
+  stripePaymentIntentId?: string;
   stripeCustomerId: string;
   stripePriceId: string;
-  tier: 'basic' | 'pro' | 'premium';
+  tier: 'none' | 'data' | 'starter' | 'pro' | 'agency';
   status: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'incomplete' | 'incomplete_expired';
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
@@ -25,10 +28,17 @@ const SubscriptionSchema = new Schema<ISubscription>(
       required: true,
       index: true
     },
+    // Recurring-subscription identifier (sub_xxx). Sparse unique so one-shots can omit it.
     stripeSubscriptionId: {
       type: String,
-      required: true,
-      unique: true
+      unique: true,
+      sparse: true
+    },
+    // Payment-intent identifier (pi_xxx) for one-shot purchases. Sparse unique.
+    stripePaymentIntentId: {
+      type: String,
+      unique: true,
+      sparse: true
     },
     stripeCustomerId: {
       type: String,
@@ -40,7 +50,7 @@ const SubscriptionSchema = new Schema<ISubscription>(
     },
     tier: {
       type: String,
-      enum: ['basic', 'pro', 'premium'],
+      enum: ['none', 'data', 'starter', 'pro', 'agency'],
       required: true
     },
     status: {

@@ -8,7 +8,8 @@ import ActionPlan from "@/components/audit/ActionPlan";
 import GeoQuickWins from "@/components/audit/GeoQuickWins";
 import CompetitorComparison from "@/components/audit/CompetitorComparison";
 import DeepDive from "@/components/audit/DeepDive";
-import type { AuditDoc, IssueItem, PromptGapItem } from "@/components/audit/auditTypes";
+import type { AuditDoc, IssueItem, PromptGapItem, HtmlScan } from "@/components/audit/auditTypes";
+import { buildSignalItems } from "@/components/audit/auditHelpers";
 import config from "@/config";
 
 // ─── Server-side data fetching ────────────────────────────────────────────────
@@ -70,6 +71,7 @@ export default function SharedAuditPage({ audit }: Props) {
     : null;
 
   const hasQuickWins = !!(llmsTxtContent || llmHijackPrompt || faqSchemaContent);
+  const signalItems = htmlScan ? buildSignalItems(htmlScan as HtmlScan) : [];
 
   // Meta content
   const businessName = audit.businessName ?? snap?.name ?? "GEO Audit";
@@ -164,6 +166,7 @@ export default function SharedAuditPage({ audit }: Props) {
                 : undefined
             }
             auditId={audit._id}
+            signalItems={signalItems}
           />
           <GeoQuickWins
             llmsTxtContent={llmsTxtContent}

@@ -604,8 +604,7 @@ def extract_keywords(html: str, language: str = "fr") -> list[dict]:
     """
     try:
         import re as _re
-        import nltk
-        from nltk.corpus import stopwords as nltk_stopwords
+        from utils.stopwords import get_stopwords
 
         soup = BeautifulSoup(html, "lxml")
 
@@ -619,14 +618,7 @@ def extract_keywords(html: str, language: str = "fr") -> list[dict]:
         if not text or len(text) < 50:
             return []
 
-        # Get stopwords
-        try:
-            stop_lang = "french" if language == "fr" else "english"
-            stop_words = set(nltk_stopwords.words(stop_lang))
-            other_lang = "english" if language == "fr" else "french"
-            stop_words.update(nltk_stopwords.words(other_lang))
-        except LookupError:
-            stop_words = set()
+        stop_words = get_stopwords(language)
 
         # Tokenize: lowercase, alpha-only tokens of 2+ chars
         tokens = _re.findall(r"\b[a-zà-ÿ]{2,}\b", text.lower())
@@ -640,7 +632,7 @@ def extract_keywords(html: str, language: str = "fr") -> list[dict]:
         max_freq = counts.most_common(1)[0][1]
 
         keywords = sorted(
-            [{"term": term, "score": round(freq / max_freq, 4)} for term, freq in counts.most_common(30)],
+            [{"word": term, "count": freq, "score": round(freq / max_freq, 4)} for term, freq in counts.most_common(30)],
             key=lambda x: x["score"],
             reverse=True,
         )

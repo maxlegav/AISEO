@@ -14,6 +14,17 @@ export default function DashboardPage() {
     }
 
     if (status === "authenticated") {
+      // Subscription gate: users without an active plan or remaining credits
+      // are not allowed into the dashboard. Send them to plan selection.
+      const hasActiveSubscription =
+        session?.user?.subscriptionStatus === "active" ||
+        (session?.user?.auditCredits ?? 0) > 0;
+
+      if (!hasActiveSubscription) {
+        router.replace("/signup?step=4");
+        return;
+      }
+
       if (session?.user?.username) {
         router.replace(`/${session.user.username}`);
       } else if (!generatingUsername) {

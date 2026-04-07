@@ -166,7 +166,14 @@
       "Bash(docker login:*)",
       "Bash(docker push:*)",
       "Bash(kubectl rollout:*)",
-      "Bash(kubectl logs:*)"
+      "Bash(kubectl logs:*)",
+      "Bash(kubectl exec:*)",
+      "Bash(npx vercel:*)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(grep:*)",
+      "Bash(npx next:*)",
+      "Bash(umask 077)",
+      "Read(//tmp/**)"
     ]
   },
   "enableAllProjectMcpServers": true,
