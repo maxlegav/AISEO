@@ -576,10 +576,9 @@ export default function Home() {
                 className="w-full aspect-video object-cover"
                 controls
                 playsInline
-                muted
                 preload="metadata"
               >
-                <source src="/syb-final-HQ.mp4" type="video/mp4" />
+                <source src="/SYBvideo.mov" type="video/mp4" />
               </video>
             </div>
           </div>

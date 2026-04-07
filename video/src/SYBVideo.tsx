@@ -445,9 +445,16 @@ const SceneBrandReveal: React.FC = () => {
 
   const features = [
     { icon: "⚡", text: "100 AI prompts tested per audit" },
-    { icon: "🤖", text: "ChatGPT · Claude · Perplexity · DeepSeek" },
+    { icon: "🤖", text: "ChatGPT · Claude · Gemini · Perplexity" },
     { icon: "📊", text: "GEO Health Score 0–100%" },
     { icon: "🏆", text: "Competitor visibility analysis" },
+  ];
+
+  const badges = [
+    { icon: "🔒", text: "SOC2 Ready" },
+    { icon: "⭐", text: "4.9/5 on G2" },
+    { icon: "🚀", text: "500+ Brands" },
+    { icon: "🌍", text: "30+ Countries" },
   ];
 
   const logoFloat = floatY(frame, 6, 110);
@@ -521,6 +528,29 @@ const SceneBrandReveal: React.FC = () => {
             }}>
               <span style={{ fontSize: 24 }}>{f.icon}</span>
               <span style={{ fontSize: 22, fontFamily: sans, color: NAVY, fontWeight: 500 }}>{f.text}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Trust badges */}
+      <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
+        {badges.map((b, i) => {
+          const { fps: vfps } = useVideoConfig();
+          const delay = 100 + i * 10;
+          const bop = fi(frame, delay, delay + 14);
+          const bsp = spring({ frame: frame - delay, fps: vfps, config: { damping: 20, stiffness: 110 } });
+          const bsc = interpolate(bsp, [0, 1], [0.75, 1]);
+          return (
+            <div key={i} style={{
+              opacity: bop, transform: `scale(${bsc})`,
+              background: "rgba(124,58,237,0.10)", backdropFilter: "blur(10px)",
+              borderRadius: 100, padding: "10px 22px",
+              display: "flex", alignItems: "center", gap: 8,
+              border: "1.5px solid rgba(124,58,237,0.20)",
+            }}>
+              <span style={{ fontSize: 18 }}>{b.icon}</span>
+              <span style={{ fontSize: 18, fontFamily: sans, color: PURPLE, fontWeight: 600 }}>{b.text}</span>
             </div>
           );
         })}
@@ -840,14 +870,14 @@ const SceneCTA: React.FC = () => {
           boxShadow: `0 0 ${32 * pulse}px ${12 * pulse}px rgba(124,58,237,0.24)`,
           display: "flex", alignItems: "center", gap: 14,
         }}>
-          <span style={{ fontSize: 26 }}>✉️</span>
-          Join the Waitlist — it&apos;s free
+          <span style={{ fontSize: 26 }}>📞</span>
+          Book a call &amp; Subscribe now
         </div>
       </div>
 
       {/* URL */}
       <div style={{ opacity: urlOp, fontSize: 26, fontFamily: sans, color: GRAY, letterSpacing: 0.5 }}>
-        showyourbrand.vercel.app
+        showyourbrand.app
       </div>
       </div>
     </AbsoluteFill>
