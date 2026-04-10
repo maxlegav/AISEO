@@ -8,7 +8,7 @@ readTime: "8 min read"
 
 Most brands think of PR as a way to get backlinks or impress investors. The brands winning at GEO in 2026 think of PR as an AI trust-building machine.
 
-Here's the logic: AI systems learn from what the web says about you. The web's most authoritative nodes — major publications, established industry media, high-profile podcasts, Wikipedia — carry enormous weight in AI training data. A mention in TechCrunch isn't just a vanity metric. It's a training signal that tells every AI system that processes that article: "this brand has been deemed credible by an authoritative third party."
+Here's the logic: AI systems learn from what the web says about you. The web's most authoritative nodes, major publications, established industry media, high-profile podcasts, Wikipedia, carry enormous weight in AI training data. A mention in TechCrunch isn't just a vanity metric. It's a training signal that tells every AI system that processes that article: "this brand has been deemed credible by an authoritative third party."
 
 Multiply that signal across ten publications, twenty podcast appearances, and a Wikipedia entry, and you've built an AI authority profile that no competitor without earned media can replicate quickly.
 
@@ -45,7 +45,7 @@ The investment required is modest: a simple survey tool, a few hundred responden
 
 ## Strategy 3: Podcast Appearances
 
-Podcast transcripts and show notes are excellent AI training material — they're long, substantive, conversational, and frequently indexed by web crawlers. A single podcast appearance on a well-regarded industry show can result in:
+Podcast transcripts and show notes are excellent AI training material, they're long, substantive, conversational, and frequently indexed by web crawlers. A single podcast appearance on a well-regarded industry show can result in:
 
 - Your name appearing in the transcript
 - Quotes attributed to you
@@ -62,4 +62,4 @@ If you're building toward Wikipedia eligibility, track your earned media coverag
 
 ## What Show Your Brand Measures
 
-AI sentiment queries — "what do people say about [brand]?", "is [brand] trustworthy?", "what's the reputation of [brand]?" — draw heavily from earned media and authoritative external sources. In the **Show Your Brand GIO audit**, we specifically test these trust and sentiment prompts alongside category queries, giving you a clear picture of whether your PR efforts are translating into positive AI perception.
+AI sentiment queries, "what do people say about [brand]?", "is [brand] trustworthy?", "what's the reputation of [brand]?", draw heavily from earned media and authoritative external sources. In the **Show Your Brand GIO audit**, we specifically test these trust and sentiment prompts alongside category queries, giving you a clear picture of whether your PR efforts are translating into positive AI perception.

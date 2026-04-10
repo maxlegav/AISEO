@@ -15,19 +15,34 @@ const TagSchema = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            "@context": "http://schema.org",
+            "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             name: config.appName,
             description:
-              "Audit your brand's visibility across 100 AI prompts on ChatGPT, Claude, Perplexity and DeepSeek. Get a GEO Health Score and actionable recommendations to appear in AI answers.",
-            image: `${config.siteUrl}/og-image.png`,
+              "Audit your brand's visibility across 100 AI prompts on all major AI engines: ChatGPT, Claude, Perplexity, Gemini and Grok. Get a GEO Health Score and actionable recommendations to appear in AI answers.",
+            image: `${config.siteUrl}/og-homepage.jpeg`,
             url: `${config.siteUrl}/`,
+            sameAs: [
+              "https://x.com/showyourbrand_",
+              "https://www.linkedin.com/company/showyourbrand/",
+            ],
             author: {
               "@type": "Organization",
               name: config.appName,
+              url: config.siteUrl,
+            },
+            publisher: {
+              "@type": "Organization",
+              name: config.appName,
+              url: config.siteUrl,
+              logo: {
+                "@type": "ImageObject",
+                url: `${config.siteUrl}/syb_logo_transparent.png`,
+              },
             },
             datePublished: "2025-01-01",
             applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
             aggregateRating: {
               "@type": "AggregateRating",
               ratingValue: "4.8",
@@ -36,10 +51,58 @@ const TagSchema = () => {
             offers: [
               {
                 "@type": "Offer",
-                price: "199.00",
+                name: "Data",
+                description: "1 GEO audit: raw JSON for developers and SEO experts",
+                price: "29.00",
                 priceCurrency: "EUR",
+                priceSpecification: { "@type": "UnitPriceSpecification", priceType: "https://schema.org/OneTimePurchase" },
+              },
+              {
+                "@type": "Offer",
+                name: "Starter",
+                description: "1 complete GEO audit with dashboard access",
+                price: "79.00",
+                priceCurrency: "EUR",
+                priceSpecification: { "@type": "UnitPriceSpecification", priceType: "https://schema.org/OneTimePurchase" },
+              },
+              {
+                "@type": "Offer",
+                name: "Pro",
+                description: "Monthly GEO audits with progress tracking",
+                price: "59.00",
+                priceCurrency: "EUR",
+                priceSpecification: { "@type": "UnitPriceSpecification", priceType: "https://schema.org/RecurringCharge", billingIncrement: 1, unitCode: "MON" },
+              },
+              {
+                "@type": "Offer",
+                name: "Agency",
+                description: "15 client GEO audits per month with white-label reports",
+                price: "599.00",
+                priceCurrency: "EUR",
+                priceSpecification: { "@type": "UnitPriceSpecification", priceType: "https://schema.org/RecurringCharge", billingIncrement: 1, unitCode: "MON" },
               },
             ],
+          }),
+        }}
+      ></script>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: config.appName,
+            url: config.siteUrl,
+            logo: `${config.siteUrl}/syb_logo_transparent.png`,
+            sameAs: [
+              "https://x.com/showyourbrand_",
+              "https://www.linkedin.com/company/showyourbrand/",
+            ],
+            contactPoint: {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              email: "contact@showyourbrand.app",
+            },
           }),
         }}
       ></script>

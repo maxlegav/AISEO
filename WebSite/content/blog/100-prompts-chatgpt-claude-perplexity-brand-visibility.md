@@ -1,12 +1,12 @@
 ---
-title: "We Tested 100 Prompts on ChatGPT, Claude, and Perplexity — Here's What We Found About Brand Visibility"
-excerpt: "We ran 100 prompts across three query categories and three AI platforms. The patterns we found reveal exactly how AI decides which brands to surface — and which to ignore. Five findings every brand needs to understand."
+title: "We Tested 100 Prompts on ChatGPT, Claude, and Perplexity. Here's What We Found About Brand Visibility"
+excerpt: "We ran 100 prompts across three query categories and three AI platforms. The patterns we found reveal exactly how AI decides which brands to surface, and which to ignore. Five findings every brand needs to understand."
 date: "2026-02-02"
 category: "Research"
 readTime: "8 min read"
 ---
 
-We ran an experiment. We took 100 prompts across three categories — category-level queries, feature-specific queries, and direct brand queries — and systematically tested them across ChatGPT, Claude (Anthropic), and Perplexity. Then we analyzed the patterns.
+We ran an experiment. We took 100 prompts across three categories, category-level queries, feature-specific queries, and direct brand queries, and systematically tested them across ChatGPT, Claude (Anthropic), and Perplexity. Then we analyzed the patterns.
 
 What we found illuminates exactly how AI decides which brands to surface, and more importantly, what kinds of brands consistently appear versus which ones consistently don't.
 
@@ -22,7 +22,7 @@ We organized prompts into three buckets:
 
 ## Finding 1: Category Queries Are Won by External Authority, Not Content Quality
 
-For broad category queries, the brands that consistently appeared were not necessarily those with the best product pages or the most comprehensive website content. They were the brands most frequently mentioned across *external* sources — Reddit, industry publications, comparison sites, and review platforms.
+For broad category queries, the brands that consistently appeared were not necessarily those with the best product pages or the most comprehensive website content. They were the brands most frequently mentioned across *external* sources. Reddit, industry publications, comparison sites, and review platforms.
 
 Brand A, with an exceptional website but minimal external mentions, barely appeared. Brand B, with a mediocre website but extensive Reddit presence and 15 backlinks from DR 40+ publications, appeared in **70% of category queries**.
 
@@ -32,7 +32,7 @@ Brand A, with an exceptional website but minimal external mentions, barely appea
 
 For feature-specific queries, the pattern reversed. Brands with clearly structured content that explicitly called out their features in extractable formats (feature tables, bulleted feature lists, explicit FAQ answers like "Does [product] integrate with Slack?") were significantly more likely to appear.
 
-Brands that described their features only in paragraph prose, with no structured extraction points, were frequently skipped — even when the feature existed and was technically superior.
+Brands that described their features only in paragraph prose, with no structured extraction points, were frequently skipped, even when the feature existed and was technically superior.
 
 ## Finding 3: Sentiment Queries Surface Reddit and Review Sites Almost Exclusively
 
@@ -54,7 +54,7 @@ Negative information is sticky and difficult to dislodge once it's embedded in A
 
 ## What This Means for Your Brand
 
-These five findings map directly onto the dimensions that **Show Your Brand** measures in its GIO audit. We send 100 prompts — across all three query categories, across multiple AI platforms — and report on exactly these patterns for your specific brand.
+These five findings map directly onto the dimensions that **Show Your Brand** measures in its GIO audit. We send 100 prompts, across all three query categories, across multiple AI platforms, and report on exactly these patterns for your specific brand.
 
 Are you winning category queries? Feature queries? How does AI describe your sentiment? Are negative mentions surfacing? How do you compare to your top two competitors across all three query types?
 

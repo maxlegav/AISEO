@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
+import Head from "next/head";
 import { GetStaticProps, GetStaticPaths } from "next";
 import TagSEO from "@/components/TagSEO";
 import Navbar from "@/components/Navbar";
 import { BlogPost } from "./index";
-import { useWaitlistModalStore } from "@/stores";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import config from "@/config";
 
 interface Props {
   post: BlogPost;
@@ -188,7 +189,6 @@ function inlineFormat(text: string): string {
 }
 
 export default function BlogPostPage({ post, content }: Props) {
-  const { openWaitlistModal } = useWaitlistModalStore();
   const categoryColor =
     CATEGORY_COLORS[post.category] || "bg-gray-50 text-gray-700";
 
@@ -198,7 +198,57 @@ export default function BlogPostPage({ post, content }: Props) {
         canonicalSlug={`blog/${post.slug}`}
         title={`${post.title} – ShowYourBrand Blog`}
         description={post.excerpt}
-      />
+        og={{
+          title: `${post.title} – ShowYourBrand Blog`,
+          description: post.excerpt,
+          image: `${config.siteUrl}/og-homepage.jpeg`,
+          url: `${config.siteUrl}/blog/${post.slug}`,
+        }}
+      >
+        <meta property="og:type" content="article" />
+        <meta property="article:published_time" content={new Date(post.date).toISOString()} />
+        <meta property="article:section" content={post.category} />
+        <meta property="article:tag" content="GEO" />
+        <meta property="article:tag" content="Generative Engine Optimization" />
+        <meta property="article:tag" content={post.category} />
+      </TagSEO>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              headline: post.title,
+              description: post.excerpt,
+              image: `${config.siteUrl}/og-homepage.jpeg`,
+              url: `${config.siteUrl}/blog/${post.slug}`,
+              datePublished: new Date(post.date).toISOString(),
+              dateModified: new Date(post.date).toISOString(),
+              author: {
+                "@type": "Organization",
+                name: "ShowYourBrand",
+                url: config.siteUrl,
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "ShowYourBrand",
+                url: config.siteUrl,
+                logo: {
+                  "@type": "ImageObject",
+                  url: `${config.siteUrl}/syb_logo_transparent.png`,
+                },
+              },
+              mainEntityOfPage: {
+                "@type": "WebPage",
+                "@id": `${config.siteUrl}/blog/${post.slug}`,
+              },
+              articleSection: post.category,
+              keywords: `GEO, Generative Engine Optimization, AI search, ${post.category}`,
+            }),
+          }}
+        />
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
         <Navbar />
@@ -253,14 +303,14 @@ export default function BlogPostPage({ post, content }: Props) {
                   Ready to see how AI describes your brand?
                 </h3>
                 <p className="text-gray-300 text-sm mb-6 max-w-md mx-auto">
-                  100 prompts across ChatGPT, Claude, Perplexity and Gemini. Full technical scan. Prioritized action plan. Prices start at €199.
+                  100 prompts across all major AI engines. Full technical scan. Prioritized action plan. Starts at €29.
                 </p>
-                <button
-                  onClick={openWaitlistModal}
+                <Link
+                  href="/#pricing"
                   className="inline-flex items-center gap-2 bg-white text-[#1E293B] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm shadow-lg"
                 >
-                  Join the Waitlist →
-                </button>
+                  See our pricing →
+                </Link>
               </div>
             </article>
 

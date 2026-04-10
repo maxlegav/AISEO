@@ -1,18 +1,18 @@
 ---
 title: "How AI Decides Which Brands to Mention (And the Exact Factors You Can Control)"
-excerpt: "AI doesn't mention brands randomly. It doesn't favor the biggest companies by default. The way AI selects which brands to include in its answers follows patterns that are increasingly well understood — and that means they can be optimized."
+excerpt: "AI doesn't mention brands randomly. It doesn't favor the biggest companies by default. The way AI selects which brands to include in its answers follows patterns that are increasingly well understood, and that means they can be optimized."
 date: "2026-02-12"
 category: "GEO Strategy"
 readTime: "8 min read"
 ---
 
-AI doesn't mention brands randomly. It doesn't favor the biggest companies by default. It doesn't necessarily pick whoever spent the most on advertising. The way AI selects which brands to include in its answers follows patterns that are increasingly well understood — and that means they can be optimized.
+AI doesn't mention brands randomly. It doesn't favor the biggest companies by default. It doesn't necessarily pick whoever spent the most on advertising. The way AI selects which brands to include in its answers follows patterns that are increasingly well understood, and that means they can be optimized.
 
 This post explains the mechanics of AI brand selection and shows you exactly which factors are within your control.
 
 ## Factor 1: Frequency of Web-Wide Mentions
 
-AI systems like ChatGPT, Claude, and Perplexity learn from vast corpora of web content. A brand that appears frequently across the open web — in blog posts, reviews, Reddit threads, news articles, comparison guides — is more likely to be "known" to the AI and therefore more likely to be surfaced in answers.
+AI systems like ChatGPT, Claude, and Perplexity learn from vast corpora of web content. A brand that appears frequently across the open web, in blog posts, reviews, Reddit threads, news articles, comparison guides, is more likely to be "known" to the AI and therefore more likely to be surfaced in answers.
 
 This is not just about your own website. It's about how often authoritative sources on the web mention you, in what context, and with what sentiment. An analysis of 30 million AI citations found that external third-party mentions increase citation probability by **over 300%** compared to self-published content alone.
 
@@ -28,7 +28,7 @@ Wikipedia is the most extreme example of this. Research analyzing ChatGPT's cita
 
 ## Factor 3: Content Freshness
 
-AI systems strongly prefer recent information. They're less likely to cite a 2019 blog post than a 2025 one covering the same topic. Keeping your content updated — adding new statistics, revising outdated sections, updating the "last modified" date and corresponding sitemap `lastmod` tag — significantly improves AI citation rates.
+AI systems strongly prefer recent information. They're less likely to cite a 2019 blog post than a 2025 one covering the same topic. Keeping your content updated, adding new statistics, revising outdated sections, updating the "last modified" date and corresponding sitemap `lastmod` tag, significantly improves AI citation rates.
 
 **What you control:** Regular content updates, accurate `lastmod` tags in your sitemap, adding new data points quarterly.
 
@@ -42,13 +42,13 @@ Research from Moz found that content with explicit "Quick Answer" boxes at the t
 
 ## Factor 5: Sentiment of Mentions
 
-This is where GIO (Generative Influence Optimization) diverges from basic GEO. AI doesn't just check whether you're mentioned — it picks up on the sentiment surrounding your brand. If most of the web content mentioning your brand is neutral or negative (negative reviews, critical Reddit threads, comparison posts where you lose), AI will reflect that.
+This is where GIO (Generative Influence Optimization) diverges from basic GEO. AI doesn't just check whether you're mentioned, it picks up on the sentiment surrounding your brand. If most of the web content mentioning your brand is neutral or negative (negative reviews, critical Reddit threads, comparison posts where you lose), AI will reflect that.
 
 **What you control:** Responding to negative reviews, creating positive content that ranks above negative mentions, building authentic positive communities on Reddit and other platforms.
 
 ## Factor 6: Technical Accessibility
 
-None of the above matters if AI can't access your content. If your robots.txt blocks AI crawlers, if your pages are JavaScript-heavy and don't render for bots, if Cloudflare is silently blocking AI traffic — the AI simply doesn't have the raw material to mention you.
+None of the above matters if AI can't access your content. If your robots.txt blocks AI crawlers, if your pages are JavaScript-heavy and don't render for bots, if Cloudflare is silently blocking AI traffic, the AI simply doesn't have the raw material to mention you.
 
 **What you control:** Your technical configuration. This is usually the fastest fix available.
 

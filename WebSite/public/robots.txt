@@ -1,9 +1,38 @@
-# *
 User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /settings
+Disallow: /admin/
+
+# AI crawlers — welcome to index our public content
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /settings
+Disallow: /admin/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /settings
+Disallow: /admin/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /settings
+Disallow: /admin/
+
+User-agent: Googlebot
 Allow: /
 
 # Host
-Host: https://ShowYourBrand.com
+Host: https://showyourbrand.app
 
 # Sitemaps
-Sitemap: https://ShowYourBrand.com/sitemap.xml
+Sitemap: https://showyourbrand.app/sitemap.xml

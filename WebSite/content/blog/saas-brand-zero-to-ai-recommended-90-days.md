@@ -1,12 +1,12 @@
 ---
 title: "How a SaaS Brand Went From Zero AI Visibility to AI-Recommended in 90 Days"
-excerpt: "A mid-sized B2B SaaS brand — a project management tool targeting SMBs — went from being completely absent from AI responses to being regularly recommended by ChatGPT, Perplexity, and Claude within 90 days. The tactics are replicable. The timeline is realistic."
+excerpt: "A mid-sized B2B SaaS brand, a project management tool targeting SMBs, went from being completely absent from AI responses to being regularly recommended by ChatGPT, Perplexity, and Claude within 90 days. The tactics are replicable. The timeline is realistic."
 date: "2026-02-04"
 category: "Case Study"
 readTime: "9 min read"
 ---
 
-This is the story of how a mid-sized B2B SaaS brand — a project management tool targeting SMBs — went from being completely absent from AI responses to being regularly recommended by ChatGPT, Perplexity, and Claude within a 90-day window.
+This is the story of how a mid-sized B2B SaaS brand, a project management tool targeting SMBs, went from being completely absent from AI responses to being regularly recommended by ChatGPT, Perplexity, and Claude within a 90-day window.
 
 The tactics are replicable. The timeline is realistic. And the results should make clear why GEO investment pays off faster than most marketing channels.
 
@@ -20,9 +20,9 @@ Their competitors were mentioned in 40-70% of relevant prompts, with positive, s
 
 ## Month 1: Fix the Foundation
 
-**Week 1** was entirely technical. robots.txt was blocking GPTBot and PerplexityBot — an old setting from a Cloudflare security configuration that nobody had reviewed. Fixed in 20 minutes. llms.txt was created from scratch.
+**Week 1** was entirely technical. robots.txt was blocking GPTBot and PerplexityBot, an old setting from a Cloudflare security configuration that nobody had reviewed. Fixed in 20 minutes. llms.txt was created from scratch.
 
-**Weeks 2-3** focused on content structure. The top 10 most important pages on the site — homepage, product pages, key feature pages — were restructured with:
+**Weeks 2-3** focused on content structure. The top 10 most important pages on the site, homepage, product pages, key feature pages, were restructured with:
 - Clear opening paragraphs answering the core question
 - Quick Answer boxes added at the top
 - FAQ sections appended to each page
@@ -34,7 +34,7 @@ Their competitors were mentioned in 40-70% of relevant prompts, with positive, s
 
 The technical work unlocks the door. The external work builds the authority.
 
-**Reddit:** A founder account was created and spent 3 weeks building karma in r/projectmanagement, r/SaaS, and r/startups — answering questions, sharing genuine insights, contributing to ongoing discussions. No promotional content at all in this phase.
+**Reddit:** A founder account was created and spent 3 weeks building karma in r/projectmanagement, r/SaaS, and r/startups, answering questions, sharing genuine insights, contributing to ongoing discussions. No promotional content at all in this phase.
 
 **Guest posts:** Two guest posts were placed on industry publications (DR 45+), each mentioning the brand in context as an example solution. Both were published by day 45.
 
@@ -56,4 +56,4 @@ Traffic from AI platforms increased by roughly 40% over 90 days in absolute term
 
 Every optimization story starts with a baseline. You can't improve what you haven't measured.
 
-**Show Your Brand's GIO audit** provides exactly that baseline — 100 prompts across multiple AI platforms, full technical scan, sentiment analysis, competitive benchmarking, and a prioritized action plan. The 90-day turnaround story above started with an audit. Yours can too.
+**Show Your Brand's GIO audit** provides exactly that baseline, 100 prompts across multiple AI platforms, full technical scan, sentiment analysis, competitive benchmarking, and a prioritized action plan. The 90-day turnaround story above started with an audit. Yours can too.

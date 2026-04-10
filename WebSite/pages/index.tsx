@@ -61,7 +61,7 @@ const cmsLogos = [
 const AIModelMarquee = () => (
   <div className="mt-8 w-full">
     <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
-    BE MENTIONNED BY:
+      MENTIONED BY ALL MAJOR AI ENGINES
     </p>
 
     <div className="relative overflow-hidden py-4 lg:py-6 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-[280px] sm:max-w-sm md:max-w-xl lg:max-w-4xl border border-white/50 shadow-sm">
@@ -389,7 +389,7 @@ export default function Home() {
     {
       question: "What is GEO?",
       answer:
-        "GEO (Generative Engine Optimization) is the practice of optimizing your website and content to be visible and cited by AI systems like ChatGPT, Claude, Perplexity, and other large language models. As more users turn to AI for answers, GEO ensures your brand appears in those responses.",
+        "GEO (Generative Engine Optimization) is the practice of optimizing your website and content to be visible and cited by all major AI engines: ChatGPT, Claude, Perplexity, Gemini, Grok and others. As more users turn to AI for answers, GEO ensures your brand appears in those responses.",
     },
     {
       question: "How long does an audit take?",
@@ -409,7 +409,7 @@ export default function Home() {
     {
       question: "Which AI models do you analyze?",
       answer:
-        "We analyze your visibility across the 4 major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, and Gemini (Google). Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
+        "We analyze your visibility across all major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, Gemini (Google) and Grok (xAI). Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
     },
     {
       question: "How often should I run an audit?",
@@ -428,7 +428,7 @@ export default function Home() {
       <TagSEO
         canonicalSlug=""
         title="ShowYourBrand | GEO Audit: Appear in ChatGPT, Claude & Perplexity"
-        description="Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & Gemini. Get your GEO score and an action plan to appear in AI answers."
+        description="Test your brand visibility across 100 AI prompts on all major AI engines. Get your GEO score and an action plan to appear in AI answers."
         keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
         og={{
           title: "ShowYourBrand | Appear in AI Search Results",
@@ -547,7 +547,7 @@ export default function Home() {
                 className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                Book a Free Call
+                Book a Call
               </Button>
             </div>
           </div>
@@ -606,8 +606,8 @@ export default function Home() {
                   See what 4 AI models actually say about you
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  We run 100 real prompts across ChatGPT, Claude, Perplexity and Gemini.
-                  You get the word-for-word responses  not estimates, not scores, the actual text.
+                  We run 100 real prompts across all major AI engines: ChatGPT, Claude, Perplexity, Gemini and Grok.
+                  You get the word-for-word responses, not estimates, not scores, the actual text.
                 </p>
               </div>
 
@@ -826,7 +826,7 @@ export default function Home() {
                 oldPrice="€49"
                 period="one-time"
                 features={[
-                  "1 GEO audit  4 AI engines",
+                  "1 GEO audit across all AI engines",
                   "Raw JSON export of all results",
                   "GEO Health Score & category breakdown",
                   "100 prompts tested, 3 competitors",
@@ -844,7 +844,7 @@ export default function Home() {
                 period="one-time"
                 features={[
                   "1 complete GEO audit",
-                  "4 AI engines: ChatGPT, Claude, Perplexity & Gemini",
+                  "All AI engines: ChatGPT, Claude, Perplexity, Gemini & Grok",
                   "GEO Health Score (0–100) with breakdown",
                   "100 AI prompts in your category",
                   "3 competitor benchmarks",
@@ -864,7 +864,7 @@ export default function Home() {
                 highlighted={true}
                 features={[
                   "1 automatic audit per month",
-                  "4 AI engines + monthly comparison",
+                  "All AI engines + monthly comparison",
                   "Month-over-month score delta",
                   "Fixed vs new issues tracking",
                   "Prompt-level gain / loss tracking",
@@ -891,7 +891,7 @@ export default function Home() {
                   "Dedicated account manager",
                 ]}
                 ctaText="Book a Call"
-                onCtaClick={openWaitlistModal}
+                ctaLink="/signup?plan=agency"
               />
             </div>
 
@@ -1014,13 +1014,12 @@ export default function Home() {
 
             <div className="mt-14 max-w-xl mx-auto">
               <div className="flex justify-center mt-4">
-                <Button
-                  onClick={openWaitlistModal}
-                  className="rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 h-auto text-base font-semibold"
+                <Link
+                  href="#pricing"
+                  className="inline-flex items-center gap-2 rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 text-base font-semibold transition-colors"
                 >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book a Free Call
-                </Button>
+                  See pricing →
+                </Link>
               </div>
             </div>
           </div>
