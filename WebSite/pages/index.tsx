@@ -49,7 +49,7 @@ const aiModels = [
 // CMS logos
 const cmsLogos = [
   { name: "Shopify", logo: "/logos/shopify-svgrepo-com.svg" },
-  { name: "", logo: "/logos/lovable.png" },
+  { name: "Lovable", logo: "/logos/lovable.png" },
   { name: "Wix", logo: "/logos/wix-svgrepo-com.svg" },
   { name: "WordPress", logo: "/logos/wordpress-logo-svgrepo-com.svg" },
   { name: "Framer", logo: "/logos/framer-svgrepo-com.svg" },

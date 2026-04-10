@@ -13,6 +13,7 @@ import config from "@/config";
 interface Props {
   post: BlogPost;
   content: string;
+  relatedPosts: BlogPost[];
 }
 
 function formatDate(dateStr: string) {
@@ -188,7 +189,7 @@ function inlineFormat(text: string): string {
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-purple-600 hover:text-purple-700 underline" target="_blank" rel="noopener">$1</a>');
 }
 
-export default function BlogPostPage({ post, content }: Props) {
+export default function BlogPostPage({ post, content, relatedPosts }: Props) {
   const categoryColor =
     CATEGORY_COLORS[post.category] || "bg-gray-50 text-gray-700";
 
@@ -218,17 +219,22 @@ export default function BlogPostPage({ post, content }: Props) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Article",
+              "@type": "BlogPosting",
               headline: post.title,
               description: post.excerpt,
               image: `${config.siteUrl}/og-homepage.jpeg`,
               url: `${config.siteUrl}/blog/${post.slug}`,
               datePublished: new Date(post.date).toISOString(),
               dateModified: new Date(post.date).toISOString(),
+              inLanguage: "en-US",
               author: {
                 "@type": "Organization",
                 name: "ShowYourBrand",
                 url: config.siteUrl,
+                logo: {
+                  "@type": "ImageObject",
+                  url: `${config.siteUrl}/syb_logo_transparent.png`,
+                },
               },
               publisher: {
                 "@type": "Organization",
@@ -244,7 +250,42 @@ export default function BlogPostPage({ post, content }: Props) {
                 "@id": `${config.siteUrl}/blog/${post.slug}`,
               },
               articleSection: post.category,
-              keywords: `GEO, Generative Engine Optimization, AI search, ${post.category}`,
+              keywords: `GEO, Generative Engine Optimization, AI search, appear on ChatGPT, ${post.category}`,
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: config.siteUrl,
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Blog",
+                  item: `${config.siteUrl}/blog`,
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: post.category,
+                  item: `${config.siteUrl}/blog?category=${encodeURIComponent(post.category)}`,
+                },
+                {
+                  "@type": "ListItem",
+                  position: 4,
+                  name: post.title,
+                  item: `${config.siteUrl}/blog/${post.slug}`,
+                },
+              ],
             }),
           }}
         />
@@ -314,6 +355,31 @@ export default function BlogPostPage({ post, content }: Props) {
               </div>
             </article>
 
+            {/* Related Posts */}
+            {relatedPosts.length > 0 && (
+              <div className="mt-10">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Related articles</h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {relatedPosts.map((related) => {
+                    const color = CATEGORY_COLORS[related.category] || "bg-gray-50 text-gray-700";
+                    return (
+                      <Link key={related.slug} href={`/blog/${related.slug}`}>
+                        <article className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col cursor-pointer">
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full w-fit mb-3 ${color}`}>
+                            {related.category}
+                          </span>
+                          <h3 className="text-sm font-semibold text-gray-900 leading-snug flex-1 line-clamp-3">
+                            {related.title}
+                          </h3>
+                          <p className="text-xs text-gray-400 mt-3">{related.readTime}</p>
+                        </article>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Back to blog */}
             <div className="mt-8 text-center">
               <Link
@@ -350,7 +416,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
-  const filePath = path.join(process.cwd(), "content/blog", `${slug}.md`);
+  const contentDir = path.join(process.cwd(), "content/blog");
+  const filePath = path.join(contentDir, `${slug}.md`);
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
 
@@ -363,5 +430,25 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     readTime: data.readTime as string,
   };
 
-  return { props: { post, content } };
+  // Related posts: same category, exclude current, max 2
+  const allFiles = fs.readdirSync(contentDir).filter((f) => f.endsWith(".md"));
+  const relatedPosts: BlogPost[] = allFiles
+    .filter((f) => f !== `${slug}.md`)
+    .map((filename) => {
+      const raw = fs.readFileSync(path.join(contentDir, filename), "utf-8");
+      const { data: d } = matter(raw);
+      return {
+        slug: filename.replace(".md", ""),
+        title: d.title as string,
+        excerpt: d.excerpt as string,
+        date: d.date as string,
+        category: d.category as string,
+        readTime: d.readTime as string,
+      };
+    })
+    .filter((p) => p.category === post.category)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 2);
+
+  return { props: { post, content, relatedPosts } };
 };

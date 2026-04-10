@@ -106,6 +106,65 @@ const TagSchema = () => {
           }),
         }}
       ></script>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "What is GEO (Generative Engine Optimization)?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "GEO (Generative Engine Optimization) is the practice of optimizing your website and content to be visible and cited by all major AI engines: ChatGPT, Claude, Perplexity, Gemini, Grok and others. As more users turn to AI for answers, GEO ensures your brand appears in those responses.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How do I appear in ChatGPT or AI search results?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "To appear in ChatGPT and other AI search results, you need to optimize your website for GEO: add structured data (Schema.org), ensure your content is factual and well-cited, add an llms.txt file, and make sure AI crawlers can access your site via robots.txt. ShowYourBrand audits your visibility across 100 AI prompts and gives you a prioritized action plan.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How long does a GEO audit take?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "A complete GEO audit typically takes 10-15 minutes to process. We analyze your website across 100 AI prompts, scan your HTML structure, and generate comprehensive recommendations. You receive real-time progress updates during the process.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Does GEO replace SEO?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "No, GEO complements traditional SEO. While SEO optimizes for search engine rankings, GEO ensures your content is structured and presented in ways that AI systems can understand and cite. Both work together to maximize your online visibility.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Which AI models does ShowYourBrand analyze?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "We analyze your visibility across all major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, Gemini (Google) and Grok (xAI). Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Do you offer white-label reports for agencies?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes. Our Agency plan includes fully customizable white-label dashboards with your branding. You can add your logo, colors, and share a custom link with your clients so they see your agency, not ShowYourBrand.",
+                },
+              },
+            ],
+          }),
+        }}
+      ></script>
     </Head>
   );
 };

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
+import Head from "next/head";
 import { GetStaticProps } from "next";
 import TagSEO from "@/components/TagSEO";
 import Navbar from "@/components/Navbar";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import config from "@/config";
 
 export interface BlogPost {
   slug: string;
@@ -45,9 +47,58 @@ export default function BlogIndex({ posts }: Props) {
     <>
       <TagSEO
         canonicalSlug="blog"
-        title="Blog – ShowYourBrand | GEO Insights & Strategy"
-        description="Expert articles on Generative Engine Optimization (GEO), AI search trends, and how to make your brand visible to ChatGPT, Claude, and Perplexity."
+        title="GEO Blog: How to Appear on ChatGPT, Claude & Perplexity | ShowYourBrand"
+        description="Expert articles on Generative Engine Optimization (GEO), AI search trends, and how to make your brand visible to ChatGPT, Claude, Perplexity, Gemini and Grok."
+        og={{
+          title: "GEO Blog: How to Appear on ChatGPT, Claude & Perplexity",
+          description: "Expert articles on GEO strategy, AI search optimization, and how to make your brand visible across all major AI engines.",
+          image: `${config.siteUrl}/og-homepage.jpeg`,
+          url: `${config.siteUrl}/blog`,
+        }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "CollectionPage",
+              name: "ShowYourBrand GEO Blog",
+              description: "Expert articles on Generative Engine Optimization (GEO), AI search trends, and how to make your brand visible to ChatGPT, Claude, Perplexity, Gemini and Grok.",
+              url: `${config.siteUrl}/blog`,
+              publisher: {
+                "@type": "Organization",
+                name: config.appName,
+                url: config.siteUrl,
+                logo: {
+                  "@type": "ImageObject",
+                  url: `${config.siteUrl}/syb_logo_transparent.png`,
+                },
+              },
+              hasPart: posts.map((p) => ({
+                "@type": "BlogPosting",
+                headline: p.title,
+                url: `${config.siteUrl}/blog/${p.slug}`,
+                datePublished: new Date(p.date).toISOString(),
+                articleSection: p.category,
+              })),
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: config.siteUrl },
+                { "@type": "ListItem", position: 2, name: "Blog", item: `${config.siteUrl}/blog` },
+              ],
+            }),
+          }}
+        />
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
         <Navbar />
