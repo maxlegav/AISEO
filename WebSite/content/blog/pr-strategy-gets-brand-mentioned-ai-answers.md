@@ -6,60 +6,67 @@ category: "GEO Strategy"
 readTime: "8 min read"
 ---
 
-Most brands think of PR as a way to get backlinks or impress investors. The brands winning at GEO in 2026 think of PR as an AI trust-building machine.
+Most brands think of PR as a way to get backlinks or impress investors. The brands winning at GEO in 2026 think of PR as an AI trust signal.
 
-Here's the logic: AI systems learn from what the web says about you. The web's most authoritative nodes, major publications, established industry media, high-profile podcasts, Wikipedia, carry enormous weight in AI training data. A mention in TechCrunch isn't just a vanity metric. It's a training signal that tells every AI system that processes that article: "this brand has been deemed credible by an authoritative third party."
+The logic is direct: AI systems learn what the web says about you. When TechCrunch writes about your product, when a respected podcast host mentions your name, when three industry analysts cite your research — those signals tell every AI model that trained on that content: "this brand has been verified as credible by third-party sources."
 
-Multiply that signal across ten publications, twenty podcast appearances, and a Wikipedia entry, and you've built an AI authority profile that no competitor without earned media can replicate quickly.
+Brand mentions correlate with AI visibility at a [0.664 correlation](https://www.reporteroutreach.com/blog/generative-engine-optimization) — three times stronger than backlinks alone. That makes earned media the highest-leverage input into your GEO score, and it's one of the hardest things to fake.
 
-## The PR-to-AI Pipeline
+## Why Earned Media Is Different From Owned Media in AI's Eyes
 
-The mechanism works as follows:
+Your website, your LinkedIn posts, your own blog — AI systems weight these lower precisely because they're self-reported. A brand can say anything about itself. What AI trusts is what others say about the brand.
 
-1. You earn media coverage (article, podcast, interview, research citation)
-2. AI systems crawl that coverage as part of their training or real-time indexing
-3. AI builds an association between your brand and the credibility of the source
-4. When users ask AI about your category, your brand is surfaced with positive, authoritative framing
-5. The more coverage you earn, the stronger and more consistent the association becomes
+[A Semrush study of the most-cited domains in AI](https://www.semrush.com/blog/most-cited-domains-ai/) found Wikipedia consistently at the top of ChatGPT citation sources. Wikipedia is the extreme case of this principle: a source with massive editorial authority, maintained by independent contributors, where every claim requires external citation. When Wikipedia covers your company, AI picks up both the Wikipedia entry and the coverage that makes your Wikipedia page credible.
 
-Research analyzing Wikipedia's role in AI citations found that Wikipedia accounts for nearly **48% of ChatGPT's top citations**. This is the extreme example of the principle: a source that has earned massive editorial authority influences AI recommendations dramatically.
+The PR-to-AI mechanism runs like this: you earn media coverage → AI crawls that coverage → AI associates your brand with the credibility of the source → when users ask about your category, your brand appears with authoritative framing. The more coverage you accumulate, the more consistently AI recommends you.
 
-## Strategy 1: HARO (Help a Reporter Out)
+## Tactic 1: HARO — Volume and Specificity
 
-HARO (now integrated into Cision) is a free service that connects journalists with expert sources. Journalists post queries asking for expert commentary or data, you respond with genuinely useful insights, and if your response is selected, you get cited in their article.
+[HARO (Help a Reporter Out)](https://www.cision.com/haro/), now part of Cision, connects journalists with expert sources. Reporters post queries asking for specific expertise; you respond; if selected, you're cited in their piece with your name, company, and usually a link.
 
-The success rate is relatively low (published data suggests 5 to 10% of quality responses get used), but the cost is only time. For a brand willing to respond to 3 to 5 relevant queries weekly, even a 5% success rate compounds over months into a meaningful earned media portfolio.
+Published response rates hover around 5–10% for quality submissions. That sounds low, but the economics work: responding to five relevant queries per week at a 7% hit rate produces roughly one to two earned placements per month. Over a year, that's a portfolio of 15–25 citations in real publications — the kind of coverage that AI models index, attribute, and cite.
 
-**The key to HARO success:** respond with specific data, concrete examples, and a clear point of view. Generic responses don't get published. Specific, counterintuitive insights supported by numbers do.
+The responses that get published share one pattern: specific numbers and counterintuitive positions. A generic response ("we recommend a proactive customer success approach") goes in the trash. A specific response ("in our analysis of 800 SaaS companies, churn above 4% annually is almost never a retention problem — it's a product-market fit signal") gets used. Journalists need quotes that say something, not quotes that fill space.
 
-## Strategy 2: Original Research and Data
+## Tactic 2: Original Research
 
-Among all types of PR content, original data and research is the most linkable, most citable, and most AI-friendly. If you can survey 100 or more relevant people and publish the results as an industry report, you've created a piece of content that:
+Among all PR content types, original data is the most AI-friendly. A survey of 300 relevant people, published as an industry report, creates a piece of content that:
 
-- Other publications will reference and link to
-- Journalists will use as a source in related articles
-- AI systems will cite when answering questions in your category
-- Positions your brand as an expert, not just a vendor
+- Other publications reference and link to when covering related topics
+- Journalists cite as a source in their own reporting
+- AI systems cite when answering questions in your category
+- Positions your brand as an authoritative voice, not a vendor pitching its product
 
-The investment required is modest: a simple survey tool, a few hundred respondents recruited through LinkedIn or industry communities, and a well-structured results article. The returns are long-lasting.
+The [GEO study from Princeton and Georgia Tech](https://arxiv.org/pdf/2311.09735) found that citing external sources improved AI visibility by up to 115% for lower-ranked content. Original research inverts this: you become the source others cite. Every article that references "according to [Your Company]'s 2026 survey" is an AI citation multiplier.
 
-## Strategy 3: Podcast Appearances
+The investment is modest. A survey tool, LinkedIn for recruiting respondents, a structured results post with clear methodology. You don't need a research department — you need a specific question your industry doesn't have good data on, and the discipline to actually run the numbers.
 
-Podcast transcripts and show notes are excellent AI training material, they're long, substantive, conversational, and frequently indexed by web crawlers. A single podcast appearance on a well-regarded industry show can result in:
+## Tactic 3: Podcast Appearances (With Transcripts)
 
-- Your name appearing in the transcript
-- Quotes attributed to you
-- Links from the show notes
-- Potentially a clip that circulates on social media
+Full-episode podcast transcripts are excellent AI training material — long, substantive, in natural language, frequently indexed by web crawlers. A 45-minute interview on a well-regarded industry podcast generates roughly 7,000–10,000 words of transcript content where your name appears dozens of times in the context of your expertise.
 
-For AI visibility specifically, target podcasts that publish full transcripts (not just summaries) and have established audiences in your target category.
+For AI visibility specifically, the criteria to prioritize are: does the show publish a full transcript (not just show notes)? Does it have a recognized audience in your target category? Does the host have their own brand authority that rubs off on guests?
 
-## Strategy 4: Wikipedia Eligibility
+One strong podcast appearance can generate show notes, a transcript page, clip posts, and sometimes a follow-up article — all indexed, all attributing expertise to your name and brand.
 
-Wikipedia remains one of the most powerful AI authority signals available. But it comes with strict requirements: your brand must have been covered in at least five to ten notable, independent publications, with coverage that goes beyond press releases and discusses your company substantively.
+## Tactic 4: Build Toward Wikipedia Eligibility
 
-If you're building toward Wikipedia eligibility, track your earned media coverage against these criteria. Once you meet the threshold, a well-written, neutrally toned Wikipedia article can dramatically shift your AI visibility.
+Wikipedia remains one of the highest-value AI authority signals available. [ChatGPT cites Wikipedia more heavily than any other source](https://www.seroundtable.com/chatgpt-google-aio-sources-39578.html), and a Wikipedia article about your company signals to every AI model that you have met a high bar of independent editorial coverage.
 
-## What Show Your Brand Measures
+Wikipedia's notability standard requires coverage in multiple independent, reliable publications — not press releases, not brand-generated content. As a rough benchmark: five to ten substantive articles in recognized publications, covering your company in depth, not just mentioning you in passing.
 
-AI sentiment queries, "what do people say about [brand]?", "is [brand] trustworthy?", "what's the reputation of [brand]?", draw heavily from earned media and authoritative external sources. In the **Show Your Brand GIO audit**, we specifically test these trust and sentiment prompts alongside category queries, giving you a clear picture of whether your PR efforts are translating into positive AI perception.
+Track your earned media against this threshold deliberately. Once you meet it, a well-written, neutrally toned Wikipedia article will shift your AI visibility faster than almost any other single action.
+
+## Measuring Whether PR Is Working for AI Visibility
+
+The mistake most brands make is measuring PR by backlinks and referral traffic. Those metrics matter for traditional SEO. For AI visibility, the relevant question is different: when someone asks ChatGPT or Perplexity "what are the best tools for [your category]?", does your name appear? With what sentiment?
+
+AI trust and sentiment queries — "is [brand] reliable?", "what do people say about [brand]?", "is [brand] worth it?" — draw almost entirely from earned media and authoritative external sources. Those are the queries that reveal whether your PR investment is translating into AI presence.
+
+The only way to answer that question is to actually send those prompts and measure the results.
+
+---
+
+## Try It on Your Own Brand
+
+ShowYourBrand runs 100 prompts across ChatGPT, Claude, Perplexity, Gemini and Grok, measures how often and how well your brand is cited, gives a GEO score and action plan. [Start your audit from €29 →](https://showyourbrand.app/#pricing)
