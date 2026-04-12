@@ -1,0 +1,61 @@
+# ShowYourBrand
+
+> ShowYourBrand is a Generative Engine Optimization (GEO) audit platform that helps businesses measure and improve their visibility in AI-generated answers from ChatGPT, Claude, Perplexity, and Gemini.
+
+## What is GEO?
+
+Generative Engine Optimization (GEO) is the practice of optimizing a website and its content so that AI systems cite and mention the brand in their responses. As more users turn to AI assistants for product and service recommendations, appearing in AI answers is becoming as important as Google rankings.
+
+## What ShowYourBrand does
+
+ShowYourBrand runs 100 real-world prompts across 4 major AI models (ChatGPT / GPT-4o, Claude / Sonnet, Perplexity / sonar-pro, and Gemini) to measure how often and how well a business is mentioned. It then scans the website technically (Schema.org markup, meta tags, FAQ structure, HTML readability) and generates a GEO Health Score from 0 to 100 with a prioritized action plan.
+
+## Core features
+
+- **AI Visibility Test** — 100 prompts tested on ChatGPT, Claude, Perplexity and Gemini
+- **GEO Health Score** — composite score from 0 to 100 measuring AI visibility
+- **Competitor Benchmarking** — compare your score against up to 3 competitors
+- **HTML & Schema Scanner** — detect missing Schema.org markup, meta tags, FAQ structure
+- **Prioritized Action Plan** — specific fixes ranked by impact (critical → high → medium → low)
+- **Monthly Tracking (Pro)** — automatic monthly re-audit with score delta and regression alerts
+- **White-Label Reports (Agency)** — agencies can share branded dashboards with clients
+
+## Pricing
+
+| Plan | Price | Type | For who |
+|------|-------|------|---------|
+| Data | €29 | One-time | Developers and technical SEO who want raw JSON |
+| Starter | €79 | One-time | Business owners who want a full audit report |
+| Pro | €59/month | Subscription | Businesses tracking monthly GEO progress |
+| Agency | €599/month | Subscription | Marketing agencies managing multiple clients |
+
+## Who it's for
+
+- **Freelance SEOs and digital consultants** adding GEO to their service offering
+- **In-house marketing teams** at SMBs who already rank on Google but are invisible on AI
+- **Marketing agencies** who want to resell GEO audits under their own brand
+
+## Company
+
+- **Website**: https://showyourbrand.app
+- **Blog**: https://showyourbrand.app/blog
+- **Twitter/X**: https://x.com/showyourbrand_
+- **LinkedIn**: https://www.linkedin.com/company/showyourbrand/
+- **Contact**: contact@showyourbrand.app
+- **Founded**: 2025
+
+## Key concepts we cover
+
+- Generative Engine Optimization (GEO)
+- AI Search Optimization
+- ChatGPT SEO / AI visibility
+- Schema.org structured data for AI
+- Brand citation in AI answers
+- GEO Health Score
+- AI prompt gap analysis
+- Competitor citation analysis
+
+## Blog
+
+Our blog covers GEO strategy, AI search trends, technical optimization guides, and case studies.
+Full article list: https://showyourbrand.app/blog

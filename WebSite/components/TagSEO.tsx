@@ -5,14 +5,14 @@ import type { ReactNode } from 'react';
 // Predefined SEO tags — prefilled with default values but you can customize them for each page
 // This let you add default SEO tags to all pages, like /terms, /privacy, without rewrtting them all
 const defaults = {
-  title: `${config.appName} — GEO Audit: Appear in ChatGPT, Claude & Perplexity`,
+  title: `${config.appName}: GEO Audit, Appear on All Major AI Engines`,
   description:
-    'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers.',
+    'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity, Gemini and Grok. Get your GEO score and an action plan to appear in AI answers.',
   keywords: `GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit, ${config.appName}`,
   og: {
-    title: `${config.appName} — GEO Audit: Appear in ChatGPT, Claude & Perplexity`,
+    title: `${config.appName}: GEO Audit, Appear on All Major AI Engines`,
     description:
-      'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity & DeepSeek. Get your GEO score and an action plan to appear in AI answers.',
+      'Test your brand visibility across 100 AI prompts on ChatGPT, Claude, Perplexity, Gemini and Grok. Get your GEO score and an action plan to appear in AI answers.',
     image: `${config.siteUrl}/og-homepage.jpeg`,
     url: `${config.siteUrl}/`,
   },
@@ -60,6 +60,7 @@ const TagSEO = ({
 
       {/* OG METAS */}
       <meta property='og:type' content='website' />
+      <meta property='og:site_name' content={config.appName} />
       <meta property='og:title' content={og?.title || defaults.og.title} />
       <meta
         property='og:description'
@@ -71,16 +72,24 @@ const TagSEO = ({
         key='og:image'
         content={og?.image || defaults.og.image}
       />
+      <meta property='og:image:width' content='1200' />
+      <meta property='og:image:height' content='630' />
       <meta property='og:url' content={og?.url || defaults.og.url} />
+      <meta property='og:locale' content='en_US' />
       <meta name='twitter:card' content='summary_large_image' />
+      <meta name='twitter:site' content='@showyourbrand_' />
+      <meta name='twitter:creator' content='@showyourbrand_' />
       <meta name='twitter:title' content={og?.title || defaults.og.title} />
       <meta name='twitter:description' content={og?.description || defaults.og.description} />
       <meta name='twitter:image' content={og?.image || defaults.og.image} />
 
+      {/* ROBOTS */}
+      <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
       {/* CANONICAL TAG */}
       <link
         rel='canonical'
-        href={`https://${config.domainName}/${canonicalSlug}`}
+        href={canonicalSlug !== undefined ? `${config.siteUrl}/${canonicalSlug}` : config.siteUrl}
       />
 
       {/* CHILDREN TAGS */}

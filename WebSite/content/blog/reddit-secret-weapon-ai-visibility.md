@@ -6,58 +6,74 @@ category: "GEO Strategy"
 readTime: "7 min read"
 ---
 
-Of all the platforms that feed into AI search responses, Reddit might be the most surprising — and the most powerful.
+Of all the platforms that feed into AI responses, Reddit is the one most brands are sleeping on.
 
-Reddit accounts for the most heavily weighted community content in Gemini and Perplexity responses. OpenAI has a formal partnership with Reddit to use its content to enhance ChatGPT's answers. And Reddit posts regularly rank in Google's top 3 results across an enormous range of informational queries.
+[Perplexity cites Reddit as its leading community source at 6.6% of all citations](https://www.tryprofound.com/blog/ai-platform-citation-patterns), outpacing most editorial publishers in certain query types. Google AI Overviews — which now appear on [a growing share of all search results](https://almcorp.com/blog/google-ai-overviews-surge-9-industries/) — has been found by researchers at SE Roundtable to source primarily from Reddit for community and recommendation queries. And on May 16, 2024, [OpenAI and Reddit announced a formal partnership](https://openai.com/index/openai-and-reddit-partnership/) giving OpenAI real-time access to Reddit's Data API — which means Reddit content flows directly into ChatGPT answers.
 
-This makes Reddit a backdoor to both traditional search *and* AI visibility simultaneously. And almost nobody outside of a handful of growth marketers is using it strategically yet.
+The deal, [reported by TechCrunch](https://techcrunch.com/2024/05/16/openai-inks-deal-to-train-ai-on-reddit-data/), is valued at approximately $60 million. It's not a rumor or an inference — it's a signed commercial agreement. Reddit content is now formally licensed training and retrieval data for the world's most used AI chat platform.
 
-## Why Reddit Dominates AI Training Data
+That makes Reddit a direct channel into AI visibility. And most brands still treat it like a forum they occasionally check for complaints.
 
-AI systems are trained on vast datasets of human-generated text. Reddit has several properties that make it particularly valuable to AI trainers:
+## Why Reddit Specifically?
 
-- It covers essentially every topic in human experience
-- Its content is written in natural conversational language (which AI is trained to replicate)
-- It represents real opinions and lived experience (not just brand messaging)
-- It is constantly updated with fresh content
+AI systems need more than facts — they need the kind of real-world context and opinion that tells users whether something actually works, not just whether it exists. Reddit delivers that in a format AI is built to process:
 
-OpenAI and Reddit announced their partnership in 2024, with Reddit providing real-time data access to improve ChatGPT's answers. The practical implication: when someone asks Perplexity or ChatGPT a community-type question — "is [tool] worth it?", "real experiences with [product]?", "what do people actually think of [brand]?" — Reddit content gets heavily weighted in the response.
+Conversational, natural-language text. Real opinions from people with nothing to sell. Upvote signals that surface community consensus. A breadth that covers essentially every topic in human experience. And constant freshness — posts indexed by AI within 24 hours of publishing.
 
-## The Right Approach: Genuine Before Promotional
+[Research on Perplexity's citation patterns](https://authoritytech.io/blog/reddit-perplexity-geo-strategy-2026) found that long-form Reddit comments (300+ words) outperform short replies in AI citations. The reason is the same reason comprehensive blog posts get cited more: depth signals expertise, and AI systems are trained to prioritize demonstrably expert content over opinion fragments.
 
-Here's where most brands get Reddit wrong. They see it as a distribution channel and treat it like a social media feed: post promotional content, drop links, try to drive traffic. Reddit's communities have moderators and community norms that make this approach result in bans, negative karma, and the opposite of the effect you want.
+When someone asks Perplexity "is [your tool] actually worth it?" or asks ChatGPT "real experiences with [your product]?", the answers that appear are coming from Reddit. That's not speculation — it's the natural output of two data licensing agreements (Reddit-OpenAI and Reddit-Google) and Perplexity's publicly documented retrieval pipeline.
 
-The approach that works is: **be genuinely helpful first, always.** Build a presence in your relevant subreddits by answering questions, sharing insights, and contributing real value. The brand association comes naturally over time, as a secondary effect of being recognized as a knowledgeable community member.
+## How Most Brands Get This Wrong
 
-Mention your brand or product only when directly relevant — roughly 10% of your interactions at most. And never drop a link unless someone specifically asks.
+The brands that fail on Reddit treat it like a distribution channel: post promotional content, drop links to blog posts, announce product updates. Subreddit moderators see this pattern hundreds of times a week and ban it. The community downvotes it. And worse than zero, it creates negative signal — AI can index that too.
 
-## Target Subreddits for B2B and SaaS Brands
+The brands that win on Reddit operate by a simple rule: be genuinely helpful first, always. The promotional signal builds as a secondary effect of being recognized as a knowledgeable contributor.
 
-The most relevant subreddits for B2B brands include:
+The rough benchmark that works: no more than 10% of your posts should mention your brand directly, and never drop a link unless someone asks. If someone asks "what tool do you use for X?", that's the moment. Not "I just published a post about this" unprompted.
 
-- **r/entrepreneur** (2.3M members) — founders and business owners discussing tools and problems
-- **r/startups** (1.5M members) — early-stage company discussions
-- **r/SaaS** (200K members) — specifically for SaaS founders and buyers
-- **r/marketing** (500K members) — marketing professionals and tactics
-- Your specific industry or category subreddits
+## Where to Show Up: Subreddits by Category
 
-## Post Formats That Perform
+For B2B and SaaS brands, the highest-value communities are:
 
-Posts get approximately 10x more visibility than comments. The post formats that consistently perform well and get cited by AI:
+**r/entrepreneur** (2.3M members) — founders and operators discussing tools, problems, and decisions. Questions here get indexed heavily and stay visible for months.
 
-- "I analyzed [50/100/X] [industry] tools — here's what I found" (data-driven, unbiased framing)
-- "We built [product] after [experience] — here are the 5 things we learned"
-- "AMA: I've been doing [relevant thing] for [X years]" (expertise sharing)
-- "What's your experience with [common industry problem]?" (community engagement)
+**r/startups** (1.5M members) — early-stage company discussions. High information density, strong upvote culture for genuinely useful content.
 
-The key is that these posts provide genuine value independent of your promotional goals.
+**r/SaaS** (200K members) — specifically for SaaS founders and buyers. Smaller community but high intent and directly relevant to most B2B products.
 
-## The Compounding Effect
+**r/marketing** (500K members) — marketing professionals discussing tactics and tools. Good for agencies and marketing-adjacent products.
 
-A well-received Reddit post can rank in Google within 24 hours. It can stay visible for years. It gets indexed by AI training systems. One post where your brand is mentioned positively, written by a respected community member, can influence AI recommendations about your category for an extended period.
+Then your specific vertical subreddits — the communities where your actual customers talk about their actual problems. Those are usually the highest-citation-potential communities because they're the most specific to the queries people ask AI.
 
-This is why Reddit is one of the highest-ROI channels in GEO — particularly for early-stage brands with limited domain authority. The subreddit's authority becomes your authority.
+## Post Formats That Get Cited
 
-## Show Your Brand Monitors This
+Posts get roughly 10x more visibility than comments in AI responses, because they're indexed as standalone content rather than contextual replies. The formats that consistently get cited:
 
-When **Show Your Brand** runs a GIO audit, we send prompts across AI platforms that are designed to surface community-derived sentiment — exactly the kind of responses that draw heavily from Reddit content. You'll see what AI says about your brand when asked in conversational, community-informed contexts, not just formal product queries. That tells you a great deal about your Reddit footprint.
+"I analyzed [50/100/X] [industry tools], here's what I found" — data-driven, credible framing. The key is the analysis has to be real and detailed. AI cites the data, not the narrative.
+
+"We built [product] after [specific experience], here are the 5 things we learned" — authentic founder storytelling with concrete lessons. Genuine and extractable.
+
+"AMA: I've been doing [relevant thing] for [X years]" — expertise sharing. The conversational Q&A format generates rich citation material.
+
+"Has anyone solved [specific industry problem]?" — community engagement that generates thread content for AI to index. Your participation in the answers positions you as an expert.
+
+## The Compounding Math
+
+A strong Reddit post can rank in Google within 24 hours and remain visible for years. It gets indexed by AI training systems. It generates comments that add more content around your brand. One well-received post in r/entrepreneur where your product is mentioned positively — written by a respected community member who tried it — can appear in AI recommendations about your category for an extended period.
+
+That's the compounding effect: Reddit's domain authority becomes your authority. A post in r/SaaS carries more AI credibility than the same content on a brand-new company blog, because the subreddit has years of community validation behind it.
+
+Early-stage brands with limited domain authority have a genuine advantage here. You don't need three years of SEO history to participate credibly in Reddit communities. You need genuine expertise and the patience to build reputation before asking for anything.
+
+## What AI Says About Your Reddit Footprint
+
+The prompts that reveal Reddit-derived sentiment are the ones that sound like a friend asking a real question: "is [brand] legit?", "what do people actually think of [brand]?", "alternatives to [brand] with better [feature]?". Those questions pull heavily from Reddit content.
+
+Most brands have no idea what AI says when those questions are asked. The answers are often being determined right now by Reddit threads from two years ago that nobody at the company knows exist.
+
+---
+
+## Try It on Your Own Brand
+
+ShowYourBrand runs 100 prompts across ChatGPT, Claude, Perplexity, Gemini and Grok, measures how often and how well your brand is cited, gives a GEO score and action plan. [Start your audit from €29 →](https://showyourbrand.app/#pricing)
