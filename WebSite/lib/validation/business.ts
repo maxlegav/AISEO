@@ -21,6 +21,30 @@ export const SetUsernameSchema = z.object({
 });
 export type SetUsernameInput = z.infer<typeof SetUsernameSchema>;
 
+const currentYear = new Date().getFullYear();
+
+/**
+ * Extended business context fields.
+ * These enrich the audit request sent to the Python service
+ * (see server/src/models/business.py AuditRequest). All optional.
+ */
+const businessContextFields = {
+  targetKeywords: z.array(z.string().min(1).max(100)).max(10).default([]),
+  servicesOrProducts: z.array(z.string().min(1).max(100)).max(10).default([]),
+  uniqueSellingPoints: z.array(z.string().min(1).max(200)).max(5).default([]),
+  targetAudience: z.string().max(200).trim().optional(),
+  priceRange: z.enum(['budget', 'mid', 'premium']).optional(),
+  yearFounded: z.number().int().min(1800).max(currentYear).optional(),
+  certifications: z.array(z.string().min(1).max(100)).max(10).default([]),
+  socialMediaUrls: z.array(z.string().min(1).max(300)).max(6).default([]),
+  localityTier: z.enum(['global', 'national', 'hyper_local']).optional(),
+  city: z.string().max(100).trim().optional(),
+  country: z.string().max(100).trim().optional(),
+  neighborhood: z.string().max(100).trim().optional(),
+  street: z.string().max(200).trim().optional(),
+  region: z.string().max(100).trim().optional(),
+};
+
 /**
  * Create business schema.
  */
@@ -31,6 +55,7 @@ export const CreateBusinessSchema = z.object({
   competitorUrls: z.array(z.string().min(1)).max(3).default([]),
   category: z.string().min(1, 'Category is required').max(100).trim(),
   description: z.string().max(500).trim().optional(),
+  ...businessContextFields,
 });
 export type CreateBusinessInput = z.infer<typeof CreateBusinessSchema>;
 
@@ -44,6 +69,20 @@ export const UpdateBusinessSchema = z.object({
   competitorUrls: z.array(z.string().min(1)).max(3).optional(),
   category: z.string().min(1).max(100).trim().optional(),
   description: z.string().max(500).trim().optional(),
+  targetKeywords: z.array(z.string().min(1).max(100)).max(10).optional(),
+  servicesOrProducts: z.array(z.string().min(1).max(100)).max(10).optional(),
+  uniqueSellingPoints: z.array(z.string().min(1).max(200)).max(5).optional(),
+  targetAudience: z.string().max(200).trim().optional(),
+  priceRange: z.enum(['budget', 'mid', 'premium']).optional(),
+  yearFounded: z.number().int().min(1800).max(currentYear).optional(),
+  certifications: z.array(z.string().min(1).max(100)).max(10).optional(),
+  socialMediaUrls: z.array(z.string().min(1).max(300)).max(6).optional(),
+  localityTier: z.enum(['global', 'national', 'hyper_local']).optional(),
+  city: z.string().max(100).trim().optional(),
+  country: z.string().max(100).trim().optional(),
+  neighborhood: z.string().max(100).trim().optional(),
+  street: z.string().max(200).trim().optional(),
+  region: z.string().max(100).trim().optional(),
 });
 export type UpdateBusinessInput = z.infer<typeof UpdateBusinessSchema>;
 

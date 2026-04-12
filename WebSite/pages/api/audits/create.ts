@@ -41,9 +41,20 @@ export default async function handler(
       competitorUrls,
       competitorNames,
       language,
+      localityTier,
       city,
       country,
       neighborhood,
+      street,
+      region,
+      targetKeywords,
+      servicesOrProducts,
+      uniqueSellingPoints,
+      targetAudience,
+      priceRange,
+      yearFounded,
+      certifications,
+      socialMediaUrls,
     } = req.body;
 
     if (!businessId || !businessName || !businessUrl || !category) {
@@ -114,6 +125,13 @@ export default async function handler(
     const processingKey = process.env.PROCESSING_SERVICE_API_KEY;
 
     if (processingKey) {
+      const hasItems = (v: unknown): v is unknown[] => Array.isArray(v) && v.length > 0;
+      const parsedYear = typeof yearFounded === 'number'
+        ? yearFounded
+        : typeof yearFounded === 'string' && yearFounded.trim()
+          ? parseInt(yearFounded, 10)
+          : undefined;
+
       const auditRequest = {
         auditId,
         businessId: businessId.toString(),
@@ -127,9 +145,21 @@ export default async function handler(
         subUrls: subUrls || [],
         competitorUrls: competitorUrls || [],
         competitorNames: competitorNames || [],
+        ...(localityTier ? { localityTier } : {}),
         ...(city ? { city } : {}),
         ...(country ? { country } : {}),
         ...(neighborhood ? { neighborhood } : {}),
+        ...(street ? { street } : {}),
+        ...(region ? { region } : {}),
+        // Extended business context — forwarded only when non-empty
+        ...(hasItems(targetKeywords) ? { targetKeywords } : {}),
+        ...(hasItems(servicesOrProducts) ? { servicesOrProducts } : {}),
+        ...(hasItems(uniqueSellingPoints) ? { uniqueSellingPoints } : {}),
+        ...(targetAudience ? { targetAudience } : {}),
+        ...(priceRange ? { priceRange } : {}),
+        ...(Number.isFinite(parsedYear) ? { yearFounded: parsedYear } : {}),
+        ...(hasItems(certifications) ? { certifications } : {}),
+        ...(hasItems(socialMediaUrls) ? { socialMediaUrls } : {}),
         // History context for the processing server
         ...(previousAudit ? { previousAuditId: previousAudit._id.toString() } : {}),
         ...(completedIssueTypes.length > 0 ? { completedIssueTypes } : {}),

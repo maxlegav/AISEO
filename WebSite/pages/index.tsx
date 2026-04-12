@@ -172,6 +172,7 @@ const PricingCard = ({
   ctaText,
   ctaLink,
   onCtaClick,
+  note,
 }: {
   title: string;
   subtitle: string;
@@ -183,6 +184,7 @@ const PricingCard = ({
   ctaText: string;
   ctaLink?: string;
   onCtaClick?: () => void;
+  note?: string;
 }) => (
   <div
     className={`relative rounded-3xl p-7 transition-all duration-300 flex flex-col h-full ${
@@ -226,6 +228,11 @@ const PricingCard = ({
         </>
       ) : null}
     </div>
+    {note && (
+      <p className={`text-xs mb-4 -mt-3 ${highlighted ? "text-gray-400" : "text-gray-400"}`}>
+        {note}
+      </p>
+    )}
     <ul className="space-y-2.5 mb-7 flex-1">
       {features.map((feature, i) => (
         <li key={i} className="flex items-start gap-3">
@@ -862,6 +869,7 @@ export default function Home() {
                 oldPrice="€99"
                 period="mo"
                 highlighted={true}
+                note="2-month minimum commitment"
                 features={[
                   "1 automatic audit per month",
                   "4 AI engines + monthly comparison",

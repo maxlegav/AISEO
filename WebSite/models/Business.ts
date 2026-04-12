@@ -10,6 +10,22 @@ export interface BusinessDocument extends mongoose.Document {
   competitorUrls: string[];
   category: string;
   description?: string;
+  // Extended business context (used by the Python audit service)
+  targetKeywords: string[];
+  servicesOrProducts: string[];
+  uniqueSellingPoints: string[];
+  targetAudience?: string;
+  priceRange?: "budget" | "mid" | "premium";
+  yearFounded?: number;
+  certifications: string[];
+  socialMediaUrls: string[];
+  // Locality (persisted so re-audits keep the same classification)
+  localityTier?: "global" | "national" | "hyper_local";
+  city?: string;
+  country?: string;
+  neighborhood?: string;
+  street?: string;
+  region?: string;
   deletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -25,6 +41,22 @@ const BusinessSchema = new Schema<BusinessDocument>(
     competitorUrls: { type: [String], default: [] },
     category: { type: String, required: true, trim: true, maxlength: 100 },
     description: { type: String, maxlength: 500 },
+    // Extended business context
+    targetKeywords: { type: [String], default: [] },
+    servicesOrProducts: { type: [String], default: [] },
+    uniqueSellingPoints: { type: [String], default: [] },
+    targetAudience: { type: String, trim: true, maxlength: 200 },
+    priceRange: { type: String, enum: ["budget", "mid", "premium"] },
+    yearFounded: { type: Number, min: 1800, max: 9999 },
+    certifications: { type: [String], default: [] },
+    socialMediaUrls: { type: [String], default: [] },
+    // Locality
+    localityTier: { type: String, enum: ["global", "national", "hyper_local"] },
+    city: { type: String, trim: true, maxlength: 100 },
+    country: { type: String, trim: true, maxlength: 100 },
+    neighborhood: { type: String, trim: true, maxlength: 100 },
+    street: { type: String, trim: true, maxlength: 200 },
+    region: { type: String, trim: true, maxlength: 100 },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true }

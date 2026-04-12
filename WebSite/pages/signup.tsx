@@ -64,6 +64,7 @@ const PlanCard = ({
   highlighted = false,
   onSelect,
   isLoading,
+  note,
 }: {
   name: string;
   price: string;
@@ -72,6 +73,7 @@ const PlanCard = ({
   highlighted?: boolean;
   onSelect: () => void;
   isLoading: boolean;
+  note?: string;
 }) => (
   <div
     className={`relative rounded-2xl p-6 transition-all duration-300 ${
@@ -102,6 +104,11 @@ const PlanCard = ({
         /{period}
       </span>
     </div>
+    {note && (
+      <p className={`text-xs mb-3 ${highlighted ? "text-gray-400" : "text-gray-400"}`}>
+        {note}
+      </p>
+    )}
     <ul className="space-y-2 mb-6">
       {features.map((feature, i) => (
         <li key={i} className="flex items-start gap-2 text-sm">
@@ -813,6 +820,7 @@ export default function SignupPage() {
                   period="mo"
                   features={config.stripe.pro.features.map((f) => f.name)}
                   highlighted
+                  note="2-month minimum commitment"
                   onSelect={() =>
                     handleSelectPlan(config.stripe.pro.priceId, "subscription")
                   }
