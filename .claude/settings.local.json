@@ -174,7 +174,12 @@
       "Bash(npx next:*)",
       "Bash(umask 077)",
       "Read(//tmp/**)",
-      "Bash(kubectl replace:*)"
+      "Bash(kubectl replace:*)",
+      "Bash(docker version:*)",
+      "Bash(kubectl set image:*)",
+      "Bash(docker image:*)",
+      "Bash(docker:*)",
+      "Bash(kubectl version:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

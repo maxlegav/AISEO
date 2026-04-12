@@ -1,7 +1,7 @@
 """
 Dynamic Prompt Generator — LLM-based prompt generation.
 
-Uses a high-end LLM (GPT-4o, or Ollama in local mode) to generate prompts tailored to any business.
+Uses a high-end LLM (GPT-5.4, or Ollama in local mode) to generate prompts tailored to any business.
 Count is controlled by config.PROMPT_COUNT (default 100, env-overridable).
 Prompts follow 5 specificity levels x 6 intent categories as defined in audit-engine-spec.md.
 
@@ -23,6 +23,264 @@ from utils.dbal.ai_api_wrapper import call_openai_api, call_ollama_api, call_cla
 logger = logging.getLogger(__name__)
 
 MAX_ATTEMPTS = 3
+PROMPT_GENERATION_MAX_TOKENS = int(os.getenv("PROMPT_GENERATION_MAX_TOKENS", "32000"))
+
+
+def _normalize_business_type(raw: str | None) -> str:
+    """Normalize free-text businessType to coarse strategy buckets."""
+    if not raw:
+        return "generic"
+    value = raw.strip().lower()
+    value = re.sub(r"[^a-z0-9]+", " ", value).strip()
+
+    if any(token in value for token in ("saas", "software", "platform", "app", "b2b")):
+        return "saas"
+    if any(token in value for token in ("ecommerce", "e commerce", "shop", "store", "d2c", "marketplace")):
+        return "ecommerce"
+    if any(token in value for token in ("restaurant", "cafe", "coffee", "bar", "bakery", "food", "brasserie")):
+        return "food_beverage"
+    if any(token in value for token in ("agency", "consult", "freelance", "studio", "law", "account", "coach")):
+        return "service_business"
+    if any(token in value for token in ("clinic", "dent", "med", "health", "wellness", "pharma")):
+        return "healthcare"
+    if any(token in value for token in ("media", "blog", "news", "magazine", "content", "publisher")):
+        return "media"
+    if any(token in value for token in ("school", "course", "academy", "training", "education", "bootcamp")):
+        return "education"
+    return "generic"
+
+
+def _business_type_playbook(business: AuditRequest) -> str:
+    """Return detailed generation strategy by business type and locality tier."""
+    btype = _normalize_business_type(business.businessType)
+    tier = business.localityTier or LocalityTier.GLOBAL
+    tier_value = tier.value
+
+    base = [
+        "## Business-Type Playbook",
+        f"- Raw business type: {business.businessType}",
+        f"- Normalized type: {btype}",
+        f"- Active locality tier: {tier_value}",
+    ]
+
+    if btype == "saas":
+        spec = """### SaaS strategy
+- Prioritise use cases, integrations, migration friction, onboarding time, pricing transparency, support quality, and team fit.
+- Include prompts from different buyers: founder, ops lead, marketing manager, developer, and procurement.
+- Comparison prompts should name realistic alternatives and include switching concerns (data import, lock-in, learning curve).
+- Reputation/trust prompts should probe uptime, security posture, data handling, and customer support responsiveness.
+- Product prompts should ask specific features, limits, seats, API/webhooks, and automation depth."""
+    elif btype == "ecommerce":
+        spec = """### E-commerce strategy
+- Prioritise product quality, price/value ratio, delivery speed, returns/refunds, sizing/fit, and payment trust.
+- Include intent variants: gift shopping, urgent purchase, budget search, premium quality hunt, and repeat buyer.
+- Comparison prompts should test alternatives on quality/price/shipping and include named competitor references when provided.
+- Reputation/trust prompts should ask legitimacy, review consistency, return handling, and after-sales support.
+- Product prompts should ask catalog depth, stock availability, materials/specs, and shipping destinations."""
+    elif btype == "food_beverage":
+        spec = """### Food & beverage strategy
+- Prioritise cuisine/style fit, ambiance, reservation friction, dietary options, service quality, and value for money.
+- Include situations: date night, friends, family, business lunch, quick bite, and remote work.
+- Comparison prompts should include neighborhood alternatives, wait-time concerns, and atmosphere preferences.
+- Reputation/trust prompts should ask freshness, consistency, hygiene confidence, and service reliability.
+- Product prompts should test menu specificity, signature dishes, opening hours, and booking options."""
+    elif btype == "service_business":
+        spec = """### Service business strategy
+- Prioritise expertise depth, scope clarity, response time, process transparency, and measurable outcomes.
+- Include customer contexts: urgent issue, first-time buyer, budget-constrained lead, premium buyer, and long-term partner.
+- Comparison prompts should test differentiation vs agencies/consultants/freelancers on pricing model and execution quality.
+- Reputation/trust prompts should ask proof of results, testimonials, credentials, and communication quality.
+- Product prompts should ask deliverables, timelines, engagement model, and support after delivery."""
+    elif btype == "healthcare":
+        spec = """### Healthcare strategy
+- Prioritise trust, qualifications, patient safety, appointment availability, treatment scope, and clarity of care pathway.
+- Include intents around urgency, first consultation, follow-up care, insurance/payment acceptance, and location convenience.
+- Comparison prompts should test perceived quality, wait times, and treatment specialization.
+- Reputation/trust prompts should ask practitioner reputation, clinic professionalism, and reliability of care.
+- Product prompts should focus on services offered, booking process, required documents, and follow-up support."""
+    elif btype == "media":
+        spec = """### Media/publisher strategy
+- Prioritise topical authority, depth of analysis, freshness, editorial trust, and practical value for readers.
+- Include audience intents: quick answer, deep dive, trend monitoring, beginner guidance, and expert perspective.
+- Comparison prompts should test source quality, bias neutrality, and comprehensiveness vs alternatives.
+- Reputation/trust prompts should ask source reliability, citation quality, and editorial standards.
+- Product prompts should ask newsletter/premium features, topic coverage breadth, and publishing cadence."""
+    elif btype == "education":
+        spec = """### Education strategy
+- Prioritise curriculum quality, outcomes, pedagogy fit, support quality, and flexibility.
+- Include learner profiles: beginner, career switcher, upskiller, student, and professional with limited time.
+- Comparison prompts should test course depth, mentorship, certification value, and price fairness.
+- Reputation/trust prompts should ask completion outcomes, alumni feedback, and practical applicability.
+- Product prompts should ask lesson format, duration, prerequisites, and career support."""
+    else:
+        spec = """### Generic business strategy
+- Prioritise value proposition clarity, differentiation, trust signals, pricing transparency, and customer fit.
+- Include diverse intents: discovery, comparison, risk reduction, and practical decision questions.
+- Ensure prompts remain concretely grounded in provided business metadata, not generic marketing phrasing."""
+
+    tier_overrides = {
+        LocalityTier.HYPER_LOCAL: """### Tier overlay: hyper_local
+- Emphasize distance, neighborhood relevance, convenience, and local alternatives.
+- At least 35% of discovery/comparison prompts should include local qualifiers (district, nearby landmarks, city zones).
+- Test practical local concerns: opening hours, walkability, same-day availability, and local reputation.""",
+        LocalityTier.NATIONAL: """### Tier overlay: national
+- Emphasize country-wide availability, shipping/coverage, and regional service consistency.
+- Include prompts that compare regional options while keeping national buyer intent.
+- Test trust across distance: delivery/remote service reliability, support access, and policy clarity.""",
+        LocalityTier.GLOBAL: """### Tier overlay: global
+- Emphasize global use cases, remote access, language/currency readiness, and broad comparability.
+- Avoid local micro-geo constraints in levels 1-3; prioritize universal buyer framing.
+- Include prompts that test international credibility and scalability perception.""",
+    }
+
+    return "\n".join(base) + "\n\n" + spec + "\n\n" + tier_overrides[tier]
+
+
+def _business_type_tier_combo_playbook(business: AuditRequest) -> str:
+    """Return extra-strict instructions for the exact type+tier combination."""
+    btype = _normalize_business_type(business.businessType)
+    tier = business.localityTier or LocalityTier.GLOBAL
+
+    combo_specs: dict[tuple[str, LocalityTier], str] = {
+        ("saas", LocalityTier.GLOBAL): """### Combo focus: SaaS + Global
+- Prioritise cross-border teams, async collaboration, and integration ecosystem fit.
+- Include prompts about language support, timezone workflows, and global compliance confidence.
+- Force comparisons against global incumbents and modern niche tools.""",
+        ("saas", LocalityTier.NATIONAL): """### Combo focus: SaaS + National
+- Prioritise in-country adoption confidence, local payment/admin constraints, and support responsiveness.
+- Include prompts about local business norms, invoicing expectations, and migration practicality.
+- Compare local champions vs global tools with practical trade-offs.""",
+        ("saas", LocalityTier.HYPER_LOCAL): """### Combo focus: SaaS + Hyper-local
+- Treat as niche-local software usage scenarios (city-specific workflows, nearby providers, local constraints).
+- Include prompts that test local relevance while keeping product-led language.
+- Compare against practical alternatives used by local operators.""",
+        ("ecommerce", LocalityTier.GLOBAL): """### Combo focus: E-commerce + Global
+- Prioritise shipping reliability across countries, duties/taxes clarity, and multilingual purchase flow confidence.
+- Include prompts on returns across borders, delivery speed realism, and buyer trust for first-time orders.
+- Compare value/quality against global marketplaces and specialist brands.""",
+        ("ecommerce", LocalityTier.NATIONAL): """### Combo focus: E-commerce + National
+- Prioritise domestic delivery speed, return simplicity, payment trust, and customer support quality.
+- Include prompts tied to country-wide shopping behavior (gift season, urgent deliveries, budget hunting).
+- Compare to national retailers and D2C alternatives by reliability and value.""",
+        ("ecommerce", LocalityTier.HYPER_LOCAL): """### Combo focus: E-commerce + Hyper-local
+- Prioritise same-day/nearby delivery, click-and-collect, and neighborhood trust signals.
+- Include prompts with city/district shopping intent and local competitor substitution.
+- Stress practical convenience and local legitimacy checks.""",
+        ("food_beverage", LocalityTier.HYPER_LOCAL): """### Combo focus: Food & Beverage + Hyper-local
+- Prioritise neighborhood intent, distance, opening hours, queue/wait expectations, and occasion fit.
+- Include prompts for date night, group outings, quick lunch, and remote-work sessions nearby.
+- Compare nearby options on ambiance, price, and consistency.""",
+        ("food_beverage", LocalityTier.NATIONAL): """### Combo focus: Food & Beverage + National
+- Treat as chain/brand-level decision context: consistency, regional presence, and ordering reliability.
+- Include prompts on delivery coverage, menu consistency, and value across cities.
+- Compare against known national chains and delivery-first alternatives.""",
+        ("food_beverage", LocalityTier.GLOBAL): """### Combo focus: Food & Beverage + Global
+- Treat as internationally discoverable brand concept or product-oriented F&B business.
+- Include prompts about global brand credibility, product consistency, and international availability.
+- Compare against recognized global references where relevant.""",
+        ("service_business", LocalityTier.HYPER_LOCAL): """### Combo focus: Services + Hyper-local
+- Prioritise proximity, availability windows, local reputation, and emergency/urgent intent.
+- Include prompts on response time, pricing clarity, and trust for local providers.
+- Compare neighborhood providers with practical decision framing.""",
+        ("service_business", LocalityTier.NATIONAL): """### Combo focus: Services + National
+- Prioritise remote/on-site coverage, standardization quality, and SLA/turnaround confidence.
+- Include prompts that test consistency across regions and support channels.
+- Compare national providers on reliability, process clarity, and outcomes.""",
+        ("service_business", LocalityTier.GLOBAL): """### Combo focus: Services + Global
+- Prioritise international delivery readiness, async collaboration, and strategic fit.
+- Include prompts around cross-border communication, timezone handoffs, and process maturity.
+- Compare boutique vs global provider dynamics with risk/reward framing.""",
+        ("healthcare", LocalityTier.HYPER_LOCAL): """### Combo focus: Healthcare + Hyper-local
+- Prioritise nearby access, appointment speed, trust, and patient safety confidence.
+- Include prompts on urgent slots, first consultation anxiety, and clinic professionalism.
+- Compare local practitioners on care quality and reliability cues.""",
+        ("healthcare", LocalityTier.NATIONAL): """### Combo focus: Healthcare + National
+- Prioritise network coverage, specialist access, and process consistency across regions.
+- Include prompts about referral paths, remote support options, and care continuity.
+- Compare provider reputations and practical access constraints.""",
+        ("healthcare", LocalityTier.GLOBAL): """### Combo focus: Healthcare + Global
+- Prioritise international patient trust, expertise signaling, and treatment pathway clarity.
+- Include prompts around cross-border consultations and credibility indicators.
+- Compare globally visible options with safety-first framing.""",
+        ("media", LocalityTier.GLOBAL): """### Combo focus: Media + Global
+- Prioritise authority, citation quality, freshness, and global audience usefulness.
+- Include prompts for quick updates, deep analysis, and topic reliability checks.
+- Compare editorial depth vs speed across global sources.""",
+        ("media", LocalityTier.NATIONAL): """### Combo focus: Media + National
+- Prioritise national relevance, local context depth, and trustworthy interpretation.
+- Include prompts around domestic policy/news understanding and practical takeaways.
+- Compare against national competitors for depth, neutrality, and timeliness.""",
+        ("media", LocalityTier.HYPER_LOCAL): """### Combo focus: Media + Hyper-local
+- Prioritise neighborhood/city relevance, utility, and credibility of local reporting.
+- Include prompts about events, openings, local business discovery, and city-life decisions.
+- Compare nearby/local sources on signal-to-noise and practical usefulness.""",
+        ("education", LocalityTier.GLOBAL): """### Combo focus: Education + Global
+- Prioritise remote learning quality, cohort diversity, and career transferability.
+- Include prompts on outcomes, mentor quality, flexibility, and global employability.
+- Compare to international alternatives by practical ROI and support.""",
+        ("education", LocalityTier.NATIONAL): """### Combo focus: Education + National
+- Prioritise local recognition, language fit, and country-specific career value.
+- Include prompts for students and professionals evaluating cost/outcomes trade-offs.
+- Compare national options on credibility, pedagogy, and job relevance.""",
+        ("education", LocalityTier.HYPER_LOCAL): """### Combo focus: Education + Hyper-local
+- Prioritise proximity, schedule fit, on-site experience, and local opportunities.
+- Include prompts around neighborhood convenience, commute, and local placement potential.
+- Compare nearby options with practical constraints and quality signals.""",
+    }
+
+    default_specs = {
+        LocalityTier.HYPER_LOCAL: """### Combo focus: Generic + Hyper-local
+- Bias towards nearby intent, local trust, and practical convenience.
+- Include strong city/district framing in discovery and comparison prompts.""",
+        LocalityTier.NATIONAL: """### Combo focus: Generic + National
+- Bias towards country-wide relevance, consistency, and remote confidence.
+- Include regional comparison while keeping national purchase intent.""",
+        LocalityTier.GLOBAL: """### Combo focus: Generic + Global
+- Bias towards universal use cases and globally comparable decision criteria.
+- Keep levels 1-3 non-local and broadly relatable.""",
+    }
+
+    return combo_specs.get((btype, tier), default_specs[tier])
+
+
+def _build_business_context_block(business: AuditRequest) -> str:
+    """Build a maximal, structured context block with all known business data."""
+    locality = (business.localityTier or LocalityTier.GLOBAL).value
+    payload = {
+        "identity": {
+            "businessName": business.businessName,
+            "businessUrl": business.businessUrl,
+            "businessType": business.businessType,
+            "category": business.category,
+            "description": business.description,
+            "language": business.language,
+            "localityTier": locality,
+        },
+        "location": {
+            "country": business.country,
+            "region": business.region,
+            "city": business.city,
+            "neighborhood": business.neighborhood,
+            "street": business.street,
+        },
+        "offer": {
+            "servicesOrProducts": business.servicesOrProducts,
+            "targetKeywords": business.targetKeywords,
+            "uniqueSellingPoints": business.uniqueSellingPoints,
+            "targetAudience": business.targetAudience,
+            "priceRange": business.priceRange,
+            "yearFounded": business.yearFounded,
+            "certifications": business.certifications,
+        },
+        "market": {
+            "competitorNames": business.competitorNames,
+            "competitorUrls": business.competitorUrls,
+            "subUrls": business.subUrls,
+            "socialMediaUrls": business.socialMediaUrls,
+        },
+        "customFields": business.customFields or {},
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
 def _build_geo_instructions(business: AuditRequest) -> str:
@@ -81,43 +339,11 @@ Geography rules for prompt generation:
 def _build_system_prompt(business: AuditRequest) -> str:
     """Build the comprehensive system prompt for the LLM prompt generator."""
 
-    # Collect all optional fields that are provided
-    optional_sections = []
-
-    if business.city:
-        optional_sections.append(f"- City: {business.city}")
-    if business.neighborhood:
-        optional_sections.append(f"- Neighborhood: {business.neighborhood}")
-    if business.region:
-        optional_sections.append(f"- Region: {business.region}")
-    if business.country:
-        optional_sections.append(f"- Country: {business.country}")
-    if business.street:
-        optional_sections.append(f"- Street: {business.street}")
-    if business.targetKeywords:
-        optional_sections.append(f"- Target Keywords: {', '.join(business.targetKeywords)}")
-    if business.uniqueSellingPoints:
-        optional_sections.append(f"- Unique Selling Points: {', '.join(business.uniqueSellingPoints)}")
-    if business.targetAudience:
-        optional_sections.append(f"- Target Audience: {business.targetAudience}")
-    if business.priceRange:
-        optional_sections.append(f"- Price Range: {business.priceRange}")
-    if business.servicesOrProducts:
-        optional_sections.append(f"- Services/Products: {', '.join(business.servicesOrProducts)}")
-    if business.competitorNames:
-        optional_sections.append(f"- Competitors: {', '.join(business.competitorNames)}")
-    if business.certifications:
-        optional_sections.append(f"- Certifications: {', '.join(business.certifications)}")
-    if business.yearFounded:
-        optional_sections.append(f"- Year Founded: {business.yearFounded}")
-    if business.customFields:
-        optional_sections.append(f"- Custom Fields: {json.dumps(business.customFields)}")
-
-    optional_block = "\n".join(optional_sections) if optional_sections else "(No additional metadata provided)"
-
     lang_instruction = "French" if business.language == "fr" else "English"
-
+    business_context_block = _build_business_context_block(business)
     geo_instructions = _build_geo_instructions(business)
+    type_playbook = _business_type_playbook(business)
+    combo_playbook = _business_type_tier_combo_playbook(business)
 
     # Build language-specific tone examples
     if business.language == "fr":
@@ -171,10 +397,29 @@ to test the visibility of a business in AI engine responses.
 - Category: {business.category}
 - Description: {business.description}
 - Locality Tier: {(business.localityTier or LocalityTier.GLOBAL).value}
-{optional_block}
+
+## Structured Business Intelligence (use this heavily)
+```json
+{business_context_block}
+```
+
+Rules for context usage:
+- Use ONLY facts from the metadata above; never invent unsupported details.
+- Reuse competitor names/URLs, services/products, audience, pricing cues, certifications, and location signals when present.
+- If a field is null/empty, do not fabricate it; adapt the prompt style accordingly.
+- Make prompts feel naturally varied while still grounded in this business context.
 
 ## Language
 Generate ALL prompts in: {lang_instruction}
+
+## Mandatory Step 0 (Web Research Before Writing)
+- First, perform web research to identify the business precisely using:
+  - the business name
+  - the primary website URL
+  - any provided sub-URLs and competitor references
+- Use this research to refine terminology, offerings, positioning, and realistic comparison context.
+- If web findings conflict with provided metadata, trust provided metadata as source of truth.
+- Do not output the research process. Only output the final JSON prompt list.
 
 ## CRITICAL: TONE — Write like a real human, not a textbook
 
@@ -202,6 +447,10 @@ Real people are casual, specific about their situation, and often include contex
    OK: "know any places like [competitor] but less crowded?"
 
 {geo_instructions}
+
+{type_playbook}
+
+{combo_playbook}
 
 ## Structure: 5 levels x {per_level} prompts each
 
@@ -371,7 +620,11 @@ async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
         api_key = "ollama-local"
         caller = call_ollama_api
         model = app_config.OLLAMA_MODEL
-        caller_kwargs = {"base_url": app_config.OLLAMA_BASE_URL, "max_tokens": 8000, "temperature": 0.7}
+        caller_kwargs = {
+            "base_url": app_config.OLLAMA_BASE_URL,
+            "max_tokens": PROMPT_GENERATION_MAX_TOKENS,
+            "temperature": 0.7,
+        }
         logger.info(f"Prompt generation using local Ollama model: {model}")
     elif app_config.CLAUDE_CODE_LOCAL_MODE:
         api_key = "claude-code-local"
@@ -384,8 +637,12 @@ async def generate_prompts(business: AuditRequest) -> list[GeneratedPrompt]:
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY not set — cannot generate prompts")
         caller = call_openai_api
-        model = "gpt-4o"
-        caller_kwargs = {"max_tokens": 8000, "temperature": 0.7}
+        model = "gpt-5.4"
+        caller_kwargs = {
+            "max_tokens": PROMPT_GENERATION_MAX_TOKENS,
+            "temperature": 0.7,
+            "use_web_search": True,
+        }
 
     last_error = ""
 
