@@ -11,7 +11,7 @@ import {
   Lato,
   Cormorant_Garamond,
 } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { NotificationProvider } from "../components/NotificationSystem";
 import { LanguageProvider } from "../components/LanguageContext";
 import WaitlistModal from "../components/WaitlistModal";
