@@ -27,7 +27,12 @@ npm run dev          # Start development server on localhost:3000
 npm run build        # Build for production
 npm run start        # Start production server
 npm run lint         # Run ESLint
+npm run typecheck    # tsc --noEmit
+npm run test         # Vitest unit tests (run once)
+npm run test:watch   # Vitest in watch mode
 ```
+
+CI (`.github/workflows/ci.yml`) runs lint + typecheck + test + build on every push/PR.
 
 ## Stack Overview
 
@@ -397,7 +402,12 @@ PROCESSING_SERVICE_URL=http://localhost:8080  # prod: http://83.228.202.11
 human-in-the-loop admin review, shareable web reports, i18n (EN/FR), blog + SEO.
 
 **Known gaps:** re-verify Stripe end-to-end against live keys; consolidate the two
-admin surfaces into one; no CI/CD or test suite (intentionally skipped, solo).
+admin surfaces into one.
+
+**Tests/CI:** minimal Vitest suite in `__tests__/` covers the critical libs
+(`subscription-limits` tier + credit gating, pricing `config`). GitHub Actions CI
+runs lint + typecheck + test + build. The Python `server/` tests are live
+integration tests (need real keys) and are not run in CI.
 
 ## Common Issues & Solutions
 

@@ -111,7 +111,8 @@ docker-compose up  # Coming in Epic 1 Story 1.4
 - **Payment flow** should be re-verified end-to-end against live Stripe (see `WebSite/STRIPE_SETUP.md`).
 - **Admin is now consolidated** into `WebSite/pages/admin` (dashboard, audit list, audit detail, prompt/audit review). The legacy standalone `Admin/` app is deprecated (`Admin/DEPRECATED.md`) — keep it until the integrated admin is verified in prod, then remove it.
 - **Report** is a shareable web page (by design — no server-side PDF).
-- No CI/CD and no automated test suite (intentionally skipped for a solo, fast-moving setup).
+- **CI** runs on every push/PR (GitHub Actions: WebSite lint + typecheck + unit tests + build; Python syntax check). See `.github/workflows/ci.yml`.
+- **Tests** are a minimal Vitest suite on the critical libs (`subscription-limits`, pricing `config`); the Python `server/` tests are live integration tests that need real keys and are not run in CI.
 
 Historical planning (PRD, epics, UX) lives in `_bmad-output/` for reference, but the
 code — not those docs — is the source of truth for what exists today.
@@ -121,7 +122,7 @@ code — not those docs — is the source of truth for what exists today.
 1. **Planning reference:** artifacts in `_bmad-output/` (PRD, Architecture, Epics, UX) — historical, may lag the code.
 2. **Development:** Work in `WebSite/` following patterns in `WebSite/CLAUDE.md`.
 3. **Processing service:** Python FastAPI in `server/` (Docker locally, Kubernetes in prod — see `server/KUBE_SETUP.md`).
-4. **Before committing:** `npm run lint` and `npm run typecheck` in `WebSite/`.
+4. **Before committing:** `npm run lint`, `npm run typecheck`, and `npm run test` in `WebSite/`.
 
 ## Migration History
 
