@@ -66,6 +66,7 @@ npm run dev          # http://localhost:3000
 npm run build        # production build (also type-checks)
 npm run lint         # ESLint (flat config, eslint.config.mjs)
 npm run typecheck    # tsc --noEmit
+npm run test         # Vitest unit tests (see WebSite/__tests__)
 
 # Processing service (from repo root)
 docker compose up --build        # http://localhost:8080
