@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ShowYourBrand** is a GEO (Generative Engine Optimization) audit platform that helps businesses become visible in AI search engines (ChatGPT, Claude, Perplexity, DeepSeek).
+**ShowYourBrand** is a GEO (Generative Engine Optimization) audit platform that helps businesses become visible in AI search engines (ChatGPT, Claude, Perplexity, Gemini).
 
 **Core Value Proposition:** Test visibility across 100 AI prompts, calculate GEO Health Score (0-100%), and provide actionable recommendations to improve AI citations.
 
@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Next.js monorepo with two services:
 
 - **`WebSite/`**: Next.js 16 application (this directory)
-- **`server/`**: Docker processing service (Python + Selenium - to be built in Epic 1)
+- **`server/`**: Python FastAPI processing service (Selenium + AI SDKs) — **already built**, deployed on Infomaniak Kubernetes (see `../server/TAKEOVER.md` and `../server/KUBE_SETUP.md`)
 
 All development work happens in the `WebSite/` directory.
 
@@ -38,10 +38,10 @@ npm run lint         # Run ESLint
 **Auth:** NextAuth 4.24.11+ (JWT strategy, 30-day sessions, Google OAuth + Credentials)
 **Payments:** Stripe 13.2.0+ (4-tier: Data €29 one-shot, Starter €79 one-shot, Pro €59/mo, Agency €599/mo + Agency Extra Audit €50 one-shot)
 **Email:** Resend (NOT Mailgun)
-**State:** Zustand 4.x (to be configured in Epic 1)
+**State:** Zustand 4.x
 **Validation:** Zod 3.x at API layer + Mongoose at DB layer
 **i18n:** React i18next (English + French)
-**Deployment:** Vercel (Next.js) + AWS Lambda/ECS (Docker service)
+**Deployment:** Vercel (Next.js) + Infomaniak Kubernetes (Python processing service)
 
 ## Architecture Patterns
 
@@ -89,28 +89,38 @@ npm run lint         # Run ESLint
 {
   businessId: ObjectId,
   userId: ObjectId,
-  status: 'pending' | 'processing' | 'completed' | 'failed',
-  geoScore: number, // 0-100
+  businessName?: string,
+  // Human-in-the-loop review flow (see "Audit lifecycle" below):
+  status:
+    | 'pending' | 'processing' | 'awaiting_prompt_approval'
+    | 'questions_review' | 'auditing' | 'review_pending'
+    | 'completed' | 'rejected' | 'failed',
+  geoScore?: number, // 0-100
 
-  // CRITICAL: Snapshot pattern - capture business state at audit time
-  businessSnapshot: {
-    name: string,
-    primaryUrl: string,
-    subUrls: string[],
-    competitorUrls: string[]
-  },
+  // Dense JSON blob written by the Python server (prompts, per-engine
+  // results, htmlScan, recommendations, competitors). Do NOT decompose.
+  results: Mixed,
 
-  promptResults: { /* AI engine results */ },
-  htmlScan: { /* HTML analysis */ },
-  recommendations: { /* AI-generated suggestions */ },
-  reportPdfUrl: string, // Vercel Blob Storage
-
+  // Admin review + sharing
+  reviewedAt?, reviewedBy?, questionsEditedAt?, questionsEditedBy?,
+  shareToken?: string,  // public report at /share/:shareToken
+  previousAuditId?: ObjectId, // history link for same business
+  issueChecklist?: { issueId, done, doneAt }[],
   createdAt: Date,
   completedAt?: Date
 }
 ```
 
-**IMPORTANT:** Always use snapshot pattern for historical data. Never `.populate()` for audits - store complete data at creation time.
+**IMPORTANT:** The report is a **shareable web page** (`/share/:shareToken`), not
+a server-side PDF. Results are stored as a snapshot blob on the audit doc — never
+`.populate()` for historical audits.
+
+### Audit lifecycle (human-in-the-loop, kept on purpose)
+
+`pending` → server generates prompts → `awaiting_prompt_approval` →
+**admin approves** → `auditing`/`processing` → `review_pending` →
+**admin completes** → `completed` (client notified, report shareable).
+Admin surface: `pages/admin/*`. See `../CLAUDE.md` for the full flow.
 
 ### Security Patterns
 
@@ -210,7 +220,7 @@ const AuditSchema = new Schema({
 });
 ```
 
-### State Management (Zustand - To Be Configured)
+### State Management (Zustand)
 
 **Convention:** Verb-first action naming
 
@@ -230,10 +240,10 @@ const AuditSchema = new Schema({
 ## Key Features (MVP - 8 Core Features)
 
 1. **Visual Site Health Dashboard** - GEO Score 0-100%, top issues, competitor comparison
-2. **Prompt Gap Analysis** - 100 prompts tested on 4 AI engines (ChatGPT, Claude, Perplexity, DeepSeek)
+2. **Prompt Gap Analysis** - 100 prompts tested on 4 AI engines (ChatGPT, Claude, Perplexity, Gemini)
 3. **HTML Scanner** - Schema.org detection, meta tags, headings, alt text, top 30 keywords (TF-IDF)
 4. **AI-Optimized Content Suggestions** - FAQ generation, schema snippets, alt text, priority system (🔴🟠🟢)
-5. **Comprehensive Report Generation** - PDF with executive summary + technical details
+5. **Comprehensive Report Generation** - shareable web page (`/share/:shareToken`) with executive summary + technical details (no server-side PDF)
 6. **Subscription Management** - Stripe integration (4 tiers: Data €29 / Starter €79 / Pro €59/mo / Agency €599/mo + Agency Extra €50)
 7. **Internationalization** - English + French (next-i18next, easy to add languages)
 8. **Admin Interface** - Founder oversight, audit debugging, platform statistics
@@ -253,17 +263,18 @@ const AuditSchema = new Schema({
 - Polling interval: 10 seconds for audit progress
 - **Rationale:** WebSockets problematic on Vercel (serverless)
 
-### PDF Storage
+### Report delivery (web page, not PDF)
 
-- Use Vercel Blob Storage (NOT filesystem, NOT GridFS)
-- Download endpoint: `/api/audits/pdf/download`
-- Secured with authentication checks
+- Reports are delivered as a **shareable web page**: `/share/:shareToken`
+  (server-rendered, `noindex`, no internal IDs leaked).
+- No server-side PDF pipeline. If a client wants a file, they print the page to PDF.
+- Share token is a 64-char random hex stored on the audit doc.
 
 ### i18n Architecture
 
 - Translation keys in `components/LanguageContext.tsx`
 - User language preference stored in DB
-- PDF reports generated in user's language
+- Reports rendered in the user's language
 - **Adding new language:** 1-2 days (translation only, no code)
 
 ## Environment Variables
@@ -301,9 +312,9 @@ ANTHROPIC_API_KEY=sk-ant-...
 PERPLEXITY_API_KEY=pplx-...
 GEMINI_API_KEY=...
 
-# Processing Service
-PROCESSING_SERVICE_API_KEY=<shared secret>
-PROCESSING_SERVICE_URL=http://localhost:5000
+# Processing Service (Python FastAPI — see ../server/TAKEOVER.md)
+PROCESSING_SERVICE_API_KEY=<shared secret>   # must match server/.env
+PROCESSING_SERVICE_URL=http://localhost:8080  # prod: http://83.228.202.11
 ```
 
 ## Development Guidelines
@@ -342,17 +353,20 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 ├── /pages/                    # Next.js Pages Router
 │   ├── /api/                  # Backend API routes
 │   │   ├── /auth/             # NextAuth endpoints
-│   │   ├── /audits/           # Audit CRUD (to be built)
-│   │   ├── /businesses/       # Business management (to be built)
-│   │   └── /webhook/          # Stripe webhooks (to be built)
-│   ├── /dashboard/            # Protected dashboard pages (to be built)
+│   │   ├── /audits/           # Audit CRUD + approve (built)
+│   │   ├── /admin/            # Admin review endpoints (built)
+│   │   ├── /businesses/       # Business management (built)
+│   │   ├── /checkout/         # Stripe checkout + buy-audit (built)
+│   │   ├── /share/            # Public share-token report API (built)
+│   │   └── /webhook/          # Stripe webhooks (built)
+│   ├── /admin/                # Admin UI (human-in-the-loop review)
+│   ├── /share/                # Public shareable report page
 │   ├── index.tsx              # Landing page (ShowYourBrand branded)
 │   ├── login.tsx, signup.tsx  # Auth pages
 │   └── dashboard.tsx          # Main dashboard entry
 ├── /components/               # React components
 │   ├── /ui/                   # Shadcn/ui primitives
-│   ├── /audit/                # Audit-specific (to be built)
-│   ├── /dashboard/            # Dashboard components (to be built)
+│   ├── /audit/                # Audit-specific components (built)
 │   └── LanguageContext.tsx    # i18n translations
 ├── /lib/                      # Core utilities
 │   ├── crypto.ts              # AES-256-GCM encryption
@@ -363,7 +377,7 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 ├── /models/                   # Mongoose schemas
 │   ├── /plugins/              # Reusable plugins
 │   │   └── fieldEncryption.ts # Encryption plugin
-│   └── User.ts                # User model (auth only, no subscription field yet)
+│   └── User.ts                # User model (auth + subscription/credits fields)
 ├── /types/                    # TypeScript types
 ├── config.ts                  # Centralized config (ShowYourBrand pricing, colors, etc.)
 ├── next.config.js             # Next.js configuration
@@ -373,27 +387,17 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 
 ## Current Project Status
 
-**Story 1.1 (Complete):** ✅
+> The old "Epic 1 in progress" status was **stale**. Most of the MVP is already
+> built (auth, businesses, audits, Stripe, admin review, shareable reports, blog,
+> SEO). The frontend builds cleanly and `npm run lint` / `npm run typecheck` pass.
+> See the repo root `README.md` for the full "built vs. gaps" breakdown.
 
-- Next.js upgraded to 16.1.4
-- TypeScript strict mode enabled
-- All Auto-Invoice code removed
-- Dependencies cleaned
+**Built & working:** auth (email + Google), businesses CRUD, audit engine
+(Python `server/`), Stripe (4 tiers + one-shot, idempotent webhooks, gating),
+human-in-the-loop admin review, shareable web reports, i18n (EN/FR), blog + SEO.
 
-**Story 1.2 (Complete):** ✅
-
-- ShowYourBrand branding applied
-- Translations updated (EN/FR)
-- Config files updated
-- Assets documented for replacement
-
-**Next Steps (Epic 1):**
-
-- Story 1.3: Setup Zustand + Zod
-- Story 1.4: Configure Docker Compose for scraping service
-- Story 1.5: Setup GitLab CI/CD
-
-**MVP Timeline:** 8-10 weeks, 2 developers
+**Known gaps:** re-verify Stripe end-to-end against live keys; consolidate the two
+admin surfaces into one; no CI/CD or test suite (intentionally skipped, solo).
 
 ## Common Issues & Solutions
 
@@ -421,13 +425,13 @@ PROCESSING_SERVICE_URL=http://localhost:5000
 
 ## Important Notes
 
-- **This is a greenfield project** - Clean slate, no legacy code (except proven security patterns)
-- **Premium Walking Skeleton** - UI must be impeccable from day 1 (agencies demand polish)
-- **First-mover race** - Speed matters, 12-18 months before giants (Ahrefs, SEMrush) arrive
-- **Agency-first** - UI polish = credibility = agency adoption
-- **All-in bet on GEO** - No hedge, pivot if it doesn't work
+- **Not greenfield anymore** - the MVP is largely built; work is now fix/fiabilise/polish, not scaffolding.
+- **Premium look** - UI must stay polished (agencies demand it).
+- **First-mover race** - speed matters before Ahrefs/SEMrush arrive.
+- **Agency-first** - UI polish = credibility = agency adoption.
+- **All-in bet on GEO**.
 
-**Current Phase:** Foundation complete, ready to build core features (Epics 2-13)
+**Current Phase:** MVP built; fiabilising payments, consolidating admin, polishing the shareable report.
 
 **Success Metrics:**
 

@@ -14,7 +14,7 @@
 | External IP | `83.228.202.11` |
 | Port | `80` (→ container `8080`) |
 | Service type | LoadBalancer |
-| Image | `s4m0s/audit-syb:0.0.1` (linux/amd64) |
+| Image | `s4m0s/audit-syb:0.0.2` (linux/amd64) — must match `image:` in `kube.yaml` |
 
 ### Test the API
 
@@ -95,7 +95,7 @@ kubectl get svc audit-syb-service -n default
 L'image Docker est buildée en `linux/amd64` (les nodes Infomaniak sont amd64). Si tu rebuilds depuis un Mac Apple Silicon :
 
 ```bash
-docker build --platform linux/amd64 -t s4m0s/audit-syb:0.0.1 .
-docker push s4m0s/audit-syb:0.0.1
+docker build --platform linux/amd64 -t s4m0s/audit-syb:0.0.2 .
+docker push s4m0s/audit-syb:0.0.2
 kubectl rollout restart deployment/audit-syb -n default
 ```

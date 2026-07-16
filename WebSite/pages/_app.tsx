@@ -12,6 +12,7 @@ import {
   Cormorant_Garamond,
 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "react-hot-toast";
 import { NotificationProvider } from "../components/NotificationSystem";
 import { LanguageProvider } from "../components/LanguageContext";
 import WaitlistModal from "../components/WaitlistModal";
@@ -97,6 +98,7 @@ export default function App({
             <Component {...pageProps} />
             <WaitlistModal />
           </NotificationProvider>
+          <Toaster position="top-right" />
           <Analytics />
         </div>
       </LanguageProvider>

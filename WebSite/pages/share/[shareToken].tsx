@@ -61,6 +61,32 @@ export default function SharedAuditPage({ audit }: Props) {
   const snap = r.businessSnapshot;
   const geoScore = audit.geoScore ?? 0;
 
+  // ─── Report meta (agency-facing summary line) ────────────────────────────
+  const ENGINE_LABELS: Record<string, string> = {
+    openai: "ChatGPT",
+    chatgpt: "ChatGPT",
+    anthropic: "Claude",
+    claude: "Claude",
+    perplexity: "Perplexity",
+    gemini: "Gemini",
+    google: "Gemini",
+  };
+  const engineNames = engines.map((e) => ENGINE_LABELS[e.toLowerCase()] ?? e);
+  const engineListLabel =
+    engineNames.length > 0
+      ? engineNames.join(", ")
+      : "ChatGPT, Claude, Perplexity, Gemini";
+  const promptCount = r.totalPromptsProcessed ?? promptResults.length;
+  const technicalScore = r.htmlScannerScore ?? null;
+  const reportDateSource = audit.completedAt ?? audit.createdAt ?? null;
+  const reportDate = reportDateSource
+    ? new Date(reportDateSource).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : null;
+
   const faqSchemaContent: string | null = promptGaps.length > 0
     ? `<script type="application/ld+json">\n{\n  "@context": "https://schema.org",\n  "@type": "FAQPage",\n  "mainEntity": [\n${
         promptGaps.map((gap) => {
@@ -77,7 +103,7 @@ export default function SharedAuditPage({ audit }: Props) {
   const businessName = audit.businessName ?? snap?.name ?? "GEO Audit";
   const scoreLabel = geoScore >= 70 ? "Good" : geoScore >= 40 ? "Moderate" : "Critical";
   const title = `GEO Report — ${businessName} (${geoScore}/100 · ${scoreLabel})`;
-  const description = `AI visibility audit for ${businessName}. GEO Health Score: ${geoScore}/100. See how this brand performs across ChatGPT, Claude, Perplexity & DeepSeek.`;
+  const description = `AI visibility audit for ${businessName}. GEO Health Score: ${geoScore}/100. See how this brand performs across ${engineListLabel}.`;
   const siteUrl = config.siteUrl;
 
   return (
@@ -140,6 +166,34 @@ export default function SharedAuditPage({ audit }: Props) {
           <p className="text-xs text-gray-400">
             GEO audit report — shared via ShowYourBrand
           </p>
+
+          {/* Report meta bar */}
+          <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs">
+            {reportDate && (
+              <div className="flex items-center gap-1.5">
+                <dt className="text-gray-400">Date</dt>
+                <dd className="font-semibold text-gray-700">{reportDate}</dd>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              <dt className="text-gray-400">AI engines</dt>
+              <dd className="font-semibold text-gray-700">{engineListLabel}</dd>
+            </div>
+            {promptCount > 0 && (
+              <div className="flex items-center gap-1.5">
+                <dt className="text-gray-400">Prompts tested</dt>
+                <dd className="font-semibold text-gray-700">{promptCount}</dd>
+              </div>
+            )}
+            {technicalScore != null && (
+              <div className="flex items-center gap-1.5">
+                <dt className="text-gray-400">Technical score</dt>
+                <dd className="font-semibold text-gray-700">
+                  {Math.round(technicalScore)}/100
+                </dd>
+              </div>
+            )}
+          </dl>
         </div>
 
         {/* Audit sections */}

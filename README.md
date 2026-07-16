@@ -76,53 +76,52 @@ docker-compose up  # Coming in Epic 1 Story 1.4
 - Stripe 13.2.0+ (subscriptions)
 - Resend (email)
 
-**AI Integration:**
+**AI Integration (in the Python processing service):**
 
 - OpenAI API (ChatGPT)
 - Anthropic API (Claude)
 - Perplexity API
-- DeepSeek API
+- Google Gemini API
 
 **Infrastructure:**
 
 - Vercel (Next.js hosting)
-- AWS Lambda/ECS (scraping service)
-- Vercel Blob (PDF storage)
+- Infomaniak Kubernetes (Python processing service — see `server/KUBE_SETUP.md`)
+- MongoDB Atlas (shared database)
 
 ## Project Status
 
-### ✅ Completed (Epic 1 Foundation)
+> The old "Epic 1 in progress / Epics 2–13 planned" status was **out of date** —
+> most of the MVP is already built and the app builds cleanly. Below reflects the
+> **actual** state of the codebase.
 
-- **Story 1.1:** Next.js 16 upgrade + TypeScript strict mode + Auto-Invoice cleanup
-- **Story 1.2:** ShowYourBrand rebrand + translations (EN/FR) + documentation
+### ✅ Built and working
 
-### 🚧 In Progress (Epic 1)
+- **Foundation:** Next.js 16 + TypeScript strict, all legacy invoice code removed, ShowYourBrand branding, EN/FR i18n, Zustand + Zod.
+- **Auth:** email/password + Google OAuth, password reset, account deletion (GDPR).
+- **Projects/businesses:** create / list / edit / delete with per-tier limits.
+- **Audit engine (Python `server/`):** prompt generation, parallel AI queries (ChatGPT/Claude/Perplexity/Gemini), mention detection, scoring, HTML scanner (W3C + schema.org + TF-IDF keywords), competitor comparison, GSC integration.
+- **Payments (Stripe):** checkout, one-shot audit purchase, webhooks (idempotent), subscription portal, tier-based feature gating.
+- **Reports:** shareable web report at `/share/:shareToken` (dashboard drill-down + competitor comparison).
+- **Admin:** human-in-the-loop review flow (approve prompts → complete → notify client).
+- **Marketing:** blog (20 posts), SEO (sitemap, `llms.txt`), waitlist, Remotion video templates.
 
-- **Story 1.3:** Zustand state management + Zod validation
-- **Story 1.4:** Docker Compose for scraping service
-- **Story 1.5:** GitLab CI/CD pipeline
+### 🚧 Known gaps / things to tighten
 
-### 📋 Planned (Epics 2-13)
+- **Payment flow** should be re-verified end-to-end against live Stripe (see `WebSite/STRIPE_SETUP.md`).
+- **Admin is now consolidated** into `WebSite/pages/admin` (dashboard, audit list, audit detail, prompt/audit review). The legacy standalone `Admin/` app is deprecated (`Admin/DEPRECATED.md`) — keep it until the integrated admin is verified in prod, then remove it.
+- **Report** is a shareable web page (by design — no server-side PDF).
+- No CI/CD and no automated test suite (intentionally skipped for a solo, fast-moving setup).
 
-- Epic 2: User Authentication
-- Epic 3: Subscription & Payments (Basic €50, Pro €150, Premium €300, One-shot €299)
-- Epic 4: Project Management
-- Epic 5: Audit Engine Core
-- Epic 6: HTML Scanner
-- Epic 7: AI Recommendations
-- Epic 8: Dashboard & Visualizations
-- Epic 9: Report Generation
-- Epic 10: Email Notifications
-- Epic 11: Admin Interface
-- Epic 12: GDPR Compliance
-- Epic 13: Google Integrations (conditional)
+Historical planning (PRD, epics, UX) lives in `_bmad-output/` for reference, but the
+code — not those docs — is the source of truth for what exists today.
 
 ## Development Workflow
 
-1. **Planning:** All artifacts in `_bmad-output/` (PRD, Architecture, Epics, UX)
-2. **Development:** Work in `WebSite/` following patterns in `WebSite/CLAUDE.md`
-3. **Docker Service:** Separate scraping service in `server/`
-4. **CI/CD:** GitLab pipeline (lint, type-check, test) - Coming in Story 1.5
+1. **Planning reference:** artifacts in `_bmad-output/` (PRD, Architecture, Epics, UX) — historical, may lag the code.
+2. **Development:** Work in `WebSite/` following patterns in `WebSite/CLAUDE.md`.
+3. **Processing service:** Python FastAPI in `server/` (Docker locally, Kubernetes in prod — see `server/KUBE_SETUP.md`).
+4. **Before committing:** `npm run lint` and `npm run typecheck` in `WebSite/`.
 
 ## Migration History
 

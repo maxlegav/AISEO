@@ -2,6 +2,11 @@
 
 FastAPI-based processing service for website scraping, AI analysis (GEO audits), and HTML scanning. Runs inside Docker with Chromium, vnu.jar (W3C validator), and Lychee (link checker).
 
+> 🧭 **New to this service / taking it over?** Read [`TAKEOVER.md`](TAKEOVER.md)
+> first — it explains where it runs in prod, which accounts/keys to recover, how to
+> run it locally with `MOCK_AI=true` (no API keys needed), and known gotchas.
+> Deployment details are in [`KUBE_SETUP.md`](KUBE_SETUP.md).
+
 ## Prerequisites
 
 - **Docker** & **Docker Compose** installed
