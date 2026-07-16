@@ -253,8 +253,9 @@ export default function DashboardLayout({
         if (projectsData.success) setProjects(projectsData.data);
 
         if (creditsData.success) {
+          // Keep in sync with TIER_LIMITS in lib/subscription-limits.ts
           const tierProjectLimits: Record<string, number> = {
-            none: 0, basic: 1, pro: 1, premium: 10,
+            none: 0, data: 1, starter: 1, pro: 1, agency: 15,
           };
           const tierLimit = tierProjectLimits[creditsData.subscriptionTier || "none"] ?? 0;
           const rawCredits = creditsData.auditCredits ?? 0;

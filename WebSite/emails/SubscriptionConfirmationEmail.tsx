@@ -34,14 +34,18 @@ const SubscriptionConfirmationEmail: React.FC<
 
   const tierDisplayName =
     {
-      basic:
-        language === "fr" ? "Basic (Audit Unique)" : "Basic (One-Time Audit)",
-      pro: language === "fr" ? "Pro (Audit Unique)" : "Pro (One-Time Audit)",
-      premium: "Premium",
+      data: language === "fr" ? "Data (Audit Unique)" : "Data (One-Time Audit)",
+      starter:
+        language === "fr"
+          ? "Starter (Audit Unique)"
+          : "Starter (One-Time Audit)",
+      pro: "Pro",
+      agency: "Agency",
     }[tier.toLowerCase()] || tier;
 
+  // One-shot tiers (payment mode): Data, Starter, and Agency Extra Audit.
   const isOneShot =
-    tier.toLowerCase() === "basic" || tier.toLowerCase() === "pro";
+    tier.toLowerCase() === "data" || tier.toLowerCase() === "starter";
 
   const content =
     language === "fr"
