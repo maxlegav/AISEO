@@ -21,7 +21,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_1px_20px_-8px_rgba(124,58,237,0.15)]">
       <div className="container mx-auto px-4">
         <div className="flex items-center h-16 relative">
           <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
@@ -70,9 +70,9 @@ export default function Navbar() {
             </Link>
             <Button
               onClick={openWaitlistModal}
-              className="text-sm font-semibold rounded-full bg-[#1E293B] hover:bg-[#334155] text-white px-5"
+              className="text-sm font-semibold rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white px-5 shadow-premium"
             >
-              Book a Call
+              Book a demo
             </Button>
           </div>
 
@@ -112,10 +112,10 @@ export default function Navbar() {
           </nav>
           <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
             <Button
-              className="w-full rounded-full bg-[#1E293B] hover:bg-[#334155] text-white font-semibold"
+              className="w-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-semibold shadow-premium"
               onClick={() => { openWaitlistModal(); setMobileOpen(false); }}
             >
-              Book a Call
+              Book a demo
             </Button>
             <Link href="/login" onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full text-sm font-medium">

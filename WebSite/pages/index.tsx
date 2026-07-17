@@ -18,6 +18,10 @@ import {
   Target,
   Zap,
   Star,
+  Sparkles,
+  Palette,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
 // AI Models with their actual logo files
@@ -189,13 +193,13 @@ const PricingCard = ({
   <div
     className={`relative rounded-3xl p-7 transition-all duration-300 flex flex-col h-full ${
       highlighted
-        ? "bg-[#1E293B] text-white shadow-2xl shadow-slate-500/25 scale-[1.02]"
+        ? "bg-[#0B1120] text-white shadow-premium-lg ring-1 ring-white/10 scale-[1.03]"
         : "bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg"
     }`}
   >
     {highlighted && (
       <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-        <span className="bg-pink-400 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+        <span className="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
           MOST POPULAR
         </span>
       </div>
@@ -494,30 +498,34 @@ export default function Home() {
         }
       `}</style>
 
-      <main ref={mainRef} className="bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
+      <main ref={mainRef} className="bg-gradient-to-b from-[#f4f1ff] via-white to-[#faf3f8]">
         <Navbar />
 
         {/* Hero Section */}
         <section className="h-screen px-4 relative overflow-hidden flex flex-col items-center">
-          <div className="absolute top-10 left-0 w-48 h-48 md:w-96 md:h-96 bg-purple-400/30 md:bg-purple-400/40 rounded-full blur-3xl" />
-          <div className="absolute top-20 right-0 w-48 h-48 md:w-[500px] md:h-[500px] bg-pink-400/20 md:bg-pink-400/30 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-[500px] md:h-[500px] bg-orange-300/40 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-grid-premium opacity-60 [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]" />
+          <div className="absolute top-10 left-0 w-48 h-48 md:w-96 md:h-96 bg-violet-400/25 rounded-full blur-3xl animate-float-slow" />
+          <div className="absolute top-20 right-0 w-48 h-48 md:w-[500px] md:h-[500px] bg-fuchsia-400/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-[520px] md:h-[520px] bg-indigo-300/25 rounded-full blur-3xl" />
 
           <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-20 md:pt-28 pb-16 md:pb-20">
             {/* Centered: Title + Subtitle + Marquee */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6">
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-tight px-2 sm:px-0">
-                Mention your{" "}
-                <span className="relative inline-block">
-                  Brand
+            <div className="flex-1 flex flex-col items-center justify-center gap-5 md:gap-7">
+              <span className="eyebrow-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700">
+                <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+                The white-label GEO platform for agencies
+              </span>
+              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-[1.05] tracking-tight px-2 sm:px-0">
+                Your clients,{" "}
+                <span className="relative inline-block text-gradient-premium">
+                  cited by AI
                   <HandDrawnUnderline />
-                </span>{" "}
-                on AI
+                </span>
               </h1>
-              <p className="text-base sm:text-lg md:text-lg lg:text-xl text-gray-700 max-w-2xl lg:max-w-3xl mx-auto px-2 sm:px-0">
-                The first Generative Engine Optimization (GEO) platform. Audit,
-                analyze, and optimize your brand&apos;s presence across all major
-                AI models.
+              <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl lg:max-w-3xl mx-auto px-2 sm:px-0 leading-relaxed">
+                ShowYourBrand is the GEO platform agencies use to audit, track and grow
+                their clients&apos; visibility across ChatGPT, Claude, Perplexity and Gemini —
+                delivered as clean, white-label reports.
               </p>
               <AIModelMarquee />
             </div>
@@ -549,13 +557,21 @@ export default function Home() {
                 </div>
               </div>
 
-              <Button
-                onClick={openWaitlistModal}
-                className="rounded-full bg-[#1E293B] hover:bg-[#334155] text-white shadow-lg px-10 py-4 h-auto text-base font-semibold"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Book a Call
-              </Button>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button
+                  onClick={openWaitlistModal}
+                  className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-premium px-9 py-4 h-auto text-base font-semibold transition-all hover:-translate-y-0.5"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book a demo
+                </Button>
+                <a
+                  href="#pricing"
+                  className="inline-flex items-center rounded-full border border-gray-300/80 bg-white/60 backdrop-blur-sm text-gray-800 hover:border-gray-400 hover:bg-white px-9 py-4 text-base font-semibold transition-all"
+                >
+                  See pricing
+                </a>
+              </div>
             </div>
           </div>
 
@@ -605,9 +621,9 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 lg:mb-6">
-                  <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-premium border border-white/60 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-violet-100">
+                  <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   See what 4 AI models actually say about you
@@ -618,9 +634,9 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 lg:mb-6">
-                  <Target className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-premium border border-white/60 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-violet-100">
+                  <Target className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   Find out who's being cited instead of you
@@ -632,9 +648,9 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100 hover:shadow-lg transition-all sm:col-span-2 lg:col-span-1">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-4 lg:mb-6">
-                  <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-gray-900" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-premium border border-white/60 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300 sm:col-span-2 lg:col-span-1">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-violet-100">
+                  <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   A fix list, not a report
@@ -644,6 +660,46 @@ export default function Home() {
                   a paragraph to rewrite, a page to restructure. Prioritized by impact.
                   No PDF to interpret, no consultant needed.
                 </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Built for agencies */}
+        <section className="px-4 py-16 md:py-24">
+          <div className="container mx-auto max-w-6xl">
+            <div className="relative overflow-hidden rounded-[2rem] bg-[#0B1120] px-6 py-14 md:px-14 md:py-20 text-white shadow-premium-lg">
+              <div className="absolute inset-0 bg-grid-dark opacity-70" />
+              <div className="absolute -top-24 -right-24 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <div className="text-center max-w-2xl mx-auto mb-12">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-violet-200 mb-5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Built for agencies
+                  </span>
+                  <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
+                    Add GEO to your offer, under your own brand
+                  </h2>
+                  <p className="text-gray-400 text-base md:text-lg leading-relaxed">
+                    Audit every client, track their progress month over month, and hand them a
+                    report that carries your agency&apos;s name — not ours.
+                  </p>
+                </div>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {[
+                    { Icon: Palette, title: "White-label reports", desc: "Share a clean report page under your agency's branding. Your clients never see ShowYourBrand." },
+                    { Icon: Users, title: "Multi-client dashboard", desc: "Manage every client's audits from one place, with competitor benchmarks on each." },
+                    { Icon: ShieldCheck, title: "Human-reviewed quality", desc: "Every audit is reviewed before delivery, so what reaches your client is always polished." },
+                  ].map(({ Icon, title, desc }) => (
+                    <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 flex items-center justify-center mb-4">
+                        <Icon className="w-6 h-6 text-violet-200" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+                      <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -677,7 +733,7 @@ export default function Home() {
                   { value: "87%", label: "of brands cited zero times", sub: "across 100 AI prompts in their category" },
                   { value: "1 mention", label: "in an AI answer", sub: "can outperform thousands of SEO clicks" },
                 ].map((stat) => (
-                  <div key={stat.value} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div key={stat.value} className="bg-white rounded-2xl p-5 shadow-premium border border-white/60">
                     <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
                     <div className="text-xs font-semibold text-gray-700 mb-1">{stat.label}</div>
                     <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
@@ -953,7 +1009,7 @@ export default function Home() {
                   quote: "The competitor comparison blew my mind. I could see exactly which pages our competitors had that were getting cited by Perplexity and we didn't. Incredibly actionable.",
                 },
               ].map((t) => (
-                <div key={t.name} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4">
+                <div key={t.name} className="bg-white rounded-2xl p-6 shadow-premium border border-white/60 flex flex-col gap-4 hover:-translate-y-1 transition-transform duration-300">
                   <p className="text-gray-700 leading-relaxed text-sm flex-1">&ldquo;{t.quote}&rdquo;</p>
                   <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 ${t.bg}`}>
@@ -982,7 +1038,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-premium border border-white/60">
               {faqs.map((faq, index) => (
                 <FAQItem
                   key={index}
@@ -1005,26 +1061,33 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="min-h-[60vh] md:h-[75vh] px-4 py-20 md:py-0 bg-[#1E293B] relative overflow-hidden flex flex-col items-center justify-center">
+        <section className="min-h-[60vh] md:h-[75vh] px-4 py-20 md:py-0 bg-[#0B1120] relative overflow-hidden flex flex-col items-center justify-center">
+          <div className="absolute inset-0 bg-grid-dark opacity-70" />
           <div className="absolute top-10 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
 
           <div className="container mx-auto max-w-5xl text-center relative z-10">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-medium text-white mb-4 md:mb-6 lg:mb-8 leading-tight">
-              Ready to dominate AI search?
+              Make GEO your agency&apos;s edge
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 max-w-2xl lg:max-w-3xl mx-auto">
-              Join hundreds of brands already optimizing for the future of
-              search. Start your free audit today and see exactly where you
-              stand.
+              Give every client a clear picture of their AI visibility — and a white-label
+              report that proves your value. Start with a single audit.
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">
-              <div className="flex justify-center mt-4">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
+                <button
+                  onClick={openWaitlistModal}
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-premium px-10 py-4 text-base font-semibold transition-all hover:-translate-y-0.5"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Book a demo
+                </button>
                 <Link
                   href="#pricing"
-                  className="inline-flex items-center gap-2 rounded-full bg-white text-[#1E293B] hover:bg-gray-100 shadow-lg px-10 py-4 text-base font-semibold transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full bg-white text-[#0B1120] hover:bg-gray-100 shadow-lg px-10 py-4 text-base font-semibold transition-colors"
                 >
                   See pricing →
                 </Link>
@@ -1034,7 +1097,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className=" text-black py-16">
+        <footer className="bg-[#0B1120] text-white py-16">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-4 gap-8 md:gap-12 mb-12">
               <div className="md:col-span-2">
@@ -1047,7 +1110,7 @@ export default function Home() {
                       height={120}
                     ></Image>
                   </div>
-                  <span className="text-base font-semibold text-gray-900 tracking-tight">
+                  <span className="text-base font-semibold text-white tracking-tight">
                     ShowYourBrand
                   </span>
                 </Link>
