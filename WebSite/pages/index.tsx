@@ -19,8 +19,6 @@ import {
   Zap,
   Star,
   Sparkles,
-  Palette,
-  Users,
   ShieldCheck,
 } from "lucide-react";
 
@@ -415,7 +413,7 @@ export default function Home() {
     {
       question: "Can I export the reports?",
       answer:
-        "Yes! All plans give you access to your audit dashboard with a shareable link. Pro and Agency subscribers get a permanent dashboard with full history. Agency plans include white-label sharing so your clients see your branding.",
+        "Yes! All plans give you access to your audit dashboard with a shareable link. Pro and Agency subscribers get a permanent dashboard with full history.",
     },
     {
       question: "Which AI models do you analyze?",
@@ -428,9 +426,9 @@ export default function Home() {
         "We recommend running audits monthly at minimum. AI models are constantly updated with new training data, and your competitors are optimizing too. Regular audits help you track progress and catch any drops in visibility before they impact your traffic.",
     },
     {
-      question: "Do you offer white-label reports for agencies?",
+      question: "How is this different from just checking AI myself?",
       answer:
-        "Yes! Our Agency plan includes fully customizable white-label dashboards with your branding. You can add your logo, colors, and share a custom link with your clients  they see your agency, not ShowYourBrand.",
+        "Typing a few prompts into ChatGPT gives you anecdotes. ShowYourBrand runs 100 structured prompts across every major engine, detects and scores each mention, benchmarks your competitors, and turns it all into a prioritized action plan — the complete, repeatable picture you can't get by hand.",
     },
   ];
 
@@ -513,19 +511,19 @@ export default function Home() {
             <div className="flex-1 flex flex-col items-center justify-center gap-5 md:gap-7">
               <span className="eyebrow-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700">
                 <Sparkles className="w-3.5 h-3.5 text-violet-600" />
-                The white-label GEO platform for agencies
+                The #1 platform to get your brand cited by AI
               </span>
               <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-[1.05] tracking-tight px-2 sm:px-0">
-                Your clients,{" "}
+                Your brand,{" "}
                 <span className="relative inline-block text-gradient-premium">
                   cited by AI
                   <HandDrawnUnderline />
                 </span>
               </h1>
               <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl lg:max-w-3xl mx-auto px-2 sm:px-0 leading-relaxed">
-                ShowYourBrand is the GEO platform agencies use to audit, track and grow
-                their clients&apos; visibility across ChatGPT, Claude, Perplexity and Gemini —
-                delivered as clean, white-label reports.
+                ShowYourBrand is the most complete way to measure and grow your brand&apos;s
+                visibility across ChatGPT, Claude, Perplexity and Gemini — with a clear
+                action plan to get you cited.
               </p>
               <AIModelMarquee />
             </div>
@@ -665,7 +663,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Built for agencies */}
+        {/* Why ShowYourBrand */}
         <section className="px-4 py-16 md:py-24">
           <div className="container mx-auto max-w-6xl">
             <div className="relative overflow-hidden rounded-[2rem] bg-[#0B1120] px-6 py-14 md:px-14 md:py-20 text-white shadow-premium-lg">
@@ -675,21 +673,21 @@ export default function Home() {
                 <div className="text-center max-w-2xl mx-auto mb-12">
                   <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-violet-200 mb-5">
                     <Sparkles className="w-3.5 h-3.5" />
-                    Built for agencies
+                    Why ShowYourBrand
                   </span>
                   <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
-                    Add GEO to your offer, under your own brand
+                    The most complete way to get cited by AI
                   </h2>
                   <p className="text-gray-400 text-base md:text-lg leading-relaxed">
-                    Audit every client, track their progress month over month, and hand them a
-                    report that carries your agency&apos;s name — not ours.
+                    Everything you need to measure your AI visibility and actually improve it —
+                    in one platform, built for GEO from the ground up.
                   </p>
                 </div>
                 <div className="grid gap-6 md:grid-cols-3">
                   {[
-                    { Icon: Palette, title: "White-label reports", desc: "Share a clean report page under your agency's branding. Your clients never see ShowYourBrand." },
-                    { Icon: Users, title: "Multi-client dashboard", desc: "Manage every client's audits from one place, with competitor benchmarks on each." },
-                    { Icon: ShieldCheck, title: "Human-reviewed quality", desc: "Every audit is reviewed before delivery, so what reaches your client is always polished." },
+                    { Icon: Target, title: "Every engine that matters", desc: "ChatGPT, Claude, Perplexity and Gemini, measured together — so you see your visibility everywhere your customers ask." },
+                    { Icon: Zap, title: "From score to action in minutes", desc: "One GEO Health Score plus prioritized, copy-paste fixes. You know exactly what to change, and why." },
+                    { Icon: ShieldCheck, title: "Human-reviewed quality", desc: "Every report is checked by an expert before delivery, so it's always accurate and ready to act on." },
                   ].map(({ Icon, title, desc }) => (
                     <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 flex items-center justify-center mb-4">
@@ -714,16 +712,16 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start mb-12">
               <div>
                 <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-gray-900 mb-5">
-                  Visitors from AI already trust you.
+                  When buyers ask AI, you&apos;re the answer — or you&apos;re invisible.
                 </h2>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
-                  Traditional SEO brings people who are still comparing options.
-                  Someone who found you through a ChatGPT answer has already validated the choice. The AI did it for them.
-                  They&apos;re not browsing. They arrived with intent.
+                  People no longer scroll through ten blue links. They ask ChatGPT, Claude or
+                  Perplexity and act on the single answer they get back. If your brand isn&apos;t
+                  in it, a competitor is.
                 </p>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg">
-                  The problem: most brands have no idea whether they&apos;re being mentioned, or silently skipped.
-                  GEO is the only way to find out, and to fix it.
+                  ShowYourBrand is the fastest way to see exactly where you stand today — and the
+                  clearest path to get your brand cited, engine by engine.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -949,7 +947,7 @@ export default function Home() {
                   "15 client audits per month",
                   "All Pro features per client",
                   "Multi-client dashboard",
-                  "White-label shareable reports",
+                  "Client-ready shareable reports",
                   "3 competitor benchmarks per client",
                   "Resell at your own price",
                   "Dedicated account manager",
@@ -1069,11 +1067,11 @@ export default function Home() {
 
           <div className="container mx-auto max-w-5xl text-center relative z-10">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-medium text-white mb-4 md:mb-6 lg:mb-8 leading-tight">
-              Make GEO your agency&apos;s edge
+              Be the brand AI recommends
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 max-w-2xl lg:max-w-3xl mx-auto">
-              Give every client a clear picture of their AI visibility — and a white-label
-              report that proves your value. Start with a single audit.
+              See exactly where you stand in ChatGPT, Claude, Perplexity and Gemini — and get a
+              clear action plan to get cited. Start with a single audit.
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">
