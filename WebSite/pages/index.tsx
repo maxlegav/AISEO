@@ -398,37 +398,32 @@ export default function Home() {
     {
       question: "What is GEO?",
       answer:
-        "GEO (Generative Engine Optimization) is the practice of optimizing your website and content to be visible and cited by all major AI engines: ChatGPT, Claude, Perplexity, Gemini, Grok and others. As more users turn to AI for answers, GEO ensures your brand appears in those responses.",
+        "GEO (Generative Engine Optimization) is the practice of making your brand visible and cited by the major AI engines: ChatGPT, Claude, Perplexity, Gemini and others. As more people ask AI instead of Google, GEO decides whether your brand shows up in those answers.",
     },
     {
-      question: "How long does an audit take?",
+      question: "How does the monitoring work?",
       answer:
-        "A complete audit typically takes 10-15 minutes to process. We analyze your website across 100+ AI prompts, scan your HTML structure, and generate comprehensive recommendations. You'll receive real-time progress updates during the process.",
+        "You add your brand, your competitors and the prompts your prospects ask. ShowYourBrand queries every major AI engine automatically — weekly by default, daily on paid plans — stores every answer, and shows your visibility score and how it evolves over time. It's continuous tracking, not a one-off snapshot.",
+    },
+    {
+      question: "Why do you show a score per AI model?",
+      answer:
+        "Because each engine sources answers differently: ChatGPT follows Bing, Perplexity favours recent high-traffic pages, Claude leans on Reddit and forums, Gemini favours Google properties like YouTube. A single global score hides this. We show why you're strong on one model and invisible on another — and the specific action to fix each.",
     },
     {
       question: "Does this replace SEO?",
       answer:
-        "No, GEO complements traditional SEO. While SEO optimizes for search engine rankings, GEO ensures your content is structured and presented in ways that AI systems can understand and cite. Both work together to maximize your online visibility.",
+        "No, GEO complements traditional SEO. SEO optimizes for search rankings; GEO makes sure AI engines understand and cite your content. Both work together to maximize your visibility.",
     },
     {
-      question: "Can I export the reports?",
+      question: "Which AI models do you track?",
       answer:
-        "Yes! All plans give you access to your audit dashboard with a shareable link. Pro and Agency subscribers get a permanent dashboard with full history.",
+        "ChatGPT (OpenAI), Claude (Anthropic), Perplexity and Gemini (Google) — the engines your customers actually use. We track your presence, position and the sources cited across all of them, every run.",
     },
     {
-      question: "Which AI models do you analyze?",
+      question: "Can agencies manage several clients?",
       answer:
-        "We analyze your visibility across all major AI platforms: ChatGPT (OpenAI), Claude (Anthropic), Perplexity, Gemini (Google) and Grok (xAI). Each model has different training data and citation patterns, so we test across all of them to give you a complete picture.",
-    },
-    {
-      question: "How often should I run an audit?",
-      answer:
-        "We recommend running audits monthly at minimum. AI models are constantly updated with new training data, and your competitors are optimizing too. Regular audits help you track progress and catch any drops in visibility before they impact your traffic.",
-    },
-    {
-      question: "How is this different from just checking AI myself?",
-      answer:
-        "Typing a few prompts into ChatGPT gives you anecdotes. ShowYourBrand runs 100 structured prompts across every major engine, detects and scores each mention, benchmarks your competitors, and turns it all into a prioritized action plan — the complete, repeatable picture you can't get by hand.",
+        "Yes. Manage multiple brands from a single dashboard, track each client's visibility over time, and on the Agency plan deliver client-ready, branded reports.",
     },
   ];
 
@@ -436,13 +431,13 @@ export default function Home() {
     <>
       <TagSEO
         canonicalSlug=""
-        title="ShowYourBrand | GEO Audit: Appear in ChatGPT, Claude & Perplexity"
-        description="Test your brand visibility across 100 AI prompts on all major AI engines. Get your GEO score and an action plan to appear in AI answers."
-        keywords="GEO optimization, generative engine optimization, AI visibility, ChatGPT SEO, brand mentions AI, AI search optimization, GEO audit"
+        title="ShowYourBrand | GEO monitoring for ChatGPT, Claude, Perplexity & Gemini"
+        description="Monitor your brand's visibility across every major AI engine, every week. Per-LLM scores, competitor tracking, cited sources and model-specific actions to get cited."
+        keywords="GEO monitoring, generative engine optimization, AI visibility tracking, ChatGPT monitoring, brand mentions AI, AI search optimization, LLM visibility"
         og={{
-          title: "ShowYourBrand | Appear in AI Search Results",
+          title: "ShowYourBrand | Track your brand across every AI engine",
           description:
-            "Is your brand cited by ChatGPT, Claude or Perplexity? Test 100 AI prompts, get your GEO score and a clear action plan. Start your free audit today.",
+            "Is your brand cited by ChatGPT, Claude, Perplexity or Gemini? Monitor your visibility week after week, track competitors, and get model-specific actions to climb.",
           image: `https://showyourbrand.app/og-homepage.jpeg`,
           url: "https://showyourbrand.app/",
         }}
@@ -511,7 +506,7 @@ export default function Home() {
             <div className="flex-1 flex flex-col items-center justify-center gap-5 md:gap-7">
               <span className="eyebrow-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700">
                 <Sparkles className="w-3.5 h-3.5 text-violet-600" />
-                The #1 platform to get your brand cited by AI
+                Continuous GEO monitoring across every AI engine
               </span>
               <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-[1.05] tracking-tight px-2 sm:px-0">
                 Your brand,{" "}
@@ -521,9 +516,9 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl lg:max-w-3xl mx-auto px-2 sm:px-0 leading-relaxed">
-                ShowYourBrand is the most complete way to measure and grow your brand&apos;s
-                visibility across ChatGPT, Claude, Perplexity and Gemini — with a clear
-                action plan to get you cited.
+                ShowYourBrand tracks how often ChatGPT, Claude, Perplexity and Gemini
+                cite your brand — every week. Watch your visibility score evolve, keep an
+                eye on competitors, and get model-specific actions to climb.
               </p>
               <AIModelMarquee />
             </div>
@@ -563,12 +558,12 @@ export default function Home() {
                   <Calendar className="w-4 h-4 mr-2" />
                   Book a demo
                 </Button>
-                <a
-                  href="#pricing"
+                <Link
+                  href="/app"
                   className="inline-flex items-center rounded-full border border-gray-300/80 bg-white/60 backdrop-blur-sm text-gray-800 hover:border-gray-400 hover:bg-white px-9 py-4 text-base font-semibold transition-all"
                 >
-                  See pricing
-                </a>
+                  See a live dashboard
+                </Link>
               </div>
             </div>
           </div>
@@ -613,8 +608,8 @@ export default function Home() {
                 GEO is the new SEO.
               </h2>
               <p className="text-gray-600 max-w-2xl lg:max-w-3xl mx-auto text-base md:text-lg lg:text-xl">
-                When someone asks ChatGPT for a recommendation, they get one answer  not ten blue links.
-                Either your brand is mentioned, or a competitor is. There is no page 2.
+                When someone asks ChatGPT for a recommendation, they get one answer — not ten blue links.
+                Either your brand is mentioned, or a competitor is. ShowYourBrand tracks that, every week.
               </p>
             </div>
 
@@ -624,11 +619,12 @@ export default function Home() {
                   <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
-                  See what 4 AI models actually say about you
+                  Track every engine, every week
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  We run 100 real prompts across all major AI engines: ChatGPT, Claude, Perplexity, Gemini and Grok.
-                  You get the word-for-word responses, not estimates, not scores, the actual text.
+                  We query ChatGPT, Claude, Perplexity and Gemini on your prompts automatically,
+                  store every answer, and turn it into a visibility score that evolves over time —
+                  not a one-off snapshot.
                 </p>
               </div>
 
@@ -637,12 +633,12 @@ export default function Home() {
                   <Target className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
-                  Find out who's being cited instead of you
+                  Know why each model ignores you
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  When AI skips your brand, it names someone else. We tell you which competitors,
-                  on which prompts, and what specifically puts them ahead  content structure,
-                  schema, backlinks from cited sources.
+                  Others give you one global score. We break it down by engine and explain it:
+                  strong on Perplexity, invisible on Claude — with the specific reason and the
+                  fix for each model.
                 </p>
               </div>
 
@@ -651,12 +647,11 @@ export default function Home() {
                   <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
-                  A fix list, not a report
+                  See competitors and the sources AI cites
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  Every issue comes with a specific action: schema markup to add,
-                  a paragraph to rewrite, a page to restructure. Prioritized by impact.
-                  No PDF to interpret, no consultant needed.
+                  Track competitors on the same prompts, and see exactly which pages ChatGPT,
+                  Claude and Perplexity pull from — and whether each source mentions you or not.
                 </p>
               </div>
             </div>
@@ -676,18 +671,18 @@ export default function Home() {
                     Why ShowYourBrand
                   </span>
                   <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
-                    The most complete way to get cited by AI
+                    GEO monitoring, built for the French market
                   </h2>
                   <p className="text-gray-400 text-base md:text-lg leading-relaxed">
-                    Everything you need to measure your AI visibility and actually improve it —
-                    in one platform, built for GEO from the ground up.
+                    Everything the best AI-visibility tools do — continuous multi-LLM tracking —
+                    with per-engine explanations and French-first support.
                   </p>
                 </div>
                 <div className="grid gap-6 md:grid-cols-3">
                   {[
-                    { Icon: Target, title: "Every engine that matters", desc: "ChatGPT, Claude, Perplexity and Gemini, measured together — so you see your visibility everywhere your customers ask." },
-                    { Icon: Zap, title: "From score to action in minutes", desc: "One GEO Health Score plus prioritized, copy-paste fixes. You know exactly what to change, and why." },
-                    { Icon: ShieldCheck, title: "Human-reviewed quality", desc: "Every report is checked by an expert before delivery, so it's always accurate and ready to act on." },
+                    { Icon: Target, title: "Every engine that matters", desc: "ChatGPT, Claude, Perplexity and Gemini, tracked together — so you see your visibility everywhere your customers ask." },
+                    { Icon: Zap, title: "Evolution, week after week", desc: "Watch your visibility score move over 12 weeks, catch drops early with alerts, and prove the impact of every change." },
+                    { Icon: ShieldCheck, title: "Made for the French market", desc: "Interface, support and use cases in French, pricing in euros — the GEO tool French brands and agencies actually get." },
                   ].map(({ Icon, title, desc }) => (
                     <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 flex items-center justify-center mb-4">
@@ -875,7 +870,7 @@ export default function Home() {
                 Simple, transparent pricing
               </h2>
               <p className="text-gray-600">
-                One audit to test. A subscription to track. An agency plan to scale.
+                Start solo, track continuously, and scale to an agency plan when you manage clients.
               </p>
             </div>
 
@@ -1070,8 +1065,8 @@ export default function Home() {
               Be the brand AI recommends
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 max-w-2xl lg:max-w-3xl mx-auto">
-              See exactly where you stand in ChatGPT, Claude, Perplexity and Gemini — and get a
-              clear action plan to get cited. Start with a single audit.
+              Track exactly where you stand in ChatGPT, Claude, Perplexity and Gemini — week
+              after week — and get model-specific actions to get cited.
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">
