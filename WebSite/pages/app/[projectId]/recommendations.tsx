@@ -1,10 +1,14 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
+import type { GetServerSideProps } from "next";
 import { ArrowRight } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
+import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
+import DemoBanner from "@/components/monitoring/DemoBanner";
 import { LLMBadge } from "@/components/monitoring/widgets";
-import { getProject, priorityLabel, Recommendation } from "@/lib/mock/monitoring";
+import { priorityLabel, Recommendation, type Project } from "@/lib/mock/monitoring";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 
 const priorityStyles: Record<
   Recommendation["priority"],
@@ -15,10 +19,27 @@ const priorityStyles: Record<
   low: { dot: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700" },
 };
 
-export default function RecommendationsView() {
-  const router = useRouter();
-  const project = getProject(router.query.projectId as string);
+interface RecommendationsProps {
+  project: Project | null;
+  demo: boolean;
+}
+
+export default function RecommendationsView({
+  project,
+  demo,
+}: RecommendationsProps) {
   if (!project) return <ProjectNotFound />;
+  if (project.pendingFirstRun) {
+    return (
+      <MonitoringLayout
+        project={project}
+        active="recommendations"
+        title="Recommandations"
+      >
+        <PendingFirstRun projectId={project.id} />
+      </MonitoringLayout>
+    );
+  }
 
   const order = { high: 0, medium: 1, low: 2 };
   const recs = [...project.recommendations].sort(
@@ -36,7 +57,9 @@ export default function RecommendationsView() {
         active="recommendations"
         title="Recommandations"
         subtitle="Des actions concrètes, spécifiques à chaque moteur où vous êtes faible."
+        demo={demo}
       >
+        <DemoBanner demo={demo} />
         <div className="space-y-4">
           {recs.map((r, i) => {
             const st = priorityStyles[r.priority];
@@ -83,3 +106,13 @@ export default function RecommendationsView() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<RecommendationsProps> = async (
+  ctx,
+) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app");
+  const projectId = ctx.params?.projectId as string;
+  const { project, demo } = await getProjectDashboard(userId, projectId);
+  return { props: { project, demo } };
+};

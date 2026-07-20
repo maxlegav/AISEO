@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
+import type { GetServerSideProps } from "next";
 import {
   ResponsiveContainer,
   LineChart,
@@ -13,6 +13,8 @@ import {
 import { Crosshair, MessageSquare, RefreshCw, Trophy } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
+import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
+import DemoBanner from "@/components/monitoring/DemoBanner";
 import {
   DeltaBadge,
   LLMBadge,
@@ -20,14 +22,30 @@ import {
   scoreColor,
   scoreLabel,
 } from "@/components/monitoring/widgets";
-import { getProject, LLMS, LLM_ORDER } from "@/lib/mock/monitoring";
+import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 
-export default function ProjectDashboard() {
-  const router = useRouter();
-  const projectId = router.query.projectId as string;
-  const project = getProject(projectId);
+interface ProjectDashboardProps {
+  project: Project | null;
+  demo: boolean;
+}
 
+export default function ProjectDashboard({ project, demo }: ProjectDashboardProps) {
   if (!project) return <ProjectNotFound />;
+
+  if (project.pendingFirstRun) {
+    return (
+      <MonitoringLayout
+        project={project}
+        active="dashboard"
+        title={project.brandName}
+        subtitle={project.category}
+      >
+        <PendingFirstRun projectId={project.id} />
+      </MonitoringLayout>
+    );
+  }
 
   const ranked = [...project.llmScores].sort(
     (a, b) => b.presenceRate - a.presenceRate
@@ -75,7 +93,9 @@ export default function ProjectDashboard() {
         active="dashboard"
         title={project.brandName}
         subtitle={project.category}
+        demo={demo}
       >
+        <DemoBanner demo={demo} />
         {/* Top: global score + stats */}
         <div className="grid gap-5 lg:grid-cols-3">
           <div className="flex items-center gap-5 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
@@ -248,3 +268,13 @@ export default function ProjectDashboard() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<ProjectDashboardProps> = async (
+  ctx,
+) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app");
+  const projectId = ctx.params?.projectId as string;
+  const { project, demo } = await getProjectDashboard(userId, projectId);
+  return { props: { project, demo } };
+};

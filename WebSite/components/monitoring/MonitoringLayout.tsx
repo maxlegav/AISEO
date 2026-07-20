@@ -23,6 +23,9 @@ export type MonitoringSection =
   | "recommendations"
   | "settings";
 
+/** Minimal shape needed by the project switcher. */
+export type SwitcherProject = Pick<Project, "id" | "brandName" | "websiteUrl">;
+
 interface MonitoringLayoutProps {
   children: ReactNode;
   project?: Project;
@@ -30,9 +33,19 @@ interface MonitoringLayoutProps {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  /** All of the user's projects, for the switcher. Defaults to demo data. */
+  projects?: SwitcherProject[];
+  /** True when the visible data is demo/mock (shows a notice). */
+  demo?: boolean;
 }
 
-function ProjectSwitcher({ current }: { current?: Project }) {
+function ProjectSwitcher({
+  current,
+  projects,
+}: {
+  current?: Project;
+  projects: SwitcherProject[];
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -59,7 +72,7 @@ function ProjectSwitcher({ current }: { current?: Project }) {
               {current ? current.brandName : "Tous les projets"}
             </span>
             <span className="block truncate text-[11px] text-gray-400">
-              {current ? current.websiteUrl : `${PROJECTS.length} marques suivies`}
+              {current ? current.websiteUrl : `${projects.length} marques suivies`}
             </span>
           </span>
         </span>
@@ -81,7 +94,7 @@ function ProjectSwitcher({ current }: { current?: Project }) {
             Tous les projets
           </Link>
           <div className="my-1 border-t border-gray-100" />
-          {PROJECTS.map((p) => (
+          {projects.map((p) => (
             <Link
               key={p.id}
               href={`/app/${p.id}`}
@@ -121,8 +134,11 @@ export default function MonitoringLayout({
   title,
   subtitle,
   actions,
+  projects,
+  demo = false,
 }: MonitoringLayoutProps) {
   const base = project ? `/app/${project.id}` : "/app";
+  const switcherProjects: SwitcherProject[] = projects ?? PROJECTS;
 
   const nav: {
     key: MonitoringSection;
@@ -171,7 +187,7 @@ export default function MonitoringLayout({
           </span>
         </Link>
 
-        <ProjectSwitcher current={project} />
+        <ProjectSwitcher current={project} projects={switcherProjects} />
 
         <nav className="mt-5 flex-1 space-y-0.5 px-3">
           <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
@@ -227,17 +243,20 @@ export default function MonitoringLayout({
           </Link>
         </nav>
 
-        <div className="mx-3 rounded-xl border border-violet-100 bg-white/80 p-3.5 shadow-sm">
-          <div className="mb-1 flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-violet-600" />
-            <span className="text-[12px] font-semibold text-gray-800">
-              Prototype
-            </span>
+        {demo && (
+          <div className="mx-3 rounded-xl border border-violet-100 bg-white/80 p-3.5 shadow-sm">
+            <div className="mb-1 flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-violet-600" />
+              <span className="text-[12px] font-semibold text-gray-800">
+                Données de démonstration
+              </span>
+            </div>
+            <p className="text-[11px] leading-snug text-gray-500">
+              Créez votre premier projet pour voir vos propres données de
+              monitoring ici.
+            </p>
           </div>
-          <p className="text-[11px] leading-snug text-gray-500">
-            Données de démonstration. Le monitoring live arrive avec le pipeline.
-          </p>
-        </div>
+        )}
       </aside>
 
       {/* Main */}

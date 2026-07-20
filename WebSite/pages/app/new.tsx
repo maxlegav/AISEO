@@ -1,24 +1,66 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useState } from "react";
-import { Info, Plus, X } from "lucide-react";
+import { useRouter } from "next/router";
+import type { GetServerSideProps } from "next";
+import { useMemo, useState } from "react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Loader2,
+  Plus,
+  Rocket,
+  X,
+} from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import { LLMBadge } from "@/components/monitoring/widgets";
-import { LLM_ORDER, LLMS } from "@/lib/mock/monitoring";
+import { LLM_ORDER, LLMS, type LLMId } from "@/lib/mock/monitoring";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
 import { cn } from "@/lib/utils";
 
+type Frequency = "weekly" | "daily";
+
+const STEPS = ["Marque", "Concurrents & requêtes", "Moteurs & lancement"];
+
 export default function NewProject() {
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [brandName, setBrandName] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [category, setCategory] = useState("");
   const [competitors, setCompetitors] = useState<string[]>([""]);
   const [prompts, setPrompts] = useState<string[]>([
     "Quel est le meilleur outil pour [votre catégorie] ?",
     "Quelles sont les alternatives à [concurrent] ?",
   ]);
-  const [engines, setEngines] = useState<Record<string, boolean>>({
+  const [frequency, setFrequency] = useState<Frequency>("weekly");
+  const [engines, setEngines] = useState<Record<LLMId, boolean>>({
     chatgpt: true,
     perplexity: true,
     claude: true,
     gemini: true,
   });
+
+  const cleanCompetitors = useMemo(
+    () => competitors.map((c) => c.trim()).filter(Boolean),
+    [competitors]
+  );
+  const cleanPrompts = useMemo(
+    () => prompts.map((p) => p.trim()).filter(Boolean),
+    [prompts]
+  );
+  const selectedLLMs = useMemo(
+    () => LLM_ORDER.filter((llm) => engines[llm]),
+    [engines]
+  );
+
+  const step0Valid = brandName.trim().length > 0 && websiteUrl.trim().length > 0;
+  const step1Valid = cleanPrompts.length > 0;
+  const step2Valid = selectedLLMs.length > 0;
 
   const updateList = (
     list: string[],
@@ -31,6 +73,39 @@ export default function NewProject() {
     setList(next);
   };
 
+  async function createAndRun() {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName: brandName.trim(),
+          websiteUrl: websiteUrl.trim(),
+          category: category.trim() || undefined,
+          competitors: cleanCompetitors,
+          prompts: cleanPrompts,
+          llms: selectedLLMs,
+          frequency,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(
+          json.message || "La création du projet a échoué. Réessayez."
+        );
+      }
+      const projectId: string = json.data._id ?? json.data.id;
+      // Fire the first run, then land on the dashboard (which will refresh).
+      await fetch(`/api/projects/${projectId}/run`, { method: "POST" });
+      router.push(`/app/${projectId}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erreur inattendue.");
+      setSubmitting(false);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -42,151 +117,303 @@ export default function NewProject() {
         title="Nouveau projet"
         subtitle="Configurez une marque à monitorer — vous verrez un premier score en quelques minutes."
       >
-        <div className="mb-5 flex items-start gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
-          Maquette : ce formulaire illustre l&apos;onboarding. La création réelle
-          sera branchée sur le pipeline de monitoring.
-        </div>
-
-        <div className="max-w-2xl space-y-5">
-          <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
-            <h2 className="mb-4 font-heading text-lg font-semibold text-gray-900">
-              Marque
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Nom de la marque
-                </label>
-                <input
-                  placeholder="Linkflow"
-                  className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
-                />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Site web
-                </label>
-                <input
-                  placeholder="linkflow.io"
-                  className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
-            <h2 className="mb-1 font-heading text-lg font-semibold text-gray-900">
-              Concurrents
-            </h2>
-            <p className="mb-4 text-sm text-gray-500">
-              Suivis sur les mêmes requêtes, pour comparer votre visibilité.
-            </p>
-            {competitors.map((c, i) => (
-              <div key={i} className="mb-2 flex items-center gap-2">
-                <input
-                  value={c}
-                  onChange={(e) =>
-                    updateList(competitors, setCompetitors, i, e.target.value)
-                  }
-                  placeholder="concurrent.com"
-                  className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
-                />
-                <button
-                  onClick={() =>
-                    setCompetitors(competitors.filter((_, j) => j !== i))
-                  }
-                  className="rounded-lg p-2 text-gray-300 hover:text-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-            <button
-              onClick={() => setCompetitors([...competitors, ""])}
-              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Ajouter un concurrent
-            </button>
-          </section>
-
-          <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
-            <h2 className="mb-1 font-heading text-lg font-semibold text-gray-900">
-              Requêtes à surveiller
-            </h2>
-            <p className="mb-4 text-sm text-gray-500">
-              Les questions que vos prospects posent aux IA dans votre catégorie.
-            </p>
-            {prompts.map((p, i) => (
-              <div key={i} className="mb-2 flex items-center gap-2">
-                <input
-                  value={p}
-                  onChange={(e) =>
-                    updateList(prompts, setPrompts, i, e.target.value)
-                  }
-                  className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
-                />
-                <button
-                  onClick={() => setPrompts(prompts.filter((_, j) => j !== i))}
-                  className="rounded-lg p-2 text-gray-300 hover:text-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-            <button
-              onClick={() => setPrompts([...prompts, ""])}
-              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Ajouter une requête
-            </button>
-          </section>
-
-          <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
-            <h2 className="mb-4 font-heading text-lg font-semibold text-gray-900">
-              Moteurs IA
-            </h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {LLM_ORDER.map((llm) => (
-                <button
-                  key={llm}
-                  onClick={() =>
-                    setEngines({ ...engines, [llm]: !engines[llm] })
-                  }
+        {/* Stepper */}
+        <div className="mb-6 flex items-center gap-3">
+          {STEPS.map((label, i) => (
+            <div key={label} className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all",
-                    engines[llm]
-                      ? "border-violet-400 bg-violet-50/60"
-                      : "border-gray-100 bg-white opacity-60"
+                    "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
+                    i < step
+                      ? "bg-violet-600 text-white"
+                      : i === step
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-400"
                   )}
                 >
-                  <LLMBadge llm={llm} size={24} showName={false} />
-                  <span className="text-xs font-medium text-gray-700">
-                    {LLMS[llm].name}
-                  </span>
-                </button>
-              ))}
+                  {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
+                </span>
+                <span
+                  className={cn(
+                    "text-sm font-medium",
+                    i === step ? "text-gray-900" : "text-gray-400"
+                  )}
+                >
+                  {label}
+                </span>
+              </div>
+              {i < STEPS.length - 1 && (
+                <span className="h-px w-6 bg-gray-200" />
+              )}
             </div>
-          </section>
+          ))}
+        </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              disabled
-              className="cursor-not-allowed rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white opacity-60"
-            >
-              Lancer le monitoring (bientôt)
-            </button>
-            <Link
-              href="/app"
-              className="text-sm font-medium text-gray-500 hover:text-gray-700"
-            >
-              Annuler
-            </Link>
+        {error && (
+          <div className="mb-5 flex max-w-2xl items-start gap-2 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <div className="max-w-2xl space-y-5">
+          {step === 0 && (
+            <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
+              <h2 className="mb-4 font-heading text-lg font-semibold text-gray-900">
+                Marque
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Nom de la marque
+                  </label>
+                  <input
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    placeholder="Linkflow"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Site web
+                  </label>
+                  <input
+                    value={websiteUrl}
+                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                    placeholder="linkflow.io"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Catégorie <span className="text-gray-400">(optionnel)</span>
+                  </label>
+                  <input
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    placeholder="SaaS B2B — automatisation commerciale"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
+          {step === 1 && (
+            <>
+              <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
+                <h2 className="mb-1 font-heading text-lg font-semibold text-gray-900">
+                  Concurrents
+                </h2>
+                <p className="mb-4 text-sm text-gray-500">
+                  Suivis sur les mêmes requêtes, pour comparer votre visibilité.
+                </p>
+                {competitors.map((c, i) => (
+                  <div key={i} className="mb-2 flex items-center gap-2">
+                    <input
+                      value={c}
+                      onChange={(e) =>
+                        updateList(competitors, setCompetitors, i, e.target.value)
+                      }
+                      placeholder="Concurrent"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCompetitors(competitors.filter((_, j) => j !== i))
+                      }
+                      className="rounded-lg p-2 text-gray-300 hover:text-red-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCompetitors([...competitors, ""])}
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Ajouter un concurrent
+                </button>
+              </section>
+
+              <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
+                <h2 className="mb-1 font-heading text-lg font-semibold text-gray-900">
+                  Requêtes à surveiller
+                </h2>
+                <p className="mb-4 text-sm text-gray-500">
+                  Les questions que vos prospects posent aux IA dans votre
+                  catégorie.
+                </p>
+                {prompts.map((p, i) => (
+                  <div key={i} className="mb-2 flex items-center gap-2">
+                    <input
+                      value={p}
+                      onChange={(e) =>
+                        updateList(prompts, setPrompts, i, e.target.value)
+                      }
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPrompts(prompts.filter((_, j) => j !== i))
+                      }
+                      className="rounded-lg p-2 text-gray-300 hover:text-red-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setPrompts([...prompts, ""])}
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Ajouter une requête
+                </button>
+              </section>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
+                <h2 className="mb-4 font-heading text-lg font-semibold text-gray-900">
+                  Moteurs IA
+                </h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {LLM_ORDER.map((llm) => (
+                    <button
+                      key={llm}
+                      type="button"
+                      onClick={() =>
+                        setEngines({ ...engines, [llm]: !engines[llm] })
+                      }
+                      className={cn(
+                        "flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all",
+                        engines[llm]
+                          ? "border-violet-400 bg-violet-50/60"
+                          : "border-gray-100 bg-white opacity-60"
+                      )}
+                    >
+                      <LLMBadge llm={llm} size={24} showName={false} />
+                      <span className="text-xs font-medium text-gray-700">
+                        {LLMS[llm].name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-premium backdrop-blur-sm">
+                <h2 className="mb-4 font-heading text-lg font-semibold text-gray-900">
+                  Fréquence
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {(
+                    [
+                      { id: "weekly", label: "Hebdomadaire", hint: "1 run / semaine" },
+                      { id: "daily", label: "Quotidien", hint: "1 run / jour" },
+                    ] as { id: Frequency; label: string; hint: string }[]
+                  ).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setFrequency(opt.id)}
+                      className={cn(
+                        "rounded-xl border-2 p-4 text-left transition-all",
+                        frequency === opt.id
+                          ? "border-violet-400 bg-violet-50/60"
+                          : "border-gray-100 bg-white"
+                      )}
+                    >
+                      <p className="text-sm font-semibold text-gray-800">
+                        {opt.label}
+                      </p>
+                      <p className="text-xs text-gray-400">{opt.hint}</p>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5 text-sm text-gray-700">
+                <p className="font-semibold text-gray-900">Récapitulatif</p>
+                <p className="mt-1">
+                  <strong>{brandName || "—"}</strong> · {cleanPrompts.length}{" "}
+                  requête(s) · {cleanCompetitors.length} concurrent(s) ·{" "}
+                  {selectedLLMs.length} moteur(s) ·{" "}
+                  {frequency === "daily" ? "quotidien" : "hebdomadaire"}
+                </p>
+              </section>
+            </>
+          )}
+
+          {/* Nav */}
+          <div className="flex items-center justify-between">
+            {step > 0 ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s - 1)}
+                disabled={submitting}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Retour
+              </button>
+            ) : (
+              <Link
+                href="/app"
+                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+              >
+                Annuler
+              </Link>
+            )}
+
+            {step < STEPS.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s + 1)}
+                disabled={step === 0 ? !step0Valid : !step1Valid}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Continuer
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={createAndRun}
+                disabled={!step2Valid || submitting}
+                className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Création & premier run…
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="h-4 w-4" />
+                    Créer et lancer le monitoring
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </MonitoringLayout>
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app/new");
+  return { props: {} };
+};

@@ -1,19 +1,37 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
+import type { GetServerSideProps } from "next";
 import { TrendingUp } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
+import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
+import DemoBanner from "@/components/monitoring/DemoBanner";
 import {
   DeltaBadge,
   LLMBadge,
   scoreColor,
 } from "@/components/monitoring/widgets";
-import { getProject, LLM_ORDER } from "@/lib/mock/monitoring";
+import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 
-export default function CompetitorsView() {
-  const router = useRouter();
-  const project = getProject(router.query.projectId as string);
+interface CompetitorsProps {
+  project: Project | null;
+  demo: boolean;
+}
+
+export default function CompetitorsView({ project, demo }: CompetitorsProps) {
   if (!project) return <ProjectNotFound />;
+  if (project.pendingFirstRun) {
+    return (
+      <MonitoringLayout
+        project={project}
+        active="competitors"
+        title="Concurrents"
+      >
+        <PendingFirstRun projectId={project.id} />
+      </MonitoringLayout>
+    );
+  }
 
   const rows = [...project.competitorTable].sort((a, b) => b.global - a.global);
   const you = rows.find((r) => r.isYou);
@@ -30,7 +48,9 @@ export default function CompetitorsView() {
         active="competitors"
         title="Concurrents"
         subtitle="Comparez votre visibilité IA à celle de vos concurrents, moteur par moteur."
+        demo={demo}
       >
+        <DemoBanner demo={demo} />
         {you && (
           <div className="mb-5 flex items-start gap-3 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
             <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-violet-600" />
@@ -128,3 +148,13 @@ export default function CompetitorsView() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<CompetitorsProps> = async (
+  ctx,
+) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app");
+  const projectId = ctx.params?.projectId as string;
+  const { project, demo } = await getProjectDashboard(userId, projectId);
+  return { props: { project, demo } };
+};

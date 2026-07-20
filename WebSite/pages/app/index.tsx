@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
-import { Plus, ArrowRight } from "lucide-react";
+import type { GetServerSideProps } from "next";
+import { Plus, ArrowRight, Sparkles } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import {
   DeltaBadge,
@@ -8,9 +9,16 @@ import {
   MiniBar,
   ScoreRing,
 } from "@/components/monitoring/widgets";
-import { LLM_ORDER, PROJECTS } from "@/lib/mock/monitoring";
+import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getProjectSummaries } from "@/lib/monitoring/dashboard";
 
-export default function AppOverview() {
+interface AppOverviewProps {
+  projects: Project[];
+  demo: boolean;
+}
+
+export default function AppOverview({ projects, demo }: AppOverviewProps) {
   return (
     <>
       <Head>
@@ -21,6 +29,8 @@ export default function AppOverview() {
         active="dashboard"
         title="Mes projets"
         subtitle="Suivez la visibilité de chaque marque dans les réponses des IA."
+        projects={projects}
+        demo={demo}
         actions={
           <Link
             href="/app/new"
@@ -31,8 +41,18 @@ export default function AppOverview() {
           </Link>
         }
       >
+        {demo && (
+          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+            <span>
+              Voici des <strong>données de démonstration</strong>. Créez votre
+              premier projet pour lancer un vrai monitoring et voir vos propres
+              scores ici.
+            </span>
+          </div>
+        )}
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {PROJECTS.map((p) => (
+          {projects.map((p) => (
             <Link
               key={p.id}
               href={`/app/${p.id}`}
@@ -51,7 +71,13 @@ export default function AppOverview() {
               </div>
 
               <div className="mb-4 flex items-center gap-2 text-xs text-gray-500">
-                <DeltaBadge value={p.globalDelta} suffix=" pts / 7j" />
+                {p.pendingFirstRun ? (
+                  <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">
+                    En attente du premier run
+                  </span>
+                ) : (
+                  <DeltaBadge value={p.globalDelta} suffix=" pts / 7j" />
+                )}
                 <span className="text-gray-300">·</span>
                 <span>
                   {p.prompts} requêtes · {p.frequency.toLowerCase()}
@@ -60,15 +86,16 @@ export default function AppOverview() {
 
               <div className="space-y-2">
                 {LLM_ORDER.map((llm) => {
-                  const s = p.llmScores.find((x) => x.llm === llm)!;
+                  const s = p.llmScores.find((x) => x.llm === llm);
+                  const rate = s?.presenceRate ?? 0;
                   return (
                     <div key={llm} className="flex items-center gap-3">
                       <div className="w-24 shrink-0">
                         <LLMBadge llm={llm} size={16} />
                       </div>
-                      <MiniBar value={s.presenceRate} />
+                      <MiniBar value={rate} />
                       <span className="w-9 shrink-0 text-right text-xs font-semibold text-gray-600">
-                        {s.presenceRate}%
+                        {rate}%
                       </span>
                     </div>
                   );
@@ -101,3 +128,12 @@ export default function AppOverview() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<AppOverviewProps> = async (
+  ctx,
+) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app");
+  const { projects, demo } = await getProjectSummaries(userId);
+  return { props: { projects, demo } };
+};

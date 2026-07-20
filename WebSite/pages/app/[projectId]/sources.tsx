@@ -1,19 +1,33 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
+import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { Check, ExternalLink, X } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
+import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
+import DemoBanner from "@/components/monitoring/DemoBanner";
 import { LLMBadge } from "@/components/monitoring/widgets";
-import { getProject, LLMId, LLMS, LLM_ORDER } from "@/lib/mock/monitoring";
+import { LLMId, LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 import { cn } from "@/lib/utils";
 
-export default function SourcesView() {
-  const router = useRouter();
-  const project = getProject(router.query.projectId as string);
+interface SourcesProps {
+  project: Project | null;
+  demo: boolean;
+}
+
+export default function SourcesView({ project, demo }: SourcesProps) {
   const [filter, setFilter] = useState<LLMId | "all">("all");
 
   if (!project) return <ProjectNotFound />;
+  if (project.pendingFirstRun) {
+    return (
+      <MonitoringLayout project={project} active="sources" title="Sources citées">
+        <PendingFirstRun projectId={project.id} />
+      </MonitoringLayout>
+    );
+  }
 
   const sources =
     filter === "all"
@@ -31,7 +45,9 @@ export default function SourcesView() {
         active="sources"
         title="Sources citées"
         subtitle="Les pages que les IA citent sur vos requêtes — et si elles mentionnent votre marque."
+        demo={demo}
       >
+        <DemoBanner demo={demo} />
         <div className="mb-5 flex flex-wrap items-center gap-2">
           <button
             onClick={() => setFilter("all")}
@@ -112,3 +128,13 @@ export default function SourcesView() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<SourcesProps> = async (
+  ctx,
+) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app");
+  const projectId = ctx.params?.projectId as string;
+  const { project, demo } = await getProjectDashboard(userId, projectId);
+  return { props: { project, demo } };
+};

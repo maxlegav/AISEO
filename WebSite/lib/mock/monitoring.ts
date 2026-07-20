@@ -109,6 +109,10 @@ export interface Project {
   competitorTable: CompetitorRow[];
   sources: SourceRow[];
   recommendations: Recommendation[];
+  /** True when this project is backed by real monitoring data (not the demo). */
+  isReal?: boolean;
+  /** True for a real project that has no run yet (show onboarding state). */
+  pendingFirstRun?: boolean;
 }
 
 /** Deterministic 12-week series builder around a target end value per LLM. */

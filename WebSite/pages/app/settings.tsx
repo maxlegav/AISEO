@@ -1,7 +1,9 @@
 import Head from "next/head";
+import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { ImagePlus, Lock, Globe, FileText } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
 import { cn } from "@/lib/utils";
 
 const PRESET_COLORS = [
@@ -170,3 +172,9 @@ export default function BrandingSettings() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const userId = await getSessionUserId(ctx);
+  if (!userId) return loginRedirect("/app/settings");
+  return { props: {} };
+};
