@@ -1,16 +1,21 @@
 import { MongoClient } from 'mongodb';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your MongoDB URI to .env.local');
-}
-
 const uri = process.env.MONGODB_URI;
 const options = {};
 
 let client;
 let clientPromise: Promise<MongoClient>;
 
-if (process.env.NODE_ENV === 'development') {
+if (!uri) {
+  // Don't crash at import time (e.g. during `next build` page-data collection
+  // in CI, where env vars are absent). Fail only if someone actually awaits a
+  // DB connection at runtime. The `.catch` prevents an unhandled-rejection
+  // warning when the promise is never awaited.
+  clientPromise = Promise.reject(
+    new Error('Please add your MongoDB URI to .env.local'),
+  );
+  clientPromise.catch(() => {});
+} else if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
   let globalWithMongo = global as typeof globalThis & {
