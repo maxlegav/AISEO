@@ -10,8 +10,16 @@ import AuditCompletedClientEmail from "@/emails/AuditCompletedClientEmail";
 import AuditCreditAvailableEmail from "@/emails/AuditCreditAvailableEmail";
 import ChecklistSummaryEmail from "@/emails/ChecklistSummaryEmail";
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazily construct the Resend client. The Resend constructor throws when no
+// API key is present, which would crash `next build` page-data collection in
+// CI (where env vars are absent) as soon as any page imports this module.
+// Callers already guard on RESEND_API_KEY before sending, so this is only
+// reached at runtime when a key is configured.
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 // Email sender configuration
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@showyourbrand.app";
@@ -47,7 +55,7 @@ export async function sendEmail({
       return { success: false, error: "Email service not configured" };
     }
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: from || FROM_EMAIL,
       to: [to],
       subject,
