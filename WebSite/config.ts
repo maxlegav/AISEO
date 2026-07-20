@@ -125,6 +125,31 @@ const config = {
     },
   },
 
+  // SYB v2 — recurring GEO *monitoring* plans (Solo / Pro / Agence).
+  // These replace the one-shot audit tiers above as we transition to the
+  // continuous-monitoring product. Prices are the single source of truth;
+  // per-plan limits (projects / engines / frequency) live in
+  // `lib/monitoring/plans.ts`, which imports these prices.
+  monitoring: {
+    currency: "EUR",
+    interval: "month",
+    solo: {
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_SOLO || "",
+      name: "Solo",
+      price: 29,
+    },
+    pro: {
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_PRO || "",
+      name: "Pro",
+      price: 79,
+    },
+    agency: {
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_AGENCY || "",
+      name: "Agence",
+      price: 149,
+    },
+  },
+
   // Email Configuration (using Resend)
   email: {
     fromNoReply: process.env.RESEND_FROM_EMAIL || "noreply@ShowYourBrand.com",

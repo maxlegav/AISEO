@@ -1,20 +1,23 @@
 import type { SubscriptionTier } from "@/lib/subscription-limits";
+import type { MonitoringFrequency } from "@/lib/monitoring/types";
+import { planForTier, planAllowsFrequency } from "@/lib/monitoring/plans";
 
 /**
- * How many monitored projects each plan allows.
- *
- * Bridges the current Stripe tiers (none/data/starter/pro/agency) to the SYB v2
- * monitoring plans until the pricing migration PR lands. `none` gets 1 slot so a
- * user can create their first project during the market-validation / trial phase.
+ * Per-plan monitoring limits, derived from `lib/monitoring/plans.ts` (the single
+ * source of truth for Solo / Pro / Agence). Legacy Stripe tiers map to Solo
+ * during the transition (see `planForTier`).
  */
-const PROJECT_LIMIT: Record<SubscriptionTier, number> = {
-  none: 1,
-  data: 2,
-  starter: 2,
-  pro: 10,
-  agency: 1000,
-};
-
 export function getProjectLimit(tier: SubscriptionTier): number {
-  return PROJECT_LIMIT[tier] ?? PROJECT_LIMIT.none;
+  return planForTier(tier).projects;
+}
+
+export function getMaxLLMs(tier: SubscriptionTier): number {
+  return planForTier(tier).maxLLMs;
+}
+
+export function isFrequencyAllowed(
+  tier: SubscriptionTier,
+  frequency: MonitoringFrequency,
+): boolean {
+  return planAllowsFrequency(planForTier(tier), frequency);
 }

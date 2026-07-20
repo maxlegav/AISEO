@@ -8,11 +8,20 @@ This file provides guidance to Claude Code / AI agents working in this repositor
 
 ## What this project is
 
-**ShowYourBrand** is a **GEO (Generative Engine Optimization) audit platform**. It
-tests how visible a business is inside AI search engines (ChatGPT, Claude,
-Perplexity, Gemini), computes a **GEO Health Score (0–100)**, compares against
-competitors, and produces actionable, shareable reports. Target market: **B2B
-agencies** auditing their clients.
+**ShowYourBrand (SYB v2)** is a **continuous GEO monitoring tool** — a French
+clone of Promptmonitor / Temso. Users configure brands, competitors and prompts;
+the app queries ChatGPT / Claude / Perplexity / Gemini automatically (weekly or
+daily), stores results, computes a **per-LLM visibility score** and tracks it
+over time (competitors, cited sources, per-engine recommendations, email
+alerts). Target users: SaaS marketing teams, freelance SEO consultants, and
+agencies monitoring 10–20 clients.
+
+> ⚠️ **Product pivot.** SYB used to be a **one-shot audit** platform. That legacy
+> audit product (`Business`/`Audit` models, `server/` Python service, human
+> review, `/share/:token` report, `config.stripe.*` audit tiers) is still in the
+> code **temporarily** but is no longer the direction. New work targets the
+> monitoring product in `WebSite/lib/monitoring/*`, `models/Project|LLMResult|`
+> `WeeklyScore|MonitoredSource`, `pages/app/*` and `pages/api/projects/*`.
 
 > ⚠️ Historical note: this repo was bootstrapped from an old invoice-management
 > SaaS ("LoopBill/AutoInvoice"). All of that has been removed — **there are no
@@ -23,8 +32,8 @@ agencies** auditing their clients.
 
 | Path | What it is | Stack | Deploy target |
 |------|-----------|-------|---------------|
-| `WebSite/` | Main app: landing, auth, dashboard, audits, payments, **admin** | Next.js 16 (Pages Router), TS strict, MongoDB/Mongoose, NextAuth, Stripe | Vercel |
-| `server/` | Processing service: runs the actual GEO audit pipeline | Python 3.11, FastAPI, Selenium, AI SDKs | Docker → Infomaniak Kubernetes (see `server/KUBE_SETUP.md`) |
+| `WebSite/` | Main app: landing, auth, **monitoring dashboard (`/app`)**, projects API + cron, payments, admin | Next.js 16 (Pages Router), TS strict, MongoDB/Mongoose, NextAuth, Stripe | Vercel |
+| `server/` | **LEGACY** — old audit pipeline (Selenium/HTML scan). **Not required by SYB v2** and slated for removal | Python 3.11, FastAPI, Selenium | do not deploy for monitoring |
 | `Admin/` | **Deprecated** standalone admin panel — merged into `WebSite/pages/admin` (see `Admin/DEPRECATED.md`) | Next.js | do not deploy |
 | `_bmad-output/` | Planning artifacts (PRD, architecture, epics, UX, specs) | Markdown | — |
 | `_bmad/` | BMAD method tooling (agent workflows) | — | — |
@@ -33,28 +42,28 @@ agencies** auditing their clients.
 
 Most application work happens in `WebSite/`.
 
-## How the pieces talk
+## How the pieces talk (SYB v2 — no Python server required)
+
+Everything runs inside Next.js. Querying the LLMs is plain HTTP to the official
+APIs, so there is **no external processing service** in the monitoring path.
 
 ```
-Browser ──> WebSite (Next.js on Vercel)
-                │  creates Audit doc (status: pending) in MongoDB
-                │  fire-and-forget POST /audit  (Bearer PROCESSING_SERVICE_API_KEY)
-                ▼
-          server/ (FastAPI on Infomaniak K8s, IP 83.228.202.11)
-                │  prompt gen → parallel AI queries → mention detection
-                │  → scoring → HTML scan → writes results back to MongoDB
-                ▼
-          MongoDB Atlas (shared by WebSite, server, and Admin)
+Vercel Cron (daily) ──> /api/cron/run-monitoring
+   └─ for each active Project due (nextRunAt):
+        for each prompt × configured LLM:
+           fetch LLM API (HTTP) → brand detection (exact+fuzzy)
+                                 → source extraction → write LLMResult (Mongo)
+        → recompute WeeklyScore (per-engine + global + delta)
+        → update MonitoredSource → Resend alert if |delta| ≥ threshold
 ```
 
-The audit flow is **human-in-the-loop by design** (kept on purpose while report
-quality is being validated):
-1. User launches an audit → `Audit` created `pending`, processing server triggered.
-2. Server generates prompts → status `awaiting_prompt_approval`.
-3. **Admin approves prompts** (`/api/audits/approve` → server `/audit/:id/approve-prompts`).
-4. Server runs the full audit → status `review_pending`.
-5. **Admin marks complete** (`/api/admin/audits/:id/complete`) → status `completed`,
-   client notified, report shareable via `/share/:shareToken`.
+Without LLM API keys, adapters return deterministic **mocks** (`mock:true`
+persisted) so the whole pipeline runs key-free (ideal for market validation).
+Manual first run for onboarding: `POST /api/projects/[id]/run`.
+
+> The **legacy audit flow** (human-in-the-loop admin review, `server/` Python,
+> `/share/:token`) still exists but is not part of SYB v2 and needs no Python
+> server for monitoring.
 
 ## Common commands
 
@@ -68,9 +77,8 @@ npm run lint         # ESLint (flat config, eslint.config.mjs)
 npm run typecheck    # tsc --noEmit
 npm run test         # Vitest unit tests (see WebSite/__tests__)
 
-# Processing service (from repo root)
-docker compose up --build        # http://localhost:8080
-# or run the container directly — see server/README.md
+# Legacy audit processing service (NOT needed for SYB v2 monitoring)
+# docker compose up --build      # only for the old audit pipeline
 ```
 
 ## Tech stack (current, not the old invoice app)
@@ -79,34 +87,40 @@ docker compose up --build        # http://localhost:8080
 - **UI:** Tailwind CSS + Shadcn/ui, Framer Motion, Recharts, Lucide.
 - **State/validation:** Zustand + Zod.
 - **DB/auth:** MongoDB (Mongoose 7) + NextAuth 4 (JWT, Google OAuth + credentials).
-- **Payments:** Stripe — 4 tiers + one-shots (see pricing below).
-- **Email:** Resend.
-- **Processing:** Python FastAPI + Selenium + OpenAI/Anthropic/Gemini/Perplexity SDKs.
+- **Payments:** Stripe — monitoring plans (`config.monitoring`) + legacy audit tiers (`config.stripe`).
+- **Email:** Resend (magic-link auth + monitoring alerts).
+- **Monitoring:** LLM adapters in `WebSite/lib/monitoring/adapters` (HTTP to OpenAI/Anthropic/Perplexity/Gemini), run by Vercel Cron — no Python.
+- **Legacy audit:** Python FastAPI + Selenium in `server/` (being retired).
 
 ## Pricing — single source of truth
 
-The **authoritative pricing lives in [`WebSite/config.ts`](WebSite/config.ts)**
-(`config.stripe.*`). Do not hardcode prices elsewhere; import from `config`.
-Current tiers:
+Prices live in [`WebSite/config.ts`](WebSite/config.ts); per-plan **limits** live
+in [`WebSite/lib/monitoring/plans.ts`](WebSite/lib/monitoring/plans.ts). Do not
+hardcode prices elsewhere; import from `config`.
 
-| Key | Name | Price | Mode |
-|-----|------|-------|------|
-| `data` | Data | €29 | one-shot |
-| `starter` | Starter | €79 | one-shot |
-| `pro` | Pro | €59/mo | subscription |
-| `agency` | Agency | €599/mo | subscription |
-| `agencyExtraAudit` | Extra Audit | €50 | one-shot (agency) |
+**SYB v2 — recurring monitoring plans (`config.monitoring`, the direction):**
 
-> Older planning docs in `_bmad-output/` mention €100/€200/€500 — those are
-> **outdated**; `config.ts` wins.
+| Key | Name | Price | Projects | LLMs | Frequency |
+|-----|------|-------|----------|------|-----------|
+| `solo` | Solo | €29/mo | 2 | 3 | weekly |
+| `pro` | Pro | €79/mo | 10 | 4 | daily |
+| `agency` | Agence | €149/mo | ∞ | 4 | daily + branded PDF |
+
+Cost model + margins: [`WebSite/PRICING_ANALYSIS.md`](WebSite/PRICING_ANALYSIS.md).
+
+**Legacy audit tiers (`config.stripe.*`, kept until billing is migrated):**
+Data €29 / Starter €79 (one-shot), Pro €59/mo, Agency €599/mo, Extra €50. The
+Stripe webhook still maps these; monitoring checkout/webhook wiring for the new
+prices (and a `solo` tier) is a documented follow-up in `PRICING_ANALYSIS.md`.
 
 ## Environment variables
 
 - `WebSite/.env.local` — see [`WebSite/.env.example`](WebSite/.env.example).
 - `server/.env` — see [`server/.env.example`](server/.env.example) and `server/README.md`.
 
-Both the web app and the processing service must point at the **same MongoDB** and
-share the same `PROCESSING_SERVICE_API_KEY`.
+SYB v2 needs only `WebSite/.env.local`. `server/.env` and
+`PROCESSING_SERVICE_API_KEY` are **legacy** (old audit pipeline) and not used by
+the monitoring product.
 
 ## Guidelines
 
