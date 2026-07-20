@@ -299,6 +299,92 @@ export async function sendChecklistSummaryEmail(params: {
 }
 
 /**
+ * Send a passwordless magic-link sign-in email (NextAuth EmailProvider).
+ */
+export async function sendMagicLinkEmail(
+  email: string,
+  url: string,
+  language: "en" | "fr" = "fr",
+): Promise<EmailResult> {
+  const subject =
+    language === "fr"
+      ? "Votre lien de connexion ShowYourBrand"
+      : "Your ShowYourBrand sign-in link";
+
+  const heading = language === "fr" ? "Connexion à ShowYourBrand" : "Sign in to ShowYourBrand";
+  const body =
+    language === "fr"
+      ? "Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien expire dans 15 minutes."
+      : "Click the button below to sign in. This link expires in 15 minutes.";
+  const cta = language === "fr" ? "Se connecter" : "Sign in";
+  const ignore =
+    language === "fr"
+      ? "Si vous n'avez pas demandé ce lien, ignorez cet email."
+      : "If you didn't request this link, you can safely ignore this email.";
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+      <h1 style="color:#1E293B; font-size:20px;">${heading}</h1>
+      <p style="color:#334155;">${body}</p>
+      <p style="margin:24px 0;">
+        <a href="${url}" style="background:#7c3aed; color:#fff; padding:12px 22px; border-radius:8px; text-decoration:none; font-weight:600;">${cta}</a>
+      </p>
+      <p style="color:#94a3b8; font-size:13px;">${ignore}</p>
+    </div>`;
+
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
+ * Notify a user that their GEO visibility moved significantly on one or more
+ * engines during the latest monitoring run (SYB v2 weekly/daily alert).
+ */
+export async function sendMonitoringAlertEmail(params: {
+  email: string;
+  userName: string;
+  brandName: string;
+  projectUrl: string;
+  globalScore: number;
+  changes: { engine: string; delta: number }[];
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, userName, brandName, projectUrl, globalScore, changes, language = "fr" } = params;
+
+  const rows = changes
+    .map((c) => {
+      const up = c.delta >= 0;
+      const color = up ? "#16a34a" : "#dc2626";
+      const sign = up ? "+" : "";
+      return `<li style="margin:4px 0;"><strong>${c.engine}</strong> : <span style="color:${color};">${sign}${c.delta} pts</span></li>`;
+    })
+    .join("");
+
+  const subject =
+    language === "fr"
+      ? `Alerte visibilité — ${brandName} (score ${globalScore}/100)`
+      : `Visibility alert — ${brandName} (score ${globalScore}/100)`;
+
+  const intro =
+    language === "fr"
+      ? `Bonjour ${userName}, la visibilité de <strong>${brandName}</strong> dans les IA a bougé cette période :`
+      : `Hello ${userName}, the AI visibility of <strong>${brandName}</strong> changed this period:`;
+
+  const cta = language === "fr" ? "Voir le tableau de bord" : "View the dashboard";
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+      <h1 style="color:#1E293B; font-size:20px;">${subject}</h1>
+      <p style="color:#334155;">${intro}</p>
+      <ul style="color:#334155; padding-left:18px;">${rows}</ul>
+      <p style="margin-top:24px;">
+        <a href="${projectUrl}" style="background:#7c3aed; color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none;">${cta}</a>
+      </p>
+    </div>`;
+
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
  * Send account deletion confirmation email.
  * Called when user requests account deletion.
  */
