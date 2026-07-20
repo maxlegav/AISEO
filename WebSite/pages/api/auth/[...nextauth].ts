@@ -1,10 +1,25 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import EmailProvider from "next-auth/providers/email";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/libs/mongo";
 import User from "@/models/User";
 import mongoose from "mongoose";
+import { sendMagicLinkEmail } from "@/lib/email";
+
+// Passwordless magic-link sign-in is enabled only when email is configured.
+const emailProviders = process.env.RESEND_API_KEY
+  ? [
+      EmailProvider({
+        from: process.env.RESEND_FROM_EMAIL || "noreply@showyourbrand.app",
+        maxAge: 15 * 60, // magic links valid 15 min
+        async sendVerificationRequest({ identifier, url }) {
+          await sendMagicLinkEmail(identifier, url);
+        },
+      }),
+    ]
+  : [];
 
 // Ensure MongoDB is connected
 const connectDB = async () => {
@@ -77,6 +92,7 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+    ...emailProviders,
   ],
   session: {
     strategy: "jwt",
