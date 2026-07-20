@@ -4,18 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ShowYourBrand** is a GEO (Generative Engine Optimization) audit platform that helps businesses become visible in AI search engines (ChatGPT, Claude, Perplexity, Gemini).
+**ShowYourBrand (SYB v2)** is a **continuous GEO monitoring tool** (French clone
+of Promptmonitor / Temso). Users configure brands, competitors and prompts; the
+app queries ChatGPT / Claude / Perplexity / Gemini on a schedule (weekly/daily),
+stores results, computes a **per-LLM visibility score** and tracks it over time.
 
-**Core Value Proposition:** Test visibility across 100 AI prompts, calculate GEO Health Score (0-100%), and provide actionable recommendations to improve AI citations.
+**Core value:** recurring visibility monitoring + per-engine breakdown
+("strong on Perplexity, absent on Claude — here's why"), competitor tracking,
+cited sources, per-LLM recommendations, and email alerts on score swings.
 
-**Target Market:** B2B (Agencies) selling GEO audits to their business clients.
+**Target users:** SaaS marketing teams, freelance SEO consultants, agencies
+(10–20 clients).
+
+> ⚠️ **Pivot from the one-shot audit.** The legacy audit product (`Business`/
+> `Audit` models, `server/` Python service, human review, `/share/:token`) is
+> still in the code temporarily but is no longer the direction. SYB v2 lives in
+> `lib/monitoring/*`, `models/Project|LLMResult|WeeklyScore|MonitoredSource`,
+> `pages/app/*`, `pages/api/projects/*` and `pages/api/cron/run-monitoring`.
+> **No Python server is required** — the monitoring pipeline is pure Next.js
+> (HTTP calls to the LLM APIs, run by Vercel Cron). Without LLM keys, adapters
+> fall back to deterministic mocks.
 
 ## Repository Structure
 
 This is a Next.js monorepo with two services:
 
-- **`WebSite/`**: Next.js 16 application (this directory)
-- **`server/`**: Python FastAPI processing service (Selenium + AI SDKs) — **already built**, deployed on Infomaniak Kubernetes (see `../server/TAKEOVER.md` and `../server/KUBE_SETUP.md`)
+- **`WebSite/`**: Next.js 16 application (this directory) — the whole SYB v2 product
+- **`server/`**: **LEGACY** Python FastAPI audit service (Selenium + AI SDKs). **Not required by SYB v2** and slated for removal; do not deploy it for monitoring.
 
 All development work happens in the `WebSite/` directory.
 
@@ -41,7 +56,7 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + test + build on every pu
 **UI:** Tailwind CSS + Shadcn/ui (copy-paste components)
 **Database:** MongoDB 5.9.2+ with Mongoose 7.4.4+
 **Auth:** NextAuth 4.24.11+ (JWT strategy, 30-day sessions, Google OAuth + Credentials)
-**Payments:** Stripe 13.2.0+ (4-tier: Data €29 one-shot, Starter €79 one-shot, Pro €59/mo, Agency €599/mo + Agency Extra Audit €50 one-shot)
+**Payments:** Stripe 13.2.0+ — SYB v2 monitoring plans in `config.monitoring` (Solo €29/mo, Pro €79/mo, Agence €149/mo; limits in `lib/monitoring/plans.ts`); legacy audit tiers still in `config.stripe` (Data €29 / Starter €79 one-shot, Pro €59/mo, Agency €599/mo, Extra €50)
 **Email:** Resend (NOT Mailgun)
 **State:** Zustand 4.x
 **Validation:** Zod 3.x at API layer + Mongoose at DB layer
@@ -51,6 +66,27 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + test + build on every pu
 ## Architecture Patterns
 
 ### Data Models
+
+#### SYB v2 monitoring models (the current product)
+
+- **`Project`** (`models/Project.ts`) — a monitored brand: `userId`, `brandName`,
+  `websiteUrl`, `category?`, `competitors[]`, `prompts[]`, `llms[]`
+  (`chatgpt|claude|perplexity|gemini`), `frequency` (`weekly|daily`), `active`,
+  `lastRunAt?`, `nextRunAt?`. All queries scope by `userId`.
+- **`LLMResult`** — one engine's answer to one prompt: `projectId`, `llm`,
+  `prompt`, `responseText`, `brandMentioned`, `brandPosition`, `sourcesCited[]`,
+  `mock` (true when key-free), `week`, `capturedAt`.
+- **`WeeklyScore`** — `projectId`, `scope` (an LLM id or `global`), `week`,
+  `presenceRate`, `avgPosition`, `deltaVsLastWeek`.
+- **`MonitoredSource`** — `projectId`, `llm`, `url`, `domain`, `citesBrand`,
+  `citations`, `firstSeenAt`.
+
+Engine logic (pure, unit-tested) is in `lib/monitoring/*`: `plans.ts` (plan
+limits), `limits.ts`, brand detection, scoring, source extraction, and
+`adapters/` (one HTTP client per LLM, mock fallback). Plan gating lives in
+`pages/api/projects/index.ts`; white-label branding in `pages/api/branding`.
+
+#### Legacy audit models (temporary, being retired)
 
 **User Model:**
 
