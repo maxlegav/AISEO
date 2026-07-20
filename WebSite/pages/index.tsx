@@ -709,9 +709,13 @@ export default function Home() {
           className="px-4 py-16 md:py-20 lg:min-h-screen bg-white/50 backdrop-blur-sm lg:flex lg:flex-col lg:items-center lg:justify-center"
         >
           <div className="container mx-auto max-w-6xl">
-            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start mb-12">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-12">
               <div>
-                <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-gray-900 mb-5">
+                <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-xs font-semibold text-violet-700 mb-5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  The new front page of the internet
+                </span>
+                <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-gray-900 mb-5 leading-[1.1]">
                   When buyers ask AI, you&apos;re the answer — or you&apos;re invisible.
                 </h2>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
@@ -724,20 +728,68 @@ export default function Home() {
                   clearest path to get your brand cited, engine by engine.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { value: "3×", label: "higher conversion rate", sub: "AI-referred vs. organic search" },
-                  { value: "58%", label: "of product searches", sub: "now start on an AI, not Google" },
-                  { value: "87%", label: "of brands cited zero times", sub: "across 100 AI prompts in their category" },
-                  { value: "1 mention", label: "in an AI answer", sub: "can outperform thousands of SEO clicks" },
-                ].map((stat) => (
-                  <div key={stat.value} className="bg-white rounded-2xl p-5 shadow-premium border border-white/60">
-                    <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                    <div className="text-xs font-semibold text-gray-700 mb-1">{stat.label}</div>
-                    <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+
+              {/* AI answer mockup — shows "the answer" vs "invisible" */}
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-br from-violet-200/50 via-fuchsia-200/30 to-transparent rounded-[2.5rem] blur-2xl" />
+                <div className="relative bg-white rounded-3xl border border-white/60 shadow-premium-lg p-5 md:p-7">
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                      <Sparkles className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <span className="text-xs md:text-sm font-medium text-gray-400">Asked to ChatGPT · Perplexity · Gemini</span>
                   </div>
-                ))}
+
+                  {/* user prompt */}
+                  <div className="flex justify-end mb-5">
+                    <div className="max-w-[85%] rounded-2xl rounded-tr-md bg-gray-100 px-4 py-2.5 text-sm text-gray-700">
+                      &ldquo;What&apos;s the best <span className="font-medium text-gray-900">solution in my category</span>?&rdquo;
+                    </div>
+                  </div>
+
+                  {/* answer: cited */}
+                  <div className="rounded-2xl border border-green-200 bg-green-50/70 p-4 mb-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-[11px] font-bold text-green-700 uppercase tracking-wider">With ShowYourBrand — you&apos;re the answer</span>
+                    </div>
+                    <p className="text-sm text-gray-700 leading-relaxed pl-7">
+                      &ldquo;I&apos;d go with <span className="font-semibold text-gray-900">your brand</span>{" "}— it&apos;s the one most often recommended for this.&rdquo;
+                    </p>
+                  </div>
+
+                  {/* answer: invisible */}
+                  <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                        <span className="block w-2 h-[2px] bg-white rounded-full" />
+                      </div>
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Without it — you&apos;re invisible</span>
+                    </div>
+                    <p className="text-sm text-gray-500 leading-relaxed pl-7">
+                      &ldquo;I&apos;d recommend <span className="font-medium text-gray-600">Competitor A</span> or <span className="font-medium text-gray-600">Competitor B</span>.&rdquo;
+                    </p>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            {/* Stats strip */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
+              {[
+                { value: "3×", label: "higher conversion rate", sub: "AI-referred vs. organic search" },
+                { value: "58%", label: "of product searches", sub: "now start on an AI, not Google" },
+                { value: "87%", label: "of brands cited zero times", sub: "across 100 AI prompts in their category" },
+                { value: "1 mention", label: "in an AI answer", sub: "can outperform thousands of SEO clicks" },
+              ].map((stat) => (
+                <div key={stat.value} className="bg-white rounded-2xl p-5 md:p-6 shadow-premium border border-white/60">
+                  <div className="text-3xl md:text-4xl font-bold text-gradient-premium mb-1.5">{stat.value}</div>
+                  <div className="text-sm font-semibold text-gray-800 mb-0.5">{stat.label}</div>
+                  <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                </div>
+              ))}
             </div>
 
             {/* Case study */}
