@@ -37,6 +37,16 @@ export interface UserDocument extends mongoose.Document {
   onboardingSeoExperience?: 'beginner' | 'intermediate' | 'expert';
   onboardingReferral?: string;
 
+  // Agency white-label branding (SYB v2). Applied to client-facing reports on
+  // the Agence plan. Persisted for any plan, but only *active* on Agence.
+  branding?: {
+    agencyName?: string;
+    logoUrl?: string;
+    primaryColor?: string;
+    customDomain?: string;
+    brandedPdfEnabled?: boolean;
+  };
+
   // Account Deletion (soft delete for GDPR)
   deletedAt?: Date;
   deletionRequestedAt?: Date;
@@ -110,6 +120,15 @@ const UserSchema = new Schema<UserDocument>(
       enum: ['beginner', 'intermediate', 'expert'],
     },
     onboardingReferral: { type: String },
+
+    // Agency white-label branding (SYB v2)
+    branding: {
+      agencyName: { type: String, trim: true, maxlength: 80 },
+      logoUrl: { type: String, trim: true, maxlength: 500 },
+      primaryColor: { type: String, trim: true, maxlength: 9 },
+      customDomain: { type: String, trim: true, maxlength: 200 },
+      brandedPdfEnabled: { type: Boolean, default: false },
+    },
 
     // Account Deletion (soft delete for GDPR)
     deletedAt: { type: Date, default: null },

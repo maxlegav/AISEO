@@ -1,9 +1,10 @@
 import Head from "next/head";
 import type { GetServerSideProps } from "next";
 import { useState } from "react";
-import { ImagePlus, Lock, Globe, FileText } from "lucide-react";
+import { ImagePlus, Lock, Globe, FileText, Loader2, Check } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getUserBranding } from "@/lib/monitoring/branding";
 import { cn } from "@/lib/utils";
 
 const PRESET_COLORS = [
@@ -16,11 +17,58 @@ const PRESET_COLORS = [
   "#0f172a",
 ];
 
-export default function BrandingSettings() {
-  const [agencyName, setAgencyName] = useState("Mon Agence");
-  const [color, setColor] = useState("#7c3aed");
-  const [domain, setDomain] = useState("");
-  const [pdf, setPdf] = useState(true);
+interface BrandingSettingsProps {
+  initial: {
+    agencyName: string;
+    logoUrl: string;
+    primaryColor: string;
+    customDomain: string;
+    brandedPdfEnabled: boolean;
+  };
+  whiteLabelActive: boolean;
+}
+
+export default function BrandingSettings({
+  initial,
+  whiteLabelActive,
+}: BrandingSettingsProps) {
+  const [agencyName, setAgencyName] = useState(initial.agencyName);
+  const [logoUrl, setLogoUrl] = useState(initial.logoUrl);
+  const [color, setColor] = useState(initial.primaryColor || "#7c3aed");
+  const [domain, setDomain] = useState(initial.customDomain);
+  const [pdf, setPdf] = useState(initial.brandedPdfEnabled);
+
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    setSaving(true);
+    setSaved(false);
+    setError(null);
+    try {
+      const res = await fetch("/api/branding", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agencyName: agencyName.trim(),
+          logoUrl: logoUrl.trim(),
+          primaryColor: color,
+          customDomain: domain.trim(),
+          brandedPdfEnabled: pdf,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Échec de l'enregistrement.");
+      }
+      setSaved(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erreur inattendue.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <>
@@ -33,10 +81,18 @@ export default function BrandingSettings() {
         title="Branding & équipe"
         subtitle="Personnalisez les rapports remis à vos clients (option agences)."
       >
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
-          <Lock className="h-3.5 w-3.5" />
-          Maquette — le white-label sera activé sur le plan Agence
-        </div>
+        {whiteLabelActive ? (
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+            <Check className="h-3.5 w-3.5" />
+            White-label actif sur votre plan Agence
+          </div>
+        ) : (
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+            <Lock className="h-3.5 w-3.5" />
+            Le white-label sera actif sur le plan Agence — vos réglages sont
+            enregistrés dès maintenant.
+          </div>
+        )}
 
         <div className="grid gap-5 lg:grid-cols-2">
           {/* Logo + identity */}
@@ -49,16 +105,32 @@ export default function BrandingSettings() {
               clients.
             </p>
 
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Logo
+            <label
+              htmlFor="logo"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
+            >
+              Logo (URL)
             </label>
             <div className="mb-5 flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-gray-300">
-                <ImagePlus className="h-6 w-6" />
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-gray-300">
+                {logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={logoUrl}
+                    alt="Logo agence"
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <ImagePlus className="h-6 w-6" />
+                )}
               </div>
-              <button className="rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                Importer un logo
-              </button>
+              <input
+                id="logo"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://…/logo.png"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+              />
             </div>
 
             <label
@@ -71,6 +143,7 @@ export default function BrandingSettings() {
               id="agency"
               value={agencyName}
               onChange={(e) => setAgencyName(e.target.value)}
+              placeholder="Mon Agence"
               className="mb-5 w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
             />
 
@@ -81,6 +154,7 @@ export default function BrandingSettings() {
               {PRESET_COLORS.map((c) => (
                 <button
                   key={c}
+                  type="button"
                   onClick={() => setColor(c)}
                   className={cn(
                     "h-8 w-8 rounded-full ring-offset-2 transition-transform hover:scale-110",
@@ -105,7 +179,7 @@ export default function BrandingSettings() {
                   style={{ backgroundColor: color }}
                 >
                   <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/25 text-xs font-bold">
-                    {agencyName.charAt(0) || "A"}
+                    {(agencyName || "A").charAt(0)}
                   </div>
                   <span className="text-sm font-semibold">
                     {agencyName || "Mon Agence"}
@@ -144,11 +218,13 @@ export default function BrandingSettings() {
                   Export PDF brandé
                 </span>
                 <button
+                  type="button"
                   onClick={() => setPdf((v) => !v)}
                   className={cn(
                     "relative h-6 w-11 rounded-full transition-colors",
                     pdf ? "bg-violet-600" : "bg-gray-200"
                   )}
+                  aria-pressed={pdf}
                 >
                   <span
                     className={cn(
@@ -160,11 +236,29 @@ export default function BrandingSettings() {
               </div>
             </div>
 
+            {error && (
+              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+
             <button
-              disabled
-              className="w-full cursor-not-allowed rounded-xl bg-gray-900/90 px-4 py-3 text-sm font-semibold text-white opacity-60"
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Enregistrer (bientôt disponible)
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Enregistrement…
+                </>
+              ) : saved ? (
+                <>
+                  <Check className="h-4 w-4" /> Enregistré
+                </>
+              ) : (
+                "Enregistrer"
+              )}
             </button>
           </section>
         </div>
@@ -173,8 +267,11 @@ export default function BrandingSettings() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<
+  BrandingSettingsProps
+> = async (ctx) => {
   const userId = await getSessionUserId(ctx);
   if (!userId) return loginRedirect("/app/settings");
-  return { props: {} };
+  const { branding, whiteLabelActive } = await getUserBranding(userId);
+  return { props: { initial: branding, whiteLabelActive } };
 };
