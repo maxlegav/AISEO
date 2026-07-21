@@ -660,17 +660,24 @@ export default function SignupPage() {
                 <p className="text-gray-600">
                   Sign up to start your AI visibility audit
                 </p>
-                {selectedPlan && (
-                  <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
-                    <p className="text-sm font-medium text-purple-700">
-                      You&apos;re signing up for the{" "}
-                      <span className="font-bold capitalize">{selectedPlan}</span> plan
-                      {selectedPlan === "basic" && " - €100"}
-                      {selectedPlan === "pro" && " - €200"}
-                      {selectedPlan === "premium" && " - €500/month"}
-                    </p>
-                  </div>
-                )}
+                {selectedPlan &&
+                  (() => {
+                    const plan =
+                      config.monitoring[
+                        selectedPlan as keyof typeof config.monitoring
+                      ];
+                    if (!plan || typeof plan !== "object" || !("price" in plan))
+                      return null;
+                    return (
+                      <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
+                        <p className="text-sm font-medium text-purple-700">
+                          Plan{" "}
+                          <span className="font-bold">{plan.name}</span> — €
+                          {plan.price}/mois
+                        </p>
+                      </div>
+                    );
+                  })()}
               </div>
 
               {/* Google Sign-up */}

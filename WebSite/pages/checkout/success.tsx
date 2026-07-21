@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { CheckCircle, Loader2, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function CheckoutSuccessPage() {
@@ -11,20 +11,23 @@ export default function CheckoutSuccessPage() {
   const [countdown, setCountdown] = useState(5);
   const { session_id: _sessionId } = router.query;
 
+  // The Stripe webhook provisions the subscription server-side. We refresh the
+  // client session once so the new active tier is reflected, but we never gate
+  // the redirect on it: /app is protected server-side, and the next-auth client
+  // session can stay in a "loading" state on some setups. Keeping update() out
+  // of the effect deps avoids re-arming the countdown on every session refresh.
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-      return;
-    }
-
-    // The Stripe webhook provisions the subscription server-side; refresh the
-    // client session so the new active tier is reflected before we hand the
-    // user over to the monitoring app.
     if (status === 'authenticated') {
       update();
     }
+  }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Countdown timer → monitoring app (SYB v2 product), not the legacy dashboard.
+  // Countdown → monitoring app (SYB v2 product), not the legacy dashboard.
+  // Runs exactly once on mount (empty deps) so it is immune to re-renders from
+  // the next-auth client session refresh — otherwise the interval would be torn
+  // down and re-armed on every refresh and the countdown would never elapse,
+  // leaving a paying user stuck on this page.
+  useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -37,15 +40,8 @@ export default function CheckoutSuccessPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router, status, update]);
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-      </div>
-    );
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
