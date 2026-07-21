@@ -241,9 +241,9 @@ export default function SignupPage() {
       return;
     }
 
-    // Authenticated user with no special flow - go to dashboard
+    // Authenticated user with no special flow - go to the monitoring workspace
     setInitialRouted(true);
-    router.push("/dashboard");
+    router.push("/app");
   }, [status, session, router, selectedPlan, initialRouted, sendOnboardingData]);
 
   const canProceed = () => {

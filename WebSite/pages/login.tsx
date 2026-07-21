@@ -43,7 +43,7 @@ export default function LoginPage() {
     if (status === "authenticated") {
       // Small delay so user can see the page and use the "switch account" link if needed
       const timer = setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/app");
       }, 100);
       return () => clearTimeout(timer);
     }
@@ -91,7 +91,7 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/app",
       });
 
       if (res?.error) {
@@ -100,7 +100,7 @@ export default function LoginPage() {
           setAuthError(errorMessage);
         }
       } else if (res?.ok) {
-        router.push("/dashboard");
+        router.push("/app");
       } else {
         setAuthError("An unexpected error occurred. Please try again.");
       }
@@ -171,7 +171,7 @@ export default function LoginPage() {
             </p>
             <div className="flex gap-3 mt-2">
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/app")}
                 className="text-sm font-medium text-blue-700 underline hover:text-blue-900"
               >
                 Go to dashboard

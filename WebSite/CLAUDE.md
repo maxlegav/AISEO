@@ -16,23 +16,27 @@ cited sources, per-LLM recommendations, and email alerts on score swings.
 **Target users:** SaaS marketing teams, freelance SEO consultants, agencies
 (10–20 clients).
 
-> ⚠️ **Pivot from the one-shot audit.** The legacy audit product (`Business`/
-> `Audit` models, `server/` Python service, human review, `/share/:token`) is
-> still in the code temporarily but is no longer the direction. SYB v2 lives in
-> `lib/monitoring/*`, `models/Project|LLMResult|WeeklyScore|MonitoredSource`,
-> `pages/app/*`, `pages/api/projects/*` and `pages/api/cron/run-monitoring`.
+> ✅ **Pivot from the one-shot audit complete.** The legacy audit product
+> (`Business`/`Audit` models, `server/` Python service, human-review admin UI,
+> `/share/:token`, the `/{username}` audit dashboard, `/api/audits|businesses|`
+> `admin|share`) has been **removed**. SYB v2 lives in `lib/monitoring/*`,
+> `models/Project|LLMResult|WeeklyScore|MonitoredSource`, `pages/app/*`,
+> `pages/api/projects/*` and `pages/api/cron/run-monitoring`.
 > **No Python server is required** — the monitoring pipeline is pure Next.js
 > (HTTP calls to the LLM APIs, run by Vercel Cron). Without LLM keys, adapters
-> fall back to deterministic mocks.
+> fall back to deterministic mocks. The only audit leftovers are billing shims:
+> the `config.stripe` tier mapping (`lib/stripe-tiers.ts`) and the `auditCredits`
+> / `data`/`starter` fields on `User`, kept so existing subscriptions resolve.
+>
+> The detailed "legacy audit" sections further down (Business/Audit models,
+> audit lifecycle, admin review, shareable reports, the 8-feature MVP list) are
+> **historical** — that code no longer exists in the repo.
 
 ## Repository Structure
 
-This is a Next.js monorepo with two services:
-
-- **`WebSite/`**: Next.js 16 application (this directory) — the whole SYB v2 product
-- **`server/`**: **LEGACY** Python FastAPI audit service (Selenium + AI SDKs). **Not required by SYB v2** and slated for removal; do not deploy it for monitoring.
-
-All development work happens in the `WebSite/` directory.
+`WebSite/` is a single Next.js 16 application — the whole SYB v2 product. The
+former `server/` Python FastAPI audit service has been removed. All development
+work happens in the `WebSite/` directory.
 
 ## Common Commands
 
@@ -61,7 +65,7 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + test + build on every pu
 **State:** Zustand 4.x
 **Validation:** Zod 3.x at API layer + Mongoose at DB layer
 **i18n:** React i18next (English + French)
-**Deployment:** Vercel (Next.js) + Infomaniak Kubernetes (Python processing service)
+**Deployment:** Vercel (Next.js only — no Python service)
 
 ## Architecture Patterns
 
@@ -352,11 +356,10 @@ OPENAI_API_KEY=sk-proj-...
 ANTHROPIC_API_KEY=sk-ant-...
 PERPLEXITY_API_KEY=pplx-...
 GEMINI_API_KEY=...
-
-# Processing Service (Python FastAPI — see ../server/TAKEOVER.md)
-PROCESSING_SERVICE_API_KEY=<shared secret>   # must match server/.env
-PROCESSING_SERVICE_URL=http://localhost:8080  # prod: http://83.228.202.11
 ```
+
+> Note: `PROCESSING_SERVICE_*` variables are obsolete (the Python audit service
+> was removed) and no longer read by the app.
 
 ## Development Guidelines
 
