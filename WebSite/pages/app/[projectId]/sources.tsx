@@ -8,7 +8,7 @@ import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
 import DemoBanner from "@/components/monitoring/DemoBanner";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import { LLMId, LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
-import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 import { cn } from "@/lib/utils";
 
@@ -132,9 +132,12 @@ export default function SourcesView({ project, demo }: SourcesProps) {
 export const getServerSideProps: GetServerSideProps<SourcesProps> = async (
   ctx,
 ) => {
-  const userId = await getSessionUserId(ctx);
-  if (!userId) return loginRedirect("/app");
+  const session = await getSessionWorkspace(ctx);
+  if (!session) return loginRedirect("/app");
   const projectId = ctx.params?.projectId as string;
-  const { project, demo } = await getProjectDashboard(userId, projectId);
+  const { project, demo } = await getProjectDashboard(
+    session.workspace.organizationId,
+    projectId,
+  );
   return { props: { project, demo } };
 };

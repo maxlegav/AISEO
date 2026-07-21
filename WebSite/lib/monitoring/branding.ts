@@ -80,9 +80,13 @@ const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URI!);
 };
 
-export async function getUserBranding(userId: string): Promise<BrandingResult> {
+/**
+ * Load white-label branding for an organization, read from its owner user.
+ * (SYB v2 multi-tenant: pass the organization owner id.)
+ */
+export async function getUserBranding(ownerId: string): Promise<BrandingResult> {
   await connectDB();
-  const user = await User.findById(userId)
+  const user = await User.findById(ownerId)
     .select("subscriptionTier branding")
     .lean<{
       subscriptionTier?: SubscriptionTier;

@@ -113,6 +113,9 @@ export interface Project {
   isReal?: boolean;
   /** True for a real project that has no run yet (show onboarding state). */
   pendingFirstRun?: boolean;
+  /** Client this project is grouped under (SYB v2 multi-tenant), if any. */
+  clientId?: string | null;
+  clientName?: string | null;
 }
 
 /** Deterministic 12-week series builder around a target end value per LLM. */

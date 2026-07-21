@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
 import mongoose from "mongoose";
 import Project from "@/models/Project";
-import User from "@/models/User";
+import Client from "@/models/Client";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { handleZodError } from "@/lib/validation/helpers";
 import { CreateProjectSchema } from "@/lib/validation/project";
 import { getProjectLimit, getMaxLLMs, isFrequencyAllowed } from "@/lib/monitoring/limits";
 import type { SubscriptionTier } from "@/lib/subscription-limits";
+import { requireWorkspace } from "@/lib/api-workspace";
+import { getWorkspacePlan } from "@/lib/monitoring/workspace";
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -17,14 +17,16 @@ const connectDB = async () => {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id) {
-      throw new ApiError(ErrorType.AUTHENTICATION, "You must be logged in");
-    }
+    const { userId, workspace } = await requireWorkspace(req, res);
     await connectDB();
+    const organizationId = workspace.organizationId;
 
     if (req.method === "GET") {
-      const projects = await Project.find({ userId: session.user.id }).sort({ createdAt: -1 });
+      const query: Record<string, unknown> = { organizationId };
+      if (typeof req.query.clientId === "string" && req.query.clientId) {
+        query.clientId = req.query.clientId;
+      }
+      const projects = await Project.find(query).sort({ createdAt: -1 });
       return res.status(200).json({ success: true, data: projects });
     }
 
@@ -32,10 +34,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const parsed = CreateProjectSchema.safeParse(req.body);
       if (!parsed.success) return handleZodError(parsed.error, res);
 
-      const user = await User.findById(session.user.id);
-      const tier = ((user!.subscriptionTier as SubscriptionTier) || "none");
+      const { tier } = await getWorkspacePlan(workspace.ownerId);
 
-      const maxLLMs = getMaxLLMs(tier);
+      // Optional client must belong to this organization.
+      let clientId: string | null = null;
+      if (typeof req.body.clientId === "string" && req.body.clientId) {
+        const client = await Client.findOne({
+          _id: req.body.clientId,
+          organizationId,
+        });
+        if (!client) {
+          throw new ApiError(ErrorType.NOT_FOUND, "Client introuvable pour cette organisation.");
+        }
+        clientId = client._id.toString();
+      }
+
+      const maxLLMs = getMaxLLMs(tier as SubscriptionTier);
       if (parsed.data.llms.length > maxLLMs) {
         return res.status(403).json({
           success: false,
@@ -53,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const limit = getProjectLimit(tier);
-      const count = await Project.countDocuments({ userId: session.user.id });
+      const count = await Project.countDocuments({ organizationId });
       if (count >= limit) {
         return res.status(403).json({
           success: false,
@@ -62,7 +76,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       }
 
-      const project = await Project.create({ ...parsed.data, userId: session.user.id });
+      const project = await Project.create({
+        ...parsed.data,
+        userId,
+        organizationId,
+        clientId,
+      });
       return res.status(201).json({ success: true, data: project });
     }
 

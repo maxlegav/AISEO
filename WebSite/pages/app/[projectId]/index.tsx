@@ -24,7 +24,7 @@ import {
   scoreLabel,
 } from "@/components/monitoring/widgets";
 import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
-import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 
 interface ProjectDashboardProps {
@@ -282,9 +282,12 @@ export default function ProjectDashboard({ project, demo }: ProjectDashboardProp
 export const getServerSideProps: GetServerSideProps<ProjectDashboardProps> = async (
   ctx,
 ) => {
-  const userId = await getSessionUserId(ctx);
-  if (!userId) return loginRedirect("/app");
+  const session = await getSessionWorkspace(ctx);
+  if (!session) return loginRedirect("/app");
   const projectId = ctx.params?.projectId as string;
-  const { project, demo } = await getProjectDashboard(userId, projectId);
+  const { project, demo } = await getProjectDashboard(
+    session.workspace.organizationId,
+    projectId,
+  );
   return { props: { project, demo } };
 };
