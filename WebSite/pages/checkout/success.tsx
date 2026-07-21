@@ -32,7 +32,7 @@ export default function CheckoutSuccessPage() {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          router.push('/app');
+          window.location.assign('/app');
           return 0;
         }
         return prev - 1;
@@ -75,7 +75,7 @@ export default function CheckoutSuccessPage() {
 
           {/* CTA Button */}
           <Button
-            onClick={() => router.push('/app')}
+            onClick={() => window.location.assign('/app')}
             className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-semibold rounded-xl"
           >
             Accéder à mes projets

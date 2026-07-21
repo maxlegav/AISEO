@@ -241,9 +241,11 @@ export default function SignupPage() {
       return;
     }
 
-    // Authenticated user with no special flow - go to the monitoring workspace
+    // Authenticated user with no special flow - go to the monitoring workspace.
+    // Full navigation so /app renders server-side with the current session,
+    // avoiding a stale client cache from a previous account.
     setInitialRouted(true);
-    router.push("/app");
+    window.location.assign("/app");
   }, [status, session, router, selectedPlan, initialRouted, sendOnboardingData]);
 
   const canProceed = () => {
