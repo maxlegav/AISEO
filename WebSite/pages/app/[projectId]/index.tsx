@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import type { GetServerSideProps } from "next";
 import {
   ResponsiveContainer,
@@ -10,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { Crosshair, MessageSquare, RefreshCw, Trophy } from "lucide-react";
+import { Crosshair, FileDown, MessageSquare, RefreshCw, Trophy } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
 import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
@@ -94,6 +95,15 @@ export default function ProjectDashboard({ project, demo }: ProjectDashboardProp
         title={project.brandName}
         subtitle={project.category}
         demo={demo}
+        actions={
+          <Link
+            href={`/app/${project.id}/report`}
+            className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+          >
+            <FileDown className="h-4 w-4" />
+            Exporter en PDF
+          </Link>
+        }
       >
         <DemoBanner demo={demo} />
         {/* Top: global score + stats */}
