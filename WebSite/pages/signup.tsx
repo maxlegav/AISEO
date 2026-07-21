@@ -789,55 +789,57 @@ export default function SignupPage() {
                   <CreditCard className="w-8 h-8 text-indigo-600" />
                 </div>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Choose your plan
+                  Choisissez votre plan
                 </h2>
                 <p className="text-gray-600">
-                  
+                  Monitoring GEO continu — annulable à tout moment.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
+              <div className="grid md:grid-cols-3 gap-6 items-center">
                 <PlanCard
-                  name={config.stripe.data.name}
-                  price={`\u20AC${config.stripe.data.price}`}
-                  period="one-time"
-                  features={config.stripe.data.features.map((f) => f.name)}
-                  onSelect={() =>
-                    handleSelectPlan(config.stripe.data.priceId, "payment")
-                  }
-                  isLoading={isLoading}
-                />
-                <PlanCard
-                  name={config.stripe.starter.name}
-                  price={`\u20AC${config.stripe.starter.price}`}
-                  period="one-time"
-                  features={config.stripe.starter.features.map((f) => f.name)}
-                  onSelect={() =>
-                    handleSelectPlan(config.stripe.starter.priceId, "payment")
-                  }
-                  isLoading={isLoading}
-                />
-                <PlanCard
-                  name={config.stripe.pro.name}
-                  price={`\u20AC${config.stripe.pro.price}`}
+                  name={config.monitoring.solo.name}
+                  price={`\u20AC${config.monitoring.solo.price}`}
                   period="mo"
-                  features={config.stripe.pro.features.map((f) => f.name)}
+                  features={[
+                    "2 projets suivis",
+                    "3 moteurs IA",
+                    "Monitoring hebdomadaire",
+                    "Score par LLM + historique",
+                  ]}
+                  onSelect={() =>
+                    handleSelectPlan(config.monitoring.solo.priceId, "subscription")
+                  }
+                  isLoading={isLoading}
+                />
+                <PlanCard
+                  name={config.monitoring.pro.name}
+                  price={`\u20AC${config.monitoring.pro.price}`}
+                  period="mo"
+                  features={[
+                    "10 projets suivis",
+                    "Tous les moteurs (ChatGPT, Claude, Perplexity, Gemini)",
+                    "Monitoring quotidien",
+                    "Concurrents, sources citées & alertes email",
+                  ]}
                   highlighted
-                  note="2-month minimum commitment"
                   onSelect={() =>
-                    handleSelectPlan(config.stripe.pro.priceId, "subscription")
+                    handleSelectPlan(config.monitoring.pro.priceId, "subscription")
                   }
                   isLoading={isLoading}
                 />
                 <PlanCard
-                  name={config.stripe.agency.name}
-                  price={`\u20AC${config.stripe.agency.price}`}
+                  name={config.monitoring.agency.name}
+                  price={`\u20AC${config.monitoring.agency.price}`}
                   period="mo"
-                  features={config.stripe.agency.features
-                    .slice(0, 4)
-                    .map((f) => f.name)}
+                  features={[
+                    "Projets illimités",
+                    "Tous les moteurs, monitoring quotidien",
+                    "Rapport PDF en marque blanche",
+                    "Idéal agences (10–20 clients)",
+                  ]}
                   onSelect={() =>
-                    handleSelectPlan(config.stripe.agency.priceId, "subscription")
+                    handleSelectPlan(config.monitoring.agency.priceId, "subscription")
                   }
                   isLoading={isLoading}
                 />

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 export default function CheckoutSuccessPage() {
   const router = useRouter();
-  const { status } = useSession();
+  const { status, update } = useSession();
   const [countdown, setCountdown] = useState(5);
   const { session_id: _sessionId } = router.query;
 
@@ -17,12 +17,19 @@ export default function CheckoutSuccessPage() {
       return;
     }
 
-    // Countdown timer
+    // The Stripe webhook provisions the subscription server-side; refresh the
+    // client session so the new active tier is reflected before we hand the
+    // user over to the monitoring app.
+    if (status === 'authenticated') {
+      update();
+    }
+
+    // Countdown timer → monitoring app (SYB v2 product), not the legacy dashboard.
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          router.push('/dashboard');
+          router.push('/app');
           return 0;
         }
         return prev - 1;
@@ -30,7 +37,7 @@ export default function CheckoutSuccessPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router, status]);
+  }, [router, status, update]);
 
   if (status === 'loading') {
     return (
@@ -67,15 +74,15 @@ export default function CheckoutSuccessPage() {
 
           {/* Countdown */}
           <p className="text-sm text-gray-500 mb-6">
-            Redirecting to dashboard in <span className="font-semibold text-purple-600">{countdown}</span> seconds...
+            Redirection vers votre espace dans <span className="font-semibold text-purple-600">{countdown}</span> secondes...
           </p>
 
           {/* CTA Button */}
           <Button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/app')}
             className="w-full h-12 bg-[#1E293B] hover:bg-[#334155] text-white font-semibold rounded-xl"
           >
-            Go to Dashboard
+            Accéder à mes projets
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
 
