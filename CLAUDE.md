@@ -16,12 +16,19 @@ over time (competitors, cited sources, per-engine recommendations, email
 alerts). Target users: SaaS marketing teams, freelance SEO consultants, and
 agencies monitoring 10–20 clients.
 
-> ⚠️ **Product pivot.** SYB used to be a **one-shot audit** platform. That legacy
-> audit product (`Business`/`Audit` models, `server/` Python service, human
-> review, `/share/:token` report, `config.stripe.*` audit tiers) is still in the
-> code **temporarily** but is no longer the direction. New work targets the
-> monitoring product in `WebSite/lib/monitoring/*`, `models/Project|LLMResult|`
-> `WeeklyScore|MonitoredSource`, `pages/app/*` and `pages/api/projects/*`.
+> ✅ **Product pivot complete.** SYB used to be a **one-shot audit** platform.
+> That legacy audit product has been **removed**: the `Business`/`Audit` models,
+> the `server/` Python service, the human-review admin UI, the `/share/:token`
+> report, the `/{username}` audit dashboard and all `/api/audits|businesses|`
+> `admin|share` routes are gone. The product now lives entirely in the monitoring
+> code: `WebSite/lib/monitoring/*`, `models/Project|LLMResult|WeeklyScore|`
+> `MonitoredSource`, `pages/app/*`, `pages/api/projects/*` and
+> `pages/api/cron/run-monitoring`.
+>
+> The only audit remnants intentionally kept are billing-compatibility shims:
+> the legacy Stripe tier mapping in `config.stripe.*` / `lib/stripe-tiers.ts`
+> (so existing subscriptions keep resolving) and the `auditCredits` /
+> `data`/`starter` values on the `User` model. These carry no UI or pipeline.
 
 > ⚠️ Historical note: this repo was bootstrapped from an old invoice-management
 > SaaS ("LoopBill/AutoInvoice"). All of that has been removed — **there are no
@@ -32,9 +39,7 @@ agencies monitoring 10–20 clients.
 
 | Path | What it is | Stack | Deploy target |
 |------|-----------|-------|---------------|
-| `WebSite/` | Main app: landing, auth, **monitoring dashboard (`/app`)**, projects API + cron, payments, admin | Next.js 16 (Pages Router), TS strict, MongoDB/Mongoose, NextAuth, Stripe | Vercel |
-| `server/` | **LEGACY** — old audit pipeline (Selenium/HTML scan). **Not required by SYB v2** and slated for removal | Python 3.11, FastAPI, Selenium | do not deploy for monitoring |
-| `Admin/` | **Deprecated** standalone admin panel — merged into `WebSite/pages/admin` (see `Admin/DEPRECATED.md`) | Next.js | do not deploy |
+| `WebSite/` | Main app: landing, auth, **monitoring dashboard (`/app`)**, projects API + cron, payments | Next.js 16 (Pages Router), TS strict, MongoDB/Mongoose, NextAuth, Stripe | Vercel |
 | `_bmad-output/` | Planning artifacts (PRD, architecture, epics, UX, specs) | Markdown | — |
 | `_bmad/` | BMAD method tooling (agent workflows) | — | — |
 | `sales/` | Go-to-market assets (pitch deck, pricing, LinkedIn agent context) | Markdown | — |
@@ -61,10 +66,6 @@ Without LLM API keys, adapters return deterministic **mocks** (`mock:true`
 persisted) so the whole pipeline runs key-free (ideal for market validation).
 Manual first run for onboarding: `POST /api/projects/[id]/run`.
 
-> The **legacy audit flow** (human-in-the-loop admin review, `server/` Python,
-> `/share/:token`) still exists but is not part of SYB v2 and needs no Python
-> server for monitoring.
-
 ## Common commands
 
 ```bash
@@ -76,9 +77,6 @@ npm run build        # production build (also type-checks)
 npm run lint         # ESLint (flat config, eslint.config.mjs)
 npm run typecheck    # tsc --noEmit
 npm run test         # Vitest unit tests (see WebSite/__tests__)
-
-# Legacy audit processing service (NOT needed for SYB v2 monitoring)
-# docker compose up --build      # only for the old audit pipeline
 ```
 
 ## Tech stack (current, not the old invoice app)
@@ -87,10 +85,9 @@ npm run test         # Vitest unit tests (see WebSite/__tests__)
 - **UI:** Tailwind CSS + Shadcn/ui, Framer Motion, Recharts, Lucide.
 - **State/validation:** Zustand + Zod.
 - **DB/auth:** MongoDB (Mongoose 7) + NextAuth 4 (JWT, Google OAuth + credentials).
-- **Payments:** Stripe — monitoring plans (`config.monitoring`) + legacy audit tiers (`config.stripe`).
+- **Payments:** Stripe — monitoring plans (`config.monitoring`); a legacy tier mapping (`config.stripe`) is retained only for billing compatibility.
 - **Email:** Resend (magic-link auth + monitoring alerts).
 - **Monitoring:** LLM adapters in `WebSite/lib/monitoring/adapters` (HTTP to OpenAI/Anthropic/Perplexity/Gemini), run by Vercel Cron — no Python.
-- **Legacy audit:** Python FastAPI + Selenium in `server/` (being retired).
 
 ## Pricing — single source of truth
 
@@ -108,26 +105,21 @@ hardcode prices elsewhere; import from `config`.
 
 Cost model + margins: [`WebSite/PRICING_ANALYSIS.md`](WebSite/PRICING_ANALYSIS.md).
 
-**Legacy audit tiers (`config.stripe.*`, kept until billing is migrated):**
-Data €29 / Starter €79 (one-shot), Pro €59/mo, Agency €599/mo, Extra €50. The
-Stripe webhook still maps these; monitoring checkout/webhook wiring for the new
-prices (and a `solo` tier) is a documented follow-up in `PRICING_ANALYSIS.md`.
+**Legacy tier mapping (`config.stripe.*`, billing compatibility only):** the
+old `data`/`starter`/`pro`/`agency` price IDs still resolve in the Stripe
+webhook so pre-existing subscriptions keep working. There is no audit product
+behind them anymore — new checkouts use the monitoring plans above.
 
 ## Environment variables
 
 - `WebSite/.env.local` — see [`WebSite/.env.example`](WebSite/.env.example).
-- `server/.env` — see [`server/.env.example`](server/.env.example) and `server/README.md`.
 
-SYB v2 needs only `WebSite/.env.local`. `server/.env` and
-`PROCESSING_SERVICE_API_KEY` are **legacy** (old audit pipeline) and not used by
-the monitoring product.
+SYB v2 needs only `WebSite/.env.local`.
 
 ## Guidelines
 
 - Read files before changing them; follow existing patterns
   (`lib/security-middleware.ts`, `lib/error-handler.ts`, Zod at the API layer).
-- Audits use a **snapshot pattern** — store full state on the audit doc, don't rely
-  on `.populate()` for historical records.
-- Keep secrets server-side (`PROCESSING_SERVICE_API_KEY`, Stripe keys, AI keys).
+- Keep secrets server-side (Stripe keys, AI keys, `NEXTAUTH_SECRET`).
 - Add user-facing strings to `components/LanguageContext.tsx` (EN/FR).
 - Run `npm run lint` and `npm run typecheck` before committing.

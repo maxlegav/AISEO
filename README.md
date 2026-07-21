@@ -45,9 +45,8 @@ Sans clé API LLM, les adaptateurs renvoient des **mocks déterministes**
 (`mock: true` persisté) — le pipeline fonctionne de bout en bout sans clé, idéal
 pour la phase de validation marché.
 
-> ⚠️ Le dossier `server/` (FastAPI + Selenium) servait à l'**ancien audit HTML**.
-> Il n'est **pas** requis par SYB v2 et sera retiré une fois l'audit legacy
-> désactivé. Ne le déploie pas pour le monitoring.
+> ✅ L'ancien dossier `server/` (FastAPI + Selenium, audit HTML one-shot) a été
+> **retiré**. Le monitoring est 100 % Next.js et n'a besoin d'aucun service Python.
 
 ## Stack
 
@@ -112,19 +111,19 @@ La CI (`.github/workflows/ci.yml`) lance lint + typecheck + tests + build.
 │   ├── pages/api/      # API Routes : projects, cron/run-monitoring, branding…
 │   ├── lib/monitoring/ # Moteur (détection, scoring, plans, adaptateurs LLM)
 │   └── models/         # Project, LLMResult, WeeklyScore, MonitoredSource, User
-├── server/             # LEGACY — ancien service d'audit Python (non requis par v2)
-├── Admin/              # DÉPRÉCIÉ — fusionné dans WebSite/pages/admin
 └── _bmad-output/       # Artefacts de planning (historiques)
 ```
 
-## Legacy — ancien produit d'audit (en cours de retrait)
+## Ancien produit d'audit — retiré
 
-Le code d'audit one-shot est encore présent et fonctionnel (modèles `Business` /
-`Audit`, routes `/api/audits/*`, `/api/admin/*`, revue humaine, rapport
-`/share/:token`, tiers Stripe audit dans `config.stripe`). Il est conservé
-**temporairement** pour ne rien casser pendant la transition et sera retiré
-**sans perte de données non planifiée** (une stratégie de migration précédera
-toute suppression). SYB v2 n'en dépend pas.
+Le produit d'audit one-shot a été **entièrement supprimé** : modèles
+`Business`/`Audit`, dashboard `/{username}`, routes `/api/audits|businesses|`
+`admin|share`, revue humaine, rapport `/share/:token` et service Python
+`server/`. Seuls subsistent des vestiges de **facturation** : le mapping des
+anciens tiers Stripe (`config.stripe` / `lib/stripe-tiers.ts`) et les champs
+`auditCredits` / `data`/`starter` sur `User`, conservés pour que les
+abonnements existants continuent de se résoudre. Aucune UI ni pipeline
+d'audit ne subsiste.
 
 ## Licence
 

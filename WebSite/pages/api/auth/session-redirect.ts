@@ -50,8 +50,8 @@ export default async function handler(
       return res.redirect("/signup?oauth=1");
     }
 
-    // Existing user logging in - always go to dashboard
-    return res.redirect("/dashboard");
+    // Existing user logging in - always go to the monitoring workspace
+    return res.redirect("/app");
   } catch (error) {
     console.error("Error during session redirect:", error);
     return res.redirect("/login?error=ServerError");
