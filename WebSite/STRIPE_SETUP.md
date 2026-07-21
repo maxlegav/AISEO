@@ -3,7 +3,23 @@
 > Ce guide reflète le **modèle de prix réel** (défini dans `config.ts`). Les
 > anciennes offres (Basic €50 / Pro €150 / Premium €300) n'existent plus.
 
-## Modèle de prix actuel (source de vérité : `config.ts`)
+## Modèle de prix — SYB v2 (le produit actuel : monitoring GEO)
+
+Ce sont les 3 plans **récurrents** vendus sur la landing (`config.monitoring`).
+Le checkout (`/api/checkout`) et le webhook les reconnaissent et provisionnent
+les tiers `solo` / `pro` / `agency`.
+
+| Tier | Nom | Prix | Mode Stripe | Variable d'env (Price ID) |
+|------|-----|------|-------------|---------------------------|
+| `solo` | Solo | €29/mois | abonnement (`subscription`) | `NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_SOLO` |
+| `pro` | Pro | €79/mois | abonnement (`subscription`) | `NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_PRO` |
+| `agency` | Agence | €149/mois | abonnement (`subscription`) | `NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_AGENCY` |
+
+Les plans monitoring **n'accordent aucun crédit d'audit** (le renouvellement les
+saute explicitement). Les limites par plan (projets / moteurs / fréquence)
+vivent dans `lib/monitoring/plans.ts`.
+
+## Modèle de prix — audit legacy (conservé le temps de la migration)
 
 | Tier | Nom | Prix | Mode Stripe | Variable d'env (Price ID) |
 |------|-----|------|-------------|---------------------------|
@@ -16,7 +32,8 @@
 Le webhook **résout toujours le tier depuis le Price ID réel de la ligne de
 commande** (pas depuis les metadata), donc on ne peut pas être piégé par un tier
 falsifié — mais les Price IDs de `.env.local` doivent correspondre exactement à
-ceux du dashboard Stripe.
+ceux du dashboard Stripe. Les prix monitoring sont prioritaires sur les prix
+audit lors de la résolution du tier (voir `lib/stripe-tiers.ts`).
 
 ## 1. Clés API
 
@@ -24,11 +41,42 @@ ceux du dashboard Stripe.
 2. **Developers → API keys** : copie la clé publique (`pk_test_…`) et la clé
    secrète (`sk_test_…`).
 
-## 2. Créer les 5 prix
+## 2. Créer les prix
 
-Dans **Products → Add product**, crée les 5 produits/prix du tableau ci-dessus
-(3 one-shot en *one-time*, 2 abonnements en *recurring / monthly*). Copie chaque
-**Price ID** (`price_…`, PAS le Product ID `prod_…`).
+**Priorité SYB v2** : dans **Products → Add product**, crée les **3 produits
+récurrents** (mensuels, EUR) du premier tableau — Solo €29, Pro €79, Agence €149.
+Copie chaque **Price ID** (`price_…`, PAS le Product ID `prod_…`).
+
+Le plus simple est de laisser le script le faire (crée les 3 produits avec un
+code fiscal + prix EUR récurrent et imprime les Price IDs) :
+
+```bash
+STRIPE_SECRET_KEY=sk_test_… node scripts/setup-monitoring-products.js
+# => {"SOLO":"price_…","PRO":"price_…","AGENCY":"price_…"}
+```
+
+Les 5 prix audit legacy ne sont nécessaires que si tu continues à vendre l'ancien
+audit one-shot ; sinon tu peux ne créer que les 3 plans monitoring.
+
+### ⚠️ Comptes avec Managed Payments (défaut sur les nouveaux comptes)
+
+Les comptes Stripe créés récemment ont **Managed Payments activé par défaut**.
+Deux conséquences pour le checkout :
+
+1. **Chaque produit doit avoir un code fiscal** (`tax_code`). Sans ça,
+   `checkout.sessions.create` échoue avec *« the product tax code is missing »*.
+   Le script utilise `txcd_10103001` (SaaS - business use). Si tu crées les
+   produits à la main : Product → **Tax code** → « Software as a service ».
+2. **La création de session Checkout exige l'API `2025-03-31.basil`+**. La route
+   `/api/checkout` épingle donc cette version (le SDK `stripe` reste par ailleurs
+   sur `2023-08-16`, que le webhook utilise pour lire les abonnements au format
+   classique — `current_period_end`, etc.).
+
+> Si tu préfères garder l'ancien comportement classique, tu peux **désactiver
+> Managed Payments** dans le dashboard Stripe (le code fonctionne alors sans le
+> `tax_code`). Le checkout d'audit legacy (`/api/checkout/buy-audit`, one-shot)
+> n'a pas été rebranché sur `basil` : il faudra la même mise à jour si tu
+> réactives la vente d'audits one-shot sur un compte Managed Payments.
 
 ## 3. Remplir `.env.local`
 
@@ -36,6 +84,13 @@ Dans **Products → Add product**, crée les 5 produits/prix du tableau ci-dessu
 STRIPE_SECRET_KEY=sk_test_…
 NEXT_PUBLIC_STRIPE_PUBLIC_KEY=pk_test_…
 STRIPE_WEBHOOK_SECRET=whsec_…
+
+# SYB v2 — plans monitoring (les 3 à créer en priorité)
+NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_SOLO=price_…
+NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_PRO=price_…
+NEXT_PUBLIC_STRIPE_PRICE_ID_MONITORING_AGENCY=price_…
+
+# Audit legacy (optionnel, seulement si tu vends encore l'audit one-shot)
 NEXT_PUBLIC_STRIPE_PRICE_ID_DATA=price_…
 NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER=price_…
 NEXT_PUBLIC_STRIPE_PRICE_ID_PRO=price_…

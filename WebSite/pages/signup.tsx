@@ -359,12 +359,15 @@ export default function SignupPage() {
 
       // If user selected a plan, redirect to checkout automatically
       if (selectedPlan) {
-        // Map plan to priceId
+        // Map plan to priceId. SYB v2 monitoring plans (solo/pro/agency) are the
+        // current product; the legacy one-shot audit tiers are kept until
+        // billing is fully migrated.
         const planToPriceId: Record<string, { priceId: string; mode: "payment" | "subscription" }> = {
+          solo: { priceId: config.monitoring.solo.priceId, mode: "subscription" },
+          pro: { priceId: config.monitoring.pro.priceId, mode: "subscription" },
+          agency: { priceId: config.monitoring.agency.priceId, mode: "subscription" },
           data: { priceId: config.stripe.data.priceId, mode: "payment" },
           starter: { priceId: config.stripe.starter.priceId, mode: "payment" },
-          pro: { priceId: config.stripe.pro.priceId, mode: "subscription" },
-          agency: { priceId: config.stripe.agency.priceId, mode: "subscription" },
         };
 
         const planConfig = planToPriceId[selectedPlan];
@@ -657,17 +660,24 @@ export default function SignupPage() {
                 <p className="text-gray-600">
                   Sign up to start your AI visibility audit
                 </p>
-                {selectedPlan && (
-                  <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
-                    <p className="text-sm font-medium text-purple-700">
-                      You&apos;re signing up for the{" "}
-                      <span className="font-bold capitalize">{selectedPlan}</span> plan
-                      {selectedPlan === "basic" && " - €100"}
-                      {selectedPlan === "pro" && " - €200"}
-                      {selectedPlan === "premium" && " - €500/month"}
-                    </p>
-                  </div>
-                )}
+                {selectedPlan &&
+                  (() => {
+                    const plan =
+                      config.monitoring[
+                        selectedPlan as keyof typeof config.monitoring
+                      ];
+                    if (!plan || typeof plan !== "object" || !("price" in plan))
+                      return null;
+                    return (
+                      <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
+                        <p className="text-sm font-medium text-purple-700">
+                          Plan{" "}
+                          <span className="font-bold">{plan.name}</span> — €
+                          {plan.price}/mois
+                        </p>
+                      </div>
+                    );
+                  })()}
               </div>
 
               {/* Google Sign-up */}
@@ -786,55 +796,57 @@ export default function SignupPage() {
                   <CreditCard className="w-8 h-8 text-indigo-600" />
                 </div>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Choose your plan
+                  Choisissez votre plan
                 </h2>
                 <p className="text-gray-600">
-                  
+                  Monitoring GEO continu — annulable à tout moment.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
+              <div className="grid md:grid-cols-3 gap-6 items-center">
                 <PlanCard
-                  name={config.stripe.data.name}
-                  price={`\u20AC${config.stripe.data.price}`}
-                  period="one-time"
-                  features={config.stripe.data.features.map((f) => f.name)}
-                  onSelect={() =>
-                    handleSelectPlan(config.stripe.data.priceId, "payment")
-                  }
-                  isLoading={isLoading}
-                />
-                <PlanCard
-                  name={config.stripe.starter.name}
-                  price={`\u20AC${config.stripe.starter.price}`}
-                  period="one-time"
-                  features={config.stripe.starter.features.map((f) => f.name)}
-                  onSelect={() =>
-                    handleSelectPlan(config.stripe.starter.priceId, "payment")
-                  }
-                  isLoading={isLoading}
-                />
-                <PlanCard
-                  name={config.stripe.pro.name}
-                  price={`\u20AC${config.stripe.pro.price}`}
+                  name={config.monitoring.solo.name}
+                  price={`\u20AC${config.monitoring.solo.price}`}
                   period="mo"
-                  features={config.stripe.pro.features.map((f) => f.name)}
+                  features={[
+                    "2 projets suivis",
+                    "3 moteurs IA",
+                    "Monitoring hebdomadaire",
+                    "Score par LLM + historique",
+                  ]}
+                  onSelect={() =>
+                    handleSelectPlan(config.monitoring.solo.priceId, "subscription")
+                  }
+                  isLoading={isLoading}
+                />
+                <PlanCard
+                  name={config.monitoring.pro.name}
+                  price={`\u20AC${config.monitoring.pro.price}`}
+                  period="mo"
+                  features={[
+                    "10 projets suivis",
+                    "Tous les moteurs (ChatGPT, Claude, Perplexity, Gemini)",
+                    "Monitoring quotidien",
+                    "Concurrents, sources citées & alertes email",
+                  ]}
                   highlighted
-                  note="2-month minimum commitment"
                   onSelect={() =>
-                    handleSelectPlan(config.stripe.pro.priceId, "subscription")
+                    handleSelectPlan(config.monitoring.pro.priceId, "subscription")
                   }
                   isLoading={isLoading}
                 />
                 <PlanCard
-                  name={config.stripe.agency.name}
-                  price={`\u20AC${config.stripe.agency.price}`}
+                  name={config.monitoring.agency.name}
+                  price={`\u20AC${config.monitoring.agency.price}`}
                   period="mo"
-                  features={config.stripe.agency.features
-                    .slice(0, 4)
-                    .map((f) => f.name)}
+                  features={[
+                    "Projets illimités",
+                    "Tous les moteurs, monitoring quotidien",
+                    "Rapport PDF en marque blanche",
+                    "Idéal agences (10–20 clients)",
+                  ]}
                   onSelect={() =>
-                    handleSelectPlan(config.stripe.agency.priceId, "subscription")
+                    handleSelectPlan(config.monitoring.agency.priceId, "subscription")
                   }
                   isLoading={isLoading}
                 />

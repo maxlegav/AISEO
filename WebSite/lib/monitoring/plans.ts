@@ -70,6 +70,7 @@ export function planForTier(tier: SubscriptionTier): MonitoringPlan {
       return MONITORING_PLANS.pro;
     case "agency":
       return MONITORING_PLANS.agency;
+    case "solo":
     case "none":
     case "data":
     case "starter":
