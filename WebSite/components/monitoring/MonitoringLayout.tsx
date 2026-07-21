@@ -92,7 +92,6 @@ function ProjectSwitcher({
         <div className="absolute left-3 right-3 top-full z-50 mt-1.5 rounded-xl border border-gray-200 bg-white py-1.5 shadow-xl">
           <Link
             href="/app"
-            prefetch={false}
             onClick={() => setOpen(false)}
             className="block px-3 py-2 text-[13px] text-gray-600 hover:bg-gray-50"
           >
@@ -103,7 +102,6 @@ function ProjectSwitcher({
             <Link
               key={p.id}
               href={`/app/${p.id}`}
-              prefetch={false}
               onClick={() => setOpen(false)}
               className={cn(
                 "flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-gray-50",
@@ -121,7 +119,6 @@ function ProjectSwitcher({
           <div className="my-1 border-t border-gray-100" />
           <Link
             href="/app/new"
-            prefetch={false}
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-violet-600 hover:bg-violet-50"
           >
@@ -214,7 +211,6 @@ export default function MonitoringLayout({
               <Link
                 key={item.key}
                 href={item.href}
-                prefetch={false}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
                   active === item.key
@@ -236,7 +232,6 @@ export default function MonitoringLayout({
           </p>
           <Link
             href="/app/clients"
-            prefetch={false}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
               active === "clients"
@@ -252,7 +247,6 @@ export default function MonitoringLayout({
           </Link>
           <Link
             href="/app/team"
-            prefetch={false}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
               active === "team"
@@ -272,7 +266,6 @@ export default function MonitoringLayout({
           </p>
           <Link
             href="/app/settings"
-            prefetch={false}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
               active === "settings"
@@ -310,7 +303,6 @@ export default function MonitoringLayout({
           <div className="flex items-center gap-3">
             <Link
               href="/app"
-              prefetch={false}
               className="mt-0.5 rounded-lg border border-white/60 bg-white/60 p-1.5 text-gray-400 transition-colors hover:text-gray-700"
               title="Tous les projets"
             >

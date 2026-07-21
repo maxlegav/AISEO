@@ -45,9 +45,31 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
         ],
       },
-      // HTML pages — short cache so updates propagate
+      // Authenticated app pages, API routes and their getServerSideProps data
+      // must never be shared-cached: a public cache would serve stale lists and
+      // even leak one account's data to another. Keep them private + no-store.
       {
-        source: '/((?!_next/static|_next/image|favicon.ico).*)',
+        source: '/app/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'private, no-store, max-age=0, must-revalidate' },
+        ],
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'private, no-store, max-age=0, must-revalidate' },
+        ],
+      },
+      {
+        source: '/_next/data/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'private, no-store, max-age=0, must-revalidate' },
+        ],
+      },
+      // Public marketing HTML — short cache so updates propagate. Excludes the
+      // dynamic/authenticated routes handled above and Next.js data/asset paths.
+      {
+        source: '/((?!_next/static|_next/image|_next/data|api|app|favicon.ico).*)',
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
         ],

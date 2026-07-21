@@ -38,19 +38,16 @@ export default function LoginPage() {
     }
   }, [router.query.error, router.query.success, router]);
 
-  // If already authenticated, redirect to the monitoring workspace.
-  // Uses a full navigation (not router.push) so /app is re-rendered server-side
-  // with the current session cookie, avoiding a stale client cache showing a
-  // previous account's projects.
+  // If already authenticated, redirect to dashboard
   useEffect(() => {
     if (status === "authenticated") {
       // Small delay so user can see the page and use the "switch account" link if needed
       const timer = setTimeout(() => {
-        window.location.assign("/app");
+        router.push("/app");
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [status]);
+  }, [status, router]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -103,7 +100,7 @@ export default function LoginPage() {
           setAuthError(errorMessage);
         }
       } else if (res?.ok) {
-        window.location.assign("/app");
+        router.push("/app");
       } else {
         setAuthError("An unexpected error occurred. Please try again.");
       }
@@ -174,7 +171,7 @@ export default function LoginPage() {
             </p>
             <div className="flex gap-3 mt-2">
               <button
-                onClick={() => window.location.assign("/app")}
+                onClick={() => router.push("/app")}
                 className="text-sm font-medium text-blue-700 underline hover:text-blue-900"
               >
                 Go to dashboard

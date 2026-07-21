@@ -55,7 +55,6 @@ export default function AppOverview({
             </span>
             <Link
               href="/app"
-              prefetch={false}
               className={
                 "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                 (!activeClientId
@@ -69,7 +68,6 @@ export default function AppOverview({
               <Link
                 key={c.id}
                 href={`/app?client=${c.id}`}
-                prefetch={false}
                 className={
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                   (activeClientId === c.id
@@ -82,7 +80,6 @@ export default function AppOverview({
             ))}
             <Link
               href="/app/clients"
-              prefetch={false}
               className="ml-auto text-xs font-medium text-violet-600 hover:text-violet-700"
             >
               Gérer les clients
@@ -104,7 +101,6 @@ export default function AppOverview({
             <Link
               key={p.id}
               href={`/app/${p.id}`}
-              prefetch={false}
               className="group flex flex-col rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-lg"
             >
               <div className="mb-4 flex items-start justify-between gap-3">
