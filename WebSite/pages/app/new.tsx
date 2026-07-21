@@ -16,15 +16,28 @@ import {
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import { LLM_ORDER, LLMS, type LLMId } from "@/lib/mock/monitoring";
-import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import mongoose from "mongoose";
+import Client from "@/models/Client";
 import { cn } from "@/lib/utils";
 
 type Frequency = "weekly" | "daily";
 
+interface ClientOption {
+  id: string;
+  name: string;
+}
+
+interface NewProjectProps {
+  clients: ClientOption[];
+  initialClientId: string | null;
+}
+
 const STEPS = ["Marque", "Concurrents & requêtes", "Moteurs & lancement"];
 
-export default function NewProject() {
+export default function NewProject({ clients, initialClientId }: NewProjectProps) {
   const router = useRouter();
+  const [clientId, setClientId] = useState<string>(initialClientId ?? "");
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +101,7 @@ export default function NewProject() {
           prompts: cleanPrompts,
           llms: selectedLLMs,
           frequency,
+          clientId: clientId || undefined,
         }),
       });
       const json = await res.json();
@@ -197,6 +211,25 @@ export default function NewProject() {
                     className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
                   />
                 </div>
+                {clients.length > 0 && (
+                  <div className="sm:col-span-2">
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                      Client <span className="text-gray-400">(optionnel)</span>
+                    </label>
+                    <select
+                      value={clientId}
+                      onChange={(e) => setClientId(e.target.value)}
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    >
+                      <option value="">Aucun client</option>
+                      {clients.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             </section>
           )}
@@ -412,8 +445,21 @@ export default function NewProject() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const userId = await getSessionUserId(ctx);
-  if (!userId) return loginRedirect("/app/new");
-  return { props: {} };
+export const getServerSideProps: GetServerSideProps<NewProjectProps> = async (
+  ctx,
+) => {
+  const session = await getSessionWorkspace(ctx);
+  if (!session) return loginRedirect("/app/new");
+  const clients = (await Client.find({
+    organizationId: session.workspace.organizationId,
+    archived: false,
+  })
+    .sort({ createdAt: -1 })
+    .lean()) as unknown as { _id: mongoose.Types.ObjectId; name: string }[];
+  return {
+    props: {
+      clients: clients.map((c) => ({ id: c._id.toString(), name: c.name })),
+      initialClientId: (ctx.query.client as string) || null,
+    },
+  };
 };

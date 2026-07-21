@@ -13,6 +13,7 @@
 
 import mongoose from "mongoose";
 import Project from "@/models/Project";
+import Client from "@/models/Client";
 import LLMResult from "@/models/LLMResult";
 import WeeklyScore from "@/models/WeeklyScore";
 import MonitoredSource from "@/models/MonitoredSource";
@@ -134,6 +135,7 @@ interface LeanProject {
   prompts: string[];
   llms: LLMId[];
   frequency: string;
+  clientId?: mongoose.Types.ObjectId | null;
 }
 
 /**
@@ -283,25 +285,59 @@ function buildPendingProject(p: LeanProject): UIProject {
   };
 }
 
+export interface ClientOption {
+  id: string;
+  name: string;
+}
+
 export interface DashboardListResult {
   projects: UIProject[];
   demo: boolean;
+  clients: ClientOption[];
 }
 
-/** Projects list for `/app`. Falls back to demo data when the user has none. */
-export async function getProjectSummaries(userId: string): Promise<DashboardListResult> {
+async function clientNameMap(organizationId: string): Promise<Map<string, string>> {
+  const clients = (await Client.find({ organizationId, archived: false })
+    .select("name")
+    .lean()) as unknown as { _id: mongoose.Types.ObjectId; name: string }[];
+  return new Map(clients.map((c) => [c._id.toString(), c.name]));
+}
+
+/**
+ * Projects list for `/app`, scoped to the acting organization. Falls back to
+ * demo data when the organization has no project. Optionally filters by client.
+ */
+export async function getProjectSummaries(
+  organizationId: string,
+  clientId?: string | null,
+): Promise<DashboardListResult> {
   await connectDB();
-  const docs = (await Project.find({ userId }).sort({ createdAt: -1 }).lean()) as unknown as LeanProject[];
-  if (docs.length === 0) {
-    return { projects: MOCK_PROJECTS, demo: true };
+  const names = await clientNameMap(organizationId);
+  const clientOptions: ClientOption[] = Array.from(names.entries()).map(
+    ([id, name]) => ({ id, name }),
+  );
+
+  const query: Record<string, unknown> = { organizationId };
+  if (clientId) query.clientId = clientId;
+  const docs = (await Project.find(query)
+    .sort({ createdAt: -1 })
+    .lean()) as unknown as LeanProject[];
+
+  if (docs.length === 0 && !clientId) {
+    return { projects: MOCK_PROJECTS, demo: true, clients: clientOptions };
   }
+
   const projects = await Promise.all(
     docs.map(async (p) => {
       const latest = await WeeklyScore.findOne({ projectId: p._id }).sort({ week: -1 }).lean();
-      return latest ? buildRanProject(p, latest.week) : buildPendingProject(p);
+      const ui = latest ? await buildRanProject(p, latest.week) : buildPendingProject(p);
+      const cid = p.clientId ? p.clientId.toString() : null;
+      ui.clientId = cid;
+      ui.clientName = cid ? names.get(cid) ?? null : null;
+      return ui;
     }),
   );
-  return { projects, demo: false };
+  return { projects, demo: false, clients: clientOptions };
 }
 
 export interface DashboardProjectResult {
@@ -310,15 +346,15 @@ export interface DashboardProjectResult {
 }
 
 /**
- * Full dashboard for a single project, scoped to its owner.
- * Falls back to the matching demo project when the user has no real projects.
+ * Full dashboard for a single project, scoped to the acting organization.
+ * Falls back to the matching demo project when the org has no real project.
  */
 export async function getProjectDashboard(
-  userId: string,
+  organizationId: string,
   projectId: string,
 ): Promise<DashboardProjectResult> {
   await connectDB();
-  const anyReal = await Project.countDocuments({ userId });
+  const anyReal = await Project.countDocuments({ organizationId });
   if (anyReal === 0) {
     const mock = MOCK_PROJECTS.find((p) => p.id === projectId) ?? null;
     return { project: mock, demo: true };
@@ -327,11 +363,21 @@ export async function getProjectDashboard(
   if (!mongoose.Types.ObjectId.isValid(projectId)) return { project: null, demo: false };
   const p = (await Project.findOne({
     _id: projectId,
-    userId,
+    organizationId,
   }).lean()) as unknown as LeanProject | null;
   if (!p) return { project: null, demo: false };
 
   const latest = await WeeklyScore.findOne({ projectId: p._id }).sort({ week: -1 }).lean();
   const project = latest ? await buildRanProject(p, latest.week) : buildPendingProject(p);
+  if (project) {
+    const cid = p.clientId ? p.clientId.toString() : null;
+    project.clientId = cid;
+    if (cid) {
+      const c = (await Client.findById(cid).select("name").lean()) as unknown as
+        | { name: string }
+        | null;
+      project.clientName = c?.name ?? null;
+    }
+  }
   return { project, demo: false };
 }

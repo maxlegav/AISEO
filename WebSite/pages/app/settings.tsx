@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { ImagePlus, Lock, Globe, FileText, Loader2, Check } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
-import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getUserBranding } from "@/lib/monitoring/branding";
 import { cn } from "@/lib/utils";
 
@@ -270,8 +270,10 @@ export default function BrandingSettings({
 export const getServerSideProps: GetServerSideProps<
   BrandingSettingsProps
 > = async (ctx) => {
-  const userId = await getSessionUserId(ctx);
-  if (!userId) return loginRedirect("/app/settings");
-  const { branding, whiteLabelActive } = await getUserBranding(userId);
+  const session = await getSessionWorkspace(ctx);
+  if (!session) return loginRedirect("/app/settings");
+  const { branding, whiteLabelActive } = await getUserBranding(
+    session.workspace.ownerId,
+  );
   return { props: { initial: branding, whiteLabelActive } };
 };

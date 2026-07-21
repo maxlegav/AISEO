@@ -10,15 +10,22 @@ import {
   ScoreRing,
 } from "@/components/monitoring/widgets";
 import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
-import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
-import { getProjectSummaries } from "@/lib/monitoring/dashboard";
+import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import { getProjectSummaries, type ClientOption } from "@/lib/monitoring/dashboard";
 
 interface AppOverviewProps {
   projects: Project[];
   demo: boolean;
+  clients: ClientOption[];
+  activeClientId: string | null;
 }
 
-export default function AppOverview({ projects, demo }: AppOverviewProps) {
+export default function AppOverview({
+  projects,
+  demo,
+  clients,
+  activeClientId,
+}: AppOverviewProps) {
   return (
     <>
       <Head>
@@ -41,6 +48,44 @@ export default function AppOverview({ projects, demo }: AppOverviewProps) {
           </Link>
         }
       >
+        {clients.length > 0 && (
+          <div className="mb-5 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+              Clients
+            </span>
+            <Link
+              href="/app"
+              className={
+                "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
+                (!activeClientId
+                  ? "border-violet-300 bg-violet-50 text-violet-700"
+                  : "border-white/60 bg-white/60 text-gray-500 hover:text-gray-800")
+              }
+            >
+              Tous
+            </Link>
+            {clients.map((c) => (
+              <Link
+                key={c.id}
+                href={`/app?client=${c.id}`}
+                className={
+                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
+                  (activeClientId === c.id
+                    ? "border-violet-300 bg-violet-50 text-violet-700"
+                    : "border-white/60 bg-white/60 text-gray-500 hover:text-gray-800")
+                }
+              >
+                {c.name}
+              </Link>
+            ))}
+            <Link
+              href="/app/clients"
+              className="ml-auto text-xs font-medium text-violet-600 hover:text-violet-700"
+            >
+              Gérer les clients
+            </Link>
+          </div>
+        )}
         {demo && (
           <div className="mb-5 flex items-start gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
@@ -60,6 +105,11 @@ export default function AppOverview({ projects, demo }: AppOverviewProps) {
             >
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div className="min-w-0">
+                  {p.clientName && (
+                    <span className="mb-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                      {p.clientName}
+                    </span>
+                  )}
                   <h3 className="truncate text-lg font-semibold text-gray-900">
                     {p.brandName}
                   </h3>
@@ -132,8 +182,12 @@ export default function AppOverview({ projects, demo }: AppOverviewProps) {
 export const getServerSideProps: GetServerSideProps<AppOverviewProps> = async (
   ctx,
 ) => {
-  const userId = await getSessionUserId(ctx);
-  if (!userId) return loginRedirect("/app");
-  const { projects, demo } = await getProjectSummaries(userId);
-  return { props: { projects, demo } };
+  const session = await getSessionWorkspace(ctx);
+  if (!session) return loginRedirect("/app");
+  const activeClientId = (ctx.query.client as string) || null;
+  const { projects, demo, clients } = await getProjectSummaries(
+    session.workspace.organizationId,
+    activeClientId,
+  );
+  return { props: { projects, demo, clients, activeClientId } };
 };
