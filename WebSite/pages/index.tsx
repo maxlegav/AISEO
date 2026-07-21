@@ -926,80 +926,57 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch max-w-5xl mx-auto">
               <PricingCard
-                title="DATA"
-                subtitle="For developers & SEO experts"
+                title="SOLO"
+                subtitle="Pour indépendants & consultants"
                 price="€29"
-                oldPrice="€49"
-                period="one-time"
+                period="mois"
                 features={[
-                  "1 GEO audit across all AI engines",
-                  "Raw JSON export of all results",
-                  "GEO Health Score & category breakdown",
-                  "100 prompts tested, 3 competitors",
-                  "HTML scanner raw results",
-                  "Permanent data access via API",
+                  "2 projets suivis en continu",
+                  "3 moteurs IA au choix",
+                  "Suivi hebdomadaire automatique",
+                  "Score de visibilité par moteur",
+                  "Suivi des concurrents",
+                  "Sources citées par les IA",
+                  "Alertes email sur variation",
                 ]}
-                ctaText="Get the data"
-                ctaLink="/signup?plan=data"
-              />
-              <PricingCard
-                title="STARTER"
-                subtitle="Test your AI visibility"
-                price="€79"
-                oldPrice="€129"
-                period="one-time"
-                features={[
-                  "1 complete GEO audit",
-                  "All AI engines: ChatGPT, Claude, Perplexity, Gemini & Grok",
-                  "GEO Health Score (0–100) with breakdown",
-                  "100 AI prompts in your category",
-                  "3 competitor benchmarks",
-                  "Technical HTML & Schema.org audit",
-                  "Prioritized action plan",
-                  "Dashboard access (30 days)",
-                ]}
-                ctaText="Start my audit"
-                ctaLink="/signup?plan=starter"
+                ctaText="Commencer"
+                ctaLink="/signup?plan=solo"
               />
               <PricingCard
                 title="PRO"
-                subtitle="Track your monthly progress"
-                price="€59"
-                oldPrice="€99"
-                period="mo"
+                subtitle="Pour équipes marketing"
+                price="€79"
+                period="mois"
                 highlighted={true}
-                note="2-month minimum commitment"
                 features={[
-                  "1 automatic audit per month",
-                  "All AI engines + monthly comparison",
-                  "Month-over-month score delta",
-                  "Fixed vs new issues tracking",
-                  "Prompt-level gain / loss tracking",
-                  "3 competitor benchmarks",
-                  "Permanent dashboard + full history",
-                  "Action checklist + 15-day progress email",
+                  "10 projets suivis en continu",
+                  "Les 4 moteurs IA (ChatGPT, Claude, Perplexity, Gemini)",
+                  "Suivi quotidien automatique",
+                  "Historique 12 semaines par moteur",
+                  "Recommandations spécifiques par moteur",
+                  "Suivi concurrents avancé",
+                  "Alertes email sur variation",
                 ]}
-                ctaText="Start tracking"
+                ctaText="Suivre ma visibilité"
                 ctaLink="/signup?plan=pro"
               />
               <PricingCard
-                title="AGENCY"
-                subtitle="For marketing agencies"
-                price="€599"
-                oldPrice="€999"
-                period="mo"
+                title="AGENCE"
+                subtitle="Pour agences (10–20 clients)"
+                price="€149"
+                period="mois"
                 features={[
-                  "15 client audits per month",
-                  "All Pro features per client",
-                  "Multi-client dashboard",
-                  "Client-ready shareable reports",
-                  "3 competitor benchmarks per client",
-                  "Resell at your own price",
-                  "Dedicated account manager",
+                  "Projets illimités",
+                  "Les 4 moteurs IA, suivi quotidien",
+                  "Dashboard multi-clients",
+                  "Rapports PDF en marque blanche",
+                  "Logo & couleurs de votre agence",
+                  "Recommandations par moteur & par client",
+                  "Support prioritaire en français",
                 ]}
-                ctaText="Book a Call"
+                ctaText="Réserver un appel"
                 ctaLink="/signup?plan=agency"
               />
             </div>

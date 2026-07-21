@@ -7,7 +7,7 @@ import User from "@/models/User";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { handleZodError } from "@/lib/validation/helpers";
 import { CreateProjectSchema } from "@/lib/validation/project";
-import { getProjectLimit } from "@/lib/monitoring/limits";
+import { getProjectLimit, getMaxLLMs, isFrequencyAllowed } from "@/lib/monitoring/limits";
 import type { SubscriptionTier } from "@/lib/subscription-limits";
 
 const connectDB = async () => {
@@ -33,7 +33,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!parsed.success) return handleZodError(parsed.error, res);
 
       const user = await User.findById(session.user.id);
-      const limit = getProjectLimit((user!.subscriptionTier as SubscriptionTier) || "none");
+      const tier = ((user!.subscriptionTier as SubscriptionTier) || "none");
+
+      const maxLLMs = getMaxLLMs(tier);
+      if (parsed.data.llms.length > maxLLMs) {
+        return res.status(403).json({
+          success: false,
+          error: "UPGRADE_REQUIRED",
+          message: `Votre plan autorise ${maxLLMs} moteur(s) par projet. Passez à un plan supérieur pour tous les activer.`,
+        });
+      }
+
+      if (!isFrequencyAllowed(tier, parsed.data.frequency)) {
+        return res.status(403).json({
+          success: false,
+          error: "UPGRADE_REQUIRED",
+          message: `Votre plan ne permet pas la fréquence « ${parsed.data.frequency} ». Passez à un plan supérieur pour le suivi quotidien.`,
+        });
+      }
+
+      const limit = getProjectLimit(tier);
       const count = await Project.countDocuments({ userId: session.user.id });
       if (count >= limit) {
         return res.status(403).json({
