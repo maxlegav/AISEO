@@ -359,12 +359,15 @@ export default function SignupPage() {
 
       // If user selected a plan, redirect to checkout automatically
       if (selectedPlan) {
-        // Map plan to priceId
+        // Map plan to priceId. SYB v2 monitoring plans (solo/pro/agency) are the
+        // current product; the legacy one-shot audit tiers are kept until
+        // billing is fully migrated.
         const planToPriceId: Record<string, { priceId: string; mode: "payment" | "subscription" }> = {
+          solo: { priceId: config.monitoring.solo.priceId, mode: "subscription" },
+          pro: { priceId: config.monitoring.pro.priceId, mode: "subscription" },
+          agency: { priceId: config.monitoring.agency.priceId, mode: "subscription" },
           data: { priceId: config.stripe.data.priceId, mode: "payment" },
           starter: { priceId: config.stripe.starter.priceId, mode: "payment" },
-          pro: { priceId: config.stripe.pro.priceId, mode: "subscription" },
-          agency: { priceId: config.stripe.agency.priceId, mode: "subscription" },
         };
 
         const planConfig = planToPriceId[selectedPlan];

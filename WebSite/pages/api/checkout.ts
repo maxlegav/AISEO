@@ -7,7 +7,10 @@ import User from '@/models/User';
 import { CheckoutSchema } from '@/lib/validation/subscription';
 import { handleZodError } from '@/lib/validation/helpers';
 import { handleApiError, ApiError, ErrorType } from '@/lib/error-handler';
-import config from '@/config';
+import {
+  getTierFromPriceId,
+  expectedModeForPriceId,
+} from '@/lib/stripe-tiers';
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -18,26 +21,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
   await mongoose.connect(process.env.MONGODB_URI!);
-};
-
-// Map price IDs to tiers. Throws on unknown price IDs to prevent provisioning
-// from arbitrary attacker-supplied price IDs (see review C2 / M1).
-type Tier = 'data' | 'starter' | 'pro' | 'agency';
-const getTierFromPriceId = (priceId: string): Tier => {
-  if (priceId === config.stripe.data.priceId) return 'data';
-  if (priceId === config.stripe.starter.priceId) return 'starter';
-  if (priceId === config.stripe.pro.priceId) return 'pro';
-  if (priceId === config.stripe.agency.priceId) return 'agency';
-  throw new ApiError(ErrorType.VALIDATION, 'Invalid price ID');
-};
-
-// Each tier is locked to a single Stripe mode. A request that mixes (e.g.)
-// the Pro priceId with `mode: 'payment'` is rejected.
-const EXPECTED_MODE: Record<Tier, 'subscription' | 'payment'> = {
-  data: 'payment',
-  starter: 'payment',
-  pro: 'subscription',
-  agency: 'subscription',
 };
 
 export default async function handler(
@@ -68,16 +51,22 @@ export default async function handler(
 
     const { priceId, mode } = validation.data;
 
-    // Whitelist the priceId against our configured tiers and reject any
-    // request whose mode does not match the tier's expected billing mode.
-    // This prevents an authenticated attacker from substituting a cheaper
-    // (or arbitrary) Stripe price and getting Pro/Starter access for the
+    // Whitelist the priceId against our configured tiers (monitoring + legacy)
+    // and reject any request whose mode does not match the price's expected
+    // billing mode. This prevents an authenticated attacker from substituting a
+    // cheaper (or arbitrary) Stripe price and getting a higher tier for the
     // wrong amount. See review finding C2.
-    const tier = getTierFromPriceId(priceId);
-    if (mode !== EXPECTED_MODE[tier]) {
+    let tier: string;
+    try {
+      tier = getTierFromPriceId(priceId);
+    } catch {
+      throw new ApiError(ErrorType.VALIDATION, 'Invalid price ID');
+    }
+    const expectedMode = expectedModeForPriceId(priceId);
+    if (mode !== expectedMode) {
       throw new ApiError(
         ErrorType.VALIDATION,
-        `Tier "${tier}" requires mode "${EXPECTED_MODE[tier]}"`
+        `Tier "${tier}" requires mode "${expectedMode}"`
       );
     }
 

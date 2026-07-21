@@ -6,6 +6,8 @@ import User from '@/models/User';
 import Subscription from '@/models/Subscription';
 import WebhookEvent from '@/models/WebhookEvent';
 import { sendSubscriptionConfirmationEmail, sendAuditCreditAvailableEmail } from '@/lib/email';
+import { getTierFromPriceId, isMonitoringPriceId } from '@/lib/stripe-tiers';
+import type { SubscriptionTier } from '@/lib/subscription-limits';
 import appConfig from '@/config';
 
 // Initialize Stripe
@@ -24,16 +26,6 @@ export const config = {
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
   await mongoose.connect(process.env.MONGODB_URI!);
-};
-
-// Map price IDs to tiers. Throws on unknown IDs so we never silently provision
-// the wrong tier when Stripe sends a price we don't recognise (review C2 / M1).
-const getTierFromPriceId = (priceId: string): 'data' | 'starter' | 'pro' | 'agency' => {
-  if (priceId === appConfig.stripe.data.priceId) return 'data';
-  if (priceId === appConfig.stripe.starter.priceId) return 'starter';
-  if (priceId === appConfig.stripe.pro.priceId) return 'pro';
-  if (priceId === appConfig.stripe.agency.priceId) return 'agency';
-  throw new Error(`[Stripe Webhook] Unknown priceId: ${priceId}`);
 };
 
 // Get amount from tier (in cents)
@@ -134,12 +126,12 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     console.error('[Stripe Webhook] No priceId on subscription', subscriptionId);
     return;
   }
-  const subscriptionTier = getTierFromPriceId(priceId);
+  const subscriptionTier: SubscriptionTier = getTierFromPriceId(priceId);
 
   // Update user
   user.stripeCustomerId = customerId;
   user.subscriptionId = subscriptionId;
-  user.subscriptionTier = subscriptionTier as 'none' | 'data' | 'starter' | 'pro' | 'agency';
+  user.subscriptionTier = subscriptionTier;
   user.subscriptionStatus = 'active';
   user.subscriptionEndDate = new Date(stripeSubscription.current_period_end * 1000);
   await user.save();
@@ -191,7 +183,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     console.error('[Stripe Webhook] No priceId on subscription update', subscription.id);
     return;
   }
-  const tier = getTierFromPriceId(priceId);
+  const tier: SubscriptionTier = getTierFromPriceId(priceId);
 
   // Map Stripe status to our status
   const statusMap: Record<string, 'active' | 'cancelled' | 'past_due' | 'trialing' | 'inactive'> = {
@@ -208,7 +200,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const status = statusMap[subscription.status] || 'inactive';
 
   // Update user
-  user.subscriptionTier = tier as 'none' | 'data' | 'starter' | 'pro' | 'agency';
+  user.subscriptionTier = tier;
   user.subscriptionStatus = status;
   user.subscriptionEndDate = new Date(subscription.current_period_end * 1000);
   await user.save();
@@ -278,6 +270,15 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   // Only handle subscription renewals (not initial checkout — that's handled by checkout.session.completed)
   if (invoice.billing_reason !== 'subscription_cycle') return;
+
+  // Audit credits are a *legacy* one-shot-audit perk. Recurring monitoring
+  // plans (SYB v2) do not grant audit credits, so skip renewals whose price is
+  // a monitoring plan even though it shares the pro/agency tier name.
+  const renewedPriceId = invoice.lines.data[0]?.price?.id;
+  if (renewedPriceId && isMonitoringPriceId(renewedPriceId)) {
+    console.log('[Stripe Webhook] Monitoring renewal — no audit credit granted');
+    return;
+  }
 
   await connectDB();
 

@@ -8,7 +8,7 @@ export interface ISubscription extends Document {
   stripePaymentIntentId?: string;
   stripeCustomerId: string;
   stripePriceId: string;
-  tier: 'none' | 'data' | 'starter' | 'pro' | 'agency';
+  tier: 'none' | 'data' | 'starter' | 'solo' | 'pro' | 'agency';
   status: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'incomplete' | 'incomplete_expired';
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
@@ -50,7 +50,7 @@ const SubscriptionSchema = new Schema<ISubscription>(
     },
     tier: {
       type: String,
-      enum: ['none', 'data', 'starter', 'pro', 'agency'],
+      enum: ['none', 'data', 'starter', 'solo', 'pro', 'agency'],
       required: true
     },
     status: {
