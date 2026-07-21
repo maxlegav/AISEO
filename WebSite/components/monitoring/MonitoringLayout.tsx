@@ -12,6 +12,8 @@ import {
   Plus,
   Bell,
   Sparkles,
+  Building2,
+  UserPlus,
 } from "lucide-react";
 import { PROJECTS, Project } from "@/lib/mock/monitoring";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,8 @@ export type MonitoringSection =
   | "competitors"
   | "sources"
   | "recommendations"
+  | "clients"
+  | "team"
   | "settings";
 
 /** Minimal shape needed by the project switcher. */
@@ -224,6 +228,40 @@ export default function MonitoringLayout({
           )}
 
           <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+            Agence
+          </p>
+          <Link
+            href="/app/clients"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
+              active === "clients"
+                ? "bg-white/90 font-medium text-gray-900 shadow-sm"
+                : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
+            )}
+          >
+            <Building2
+              className="h-[17px] w-[17px]"
+              strokeWidth={active === "clients" ? 2.2 : 1.8}
+            />
+            Clients
+          </Link>
+          <Link
+            href="/app/team"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
+              active === "team"
+                ? "bg-white/90 font-medium text-gray-900 shadow-sm"
+                : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
+            )}
+          >
+            <UserPlus
+              className="h-[17px] w-[17px]"
+              strokeWidth={active === "team" ? 2.2 : 1.8}
+            />
+            Équipe
+          </Link>
+
+          <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
             Compte
           </p>
           <Link
@@ -239,7 +277,7 @@ export default function MonitoringLayout({
               className="h-[17px] w-[17px]"
               strokeWidth={active === "settings" ? 2.2 : 1.8}
             />
-            Branding & équipe
+            Branding
           </Link>
         </nav>
 

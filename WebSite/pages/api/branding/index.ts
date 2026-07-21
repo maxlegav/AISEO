@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
@@ -8,6 +6,7 @@ import { handleZodError } from "@/lib/validation/helpers";
 import { UpdateBrandingSchema } from "@/lib/validation/branding";
 import { planForTier } from "@/lib/monitoring/plans";
 import type { SubscriptionTier } from "@/lib/subscription-limits";
+import { requireWorkspace, requireManager } from "@/lib/api-workspace";
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -24,13 +23,11 @@ const EMPTY_BRANDING = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id) {
-      throw new ApiError(ErrorType.AUTHENTICATION, "You must be logged in");
-    }
+    const { workspace } = await requireWorkspace(req, res);
     await connectDB();
 
-    const user = await User.findById(session.user.id);
+    // Branding is organization-level: read/write the org owner's User.branding.
+    const user = await User.findById(workspace.ownerId);
     if (!user) throw new ApiError(ErrorType.NOT_FOUND, "User not found");
 
     const tier = (user.subscriptionTier as SubscriptionTier) || "none";
@@ -48,6 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === "PUT") {
+      requireManager(workspace);
       const parsed = UpdateBrandingSchema.safeParse(req.body);
       if (!parsed.success) return handleZodError(parsed.error, res);
 
