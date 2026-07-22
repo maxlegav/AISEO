@@ -27,7 +27,7 @@ export function hasRealKey(llm: LLMId): boolean {
 /**
  * Query one LLM. Uses the real provider when its key is set; otherwise returns
  * the deterministic mock so the pipeline works end-to-end without any key.
- * Never throws — provider/network errors become an `error` field on the result.
+ * Never throws: provider/network errors become an `error` field on the result.
  */
 export async function queryLLM(prompt: string, ctx: LLMQueryContext): Promise<LLMResponse> {
   if (!hasRealKey(ctx.llm)) {

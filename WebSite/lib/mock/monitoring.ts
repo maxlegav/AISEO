@@ -13,7 +13,7 @@ export interface LLMMeta {
   name: string;
   logo: string;
   color: string;
-  /** How this engine sources its answers — drives per-LLM explanations. */
+  /** How this engine sources its answers, drives per-LLM explanations. */
   bias: string;
 }
 
@@ -96,7 +96,7 @@ export interface Recommendation {
 
 export type Priority = "high" | "medium" | "low";
 
-/** Per-prompt visibility breakdown — the core of the recommendations page. */
+/** Per-prompt visibility breakdown: the core of the recommendations page. */
 export interface PromptInsight {
   prompt: string;
   status: "won" | "partial" | "lost";
@@ -236,7 +236,7 @@ export const PROJECTS: Project[] = [
     id: "linkflow",
     brandName: "Linkflow",
     websiteUrl: "linkflow.io",
-    category: "SaaS B2B — automatisation commerciale",
+    category: "SaaS B2B, automatisation commerciale",
     competitors: ["Salesloft", "Lemlist", "Waalaxy"],
     prompts: 24,
     frequency: "Quotidien",
@@ -265,7 +265,7 @@ export const PROJECTS: Project[] = [
         avgPosition: 3.1,
         deltaVsLastWeek: 4,
         explanation:
-          "Faible : Gemini privilégie YouTube et les propriétés Google. Vous n'avez aucune vidéo indexée sur ces requêtes — c'est le principal frein.",
+          "Faible : Gemini privilégie YouTube et les propriétés Google. Vous n'avez aucune vidéo indexée sur ces requêtes, c'est le principal frein.",
       },
       {
         llm: "claude",
@@ -379,7 +379,7 @@ export const PROJECTS: Project[] = [
     id: "atelier-moreau",
     brandName: "Atelier Moreau",
     websiteUrl: "atelier-moreau.fr",
-    category: "E-commerce — mobilier artisanal",
+    category: "E-commerce, mobilier artisanal",
     competitors: ["Made.com", "Tikamoon", "Maisons du Monde"],
     prompts: 18,
     frequency: "Hebdomadaire",
@@ -400,7 +400,7 @@ export const PROJECTS: Project[] = [
         avgPosition: 2.4,
         deltaVsLastWeek: -3,
         explanation:
-          "En baisse : vos fiches produit datent. Perplexity privilégie le contenu récent — rafraîchissez vos pages phares pour regagner en visibilité.",
+          "En baisse : vos fiches produit datent. Perplexity privilégie le contenu récent, rafraîchissez vos pages phares pour regagner en visibilité.",
       },
       {
         llm: "gemini",

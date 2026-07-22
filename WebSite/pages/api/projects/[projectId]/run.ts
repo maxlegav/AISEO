@@ -5,7 +5,7 @@ import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { runProjectMonitoring } from "@/lib/monitoring/pipeline";
 import { requireWorkspace } from "@/lib/api-workspace";
 
-// A manual run queries every prompt × engine — give it room.
+// A manual run queries every prompt × engine, so give it room.
 export const config = { maxDuration: 300 };
 
 const connectDB = async () => {

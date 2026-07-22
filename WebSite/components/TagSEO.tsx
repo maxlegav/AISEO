@@ -2,7 +2,7 @@ import Head from 'next/head';
 import config from '@/config';
 import type { ReactNode } from 'react';
 
-// Predefined SEO tags — prefilled with default values but you can customize them for each page
+// Predefined SEO tags: prefilled with default values but you can customize them for each page
 // This let you add default SEO tags to all pages, like /terms, /privacy, without rewrtting them all
 const defaults = {
   title: `${config.appName}: GEO Audit, Appear on All Major AI Engines`,

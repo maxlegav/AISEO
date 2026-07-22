@@ -6,7 +6,7 @@ export type MembershipStatus = "active" | "invited";
 
 /**
  * Links a user to an Organization with a role (SYB v2 multi-tenant). An invite
- * is a Membership with `status: "invited"` and no `userId` yet — it carries the
+ * is a Membership with `status: "invited"` and no `userId` yet: it carries the
  * invited `email` and an `inviteToken`. Accepting the invite attaches `userId`
  * and flips the status to `active`.
  */

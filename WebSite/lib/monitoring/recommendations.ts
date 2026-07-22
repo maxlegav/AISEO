@@ -2,7 +2,7 @@
  * Data-driven GEO recommendations for SYB v2.
  *
  * Everything here is pure and derived from stored monitoring data
- * (LLMResult rows, MonitoredSource rows, competitors). No hardcoded advice —
+ * (LLMResult rows, MonitoredSource rows, competitors). No hardcoded advice:
  * each recommendation references the actual prompt, competitor or source that
  * produced it, so the page reads like a real consultant's action plan rather
  * than generic tips.
@@ -184,13 +184,13 @@ export function buildActionPlan(
     });
   }
 
-  // 3) Weakest engine — a structural push.
+  // 3) Weakest engine: a structural push.
   const weakest = [...llmScores].sort((a, b) => a.presenceRate - b.presenceRate)[0];
   if (weakest) {
     items.push({
       id: `engine-${weakest.llm}`,
       title: `Rattrapez votre retard sur ${LLMS[weakest.llm].name} (${weakest.presenceRate}%)`,
-      detail: `${LLMS[weakest.llm].name} — ${LLMS[weakest.llm].bias} Adaptez votre stratégie de contenu à ce biais pour remonter.`,
+      detail: `${LLMS[weakest.llm].name} : ${LLMS[weakest.llm].bias} Adaptez votre stratégie de contenu à ce biais pour remonter.`,
       priority: weakest.presenceRate < 25 ? "high" : "medium",
       impact: Math.round((100 - weakest.presenceRate) / 8),
       effort: "Élevé",
@@ -199,7 +199,7 @@ export function buildActionPlan(
     });
   }
 
-  // 4) A lost prompt (nobody cites you) — greenfield content.
+  // 4) A lost prompt (nobody cites you): greenfield content.
   const lost = insights.find((i) => i.status === "lost");
   if (lost) {
     items.push({
@@ -214,7 +214,7 @@ export function buildActionPlan(
     });
   }
 
-  // 5) Technical baseline — always worth doing, low effort.
+  // 5) Technical baseline: always worth doing, low effort.
   items.push({
     id: "technical-baseline",
     title: "Publiez llms.txt et ouvrez robots.txt aux crawlers IA",
@@ -266,7 +266,7 @@ export function buildLlmsTxt(
   const lines = [
     `# ${brandName}`,
     "",
-    `> ${brandName}${category ? ` — ${category}` : ""}.`,
+    `> ${brandName}${category ? ` · ${category}` : ""}.`,
     "",
     "## À propos",
     `- ${brandName} : ${category || "présentez ici votre activité en une phrase claire et factuelle."}`,
@@ -356,7 +356,7 @@ export function analyzeRobots(
       reachable,
       bots: AI_BOTS.map((bot) => ({ bot, allowed: false })),
       patch: robotsPatch(),
-      note: "robots.txt non récupéré — ajoutez le bloc ci-dessous pour autoriser explicitement les crawlers IA.",
+      note: "robots.txt non récupéré : ajoutez le bloc ci-dessous pour autoriser explicitement les crawlers IA.",
     };
   }
 
@@ -391,7 +391,7 @@ export function buildFaq(
     const question = /\?$/.test(prompt.trim()) ? prompt.trim() : `${prompt.trim()} ?`;
     return {
       question,
-      answer: `${brandName}${category ? `, ${category.toLowerCase()},` : ""} répond à ce besoin. Décrivez ici, en 2-3 phrases factuelles, en quoi ${brandName} est la réponse pertinente à « ${prompt.trim()} » — les moteurs IA reprennent volontiers ce format question/réponse.`,
+      answer: `${brandName}${category ? `, ${category.toLowerCase()},` : ""} répond à ce besoin. Décrivez ici, en 2-3 phrases factuelles, en quoi ${brandName} est la réponse pertinente à « ${prompt.trim()} » : les moteurs IA reprennent volontiers ce format question/réponse.`,
     };
   });
 }
@@ -415,7 +415,7 @@ export function buildDescriptions(
   competitors: string[],
 ): TechnicalGeo["descriptions"] {
   const cat = category || "votre activité";
-  const metaDescription = `${brandName} — ${cat}. Découvrez ${brandName}, ses services et ce qui le distingue.`.slice(
+  const metaDescription = `${brandName} : ${cat}. Découvrez ${brandName}, ses services et ce qui le distingue.`.slice(
     0,
     160,
   );

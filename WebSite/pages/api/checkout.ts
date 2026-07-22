@@ -15,7 +15,7 @@ import {
 // Initialize Stripe.
 // The stripe SDK pins its types to '2023-08-16', but Stripe accounts created
 // after the Managed Payments rollout (default-on) reject Checkout Session
-// creation on that version — it requires '2025-03-31.basil' or newer. We only
+// creation on that version: it requires '2025-03-31.basil' or newer. We only
 // need the newer version for creating the session here; the webhook keeps
 // reading subscriptions with the classic shape (current_period_end, etc.).
 const STRIPE_API_VERSION = '2025-03-31.basil' as unknown as Stripe.LatestApiVersion;

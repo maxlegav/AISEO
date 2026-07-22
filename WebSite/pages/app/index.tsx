@@ -170,7 +170,7 @@ export default function AppOverview({
               Ajouter une marque à monitorer
             </span>
             <span className="mt-1 text-xs text-gray-400">
-              Marque, concurrents, requêtes — résultats en quelques minutes.
+              Marque, concurrents, requêtes : résultats en quelques minutes.
             </span>
           </Link>
         </div>

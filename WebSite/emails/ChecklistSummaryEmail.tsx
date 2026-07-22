@@ -37,29 +37,29 @@ const ChecklistSummaryEmail: React.FC<Props> = ({
 }) => {
   const c = language === "fr"
     ? {
-        preview: `Bilan de vos actions GEO — ${businessName}`,
+        preview: `Bilan de vos actions GEO : ${businessName}`,
         title: "Bilan de vos actions GEO",
         greeting: `Bonjour ${userName},`,
-        intro: `Il y a 15 jours, vous avez reçu votre audit GEO pour **${businessName}** (score : ${geoScore}/100). Voici un résumé de ce que vous avez accompli — et ce qu'il reste à faire.`,
+        intro: `Il y a 15 jours, vous avez reçu votre audit GEO pour **${businessName}** (score : ${geoScore}/100). Voici un résumé de ce que vous avez accompli, et ce qu'il reste à faire.`,
         doneTitle: "✅ Actions effectuées",
         noDone: "Aucune action cochée pour le moment.",
         pendingTitle: "⏳ Actions encore à faire",
         noPending: "Bravo ! Vous avez traité tous les problèmes détectés.",
         ctaText: "Revoir mon plan d'action →",
-        nextAudit: "🔄 Votre prochain audit mensuel se lancera automatiquement dans quelques jours — les nouvelles recommandations tiendront compte de ce que vous avez déjà traité.",
+        nextAudit: "🔄 Votre prochain audit mensuel se lancera automatiquement dans quelques jours : les nouvelles recommandations tiendront compte de ce que vous avez déjà traité.",
         footer: "Vous recevez cet email car vous êtes abonné au plan Pro ShowYourBrand.",
       }
     : {
-        preview: `GEO Action Progress Summary — ${businessName}`,
+        preview: `GEO Action Progress Summary: ${businessName}`,
         title: "GEO Action Progress Summary",
         greeting: `Hello ${userName},`,
-        intro: `15 days ago, you received your GEO audit for **${businessName}** (score: ${geoScore}/100). Here's a summary of what you've accomplished — and what's still pending.`,
+        intro: `15 days ago, you received your GEO audit for **${businessName}** (score: ${geoScore}/100). Here's a summary of what you've accomplished, and what's still pending.`,
         doneTitle: "✅ Completed actions",
         noDone: "No actions checked yet.",
         pendingTitle: "⏳ Actions still pending",
         noPending: "Great work! You've addressed all detected issues.",
         ctaText: "Review my action plan →",
-        nextAudit: "🔄 Your next monthly audit will launch automatically in a few days — new recommendations will take into account what you've already fixed.",
+        nextAudit: "🔄 Your next monthly audit will launch automatically in a few days: new recommendations will take into account what you've already fixed.",
         footer: "You're receiving this because you're subscribed to the ShowYourBrand Pro plan.",
       };
 

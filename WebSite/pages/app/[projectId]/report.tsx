@@ -61,7 +61,7 @@ export default function ProjectReport({
     <>
       <Head>
         <title>
-          Rapport GEO — {project.brandName} · {branding.name}
+          Rapport GEO · {project.brandName} · {branding.name}
         </title>
         <meta name="robots" content="noindex" />
       </Head>
@@ -349,7 +349,7 @@ export default function ProjectReport({
                       {s.citations}
                     </td>
                     <td className="py-2.5 text-center">
-                      {s.citesBrand ? "Oui" : "—"}
+                      {s.citesBrand ? "Oui" : "Non"}
                     </td>
                   </tr>
                 ))}
@@ -395,7 +395,7 @@ export default function ProjectReport({
         <footer className="mt-10 border-t border-gray-200 pt-4 text-center text-xs text-gray-400">
           {branding.whiteLabel ? (
             <>
-              Rapport préparé par {branding.name} — {branding.domain}
+              Rapport préparé par {branding.name} · {branding.domain}
             </>
           ) : (
             <>Généré par ShowYourBrand · showyourbrand.io</>

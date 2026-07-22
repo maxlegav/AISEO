@@ -36,7 +36,7 @@ const AuditStartedAdminEmail: React.FC<AuditStartedAdminEmailProps> = ({
   return (
     <Html>
       <Head />
-      <Preview>🚀 New audit launched — {businessName} ({userEmail})</Preview>
+      <Preview>🚀 New audit launched: {businessName} ({userEmail})</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
@@ -118,7 +118,7 @@ const AuditStartedAdminEmail: React.FC<AuditStartedAdminEmailProps> = ({
 
           <Section style={footer}>
             <Text style={footerText}>
-              ShowYourBrand — Internal notification · Do not forward
+              ShowYourBrand · Internal notification · Do not forward
             </Text>
           </Section>
         </Container>

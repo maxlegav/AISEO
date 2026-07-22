@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, models, model } from 'mongoose';
 
 /**
- * WebhookEvent — idempotency ledger for Stripe webhooks.
+ * WebhookEvent: idempotency ledger for Stripe webhooks.
  *
  * Stripe explicitly retries webhook deliveries (including in success cases when
  * the network drops the ack), so handlers must be idempotent. We achieve this by
@@ -14,7 +14,7 @@ import mongoose, { Schema, Document, models, model } from 'mongoose';
  *   2. If the insert succeeds, run the handler. On success leave the row in
  *      place forever. On failure, delete the row so Stripe's retry can re-run.
  *   3. If the insert fails with E11000 (duplicate key), the event has already
- *      been processed (or is being processed concurrently) — return 200 and
+ *      been processed (or is being processed concurrently), so return 200 and
  *      skip the handler.
  */
 export interface IWebhookEvent extends Document {

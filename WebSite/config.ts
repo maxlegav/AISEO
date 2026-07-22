@@ -14,13 +14,13 @@ const config = {
   // Domain (TODO: Story 1.2 - set actual domain)
   domainName: "ShowYourBrand.app",
 
-  // Live site URL — reads from NEXT_PUBLIC_SITE_URL env var (set in Vercel dashboard)
+  // Live site URL: reads from NEXT_PUBLIC_SITE_URL env var (set in Vercel dashboard)
   // Falls back to the current Vercel deployment URL
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://showyourbrand.app",
 
   // Stripe Configuration - ShowYourBrand Pricing
   stripe: {
-    // Data One-Shot: €29 — raw JSON for developers & technical SEO
+    // Data One-Shot: €29, raw JSON for developers & technical SEO
     data: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_DATA || "",
       name: "Data",
@@ -32,7 +32,7 @@ const config = {
       dashboardAccessDays: null,
       auditsIncluded: 1,
       features: [
-        { name: "1 GEO audit — 4 AI engines" },
+        { name: "1 GEO audit sur 4 AI engines" },
         { name: "Raw JSON export of all results" },
         { name: "GEO Health Score & category breakdown" },
         { name: "100 prompts tested, 3 competitors" },
@@ -40,7 +40,7 @@ const config = {
         { name: "Permanent data access via API" },
       ],
     },
-    // Starter One-Shot: €79 — test your AI visibility
+    // Starter One-Shot: €79, test your AI visibility
     starter: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER || "",
       name: "Starter",
@@ -63,7 +63,7 @@ const config = {
         { name: "Dashboard access (30 days)" },
       ],
     },
-    // Pro Subscription: €59/month — track monthly progress
+    // Pro Subscription: €59/month, track monthly progress
     pro: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO || "",
       name: "Pro",
@@ -86,7 +86,7 @@ const config = {
         { name: "Regression alerts by email" },
       ],
     },
-    // Agency Subscription: €599/month — multi-client with white-label
+    // Agency Subscription: €599/month, multi-client with white-label
     agency: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_AGENCY || "",
       name: "Agency",
@@ -108,7 +108,7 @@ const config = {
         { name: "Dedicated account manager" },
       ],
     },
-    // Agency Extra Audit: €50 one-shot — additional audit beyond monthly credits
+    // Agency Extra Audit: €50 one-shot, additional audit beyond monthly credits
     agencyExtraAudit: {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_AGENCY_EXTRA || "",
       name: "Extra Audit",
@@ -125,7 +125,7 @@ const config = {
     },
   },
 
-  // SYB v2 — recurring GEO *monitoring* plans (Solo / Pro / Agence).
+  // SYB v2: recurring GEO *monitoring* plans (Solo / Pro / Agence).
   // These replace the one-shot audit tiers above as we transition to the
   // continuous-monitoring product. Prices are the single source of truth;
   // per-plan limits (projects / engines / frequency) live in

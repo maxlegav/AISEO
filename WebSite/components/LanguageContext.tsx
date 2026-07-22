@@ -249,7 +249,7 @@ export const translations: Translations = {
     "wizard.tierLocal": "Local",
     "wizard.tierLocalDesc": "Magasin, restaurant, agence",
     "wizard.tierHint": "Choisissez un type pour adapter les champs ci-dessous.",
-    "wizard.tierGlobalNote": "Aucune information de localisation requise — votre activité est mondiale.",
+    "wizard.tierGlobalNote": "Aucune information de localisation requise : votre activité est mondiale.",
     // Category presets (step 2)
     "wizard.catSaas": "SaaS / Logiciel",
     "wizard.catSaasDesc": "App, plateforme, API",
@@ -290,7 +290,7 @@ export const translations: Translations = {
     "wizard.location": "Localisation",
     "wizard.upgradeOrBuyCredits": "Améliorer votre plan ou acheter des crédits",
     // Business details (step 4)
-    "wizard.detailsHelper": "Tous les champs sont optionnels — chaque réponse améliore la précision de l'audit.",
+    "wizard.detailsHelper": "Tous les champs sont optionnels : chaque réponse améliore la précision de l'audit.",
     "wizard.services": "Services / produits",
     "wizard.servicesPlaceholder": "Ex : votre produit ou service principal...",
     "wizard.servicesPlaceholder.saas": "Ex : gestion de projet, CRM, analytics...",
@@ -702,7 +702,7 @@ export const translations: Translations = {
     "wizard.tierLocal": "Local",
     "wizard.tierLocalDesc": "Shop, restaurant, agency",
     "wizard.tierHint": "Pick a type to adapt the fields below.",
-    "wizard.tierGlobalNote": "No location info needed — your business is global.",
+    "wizard.tierGlobalNote": "No location info needed: your business is global.",
     // Category presets (step 2)
     "wizard.catSaas": "SaaS / Software",
     "wizard.catSaasDesc": "App, platform, API",
@@ -743,7 +743,7 @@ export const translations: Translations = {
     "wizard.location": "Location",
     "wizard.upgradeOrBuyCredits": "Upgrade your plan or buy credits",
     // Business details (step 4)
-    "wizard.detailsHelper": "Every field is optional — each answer improves audit precision.",
+    "wizard.detailsHelper": "Every field is optional: each answer improves audit precision.",
     "wizard.services": "Services / products",
     "wizard.servicesPlaceholder": "E.g. your main product or service...",
     "wizard.servicesPlaceholder.saas": "E.g. project management, CRM, analytics...",

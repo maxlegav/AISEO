@@ -11,7 +11,7 @@
  * (tie-break: the org the user owns). This means an invited teammate whose own
  * personal org is empty transparently lands in the agency workspace.
  *
- * Only call these from server code (getServerSideProps / API routes) — they
+ * Only call these from server code (getServerSideProps / API routes); they
  * touch Mongo + models.
  */
 import mongoose from "mongoose";

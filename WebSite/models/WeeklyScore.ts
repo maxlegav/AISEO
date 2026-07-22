@@ -34,7 +34,7 @@ const WeeklyScoreSchema = new Schema<WeeklyScoreDocument>(
   { timestamps: true, collection: "weeklyscores" },
 );
 
-// One score per project/scope/week — upserted on each run.
+// One score per project/scope/week, upserted on each run.
 WeeklyScoreSchema.index({ projectId: 1, scope: 1, week: 1 }, { unique: true });
 
 const WeeklyScore = (models?.WeeklyScore ||

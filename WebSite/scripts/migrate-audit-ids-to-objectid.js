@@ -46,7 +46,7 @@ async function migrate() {
         if (ObjectId.isValid(doc.userId)) {
           updates.userId = new ObjectId(doc.userId);
         } else {
-          console.warn(`  [${doc._id}] userId "${doc.userId}" is not a valid ObjectId — skipping field`);
+          console.warn(`  [${doc._id}] userId "${doc.userId}" is not a valid ObjectId, skipping field`);
           errors++;
         }
       }
@@ -56,7 +56,7 @@ async function migrate() {
         if (ObjectId.isValid(doc.businessId)) {
           updates.businessId = new ObjectId(doc.businessId);
         } else {
-          console.warn(`  [${doc._id}] businessId "${doc.businessId}" is not a valid ObjectId — skipping field`);
+          console.warn(`  [${doc._id}] businessId "${doc.businessId}" is not a valid ObjectId, skipping field`);
           errors++;
         }
       }

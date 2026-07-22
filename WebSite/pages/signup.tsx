@@ -672,7 +672,7 @@ export default function SignupPage() {
                       <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
                         <p className="text-sm font-medium text-purple-700">
                           Plan{" "}
-                          <span className="font-bold">{plan.name}</span> — €
+                          <span className="font-bold">{plan.name}</span> : €
                           {plan.price}/mois
                         </p>
                       </div>
@@ -799,7 +799,7 @@ export default function SignupPage() {
                   Choisissez votre plan
                 </h2>
                 <p className="text-gray-600">
-                  Monitoring GEO continu — annulable à tout moment.
+                  Monitoring GEO continu, annulable à tout moment.
                 </p>
               </div>
 

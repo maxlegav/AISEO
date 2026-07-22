@@ -1,5 +1,5 @@
 /**
- * SYB v2 monitoring plans — the single source of truth for per-plan *limits*
+ * SYB v2 monitoring plans: the single source of truth for per-plan *limits*
  * (how many projects, how many engines, which frequencies, branded PDF).
  *
  * Prices come from `config.monitoring` (the authoritative pricing source); this

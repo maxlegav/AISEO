@@ -24,7 +24,7 @@ export default function CheckoutSuccessPage() {
 
   // Countdown → monitoring app (SYB v2 product), not the legacy dashboard.
   // Runs exactly once on mount (empty deps) so it is immune to re-renders from
-  // the next-auth client session refresh — otherwise the interval would be torn
+  // the next-auth client session refresh. Otherwise the interval would be torn
   // down and re-armed on every refresh and the countdown would never elapse,
   // leaving a paying user stuck on this page.
   useEffect(() => {

@@ -67,7 +67,7 @@ export default function ProjectDashboard({ project, demo }: ProjectDashboardProp
       value:
         best.avgPosition != null
           ? `${best.avgPosition.toFixed(1)}ᵉ`
-          : "—",
+          : "N/A",
       hint: "quand la marque est citée",
     },
     {
@@ -207,7 +207,7 @@ export default function ProjectDashboard({ project, demo }: ProjectDashboardProp
           </div>
         </div>
 
-        {/* Per-LLM breakdown — the differentiator */}
+        {/* Per-LLM breakdown: the differentiator */}
         <div className="mt-6">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold text-gray-900">

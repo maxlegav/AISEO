@@ -28,7 +28,7 @@ export default function PrivacyPage() {
                 </svg>
               </div>
               <div>
-                <div className="font-semibold text-green-800 text-sm">GDPR Compliant — EU Data Protection</div>
+                <div className="font-semibold text-green-800 text-sm">GDPR Compliant · EU Data Protection</div>
                 <div className="text-green-700 text-xs mt-0.5">Your data is processed in accordance with Regulation (EU) 2016/679. You have full rights over your personal data.</div>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function PrivacyPage() {
                 <ul className="list-disc pl-6 text-gray-600 mb-4 space-y-2">
                   <li>
                     <strong>Performance of a contract (Art. 6(1)(b)):</strong> Account creation, subscription management,
-                    audit execution, and delivery of results — all necessary to provide the service you signed up for.
+                    audit execution, and delivery of results, all necessary to provide the service you signed up for.
                   </li>
                   <li>
                     <strong>Legitimate interests (Art. 6(1)(f)):</strong> Platform security, fraud prevention, service
@@ -200,8 +200,8 @@ export default function PrivacyPage() {
                     French tax law (6 years) and compliance with applicable regulations.
                   </li>
                   <li>
-                    <strong>Consent (Art. 6(1)(a)):</strong> Marketing communications and optional analytics cookies —
-                    you can withdraw consent at any time.
+                    <strong>Consent (Art. 6(1)(a)):</strong> Marketing communications and optional analytics cookies.
+                    You can withdraw consent at any time.
                   </li>
                 </ul>
                 <p className="text-gray-600 mb-4">
@@ -293,37 +293,37 @@ export default function PrivacyPage() {
                 </p>
                 <ul className="list-disc pl-6 text-gray-600 mb-4 space-y-2">
                   <li>
-                    <strong>Stripe</strong> — Payment processing (PCI DSS Level
+                    <strong>Stripe</strong>: Payment processing (PCI DSS Level
                     1 compliant)
                   </li>
                   <li>
-                    <strong>MongoDB Atlas</strong> — Database hosting (SOC 2
+                    <strong>MongoDB Atlas</strong>: Database hosting (SOC 2
                     Type II certified)
                   </li>
                   <li>
-                    <strong>Vercel</strong> — Application hosting and deployment
+                    <strong>Vercel</strong>: Application hosting and deployment
                   </li>
                   <li>
-                    <strong>Resend</strong> — Transactional email delivery
+                    <strong>Resend</strong>: Transactional email delivery
                   </li>
                   <li>
-                    <strong>OpenAI API</strong> — ChatGPT analysis for GEO
+                    <strong>OpenAI API</strong>: ChatGPT analysis for GEO
                     audits
                   </li>
                   <li>
-                    <strong>Anthropic API</strong> — Claude analysis for GEO
+                    <strong>Anthropic API</strong>: Claude analysis for GEO
                     audits
                   </li>
                   <li>
-                    <strong>Perplexity API</strong> — Perplexity analysis for
+                    <strong>Perplexity API</strong>: Perplexity analysis for
                     GEO audits
                   </li>
                   <li>
-                    <strong>DeepSeek API</strong> — DeepSeek analysis for GEO
+                    <strong>DeepSeek API</strong>: DeepSeek analysis for GEO
                     audits
                   </li>
                   <li>
-                    <strong>Google OAuth</strong> — Optional social login
+                    <strong>Google OAuth</strong>: Optional social login
                     provider
                   </li>
                 </ul>
@@ -394,7 +394,7 @@ export default function PrivacyPage() {
                 </p>
                 <p className="text-gray-600 mb-4">
                   You also have the right to lodge a complaint with the French
-                  data protection authority (CNIL — Commission Nationale de
+                  data protection authority (CNIL, Commission Nationale de
                   l&apos;Informatique et des Libert&eacute;s) at www.cnil.fr.
                 </p>
               </section>
@@ -408,7 +408,7 @@ export default function PrivacyPage() {
                   properly (authentication, session management, language
                   preferences). We do not use third-party advertising cookies.
                   We may use analytics cookies to understand how our platform is
-                  used — you can opt out at any time.
+                  used. You can opt out at any time.
                 </p>
               </section>
 

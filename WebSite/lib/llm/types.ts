@@ -13,7 +13,7 @@ export interface LLMResponse {
 }
 
 export interface LLMQueryContext {
-  /** Monitored brand — passed to the mock so it can realistically cite it. */
+  /** Monitored brand, passed to the mock so it can realistically cite it. */
   brandName: string;
   llm: LLMId;
 }

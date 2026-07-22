@@ -89,7 +89,7 @@ export default function BrandingSettings({
         ) : (
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
             <Lock className="h-3.5 w-3.5" />
-            Le white-label sera actif sur le plan Agence — vos réglages sont
+            Le white-label sera actif sur le plan Agence. Vos réglages sont
             enregistrés dès maintenant.
           </div>
         )}
