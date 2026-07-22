@@ -12,6 +12,7 @@ import {
   ExternalLink,
   ScanSearch,
   AlertTriangle,
+  Send,
 } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
@@ -409,6 +410,12 @@ export default function RecommendationsView({
                     </tbody>
                   </table>
                 </div>
+                <a
+                  href={`/app/${project.id}/outreach`}
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-100"
+                >
+                  <Send className="h-4 w-4" /> Préparer des demandes de mention
+                </a>
               </section>
             )}
 

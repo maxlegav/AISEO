@@ -7,6 +7,7 @@ import {
   Link2,
   Lightbulb,
   Activity,
+  Send,
   Settings,
   ChevronDown,
   ChevronsLeft,
@@ -25,6 +26,7 @@ export type MonitoringSection =
   | "sources"
   | "recommendations"
   | "impact"
+  | "outreach"
   | "clients"
   | "team"
   | "settings";
@@ -180,6 +182,13 @@ export default function MonitoringLayout({
       label: "Impact",
       icon: Activity,
       href: `${base}/impact`,
+      disabled: !project,
+    },
+    {
+      key: "outreach",
+      label: "Outreach",
+      icon: Send,
+      href: `${base}/outreach`,
       disabled: !project,
     },
   ];
