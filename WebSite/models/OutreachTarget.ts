@@ -1,6 +1,22 @@
 import mongoose from "mongoose";
 import { Schema, models, model } from "mongoose";
 import type { LLMId } from "@/lib/monitoring/types";
+import type { OutreachChannelKind } from "@/lib/outreach/channel";
+
+/** All channels the agent can prepare an action for. Kept in sync with `lib/outreach/channel.ts`. */
+export const OUTREACH_CHANNELS: OutreachChannelKind[] = [
+  "email",
+  "contact_form",
+  "reddit",
+  "quora",
+  "medium",
+  "youtube",
+  "forum",
+  "review_platform",
+  "listing",
+  "wikipedia",
+  "social",
+];
 
 /**
  * A prepared outreach request toward a high-authority source that the engines
@@ -30,6 +46,10 @@ export interface OutreachTargetDocument extends mongoose.Document {
   /** Public email found on the site, or null (contact to find manually). */
   contactEmail: string | null;
   contactSource: ContactSource;
+  /** How to reach this source (email, reddit, quora, review_platform, ...). */
+  channel: OutreachChannelKind;
+  /** Destination for the primary action (mailto is derived; else the cited page). */
+  actionUrl: string | null;
   status: OutreachStatus;
   /** Agent-written draft. */
   draftSubject: string;
@@ -70,6 +90,12 @@ const OutreachTargetSchema = new Schema<OutreachTargetDocument>(
       enum: ["page_contact", "manual", null],
       default: null,
     },
+    channel: {
+      type: String,
+      enum: OUTREACH_CHANNELS,
+      default: "email",
+    },
+    actionUrl: { type: String, default: null, maxlength: 500 },
     status: {
       type: String,
       enum: ["draft", "approved", "rejected", "sent"],

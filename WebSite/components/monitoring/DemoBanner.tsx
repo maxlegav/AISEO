@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import SybMark from "@/components/icons/SybMark";
 
 /** Notice shown on dashboard pages when the data is demo/mock, not real. */
 export default function DemoBanner({ demo }: { demo: boolean }) {
   if (!demo) return null;
   return (
     <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
-      <Sparkles className="h-4 w-4 shrink-0 text-violet-600" />
+      <SybMark className="h-4 w-4 shrink-0 text-violet-600" />
       <span>
         Données de démonstration. Créez votre premier projet pour lancer un vrai
         monitoring.

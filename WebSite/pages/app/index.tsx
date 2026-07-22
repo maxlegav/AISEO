@@ -1,7 +1,9 @@
 import Head from "next/head";
 import Link from "next/link";
 import type { GetServerSideProps } from "next";
-import { Plus, ArrowRight, Sparkles } from "lucide-react";
+import { Plus, ArrowRight } from "lucide-react";
+import SybMark from "@/components/icons/SybMark";
+import Favicon from "@/components/monitoring/Favicon";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import {
   DeltaBadge,
@@ -88,7 +90,7 @@ export default function AppOverview({
         )}
         {demo && (
           <div className="mb-5 flex items-start gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
-            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+            <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
             <span>
               Voici des <strong>données de démonstration</strong>. Créez votre
               premier projet pour lancer un vrai monitoring et voir vos propres
@@ -104,18 +106,26 @@ export default function AppOverview({
               className="group flex flex-col rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-lg"
             >
               <div className="mb-4 flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  {p.clientName && (
-                    <span className="mb-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                      {p.clientName}
-                    </span>
-                  )}
-                  <h3 className="truncate text-lg font-semibold text-gray-900">
-                    {p.brandName}
-                  </h3>
-                  <p className="truncate text-sm text-gray-400">
-                    {p.websiteUrl}
-                  </p>
+                <div className="flex min-w-0 items-start gap-2.5">
+                  <Favicon
+                    source={p.websiteUrl}
+                    label={p.brandName}
+                    size={36}
+                    rounded="rounded-xl"
+                  />
+                  <div className="min-w-0">
+                    {p.clientName && (
+                      <span className="mb-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                        {p.clientName}
+                      </span>
+                    )}
+                    <h3 className="truncate text-lg font-semibold text-gray-900">
+                      {p.brandName}
+                    </h3>
+                    <p className="truncate text-sm text-gray-400">
+                      {p.websiteUrl}
+                    </p>
+                  </div>
                 </div>
                 <ScoreRing value={p.globalScore} size={72} stroke={7} />
               </div>

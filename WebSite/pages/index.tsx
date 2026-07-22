@@ -18,9 +18,9 @@ import {
   Target,
   Zap,
   Star,
-  Sparkles,
   ShieldCheck,
 } from "lucide-react";
+import SybMark from "@/components/icons/SybMark";
 
 // AI Models with their actual logo files
 const aiModels = [
@@ -505,7 +505,7 @@ export default function Home() {
             {/* Centered: Title + Subtitle + Marquee */}
             <div className="flex-1 flex flex-col items-center justify-center gap-5 md:gap-7">
               <span className="eyebrow-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700">
-                <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+                <SybMark className="w-3.5 h-3.5 text-violet-600" />
                 Continuous GEO monitoring across every AI engine
               </span>
               <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-[1.05] tracking-tight px-2 sm:px-0">
@@ -667,7 +667,7 @@ export default function Home() {
               <div className="relative z-10">
                 <div className="text-center max-w-2xl mx-auto mb-12">
                   <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-violet-200 mb-5">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <SybMark className="w-3.5 h-3.5" />
                     Why ShowYourBrand
                   </span>
                   <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
@@ -707,7 +707,7 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-12">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-xs font-semibold text-violet-700 mb-5">
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <SybMark className="w-3.5 h-3.5" />
                   The new front page of the internet
                 </span>
                 <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-gray-900 mb-5 leading-[1.1]">
@@ -730,7 +730,7 @@ export default function Home() {
                 <div className="relative bg-white rounded-3xl border border-white/60 shadow-premium-lg p-5 md:p-7">
                   <div className="flex items-center gap-2 mb-5">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
-                      <Sparkles className="w-3.5 h-3.5 text-white" />
+                      <SybMark className="w-3.5 h-3.5 text-white" />
                     </div>
                     <span className="text-xs md:text-sm font-medium text-gray-400">Asked to ChatGPT · Perplexity · Gemini</span>
                   </div>

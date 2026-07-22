@@ -8,25 +8,31 @@ import {
   Copy,
   Check,
   Mail,
+  FileText,
+  MessageSquare,
+  MessagesSquare,
+  HelpCircle,
+  PenLine,
+  Youtube,
+  Star,
+  MapPin,
+  BookOpen,
+  Share2,
   ThumbsUp,
   ThumbsDown,
   Ban,
   Info,
-  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
+import SybMark from "@/components/icons/SybMark";
+import Favicon from "@/components/monitoring/Favicon";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import type { OutreachStatus } from "@/models/OutreachTarget";
+import { CHANNEL_META, type OutreachChannelKind } from "@/lib/outreach/channel";
 import type {
   OutreachTargetView,
   SuppressionView,
 } from "@/lib/outreach/outreach-page";
-
-const STATUS_LABEL: Record<OutreachStatus, string> = {
-  draft: "Brouillon",
-  approved: "Validé",
-  rejected: "Rejeté",
-  sent: "Envoyé",
-};
 
 const STATUS_STYLE: Record<OutreachStatus, string> = {
   draft: "bg-amber-50 text-amber-700",
@@ -34,6 +40,30 @@ const STATUS_STYLE: Record<OutreachStatus, string> = {
   rejected: "bg-gray-100 text-gray-500",
   sent: "bg-emerald-50 text-emerald-700",
 };
+
+const CHANNEL_ICON: Record<OutreachChannelKind, LucideIcon> = {
+  email: Mail,
+  contact_form: FileText,
+  reddit: MessageSquare,
+  quora: HelpCircle,
+  medium: PenLine,
+  youtube: Youtube,
+  forum: MessagesSquare,
+  review_platform: Star,
+  listing: MapPin,
+  wikipedia: BookOpen,
+  social: Share2,
+};
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Status label, channel-aware for the "done" state (envoyé / publié / fait). */
+function statusLabel(status: OutreachStatus, channel: OutreachChannelKind): string {
+  if (status === "sent") return capitalize(CHANNEL_META[channel].doneVerb);
+  return { draft: "Brouillon", approved: "Validé", rejected: "Rejeté", sent: "" }[status];
+}
 
 function ScorePill({ score }: { score: number }) {
   const tone =
@@ -47,6 +77,15 @@ function ScorePill({ score }: { score: number }) {
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${tone}`}
     >
       Pertinence {score}/100
+    </span>
+  );
+}
+
+function ChannelBadge({ channel }: { channel: OutreachChannelKind }) {
+  const Icon = CHANNEL_ICON[channel];
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-700">
+      <Icon className="h-3 w-3" /> {CHANNEL_META[channel].label}
     </span>
   );
 }
@@ -67,10 +106,14 @@ function TargetCard({
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const meta = CHANNEL_META[target.channel];
+  const usesEmail = meta.usesEmail;
+  const hasSubject = target.channel === "email" || target.channel === "contact_form";
+
   const dirty =
     subject !== target.subject ||
     body !== target.body ||
-    (email || null) !== (target.contactEmail ?? null);
+    (usesEmail && (email || null) !== (target.contactEmail ?? null));
 
   async function patch(payload: Record<string, unknown>, tag: string) {
     setBusy(tag);
@@ -101,7 +144,7 @@ function TargetCard({
       {
         editedSubject: subject,
         editedBody: body,
-        contactEmail: email.trim() || null,
+        ...(usesEmail ? { contactEmail: email.trim() || null } : {}),
       },
       "save",
     );
@@ -156,9 +199,10 @@ function TargetCard({
     }
   }
 
-  async function copyEmail() {
+  async function copyDraft() {
     try {
-      await navigator.clipboard.writeText(`Objet : ${subject}\n\n${body}`);
+      const text = hasSubject && subject ? `Objet : ${subject}\n\n${body}` : body;
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -169,20 +213,25 @@ function TargetCard({
   const mailto = `mailto:${encodeURIComponent(email.trim())}?subject=${encodeURIComponent(
     subject,
   )}&body=${encodeURIComponent(body)}`;
+  const actionHref = usesEmail ? mailto : target.actionUrl ?? "";
+  const actionEnabled = usesEmail ? Boolean(email.trim()) : Boolean(target.actionUrl);
+  const ActionIcon = usesEmail ? Mail : ExternalLink;
 
   return (
     <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="mb-1 flex flex-wrap items-center gap-2">
+            <Favicon source={target.domain} label={target.domain} size={22} rounded="rounded-md" />
             <span className="text-[15px] font-semibold text-gray-900">
               {target.domain}
             </span>
+            <ChannelBadge channel={target.channel} />
             <ScorePill score={target.relevanceScore} />
             <span
               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${STATUS_STYLE[target.status]}`}
             >
-              {STATUS_LABEL[target.status]}
+              {statusLabel(target.status, target.channel)}
             </span>
             {target.mock && (
               <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
@@ -226,37 +275,48 @@ function TargetCard({
         </button>
       </div>
 
-      <label className="mb-2 block text-sm">
-        <span className="mb-1 block font-medium text-gray-700">
-          Email de contact
-        </span>
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={
-            target.contactSource === "page_contact"
-              ? ""
-              : "Contact à trouver manuellement (aucun email public détecté)"
-          }
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-        />
-        {target.contactSource === "page_contact" && (
-          <span className="mt-1 block text-[11px] text-gray-400">
-            Email public détecté sur la page contact du site.
-          </span>
-        )}
-      </label>
+      <div className="mb-3 flex items-start gap-1.5 rounded-lg bg-violet-50/60 px-3 py-2 text-[12px] text-violet-800">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <span>{meta.howto}</span>
+      </div>
 
-      <label className="mb-2 block text-sm">
-        <span className="mb-1 block font-medium text-gray-700">Objet</span>
-        <input
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-        />
-      </label>
+      {usesEmail && (
+        <label className="mb-2 block text-sm">
+          <span className="mb-1 block font-medium text-gray-700">
+            Email de contact
+          </span>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={
+              target.contactSource === "page_contact"
+                ? ""
+                : "Contact à trouver manuellement (aucun email public détecté)"
+            }
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          />
+          {target.contactSource === "page_contact" && (
+            <span className="mt-1 block text-[11px] text-gray-400">
+              Email public détecté sur la page contact du site.
+            </span>
+          )}
+        </label>
+      )}
+
+      {hasSubject && (
+        <label className="mb-2 block text-sm">
+          <span className="mb-1 block font-medium text-gray-700">Objet</span>
+          <input
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          />
+        </label>
+      )}
       <label className="block text-sm">
-        <span className="mb-1 block font-medium text-gray-700">Message</span>
+        <span className="mb-1 block font-medium text-gray-700">
+          {usesEmail ? "Message" : "Contenu à publier"}
+        </span>
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -283,7 +343,7 @@ function TargetCard({
           </button>
         )}
         <button
-          onClick={copyEmail}
+          onClick={copyDraft}
           className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
         >
           {copied ? (
@@ -292,19 +352,21 @@ function TargetCard({
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4" /> Copier l&apos;email
+              <Copy className="h-4 w-4" /> {usesEmail ? "Copier l'email" : "Copier le message"}
             </>
           )}
         </button>
         <a
-          href={mailto}
+          href={actionEnabled ? actionHref : undefined}
+          target={usesEmail ? undefined : "_blank"}
+          rel={usesEmail ? undefined : "noopener noreferrer"}
           className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
-            email.trim()
+            actionEnabled
               ? "border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
               : "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
           }`}
         >
-          <Mail className="h-4 w-4" /> Ouvrir dans ma messagerie
+          <ActionIcon className="h-4 w-4" /> {meta.actionLabel}
         </a>
         {target.status !== "approved" && (
           <button
@@ -321,7 +383,7 @@ function TargetCard({
             disabled={busy !== null}
             className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-60"
           >
-            <Send className="h-4 w-4" /> J&apos;ai envoyé
+            <Send className="h-4 w-4" /> J&apos;ai {meta.doneVerb}
           </button>
         )}
         {target.status !== "rejected" && (
@@ -333,14 +395,16 @@ function TargetCard({
             <ThumbsDown className="h-4 w-4" /> Rejeter
           </button>
         )}
-        <button
-          onClick={suppress}
-          disabled={busy !== null}
-          title="Ajouter cet email à la liste « ne plus contacter »"
-          className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-500 transition-colors hover:text-red-600 disabled:opacity-60"
-        >
-          <Ban className="h-4 w-4" /> Ne plus contacter
-        </button>
+        {usesEmail && (
+          <button
+            onClick={suppress}
+            disabled={busy !== null}
+            title="Ajouter cet email à la liste « ne plus contacter »"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-500 transition-colors hover:text-red-600 disabled:opacity-60"
+          >
+            <Ban className="h-4 w-4" /> Ne plus contacter
+          </button>
+        )}
       </div>
     </div>
   );
@@ -383,7 +447,7 @@ export default function OutreachManager({
       const created = json.data?.created ?? 0;
       setNotice(
         created > 0
-          ? `${created} demande(s) préparée(s). Relisez, éditez, puis envoyez depuis votre messagerie.`
+          ? `${created} demande(s) préparée(s). Relisez, éditez, puis envoyez ou publiez vous-même.`
           : "Aucune nouvelle cible à préparer (déjà traitées, ou aucune source à conquérir).",
       );
       refresh();
@@ -398,13 +462,14 @@ export default function OutreachManager({
     <div className="space-y-5">
       <div className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5">
         <p className="text-sm font-semibold text-gray-900">
-          Transformez les « sources à conquérir » en demandes de mention.
+          Transformez les « sources à conquérir » en actions ciblées.
         </p>
         <p className="mt-0.5 text-sm text-gray-600">
-          L&apos;agent identifie les sites que les IA citent sans vous
-          mentionner, cherche un email de contact public et rédige un brouillon
-          personnalisé. Vous relisez, éditez, puis envoyez vous-même : rien
-          n&apos;est envoyé automatiquement.
+          L&apos;agent identifie les sources que les IA citent sans vous
+          mentionner et choisit le bon canal pour chacune : email pour un site
+          éditorial, réponse sur Reddit ou Quora, fiche à revendiquer sur G2 ou
+          TripAdvisor, etc. Vous relisez, éditez, puis envoyez ou publiez
+          vous-même : rien n&apos;est envoyé automatiquement.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <button
@@ -418,7 +483,7 @@ export default function OutreachManager({
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" /> Préparer des demandes
+                <SybMark className="h-4 w-4" /> Préparer des demandes
               </>
             )}
           </button>
@@ -481,9 +546,9 @@ export default function OutreachManager({
       )}
 
       <p className="text-[11px] leading-relaxed text-gray-400">
-        Cadre : demande de mention éditoriale B2B, contacts professionnels
+        Cadre : demande de mention ou contribution B2B, contacts et pages
         publics uniquement, aucun envoi automatique, opt-out respecté. Vérifiez
-        chaque brouillon et l&apos;adresse avant envoi.
+        chaque brouillon et sa destination avant envoi ou publication.
       </p>
     </div>
   );

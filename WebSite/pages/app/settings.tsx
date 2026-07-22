@@ -3,6 +3,7 @@ import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { ImagePlus, Lock, Globe, FileText, Loader2, Check } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import Favicon from "@/components/monitoring/Favicon";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getUserBranding } from "@/lib/monitoring/branding";
 import { cn } from "@/lib/utils";
@@ -178,9 +179,18 @@ export default function BrandingSettings({
                   className="flex items-center gap-2 px-4 py-3 text-white"
                   style={{ backgroundColor: color }}
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/25 text-xs font-bold">
-                    {(agencyName || "A").charAt(0)}
-                  </div>
+                  {domain ? (
+                    <Favicon
+                      source={domain}
+                      label={agencyName || "A"}
+                      size={24}
+                      rounded="rounded-md"
+                    />
+                  ) : (
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/25 text-xs font-bold">
+                      {(agencyName || "A").charAt(0)}
+                    </div>
+                  )}
                   <span className="text-sm font-semibold">
                     {agencyName || "Mon Agence"}
                   </span>

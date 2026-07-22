@@ -11,6 +11,7 @@ import OutreachTarget, {
   type ContactSource,
 } from "@/models/OutreachTarget";
 import OutreachSuppression from "@/models/OutreachSuppression";
+import type { OutreachChannelKind } from "@/lib/outreach/channel";
 import { hasScores } from "@/lib/monitoring/impact";
 import type { LLMId } from "@/lib/monitoring/types";
 
@@ -26,6 +27,8 @@ export interface OutreachTargetView {
   relevanceScore: number;
   contactEmail: string | null;
   contactSource: ContactSource;
+  channel: OutreachChannelKind;
+  actionUrl: string | null;
   status: OutreachStatus;
   subject: string;
   body: string;
@@ -117,6 +120,8 @@ export async function getOutreachData(
     relevanceScore: t.relevanceScore ?? 0,
     contactEmail: t.contactEmail ?? null,
     contactSource: t.contactSource ?? null,
+    channel: (t.channel ?? "email") as OutreachChannelKind,
+    actionUrl: t.actionUrl ?? null,
     status: t.status,
     subject: t.editedSubject ?? t.draftSubject ?? "",
     body: t.editedBody ?? t.draftBody ?? "",
