@@ -145,6 +145,36 @@ export interface RobotsBotStatus {
   allowed: boolean;
 }
 
+export type OnPageStatus = "ok" | "warn" | "missing";
+
+/** One checked on-page GEO signal (title, meta, H1, JSON-LD, OpenGraph...). */
+export interface OnPageItem {
+  label: string;
+  status: OnPageStatus;
+  detail: string;
+}
+
+/** Result of scanning the live home page HTML. */
+export interface OnPageScan {
+  scanned: boolean;
+  title: string | null;
+  metaDescription: string | null;
+  h1: string | null;
+  jsonLdTypes: string[];
+  hasFaqSchema: boolean;
+  hasOrganizationSchema: boolean;
+  openGraph: boolean;
+  items: OnPageItem[];
+}
+
+/** State of the site's own /llms.txt vs. the recommended one. */
+export interface LlmsTxtStatus {
+  found: boolean;
+  complete: boolean;
+  missing: string[];
+  note: string;
+}
+
 /** Technical GEO deliverables (llms.txt, robots.txt, sitemap, FAQ, descriptions). */
 export interface TechnicalGeo {
   llmsTxt: string;
@@ -167,6 +197,10 @@ export interface TechnicalGeo {
     metaDescription: string;
     sentenceDescriptors: string[];
   };
+  /** State of the site's own /llms.txt (live fetch), if checked. */
+  llmsTxtStatus?: LlmsTxtStatus;
+  /** On-page scan of the live home page (title/meta/H1/JSON-LD/OpenGraph). */
+  onPage?: OnPageScan;
 }
 
 export interface Project {
