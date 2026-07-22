@@ -6,6 +6,7 @@ import {
   Users,
   Link2,
   Lightbulb,
+  Activity,
   Settings,
   ChevronDown,
   ChevronsLeft,
@@ -23,6 +24,7 @@ export type MonitoringSection =
   | "competitors"
   | "sources"
   | "recommendations"
+  | "impact"
   | "clients"
   | "team"
   | "settings";
@@ -171,6 +173,13 @@ export default function MonitoringLayout({
       label: "Recommandations",
       icon: Lightbulb,
       href: `${base}/recommendations`,
+      disabled: !project,
+    },
+    {
+      key: "impact",
+      label: "Impact",
+      icon: Activity,
+      href: `${base}/impact`,
       disabled: !project,
     },
   ];

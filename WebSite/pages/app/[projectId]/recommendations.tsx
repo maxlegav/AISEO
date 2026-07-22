@@ -18,6 +18,7 @@ import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
 import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
 import DemoBanner from "@/components/monitoring/DemoBanner";
 import CopyBlock from "@/components/monitoring/CopyBlock";
+import GenerateDeliverable from "@/components/monitoring/GenerateDeliverable";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import {
   priorityLabel,
@@ -114,7 +115,13 @@ function ActionCard({ item }: { item: ActionItem }) {
   );
 }
 
-function PromptCard({ insight }: { insight: PromptInsight }) {
+function PromptCard({
+  insight,
+  projectId,
+}: {
+  insight: PromptInsight;
+  projectId: string;
+}) {
   const st = statusStyles[insight.status];
   return (
     <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">
@@ -183,6 +190,23 @@ function PromptCard({ insight }: { insight: PromptInsight }) {
       <div className="rounded-xl bg-violet-50/70 p-3 text-sm leading-relaxed text-gray-700">
         <span className="font-semibold text-violet-700">Action : </span>
         {insight.action}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <GenerateDeliverable
+          projectId={projectId}
+          kind="answer_page"
+          prompt={insight.prompt}
+          label="Générer la page de réponse"
+          compact
+        />
+        <GenerateDeliverable
+          projectId={projectId}
+          kind="forum_reply"
+          prompt={insight.prompt}
+          label="Générer un brouillon Reddit/Quora"
+          compact
+        />
       </div>
     </div>
   );
@@ -326,7 +350,11 @@ export default function RecommendationsView({
               />
               <div className="grid gap-3 lg:grid-cols-2">
                 {promptsToWin.map((insight) => (
-                  <PromptCard key={insight.prompt} insight={insight} />
+                  <PromptCard
+                    key={insight.prompt}
+                    insight={insight}
+                    projectId={project.id}
+                  />
                 ))}
               </div>
             </section>
@@ -449,6 +477,11 @@ export default function RecommendationsView({
                         : `Publiez ce fichier à la racine (${project.websiteUrl.replace(/\/+$/, "")}/llms.txt) pour décrire votre marque et vos pages clés aux crawlers IA.`}
                     </p>
                     <CopyBlock code={technical.llmsTxt} label="llms.txt" />
+                    <GenerateDeliverable
+                      projectId={project.id}
+                      kind="llms_txt"
+                      label="Générer un llms.txt complet"
+                    />
                   </div>
 
                   {/* robots.txt */}
@@ -529,6 +562,11 @@ export default function RecommendationsView({
                       code={technical.faqJsonLd}
                       label="JSON-LD (schema.org FAQPage)"
                     />
+                    <GenerateDeliverable
+                      projectId={project.id}
+                      kind="faq_jsonld"
+                      label="Générer une FAQ rédigée"
+                    />
                   </div>
 
                   {/* Descriptions */}
@@ -560,6 +598,32 @@ export default function RecommendationsView({
                         </li>
                       ))}
                     </ul>
+                  </div>
+
+                  {/* Organization JSON-LD patch */}
+                  <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        Balisage Organization (schema.org)
+                      </h3>
+                      {technical.onPage &&
+                        !technical.onPage.hasOrganizationSchema && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-600">
+                            <X className="h-3 w-3" /> Absent de votre page
+                          </span>
+                        )}
+                    </div>
+                    <p className="mb-3 text-sm text-gray-600">
+                      Ce bloc JSON-LD Organization aide les IA à identifier votre
+                      marque. Générez-le à partir des infos réelles de votre site,
+                      puis collez-le dans le &lt;head&gt;.
+                    </p>
+                    <GenerateDeliverable
+                      projectId={project.id}
+                      kind="org_jsonld"
+                      label="Générer le balisage Organization"
+                      compact
+                    />
                   </div>
                 </div>
               </section>
