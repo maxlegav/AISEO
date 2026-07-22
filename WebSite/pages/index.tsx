@@ -791,7 +791,7 @@ export default function Home() {
             <div className="bg-[#0F172A] rounded-3xl overflow-hidden text-white">
               <div className="grid md:grid-cols-2">
 
-                {/* Left  Story */}
+                {/* Left: Story */}
                 <div className="p-8 md:p-12 flex flex-col justify-center">
                   <p className="text-xs text-gray-500 uppercase tracking-widest mb-6">B2B SaaS · Project Management</p>
 
@@ -830,7 +830,7 @@ export default function Home() {
                   <p className="text-gray-600 text-xs">Founder, anonymous at their request</p>
                 </div>
 
-                {/* Right  Dashboard mockup */}
+                {/* Right: Dashboard mockup */}
                 <div className="bg-[#1E293B] p-6 md:p-8 flex flex-col gap-4">
 
                   {/* Header */}
@@ -1014,14 +1014,14 @@ export default function Home() {
                   role: "Founder, SaaS B2B",
                   avatar: "T",
                   bg: "bg-purple-600",
-                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why  and fixed it in a week. Our citation rate on ChatGPT doubled.",
+                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why, and fixed it in a week. Our citation rate on ChatGPT doubled.",
                 },
                 {
                   name: "Sophie M.",
                   role: "CEO, Marketing Agency",
                   avatar: "S",
                   bg: "bg-pink-500",
-                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports  I just present them. It's a game changer for the agency.",
+                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports, and I just present them. It's a game changer for the agency.",
                 },
                 {
                   name: "Antoine L.",
