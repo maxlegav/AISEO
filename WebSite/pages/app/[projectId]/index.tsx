@@ -15,6 +15,7 @@ import { Crosshair, FileDown, MessageSquare, RefreshCw, Trophy } from "lucide-re
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
 import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
+import RunButton from "@/components/monitoring/RunButton";
 import DemoBanner from "@/components/monitoring/DemoBanner";
 import {
   DeltaBadge,
@@ -96,13 +97,16 @@ export default function ProjectDashboard({ project, demo }: ProjectDashboardProp
         subtitle={project.category}
         demo={demo}
         actions={
-          <Link
-            href={`/app/${project.id}/report`}
-            className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
-          >
-            <FileDown className="h-4 w-4" />
-            Exporter en PDF
-          </Link>
+          <>
+            {project.isReal && !demo && <RunButton projectId={project.id} />}
+            <Link
+              href={`/app/${project.id}/report`}
+              className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+            >
+              <FileDown className="h-4 w-4" />
+              Exporter en PDF
+            </Link>
+          </>
         }
       >
         <DemoBanner demo={demo} />
