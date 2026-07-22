@@ -3,12 +3,14 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import Project from "@/models/Project";
 import MonitoredSource from "@/models/MonitoredSource";
-import OutreachTarget from "@/models/OutreachTarget";
+import OutreachTarget, { type ContactSource } from "@/models/OutreachTarget";
 import OutreachSuppression from "@/models/OutreachSuppression";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { requireWorkspace } from "@/lib/api-workspace";
 import { domainOf } from "@/lib/monitoring/source-extraction";
 import { findContactEmail } from "@/lib/outreach/contact";
+import { classifyChannel, CHANNEL_META } from "@/lib/outreach/channel";
+import type { OutreachChannelKind } from "@/lib/outreach/channel";
 import { generateOutreachDraft, relevanceScore } from "@/lib/outreach/draft";
 import { draftsRemainingToday } from "@/lib/outreach/outreach-page";
 import type { LLMId } from "@/lib/monitoring/types";
@@ -126,10 +128,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (agg.domain === ownDomain || tracked.has(agg.domain)) continue;
 
         const engines = Array.from(agg.engines);
-        const contact = await findContactEmail(agg.domain);
-        if (contact.email && suppressedEmails.has(contact.email.toLowerCase())) {
-          continue;
+
+        // Pick the right channel for this destination. Known platforms (Reddit,
+        // Quora, G2, TripAdvisor, ...) get a platform-specific action and no
+        // email lookup; regular sites get email discovery, falling back to a
+        // contact-form action when no public email is displayed.
+        const platform = classifyChannel(agg.domain);
+        let channel: OutreachChannelKind;
+        let contactEmail: string | null = null;
+        let contactSource: ContactSource = null;
+
+        if (platform) {
+          channel = platform;
+        } else {
+          const contact = await findContactEmail(agg.domain);
+          if (contact.email && suppressedEmails.has(contact.email.toLowerCase())) {
+            continue;
+          }
+          contactEmail = contact.email;
+          contactSource = contact.source;
+          channel = contact.email ? "email" : "contact_form";
         }
+
+        // For platform channels the action opens the cited page; for a contact
+        // form we point at the site's /contact; email uses a derived mailto.
+        const actionUrl = CHANNEL_META[channel].usesEmail
+          ? null
+          : channel === "contact_form"
+            ? `https://${agg.domain}/contact`
+            : agg.sampleUrl || `https://${agg.domain}`;
 
         const draft = await generateOutreachDraft({
           brandName: project.brandName,
@@ -139,6 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           sampleUrl: agg.sampleUrl,
           engines,
           citations: agg.citations,
+          channel,
         });
 
         const doc = await OutreachTarget.create({
@@ -150,8 +178,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           engines,
           citations: agg.citations,
           relevanceScore: relevanceScore(agg.citations, engines),
-          contactEmail: contact.email,
-          contactSource: contact.source,
+          contactEmail,
+          contactSource,
+          channel,
+          actionUrl,
           status: "draft",
           draftSubject: draft.subject,
           draftBody: draft.body,

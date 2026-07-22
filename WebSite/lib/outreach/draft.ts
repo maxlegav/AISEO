@@ -1,8 +1,12 @@
 /**
  * Outreach draft generation. Turns a "source à conquérir" (a domain the engines
- * cite but that ignores the brand) into a short, honest editorial mention
- * request, grounded in the project's GEO data. Human-in-the-loop: this only
- * prepares a draft the user reviews, edits and sends themselves.
+ * cite but that ignores the brand) into a short, honest, channel-appropriate
+ * action, grounded in the project's GEO data. Human-in-the-loop: this only
+ * prepares a draft the user reviews, edits and sends/publishes themselves.
+ *
+ * The draft is tailored to the destination (see `lib/outreach/channel.ts`): an
+ * editorial email for a personal site, a helpful comment for a Reddit thread or
+ * Quora question, a listing-claim checklist for a G2/TripAdvisor page, etc.
  *
  * With an LLM key the draft is actually written by the model; otherwise
  * `generateOutreachDraft` returns a deterministic template built from the same
@@ -10,6 +14,7 @@
  */
 import type { LLMId } from "@/lib/monitoring/types";
 import { generateText } from "@/lib/llm/generate";
+import { CHANNEL_META, type OutreachChannelKind } from "@/lib/outreach/channel";
 
 const ENGINE_LABEL: Record<LLMId, string> = {
   chatgpt: "ChatGPT",
@@ -26,6 +31,8 @@ export interface OutreachContext {
   sampleUrl: string;
   engines: LLMId[];
   citations: number;
+  /** How to reach this source. Defaults to email. */
+  channel?: OutreachChannelKind;
 }
 
 export interface OutreachDraft {
@@ -62,48 +69,156 @@ function origin(websiteUrl: string): string {
   }
 }
 
-const SYSTEM =
-  "Tu es un consultant GEO francophone qui rédige une demande de mention " +
-  "éditoriale honnête à un site tiers. Ton bref, professionnel, sans fausse " +
-  "familiarité ni flatterie. Jamais de promesse trompeuse. N'utilise jamais de " +
-  "tiret cadratin. Réponds STRICTEMENT au format :\nObjet: <objet>\n<corps de l'email>";
+function channelOf(ctx: OutreachContext): OutreachChannelKind {
+  return ctx.channel ?? "email";
+}
 
-function buildUser(ctx: OutreachContext): string {
+const SYSTEM_BASE =
+  "Tu es un consultant GEO francophone. Ton bref, professionnel, honnête, sans " +
+  "fausse familiarité ni flatterie, jamais de promesse trompeuse. N'utilise " +
+  "jamais de tiret cadratin.";
+
+/** Channel-specific system prompt + expected output format. */
+function systemFor(channel: OutreachChannelKind): string {
+  if (CHANNEL_META[channel].usesEmail || channel === "contact_form") {
+    return (
+      `${SYSTEM_BASE} Tu rédiges une demande de mention éditoriale. Réponds ` +
+      `STRICTEMENT au format :\nObjet: <objet>\n<corps du message>`
+    );
+  }
   return (
-    `Rédige une demande de mention pour la marque « ${ctx.brandName} » ` +
-    `(${ctx.category || "activité non précisée"}, site ${origin(ctx.websiteUrl)}) ` +
-    `adressée à la rédaction du site ${ctx.domain}.\n` +
-    `Contexte factuel : ${ctx.domain} est cité par ${enginesPhrase(ctx.engines)} ` +
-    `sur des requêtes de cette catégorie, mais ne mentionne pas encore ${ctx.brandName}.\n` +
-    `L'email doit : expliquer pourquoi ${ctx.brandName} mérite d'y figurer (valeur pour ` +
-    `leurs lecteurs), rester court (moins de 140 mots), proposer des éléments concrets ` +
-    `(lien, informations), et indiquer poliment l'origine du contact. Pas de pièce jointe.`
+    `${SYSTEM_BASE} Tu rédiges un message à publier sur la plateforme indiquée ` +
+    `(commentaire, réponse ou plan d'action), pas un email. Divulgue le lien avec ` +
+    `la marque. Réponds uniquement avec le contenu à publier, sans objet.`
   );
 }
 
-/** Deterministic template used when no LLM key is configured. */
+function buildUser(ctx: OutreachContext): string {
+  const channel = channelOf(ctx);
+  const meta = CHANNEL_META[channel];
+  const common =
+    `Marque : « ${ctx.brandName} » (${ctx.category || "activité non précisée"}, ` +
+    `site ${origin(ctx.websiteUrl)}).\n` +
+    `Source à conquérir : ${ctx.domain} (page : ${ctx.sampleUrl || ctx.domain}), ` +
+    `citée par ${enginesPhrase(ctx.engines)} sur des requêtes de cette catégorie ` +
+    `mais ne mentionnant pas encore ${ctx.brandName}.\n` +
+    `Canal : ${meta.label}. ${meta.howto}\n`;
+
+  if (channel === "email" || channel === "contact_form") {
+    return (
+      common +
+      `Rédige une demande de mention courte (moins de 140 mots) : pourquoi ` +
+      `${ctx.brandName} mérite d'y figurer (valeur pour les lecteurs), propose des ` +
+      `éléments concrets (lien, informations), indique poliment l'origine du contact.`
+    );
+  }
+  if (channel === "review_platform" || channel === "listing") {
+    return (
+      common +
+      `Rédige un court plan d'action (3 à 5 puces) pour que ${ctx.brandName} soit ` +
+      `présent sur cette plateforme : revendiquer/créer la fiche, la compléter, ` +
+      `obtenir des avis ou informations à jour. Pas d'email.`
+    );
+  }
+  if (channel === "wikipedia") {
+    return (
+      common +
+      `Rédige une suggestion neutre et sourcée à poster en page de discussion pour ` +
+      `envisager d'ajouter ${ctx.brandName}, en rappelant les règles de neutralité. ` +
+      `Pas de ton promotionnel.`
+    );
+  }
+  return (
+    common +
+    `Rédige un message utile et non promotionnel à publier (moins de 120 mots) qui ` +
+    `mentionne ${ctx.brandName} de façon pertinente et transparente, avec le lien ` +
+    `${origin(ctx.websiteUrl)}.`
+  );
+}
+
+/** Deterministic template used when no LLM key is configured, per channel. */
 export function buildMockDraft(ctx: OutreachContext): { subject: string; body: string } {
-  const subject = `Suggestion : ajouter ${ctx.brandName} à votre sélection ${ctx.category || ""}`.trim();
+  const channel = channelOf(ctx);
+  const brandUrl = origin(ctx.websiteUrl);
+  const cat = ctx.category || "votre thématique";
+  const engines = enginesPhrase(ctx.engines);
+
+  if (channel === "email" || channel === "contact_form") {
+    const subject = `Suggestion : ajouter ${ctx.brandName} à votre sélection ${ctx.category || ""}`.trim();
+    const via =
+      channel === "contact_form"
+        ? `(Message à envoyer via votre formulaire de contact. `
+        : `(Ce message vous est adressé car ${ctx.domain} traite ce sujet ; `;
+    const body = [
+      `Bonjour,`,
+      ``,
+      `Je vous contacte au sujet de vos contenus autour de ${cat}, que ${engines} ` +
+        `citent régulièrement comme référence.`,
+      ``,
+      `${ctx.brandName} (${brandUrl}) est un acteur pertinent de ce domaine qui ` +
+        `n'apparaît pas encore dans votre page. Il pourrait utilement compléter votre ` +
+        `sélection pour vos lecteurs qui comparent les options.`,
+      ``,
+      `Je reste à disposition pour vous fournir des informations, des chiffres ou un ` +
+        `lien à jour si cela vous est utile. Vous décidez librement de l'opportunité ` +
+        `de l'ajouter.`,
+      ``,
+      `Bien à vous,`,
+      `L'équipe ${ctx.brandName}`,
+      ``,
+      `${via}répondez STOP si vous ne souhaitez pas être recontacté.)`,
+    ].join("\n");
+    return { subject, body };
+  }
+
+  if (channel === "review_platform" || channel === "listing") {
+    const where = ctx.domain;
+    const body = [
+      `Plan d'action pour ${ctx.brandName} sur ${where}`,
+      `(${where} est cité par ${engines} sur des requêtes de ${cat}, sans mentionner ` +
+        `${ctx.brandName}.)`,
+      ``,
+      `- Revendiquez ou créez la fiche de ${ctx.brandName} sur ${where}.`,
+      `- Complétez le profil : description claire, catégorie, lien ${brandUrl}, visuels.`,
+      channel === "review_platform"
+        ? `- Sollicitez quelques avis clients récents et authentiques.`
+        : `- Ajoutez horaires, localisation et informations pratiques à jour.`,
+      `- Reliez la fiche à ${brandUrl} pour renforcer la cohérence des signaux.`,
+      ``,
+      `Objectif : apparaître là où les IA vont chercher leurs références.`,
+    ].join("\n");
+    return { subject: "", body };
+  }
+
+  if (channel === "wikipedia") {
+    const body = [
+      `Suggestion à poster en page de discussion (Wikipédia)`,
+      ``,
+      `Bonjour, ${ctx.domain} est utilisé comme source par ${engines} sur des sujets ` +
+        `de ${cat}. Si cela respecte les critères d'admissibilité et de neutralité, ` +
+        `${ctx.brandName} (${brandUrl}) pourrait être mentionné avec une source fiable ` +
+        `et indépendante.`,
+      ``,
+      `Je signale un possible conflit d'intérêt et laisse la communauté décider. ` +
+        `Aucune formulation promotionnelle n'est proposée.`,
+    ].join("\n");
+    return { subject: "", body };
+  }
+
+  // reddit / quora / medium / youtube / forum / social: a message to publish.
+  const platform = CHANNEL_META[channel].label;
   const body = [
-    `Bonjour,`,
+    `Message à publier sur ${platform} (${ctx.domain})`,
+    `(Page citée par ${engines} sur des requêtes de ${cat}.)`,
     ``,
-    `Je vous contacte au sujet de vos contenus autour de ${ctx.category || "votre thématique"}, ` +
-      `que ${enginesPhrase(ctx.engines)} citent régulièrement comme référence.`,
+    `Bonjour, pour compléter le sujet, ${ctx.brandName} (${brandUrl}) est une option ` +
+      `pertinente en ${cat} qui n'est pas encore citée ici. Je précise en toute ` +
+      `transparence mon lien avec cette marque.`,
     ``,
-    `${ctx.brandName} (${origin(ctx.websiteUrl)}) est un acteur pertinent de ce domaine qui ` +
-      `n'apparaît pas encore dans votre page. Il pourrait utilement compléter votre sélection ` +
-      `pour vos lecteurs qui comparent les options.`,
-    ``,
-    `Je reste à disposition pour vous fournir des informations, des chiffres ou un lien à jour ` +
-      `si cela vous est utile. Vous décidez librement de l'opportunité de l'ajouter.`,
-    ``,
-    `Bien à vous,`,
-    `L'équipe ${ctx.brandName}`,
-    ``,
-    `(Ce message vous est adressé car ${ctx.domain} traite ce sujet ; répondez STOP si vous ne ` +
-      `souhaitez pas être recontacté.)`,
+    `Message utile et non promotionnel : ajoutez un élément concret (retour ` +
+      `d'expérience, chiffre, comparaison) plutôt qu'une simple mention.`,
   ].join("\n");
-  return { subject, body };
+  return { subject: "", body };
 }
 
 /** Parse "Objet: ...\n<body>" from a model response, tolerant to variations. */
@@ -116,18 +231,24 @@ function parseSubjectBody(text: string): { subject: string; body: string } | nul
 
 /**
  * Produce one outreach draft. Uses a real LLM when a key is set; otherwise the
- * deterministic template (flagged `mock: true`).
+ * deterministic template (flagged `mock: true`). Channel-aware.
  */
 export async function generateOutreachDraft(ctx: OutreachContext): Promise<OutreachDraft> {
+  const channel = channelOf(ctx);
   const mock = buildMockDraft(ctx);
-  const result = await generateText(SYSTEM, buildUser(ctx));
+  const result = await generateText(systemFor(channel), buildUser(ctx));
 
   if (result.mock || !result.text) {
     return { subject: mock.subject, body: mock.body, mock: true };
   }
+
+  // Non-email channels have no subject: keep the whole model text as body.
+  if (!CHANNEL_META[channel].usesEmail && channel !== "contact_form") {
+    return { subject: "", body: result.text.trim(), mock: false, provider: result.provider };
+  }
+
   const parsed = parseSubjectBody(result.text);
   if (!parsed) {
-    // Model did not follow the format: keep its text as body, template subject.
     return { subject: mock.subject, body: result.text.trim(), mock: false, provider: result.provider };
   }
   return { subject: parsed.subject, body: parsed.body, mock: false, provider: result.provider };

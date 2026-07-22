@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Sparkles, Loader2, AlertTriangle, Info } from "lucide-react";
+import { Loader2, AlertTriangle, Info } from "lucide-react";
+import SybMark from "@/components/icons/SybMark";
 import CopyBlock from "@/components/monitoring/CopyBlock";
 import type { DeliverableKind } from "@/lib/generation/deliverables";
 
@@ -71,7 +72,7 @@ export default function GenerateDeliverable({
           </>
         ) : (
           <>
-            <Sparkles className="h-4 w-4" />
+            <SybMark className="h-4 w-4" />
             {result ? "Régénérer" : label}
           </>
         )}
@@ -95,7 +96,7 @@ export default function GenerateDeliverable({
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-                <Sparkles className="h-3 w-3" /> Rédigé par IA
+                <SybMark className="h-3 w-3" /> Rédigé par IA
                 {result.provider ? ` (${result.provider})` : ""}
               </span>
             )}

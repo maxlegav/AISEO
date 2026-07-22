@@ -13,12 +13,13 @@ import {
   ChevronsLeft,
   Plus,
   Bell,
-  Sparkles,
   Building2,
   UserPlus,
 } from "lucide-react";
 import { PROJECTS, Project } from "@/lib/mock/monitoring";
 import { cn } from "@/lib/utils";
+import SybMark from "@/components/icons/SybMark";
+import Favicon from "@/components/monitoring/Favicon";
 
 export type MonitoringSection =
   | "dashboard"
@@ -72,9 +73,17 @@ function ProjectSwitcher({
         className="w-full flex items-center justify-between gap-2 rounded-xl border border-white/60 bg-white/70 px-3 py-2.5 text-left shadow-sm transition-colors hover:bg-white"
       >
         <span className="flex items-center gap-2.5 min-w-0">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-xs font-bold text-white">
-            {current ? current.brandName.charAt(0) : "•"}
-          </span>
+          {current ? (
+            <Favicon
+              source={current.websiteUrl}
+              label={current.brandName}
+              size={28}
+            />
+          ) : (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-xs font-bold text-white">
+              •
+            </span>
+          )}
           <span className="min-w-0">
             <span className="block truncate text-[13px] font-semibold text-gray-900">
               {current ? current.brandName : "Tous les projets"}
@@ -114,9 +123,12 @@ function ProjectSwitcher({
                   : "text-gray-600"
               )}
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-fuchsia-500 text-[11px] font-bold text-white">
-                {p.brandName.charAt(0)}
-              </span>
+              <Favicon
+                source={p.websiteUrl}
+                label={p.brandName}
+                size={24}
+                rounded="rounded-md"
+              />
               {p.brandName}
             </Link>
           ))}
@@ -302,7 +314,7 @@ export default function MonitoringLayout({
         {demo && (
           <div className="mx-3 rounded-xl border border-violet-100 bg-white/80 p-3.5 shadow-sm">
             <div className="mb-1 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-violet-600" />
+              <SybMark className="h-3.5 w-3.5 text-violet-600" />
               <span className="text-[12px] font-semibold text-gray-800">
                 Données de démonstration
               </span>
