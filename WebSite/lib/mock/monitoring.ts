@@ -94,6 +94,81 @@ export interface Recommendation {
   detail: string;
 }
 
+export type Priority = "high" | "medium" | "low";
+
+/** Per-prompt visibility breakdown — the core of the recommendations page. */
+export interface PromptInsight {
+  prompt: string;
+  status: "won" | "partial" | "lost";
+  /** Engines that cite the brand on this prompt. */
+  enginesCiting: LLMId[];
+  /** Configured engines that answered but did NOT cite the brand. */
+  enginesMissing: LLMId[];
+  /** Competitors cited on this prompt while the brand is absent. */
+  competitorsAhead: string[];
+  /** Sources the engines cited on this prompt where the brand is absent. */
+  winningSources: { domain: string; url: string }[];
+  /** Concrete, prompt-specific action. */
+  action: string;
+  /** Estimated global score points if the brand wins every missing engine here. */
+  potential: number;
+}
+
+/** A high-authority source that the engines cite but that never mentions the brand. */
+export interface SourceTarget {
+  domain: string;
+  sampleUrl: string;
+  citations: number;
+  engines: LLMId[];
+}
+
+/** A single prioritized action in the action plan. */
+export interface ActionItem {
+  id: string;
+  title: string;
+  detail: string;
+  priority: Priority;
+  /** Estimated global score points. */
+  impact: number;
+  effort: "Faible" | "Moyen" | "Élevé";
+  engines: LLMId[];
+  category: "content" | "sources" | "technical" | "engine";
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface RobotsBotStatus {
+  bot: string;
+  allowed: boolean;
+}
+
+/** Technical GEO deliverables (llms.txt, robots.txt, sitemap, FAQ, descriptions). */
+export interface TechnicalGeo {
+  llmsTxt: string;
+  robots: {
+    checked: boolean;
+    reachable: boolean;
+    bots: RobotsBotStatus[];
+    patch: string;
+    note: string;
+  };
+  sitemap: {
+    checked: boolean;
+    found: boolean;
+    url: string;
+    note: string;
+  };
+  faq: FaqItem[];
+  faqJsonLd: string;
+  descriptions: {
+    metaDescription: string;
+    sentenceDescriptors: string[];
+  };
+}
+
 export interface Project {
   id: string;
   brandName: string;
@@ -109,6 +184,14 @@ export interface Project {
   competitorTable: CompetitorRow[];
   sources: SourceRow[];
   recommendations: Recommendation[];
+  /** Per-prompt visibility breakdown (data-driven recommendations). */
+  promptInsights?: PromptInsight[];
+  /** High-authority sources to earn a mention on. */
+  sourceTargets?: SourceTarget[];
+  /** Prioritized action plan with estimated impact/effort. */
+  actionPlan?: ActionItem[];
+  /** Technical GEO deliverables (llms.txt, robots.txt, sitemap, FAQ, descriptions). */
+  technical?: TechnicalGeo;
   /** True when this project is backed by real monitoring data (not the demo). */
   isReal?: boolean;
   /** True for a real project that has no run yet (show onboarding state). */

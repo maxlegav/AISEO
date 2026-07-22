@@ -18,6 +18,7 @@ import LLMResult from "@/models/LLMResult";
 import WeeklyScore from "@/models/WeeklyScore";
 import MonitoredSource from "@/models/MonitoredSource";
 import { detectBrand } from "@/lib/monitoring/brand-detection";
+import { domainOf } from "@/lib/monitoring/source-extraction";
 import type { LLMId } from "@/lib/monitoring/types";
 import { LLM_ORDER } from "@/lib/monitoring/types";
 import {
@@ -29,6 +30,14 @@ import {
   type SourceRow,
   type Recommendation,
 } from "@/lib/mock/monitoring";
+import {
+  analyzePrompts,
+  buildSourceTargets,
+  buildActionPlan,
+  buildTechnicalGeo,
+  type ResultRow,
+} from "@/lib/monitoring/recommendations";
+import { fetchSiteSignals } from "@/lib/monitoring/site-signals";
 
 async function connectDB(): Promise<void> {
   if (mongoose.connection.readyState !== 1) {
@@ -243,6 +252,39 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
     .slice(0, 3)
     .map((s) => recommendationFor(s.llm, s.presenceRate));
 
+  // --- data-driven recommendations (per-prompt, sources, action plan) ---
+  const resultRows: ResultRow[] = results.map((r) => ({
+    prompt: r.prompt,
+    llm: r.llm as LLMId,
+    brandMentioned: r.brandMentioned,
+    responseText: r.responseText,
+    sourcesCited: r.sourcesCited ?? [],
+  }));
+  const promptInsights = analyzePrompts(resultRows, p.competitors);
+  const sourceTargets = buildSourceTargets(sources);
+  const actionPlan = buildActionPlan(
+    promptInsights,
+    sourceTargets,
+    llmScores.map((s) => ({ llm: s.llm, presenceRate: s.presenceRate })),
+  );
+
+  // --- technical GEO deliverables (best-effort live site check) ---
+  const signals = await fetchSiteSignals(p.websiteUrl);
+  const ownDomainSources = sources
+    .filter((s) => s.domain === domainOf(p.websiteUrl))
+    .map((s) => s.url);
+  const technical = buildTechnicalGeo({
+    brandName: p.brandName,
+    websiteUrl: p.websiteUrl,
+    category: p.category ?? "",
+    competitors: p.competitors,
+    prompts: p.prompts,
+    topSourceUrls: ownDomainSources,
+    robotsText: signals.robotsText,
+    robotsReachable: signals.robotsReachable,
+    sitemapFound: signals.sitemapFound,
+  });
+
   return {
     id: projectId.toString(),
     brandName: p.brandName,
@@ -258,6 +300,10 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
     competitorTable,
     sources,
     recommendations,
+    promptInsights,
+    sourceTargets,
+    actionPlan,
+    technical,
     isReal: true,
     pendingFirstRun: false,
   };
