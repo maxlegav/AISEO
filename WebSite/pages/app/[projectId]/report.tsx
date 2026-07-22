@@ -19,7 +19,7 @@ import {
   scoreLabel,
 } from "@/components/monitoring/widgets";
 import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
-import { getSessionUserId, loginRedirect } from "@/lib/app-auth";
+import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 import {
   getUserBranding,
@@ -433,12 +433,15 @@ export default function ProjectReport({
 export const getServerSideProps: GetServerSideProps<ReportProps> = async (
   ctx,
 ) => {
-  const userId = await getSessionUserId(ctx);
-  if (!userId) return loginRedirect("/app");
+  const session = await getSessionWorkspace(ctx);
+  if (!session) return loginRedirect("/app");
 
   const projectId = ctx.params?.projectId as string;
   const [{ project, demo }, { branding, whiteLabelActive }] = await Promise.all(
-    [getProjectDashboard(userId, projectId), getUserBranding(userId)],
+    [
+      getProjectDashboard(session.workspace.organizationId, projectId),
+      getUserBranding(session.workspace.ownerId),
+    ],
   );
 
   // No data to export yet → send the user back to the project (onboarding run).
