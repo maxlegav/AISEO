@@ -283,6 +283,8 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
     robotsText: signals.robotsText,
     robotsReachable: signals.robotsReachable,
     sitemapFound: signals.sitemapFound,
+    llmsTxtExisting: signals.llmsTxt,
+    homeHtml: signals.homeHtml,
   });
 
   return {

@@ -10,6 +10,8 @@ import {
   X,
   TrendingUp,
   ExternalLink,
+  ScanSearch,
+  AlertTriangle,
 } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
@@ -24,6 +26,8 @@ import {
   type PromptInsight,
   type ActionItem,
   type Project,
+  type OnPageStatus,
+  type OnPageItem,
 } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectDashboard } from "@/lib/monitoring/dashboard";
@@ -179,6 +183,35 @@ function PromptCard({ insight }: { insight: PromptInsight }) {
       <div className="rounded-xl bg-violet-50/70 p-3 text-sm leading-relaxed text-gray-700">
         <span className="font-semibold text-violet-700">Action : </span>
         {insight.action}
+      </div>
+    </div>
+  );
+}
+
+const onPageStatusStyles: Record<
+  OnPageStatus,
+  { className: string; icon: typeof Check }
+> = {
+  ok: { className: "bg-emerald-50 text-emerald-700", icon: Check },
+  warn: { className: "bg-amber-50 text-amber-700", icon: AlertTriangle },
+  missing: { className: "bg-red-50 text-red-600", icon: X },
+};
+
+function OnPageRow({ item }: { item: OnPageItem }) {
+  const st = onPageStatusStyles[item.status];
+  const Icon = st.icon;
+  return (
+    <div className="flex items-start gap-3 border-b border-gray-50 py-3 last:border-0">
+      <span
+        className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${st.className}`}
+      >
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-gray-900">{item.label}</p>
+        <p className="break-words text-xs leading-relaxed text-gray-600">
+          {item.detail}
+        </p>
       </div>
     </div>
   );
@@ -351,7 +384,23 @@ export default function RecommendationsView({
               </section>
             )}
 
-            {/* 4. Technical GEO deliverables */}
+            {/* 4. On-page scan of the live site */}
+            {technical?.onPage?.scanned && (
+              <section>
+                <SectionTitle
+                  icon={ScanSearch}
+                  title="Analyse on-page de votre site"
+                  subtitle={`Scan en direct de ${project.websiteUrl.replace(/\/+$/, "")} : ce que les IA voient réellement sur votre page d'accueil.`}
+                />
+                <div className="overflow-hidden rounded-2xl border border-white/60 bg-white/80 px-5 shadow-premium backdrop-blur-sm">
+                  {technical.onPage.items.map((item) => (
+                    <OnPageRow key={item.label} item={item} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* 5. Technical GEO deliverables */}
             {technical && (
               <section>
                 <SectionTitle
@@ -362,12 +411,42 @@ export default function RecommendationsView({
                 <div className="space-y-4">
                   {/* llms.txt */}
                   <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">
-                    <h3 className="mb-1 text-base font-semibold text-gray-900">
-                      llms.txt
-                    </h3>
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        llms.txt
+                      </h3>
+                      {technical.llmsTxtStatus && (
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                            technical.llmsTxtStatus.found &&
+                            technical.llmsTxtStatus.complete
+                              ? "bg-emerald-50 text-emerald-700"
+                              : technical.llmsTxtStatus.found
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-red-50 text-red-600"
+                          }`}
+                        >
+                          {technical.llmsTxtStatus.found &&
+                          technical.llmsTxtStatus.complete ? (
+                            <Check className="h-3 w-3" />
+                          ) : technical.llmsTxtStatus.found ? (
+                            <AlertTriangle className="h-3 w-3" />
+                          ) : (
+                            <X className="h-3 w-3" />
+                          )}
+                          {technical.llmsTxtStatus.found &&
+                          technical.llmsTxtStatus.complete
+                            ? "En ligne et complet"
+                            : technical.llmsTxtStatus.found
+                              ? "À compléter"
+                              : "Absent"}
+                        </span>
+                      )}
+                    </div>
                     <p className="mb-3 text-sm text-gray-600">
-                      Publiez ce fichier à la racine ({project.websiteUrl.replace(/\/+$/, "")}/llms.txt) pour
-                      décrire votre marque et vos pages clés aux crawlers IA.
+                      {technical.llmsTxtStatus
+                        ? technical.llmsTxtStatus.note
+                        : `Publiez ce fichier à la racine (${project.websiteUrl.replace(/\/+$/, "")}/llms.txt) pour décrire votre marque et vos pages clés aux crawlers IA.`}
                     </p>
                     <CopyBlock code={technical.llmsTxt} label="llms.txt" />
                   </div>
@@ -486,7 +565,7 @@ export default function RecommendationsView({
               </section>
             )}
 
-            {/* 5. Per-engine playbook */}
+            {/* 6. Per-engine playbook */}
             <section>
               <SectionTitle
                 icon={Lightbulb}

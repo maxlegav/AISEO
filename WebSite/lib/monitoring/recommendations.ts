@@ -21,6 +21,7 @@ import {
 } from "@/lib/mock/monitoring";
 import { detectBrand } from "@/lib/monitoring/brand-detection";
 import { domainOf } from "@/lib/monitoring/source-extraction";
+import { scanOnPage, analyzeLlmsTxt } from "@/lib/monitoring/onpage";
 
 /** One stored engine answer to one prompt (subset of LLMResult we need). */
 export interface ResultRow {
@@ -440,6 +441,10 @@ export function buildTechnicalGeo(params: {
   robotsText: string | null;
   robotsReachable: boolean;
   sitemapFound: boolean | null;
+  /** Raw content of the site's own /llms.txt (live fetch), if any. */
+  llmsTxtExisting?: string | null;
+  /** Home page HTML (live fetch) for the on-page scan, if any. */
+  homeHtml?: string | null;
 }): TechnicalGeo {
   const origin = siteOrigin(params.websiteUrl);
   const faq = buildFaq(params.brandName, params.category, params.prompts);
@@ -470,5 +475,13 @@ export function buildTechnicalGeo(params: {
       params.category,
       params.competitors,
     ),
+    llmsTxtStatus:
+      params.llmsTxtExisting === undefined
+        ? undefined
+        : analyzeLlmsTxt(params.llmsTxtExisting),
+    onPage:
+      params.homeHtml === undefined
+        ? undefined
+        : scanOnPage(params.homeHtml, params.brandName),
   };
 }
