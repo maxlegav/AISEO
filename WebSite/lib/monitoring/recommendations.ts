@@ -286,6 +286,66 @@ export function buildLlmsTxt(
   return lines.join("\n");
 }
 
+interface RobotGroup {
+  agents: string[];
+  rules: { type: "allow" | "disallow"; path: string }[];
+}
+
+/**
+ * Parse robots.txt into groups. Consecutive `User-agent:` lines share the
+ * following rule block (per the robots.txt spec); a new group starts when a
+ * `User-agent:` line appears after a rule line.
+ */
+function parseRobotGroups(robotsText: string): RobotGroup[] {
+  const groups: RobotGroup[] = [];
+  let current: RobotGroup | null = null;
+  for (const raw of robotsText.split(/\r?\n/)) {
+    const line = raw.replace(/#.*$/, "").trim();
+    if (!line) continue;
+    const ci = line.indexOf(":");
+    if (ci === -1) continue;
+    const field = line.slice(0, ci).trim().toLowerCase();
+    const value = line.slice(ci + 1).trim();
+    if (field === "user-agent") {
+      if (!current || current.rules.length > 0) {
+        current = { agents: [], rules: [] };
+        groups.push(current);
+      }
+      current.agents.push(value.toLowerCase());
+    } else if (field === "allow" || field === "disallow") {
+      if (!current) {
+        current = { agents: ["*"], rules: [] };
+        groups.push(current);
+      }
+      current.rules.push({ type: field, path: value });
+    }
+  }
+  return groups;
+}
+
+/** Most specific applicable group for a bot: exact match, else the `*` group. */
+function groupForBot(groups: RobotGroup[], bot: string): RobotGroup | null {
+  const b = bot.toLowerCase();
+  let wildcard: RobotGroup | null = null;
+  for (const g of groups) {
+    if (g.agents.includes(b)) return g;
+    if (g.agents.includes("*")) wildcard = g;
+  }
+  return wildcard;
+}
+
+/** Whether the group lets a crawler reach the site root ("/"). */
+function allowsRoot(group: RobotGroup | null): boolean {
+  if (!group) return true;
+  let disallowRoot = false;
+  let allowRoot = false;
+  for (const r of group.rules) {
+    if (r.type === "disallow" && r.path === "/") disallowRoot = true;
+    if (r.type === "allow" && (r.path === "/" || r.path === "")) allowRoot = true;
+  }
+  return !disallowRoot || allowRoot;
+}
+
 export function analyzeRobots(
   robotsText: string | null,
   reachable: boolean,
@@ -300,22 +360,11 @@ export function analyzeRobots(
     };
   }
 
-  const text = robotsText.toLowerCase();
-  const bots: RobotsBotStatus[] = AI_BOTS.map((bot) => {
-    const b = bot.toLowerCase();
-    // Blocked if there's a "user-agent: <bot>" section with "disallow: /".
-    const idx = text.indexOf(`user-agent: ${b}`);
-    if (idx === -1) {
-      // No specific rule → covered by wildcard; blocked only if "* disallow: /".
-      const star = text.indexOf("user-agent: *");
-      const blockedByStar =
-        star !== -1 && /disallow:\s*\/\s*($|\n)/.test(text.slice(star, star + 200));
-      return { bot, allowed: !blockedByStar };
-    }
-    const section = text.slice(idx, idx + 200);
-    const blocked = /disallow:\s*\/\s*($|\n)/.test(section);
-    return { bot, allowed: !blocked };
-  });
+  const groups = parseRobotGroups(robotsText);
+  const bots: RobotsBotStatus[] = AI_BOTS.map((bot) => ({
+    bot,
+    allowed: allowsRoot(groupForBot(groups, bot)),
+  }));
 
   const blocked = bots.filter((b) => !b.allowed);
   return {

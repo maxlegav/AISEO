@@ -136,6 +136,28 @@ describe("analyzeRobots", () => {
     expect(r.reachable).toBe(false);
     expect(r.patch).toContain("GPTBot");
   });
+
+  it("treats consecutive user-agent lines as one shared group (root allowed)", () => {
+    // Squarespace-style: many bots listed together, then `*`, then only
+    // path-specific disallows — root is NOT blocked, so every bot is allowed.
+    const robots = [
+      "User-agent: ClaudeBot",
+      "User-agent: Google-Extended",
+      "User-agent: GPTBot",
+      "User-agent: *",
+      "Disallow: /config",
+      "Disallow: /search",
+      "Disallow: /*?author=*",
+    ].join("\n");
+    const r = analyzeRobots(robots, true);
+    expect(r.bots.every((b) => b.allowed)).toBe(true);
+  });
+
+  it("does not false-positive on long disallow paths starting with /", () => {
+    // `Disallow: /static/` must NOT be read as a root block.
+    const r = analyzeRobots("User-agent: *\nDisallow: /static/\nDisallow: /api/", true);
+    expect(r.bots.every((b) => b.allowed)).toBe(true);
+  });
 });
 
 describe("technical deliverables", () => {
