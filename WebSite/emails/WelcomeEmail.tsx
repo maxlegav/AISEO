@@ -48,14 +48,14 @@ const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
           title: "Welcome to ShowYourBrand!",
           greeting: `Hello ${name},`,
           intro:
-            "Thank you for signing up for ShowYourBrand — the first Generative Engine Optimization (GEO) platform.",
+            "Thank you for signing up for ShowYourBrand, the first Generative Engine Optimization (GEO) platform.",
           whatNext: "What can you do now?",
           feature1: "Set up your first project (website to audit)",
           feature2: "Run a GEO audit across 100 AI prompts",
           feature3: "Get recommendations to improve your AI visibility",
           ctaText: "Go to Dashboard",
           support:
-            "Questions? Just reply to this email — we read every message.",
+            "Questions? Just reply to this email; we read every message.",
           signature: "The ShowYourBrand Team",
         };
 

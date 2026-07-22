@@ -15,7 +15,7 @@ export interface LLMMeta {
   id: LLMId;
   name: string;
   color: string;
-  /** How this engine sources its answers — drives per-LLM explanations. */
+  /** How this engine sources its answers, drives per-LLM explanations. */
   bias: string;
 }
 

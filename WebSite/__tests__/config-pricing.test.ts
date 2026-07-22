@@ -31,7 +31,7 @@ describe("config.stripe pricing (single source of truth)", () => {
   });
 });
 
-// SYB v2 recurring monitoring plans (Solo / Pro / Agence) — anti-drift guard.
+// SYB v2 recurring monitoring plans (Solo / Pro / Agence): anti-drift guard.
 describe("config.monitoring pricing (SYB v2 plans)", () => {
   it("keeps the canonical monthly prices", () => {
     expect(config.monitoring.solo.price).toBe(29);

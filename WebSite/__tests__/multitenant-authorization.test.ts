@@ -14,7 +14,7 @@ function workspace(role: MembershipRole): Workspace {
   };
 }
 
-describe("requireManager — organization role enforcement", () => {
+describe("requireManager: organization role enforcement", () => {
   it("allows owner and admin to manage the organization", () => {
     expect(() => requireManager(workspace("owner"))).not.toThrow();
     expect(() => requireManager(workspace("admin"))).not.toThrow();

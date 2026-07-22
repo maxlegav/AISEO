@@ -2,7 +2,7 @@ import type { LLMResponse, LLMQueryContext } from "./types";
 
 /**
  * Real provider adapters. Each is a plain HTTPS call to the provider's chat
- * API — no Python service, no SDK. Small models are used (see PRD cost table):
+ * API, no Python service, no SDK. Small models are used (see PRD cost table):
  * gpt-4o-mini, claude-haiku, sonar, gemini-flash.
  *
  * These are only invoked when the corresponding API key is present; otherwise

@@ -3,9 +3,9 @@
 const Stripe = require("stripe");
 
 const PLANS = [
-  { key: "SOLO", name: "SYB Monitoring — Solo", amount: 2900 },
-  { key: "PRO", name: "SYB Monitoring — Pro", amount: 7900 },
-  { key: "AGENCY", name: "SYB Monitoring — Agence", amount: 14900 },
+  { key: "SOLO", name: "SYB Monitoring · Solo", amount: 2900 },
+  { key: "PRO", name: "SYB Monitoring · Pro", amount: 7900 },
+  { key: "AGENCY", name: "SYB Monitoring · Agence", amount: 14900 },
 ];
 
 // Stripe accounts with Managed Payments enabled (default on new accounts)

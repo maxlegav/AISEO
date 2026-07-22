@@ -2,7 +2,7 @@
  * The monitoring pipeline: run one project's prompts across its LLMs, store the
  * raw results, recompute scores/sources, and flag significant score changes.
  *
- * This is the "server" of SYB v2 — it lives entirely inside the Next.js app and
+ * This is the "server" of SYB v2: it lives entirely inside the Next.js app and
  * is driven by a Vercel Cron endpoint. No external Python service.
  */
 

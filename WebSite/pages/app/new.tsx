@@ -129,7 +129,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
       <MonitoringLayout
         active="dashboard"
         title="Nouveau projet"
-        subtitle="Configurez une marque à monitorer — vous verrez un premier score en quelques minutes."
+        subtitle="Configurez une marque à monitorer : vous verrez un premier score en quelques minutes."
       >
         {/* Stepper */}
         <div className="mb-6 flex items-center gap-3">
@@ -207,7 +207,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                   <input
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    placeholder="SaaS B2B — automatisation commerciale"
+                    placeholder="SaaS B2B, automatisation commerciale"
                     className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
                   />
                 </div>
@@ -378,7 +378,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
               <section className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5 text-sm text-gray-700">
                 <p className="font-semibold text-gray-900">Récapitulatif</p>
                 <p className="mt-1">
-                  <strong>{brandName || "—"}</strong> · {cleanPrompts.length}{" "}
+                  <strong>{brandName || "Votre marque"}</strong> · {cleanPrompts.length}{" "}
                   requête(s) · {cleanCompetitors.length} concurrent(s) ·{" "}
                   {selectedLLMs.length} moteur(s) ·{" "}
                   {frequency === "daily" ? "quotidien" : "hebdomadaire"}

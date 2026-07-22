@@ -118,11 +118,11 @@ export const authOptions: NextAuthOptions = {
             token.auditCredits = dbUser.auditCredits;
             token.language = dbUser.language;
           } else {
-            // User no longer exists in DB — invalidate session
+            // User no longer exists in DB: invalidate session
             return { ...token, id: "" as string };
           }
         } catch (error) {
-          // DB error — keep existing token data so session doesn't break
+          // DB error: keep existing token data so session doesn't break
           // on transient MongoDB issues. The token retains its last-known values.
           console.error("[NextAuth] JWT callback DB error:", error);
         }

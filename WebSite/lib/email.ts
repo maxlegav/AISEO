@@ -172,8 +172,8 @@ export async function sendAuditStartedClientEmail(params: {
 
   const subject =
     language === "fr"
-      ? `Votre audit GEO a démarré — ${businessName}`
-      : `Your GEO audit has started — ${businessName}`;
+      ? `Votre audit GEO a démarré : ${businessName}`
+      : `Your GEO audit has started: ${businessName}`;
 
   const html = await render(
     AuditStartedClientEmail({ userName, businessName, businessUrl, language })
@@ -206,7 +206,7 @@ export async function sendAuditStartedAdminEmail(params: {
 
   return sendEmail({
     to: adminEmail,
-    subject: `[SYB] 🚀 Audit launched — ${params.businessName} (${params.userEmail})`,
+    subject: `[SYB] 🚀 Audit launched: ${params.businessName} (${params.userEmail})`,
     html,
   });
 }
@@ -234,7 +234,7 @@ export async function sendAuditLaunchedAdminEmail(params: {
 
   return sendEmail({
     to: adminEmail,
-    subject: `[SYB] New audit to validate — ${params.businessName}`,
+    subject: `[SYB] New audit to validate: ${params.businessName}`,
     html,
   });
 }
@@ -276,8 +276,8 @@ export async function sendAuditCreditAvailableEmail(params: {
   const { email, userName, language = "fr" } = params;
   const subject =
     language === "fr"
-      ? "Votre crédit d'audit mensuel est disponible — ShowYourBrand"
-      : "Your monthly audit credit is available — ShowYourBrand";
+      ? "Votre crédit d'audit mensuel est disponible · ShowYourBrand"
+      : "Your monthly audit credit is available · ShowYourBrand";
   const html = await render(AuditCreditAvailableEmail({ userName, language }));
   return sendEmail({ to: email, subject, html });
 }
@@ -298,8 +298,8 @@ export async function sendChecklistSummaryEmail(params: {
   const { email, userName, businessName, geoScore, doneItems, pendingItems, auditUrl, language = "fr" } = params;
   const subject =
     language === "fr"
-      ? `Bilan de vos actions GEO — ${businessName}`
-      : `GEO action progress summary — ${businessName}`;
+      ? `Bilan de vos actions GEO : ${businessName}`
+      : `GEO action progress summary: ${businessName}`;
   const html = await render(
     ChecklistSummaryEmail({ userName, businessName, geoScore, doneItems, pendingItems, auditUrl, language })
   );
@@ -369,8 +369,8 @@ export async function sendMonitoringAlertEmail(params: {
 
   const subject =
     language === "fr"
-      ? `Alerte visibilité — ${brandName} (score ${globalScore}/100)`
-      : `Visibility alert — ${brandName} (score ${globalScore}/100)`;
+      ? `Alerte visibilité : ${brandName} (score ${globalScore}/100)`
+      : `Visibility alert: ${brandName} (score ${globalScore}/100)`;
 
   const intro =
     language === "fr"

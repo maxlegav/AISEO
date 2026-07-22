@@ -44,7 +44,7 @@ export default function SourcesView({ project, demo }: SourcesProps) {
         project={project}
         active="sources"
         title="Sources citées"
-        subtitle="Les pages que les IA citent sur vos requêtes — et si elles mentionnent votre marque."
+        subtitle="Les pages que les IA citent sur vos requêtes, et si elles mentionnent votre marque."
         demo={demo}
       >
         <DemoBanner demo={demo} />

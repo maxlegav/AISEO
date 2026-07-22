@@ -25,7 +25,7 @@ const AuditNotificationAdminEmail: React.FC<AuditNotificationAdminEmailProps> = 
   return (
     <Html>
       <Head />
-      <Preview>New audit to validate — {businessName}</Preview>
+      <Preview>New audit to validate: {businessName}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={headerBanner}>
@@ -61,7 +61,7 @@ const AuditNotificationAdminEmail: React.FC<AuditNotificationAdminEmailProps> = 
           <Hr style={divider} />
 
           <Section style={footer}>
-            <Text style={footerText}>ShowYourBrand — Admin notification</Text>
+            <Text style={footerText}>ShowYourBrand · Admin notification</Text>
           </Section>
         </Container>
       </Body>

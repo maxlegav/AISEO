@@ -270,7 +270,7 @@ export default function RecommendationsView({
           </div>
         ) : (
           <div className="space-y-10">
-            {/* 1 — Prioritized action plan */}
+            {/* 1. Prioritized action plan */}
             <section>
               <SectionTitle
                 icon={Target}
@@ -284,7 +284,7 @@ export default function RecommendationsView({
               </div>
             </section>
 
-            {/* 2 — Prompts to win */}
+            {/* 2. Prompts to win */}
             <section>
               <SectionTitle
                 icon={Trophy}
@@ -298,7 +298,7 @@ export default function RecommendationsView({
               </div>
             </section>
 
-            {/* 3 — Sources to conquer */}
+            {/* 3. Sources to conquer */}
             {sourceTargets.length > 0 && (
               <section>
                 <SectionTitle
@@ -351,7 +351,7 @@ export default function RecommendationsView({
               </section>
             )}
 
-            {/* 4 — Technical GEO deliverables */}
+            {/* 4. Technical GEO deliverables */}
             {technical && (
               <section>
                 <SectionTitle
@@ -375,7 +375,7 @@ export default function RecommendationsView({
                   {/* robots.txt */}
                   <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">
                     <h3 className="mb-1 text-base font-semibold text-gray-900">
-                      robots.txt — accès des crawlers IA
+                      robots.txt : accès des crawlers IA
                     </h3>
                     <p className="mb-3 text-sm text-gray-600">
                       {technical.robots.note}
@@ -486,7 +486,7 @@ export default function RecommendationsView({
               </section>
             )}
 
-            {/* 5 — Per-engine playbook */}
+            {/* 5. Per-engine playbook */}
             <section>
               <SectionTitle
                 icon={Lightbulb}

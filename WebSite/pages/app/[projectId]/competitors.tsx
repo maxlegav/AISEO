@@ -67,7 +67,7 @@ export default function CompetitorsView({ project, demo }: CompetitorsProps) {
                   </strong>{" "}
                   vous {ahead.length > 1 ? "dépassent" : "dépasse"} sur le score
                   global. Votre plus gros écart est sur{" "}
-                  <strong>Claude</strong> — voir les recommandations.
+                  <strong>Claude</strong> : voir les recommandations.
                 </>
               )}
             </p>

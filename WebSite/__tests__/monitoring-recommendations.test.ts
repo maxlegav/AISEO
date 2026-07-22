@@ -139,7 +139,7 @@ describe("analyzeRobots", () => {
 
   it("treats consecutive user-agent lines as one shared group (root allowed)", () => {
     // Squarespace-style: many bots listed together, then `*`, then only
-    // path-specific disallows — root is NOT blocked, so every bot is allowed.
+    // path-specific disallows: root is NOT blocked, so every bot is allowed.
     const robots = [
       "User-agent: ClaudeBot",
       "User-agent: Google-Extended",

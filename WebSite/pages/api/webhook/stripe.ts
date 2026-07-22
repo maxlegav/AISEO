@@ -84,7 +84,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
     // Create purchase record for one-shot audit. Note: we store the
     // payment_intent in its own dedicated field, NOT in stripeSubscriptionId
-    // (which is reserved for recurring sub_xxx ids — see review C4).
+    // (which is reserved for recurring sub_xxx ids; see review C4).
     await Subscription.create({
       userId: user._id,
       stripePaymentIntentId: session.payment_intent as string,
@@ -268,7 +268,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  // Only handle subscription renewals (not initial checkout — that's handled by checkout.session.completed)
+  // Only handle subscription renewals (not initial checkout, which is handled by checkout.session.completed)
   if (invoice.billing_reason !== 'subscription_cycle') return;
 
   // Audit credits are a *legacy* one-shot-audit perk. Recurring monitoring
@@ -276,7 +276,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   // a monitoring plan even though it shares the pro/agency tier name.
   const renewedPriceId = invoice.lines.data[0]?.price?.id;
   if (renewedPriceId && isMonitoringPriceId(renewedPriceId)) {
-    console.log('[Stripe Webhook] Monitoring renewal — no audit credit granted');
+    console.log('[Stripe Webhook] Monitoring renewal: no audit credit granted');
     return;
   }
 

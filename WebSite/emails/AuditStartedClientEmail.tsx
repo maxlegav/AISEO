@@ -61,7 +61,7 @@ const AuditStartedClientEmail: React.FC<AuditStartedClientEmailProps> = ({
           step4: "Analysis of results and generation of your personalized report",
           eta: "You'll receive an email as soon as your report is ready. This process may take a few hours.",
           ctaText: "Track my audit →",
-          support: "Questions? Just reply to this email — we read every message.",
+          support: "Questions? Just reply to this email; we read every message.",
           sig: "The ShowYourBrand Team",
         };
 

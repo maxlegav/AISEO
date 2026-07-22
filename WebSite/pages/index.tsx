@@ -403,12 +403,12 @@ export default function Home() {
     {
       question: "How does the monitoring work?",
       answer:
-        "You add your brand, your competitors and the prompts your prospects ask. ShowYourBrand queries every major AI engine automatically — weekly by default, daily on paid plans — stores every answer, and shows your visibility score and how it evolves over time. It's continuous tracking, not a one-off snapshot.",
+        "You add your brand, your competitors and the prompts your prospects ask. ShowYourBrand queries every major AI engine automatically (weekly by default, daily on paid plans), stores every answer, and shows your visibility score and how it evolves over time. It's continuous tracking, not a one-off snapshot.",
     },
     {
       question: "Why do you show a score per AI model?",
       answer:
-        "Because each engine sources answers differently: ChatGPT follows Bing, Perplexity favours recent high-traffic pages, Claude leans on Reddit and forums, Gemini favours Google properties like YouTube. A single global score hides this. We show why you're strong on one model and invisible on another — and the specific action to fix each.",
+        "Because each engine sources answers differently: ChatGPT follows Bing, Perplexity favours recent high-traffic pages, Claude leans on Reddit and forums, Gemini favours Google properties like YouTube. A single global score hides this. We show why you're strong on one model and invisible on another, plus the specific action to fix each.",
     },
     {
       question: "Does this replace SEO?",
@@ -418,7 +418,7 @@ export default function Home() {
     {
       question: "Which AI models do you track?",
       answer:
-        "ChatGPT (OpenAI), Claude (Anthropic), Perplexity and Gemini (Google) — the engines your customers actually use. We track your presence, position and the sources cited across all of them, every run.",
+        "ChatGPT (OpenAI), Claude (Anthropic), Perplexity and Gemini (Google): the engines your customers actually use. We track your presence, position and the sources cited across all of them, every run.",
     },
     {
       question: "Can agencies manage several clients?",
@@ -517,7 +517,7 @@ export default function Home() {
               </h1>
               <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl lg:max-w-3xl mx-auto px-2 sm:px-0 leading-relaxed">
                 ShowYourBrand tracks how often ChatGPT, Claude, Perplexity and Gemini
-                cite your brand — every week. Watch your visibility score evolve, keep an
+                cite your brand, every week. Watch your visibility score evolve, keep an
                 eye on competitors, and get model-specific actions to climb.
               </p>
               <AIModelMarquee />
@@ -608,7 +608,7 @@ export default function Home() {
                 GEO is the new SEO.
               </h2>
               <p className="text-gray-600 max-w-2xl lg:max-w-3xl mx-auto text-base md:text-lg lg:text-xl">
-                When someone asks ChatGPT for a recommendation, they get one answer — not ten blue links.
+                When someone asks ChatGPT for a recommendation, they get one answer, not ten blue links.
                 Either your brand is mentioned, or a competitor is. ShowYourBrand tracks that, every week.
               </p>
             </div>
@@ -623,7 +623,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   We query ChatGPT, Claude, Perplexity and Gemini on your prompts automatically,
-                  store every answer, and turn it into a visibility score that evolves over time —
+                  store every answer, and turn it into a visibility score that evolves over time,
                   not a one-off snapshot.
                 </p>
               </div>
@@ -637,7 +637,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   Others give you one global score. We break it down by engine and explain it:
-                  strong on Perplexity, invisible on Claude — with the specific reason and the
+                  strong on Perplexity, invisible on Claude, with the specific reason and the
                   fix for each model.
                 </p>
               </div>
@@ -651,7 +651,7 @@ export default function Home() {
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                   Track competitors on the same prompts, and see exactly which pages ChatGPT,
-                  Claude and Perplexity pull from — and whether each source mentions you or not.
+                  Claude and Perplexity pull from, and whether each source mentions you or not.
                 </p>
               </div>
             </div>
@@ -674,15 +674,15 @@ export default function Home() {
                     GEO monitoring, built for the French market
                   </h2>
                   <p className="text-gray-400 text-base md:text-lg leading-relaxed">
-                    Everything the best AI-visibility tools do — continuous multi-LLM tracking —
-                    with per-engine explanations and French-first support.
+                    Everything the best AI-visibility tools do, from continuous multi-LLM tracking
+                    to per-engine explanations and French-first support.
                   </p>
                 </div>
                 <div className="grid gap-6 md:grid-cols-3">
                   {[
-                    { Icon: Target, title: "Every engine that matters", desc: "ChatGPT, Claude, Perplexity and Gemini, tracked together — so you see your visibility everywhere your customers ask." },
+                    { Icon: Target, title: "Every engine that matters", desc: "ChatGPT, Claude, Perplexity and Gemini, tracked together, so you see your visibility everywhere your customers ask." },
                     { Icon: Zap, title: "Evolution, week after week", desc: "Watch your visibility score move over 12 weeks, catch drops early with alerts, and prove the impact of every change." },
-                    { Icon: ShieldCheck, title: "Made for the French market", desc: "Interface, support and use cases in French, pricing in euros — the GEO tool French brands and agencies actually get." },
+                    { Icon: ShieldCheck, title: "Made for the French market", desc: "Interface, support and use cases in French, pricing in euros: the GEO tool French brands and agencies actually get." },
                   ].map(({ Icon, title, desc }) => (
                     <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 flex items-center justify-center mb-4">
@@ -711,7 +711,7 @@ export default function Home() {
                   The new front page of the internet
                 </span>
                 <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-gray-900 mb-5 leading-[1.1]">
-                  When buyers ask AI, you&apos;re the answer — or you&apos;re invisible.
+                  When buyers ask AI, you&apos;re the answer, or you&apos;re invisible.
                 </h2>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-6">
                   People no longer scroll through ten blue links. They ask ChatGPT, Claude or
@@ -719,12 +719,12 @@ export default function Home() {
                   in it, a competitor is.
                 </p>
                 <p className="text-gray-600 leading-relaxed text-base md:text-lg">
-                  ShowYourBrand is the fastest way to see exactly where you stand today — and the
+                  ShowYourBrand is the fastest way to see exactly where you stand today, and the
                   clearest path to get your brand cited, engine by engine.
                 </p>
               </div>
 
-              {/* AI answer mockup — shows "the answer" vs "invisible" */}
+              {/* AI answer mockup: shows "the answer" vs "invisible" */}
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-violet-200/50 via-fuchsia-200/30 to-transparent rounded-[2.5rem] blur-2xl" />
                 <div className="relative bg-white rounded-3xl border border-white/60 shadow-premium-lg p-5 md:p-7">
@@ -748,10 +748,10 @@ export default function Home() {
                       <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 text-white" />
                       </div>
-                      <span className="text-[11px] font-bold text-green-700 uppercase tracking-wider">With ShowYourBrand — you&apos;re the answer</span>
+                      <span className="text-[11px] font-bold text-green-700 uppercase tracking-wider">With ShowYourBrand, you&apos;re the answer</span>
                     </div>
                     <p className="text-sm text-gray-700 leading-relaxed pl-7">
-                      &ldquo;I&apos;d go with <span className="font-semibold text-gray-900">your brand</span>{" "}— it&apos;s the one most often recommended for this.&rdquo;
+                      &ldquo;I&apos;d go with <span className="font-semibold text-gray-900">your brand</span>{" "}: it&apos;s the one most often recommended for this.&rdquo;
                     </p>
                   </div>
 
@@ -761,7 +761,7 @@ export default function Home() {
                       <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
                         <span className="block w-2 h-[2px] bg-white rounded-full" />
                       </div>
-                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Without it — you&apos;re invisible</span>
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Without it, you&apos;re invisible</span>
                     </div>
                     <p className="text-sm text-gray-500 leading-relaxed pl-7">
                       &ldquo;I&apos;d recommend <span className="font-medium text-gray-600">Competitor A</span> or <span className="font-medium text-gray-600">Competitor B</span>.&rdquo;
@@ -791,7 +791,7 @@ export default function Home() {
             <div className="bg-[#0F172A] rounded-3xl overflow-hidden text-white">
               <div className="grid md:grid-cols-2">
 
-                {/* Left  Story */}
+                {/* Left: Story */}
                 <div className="p-8 md:p-12 flex flex-col justify-center">
                   <p className="text-xs text-gray-500 uppercase tracking-widest mb-6">B2B SaaS · Project Management</p>
 
@@ -830,7 +830,7 @@ export default function Home() {
                   <p className="text-gray-600 text-xs">Founder, anonymous at their request</p>
                 </div>
 
-                {/* Right  Dashboard mockup */}
+                {/* Right: Dashboard mockup */}
                 <div className="bg-[#1E293B] p-6 md:p-8 flex flex-col gap-4">
 
                   {/* Header */}
@@ -1014,14 +1014,14 @@ export default function Home() {
                   role: "Founder, SaaS B2B",
                   avatar: "T",
                   bg: "bg-purple-600",
-                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why  and fixed it in a week. Our citation rate on ChatGPT doubled.",
+                  quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why, and fixed it in a week. Our citation rate on ChatGPT doubled.",
                 },
                 {
                   name: "Sophie M.",
                   role: "CEO, Marketing Agency",
                   avatar: "S",
                   bg: "bg-pink-500",
-                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports  I just present them. It's a game changer for the agency.",
+                  quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports, and I just present them. It's a game changer for the agency.",
                 },
                 {
                   name: "Antoine L.",
@@ -1094,8 +1094,8 @@ export default function Home() {
               Be the brand AI recommends
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 max-w-2xl lg:max-w-3xl mx-auto">
-              Track exactly where you stand in ChatGPT, Claude, Perplexity and Gemini — week
-              after week — and get model-specific actions to get cited.
+              Track exactly where you stand in ChatGPT, Claude, Perplexity and Gemini, week
+              after week, and get model-specific actions to get cited.
             </p>
 
             <div className="mt-14 max-w-xl mx-auto">

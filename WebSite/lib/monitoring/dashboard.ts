@@ -65,7 +65,7 @@ function explain(llm: LLMId, rate: number): string {
     perplexity: {
       fort: "Fort : vos pages récentes et bien référencées sont reprises telles quelles. Perplexity vous cite sur la majorité des requêtes.",
       moyen:
-        "Moyen : Perplexity vous reprend par intermittence. Rafraîchissez vos pages phares — il privilégie le contenu récent à fort trafic.",
+        "Moyen : Perplexity vous reprend par intermittence. Rafraîchissez vos pages phares, il privilégie le contenu récent à fort trafic.",
       faible:
         "Faible : votre contenu est perçu comme daté. Mettez à jour vos pages clés pour regagner en visibilité Perplexity.",
       critique:

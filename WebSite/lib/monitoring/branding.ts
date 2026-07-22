@@ -50,7 +50,7 @@ export interface ReportBranding {
 /**
  * Decide the branding to render on an exported report. White-label (agency
  * logo/colors replacing the SYB mark) is only applied when the plan allows it
- * (`whiteLabelActive`), the agency enabled branded PDF, and a name is set —
+ * (`whiteLabelActive`), the agency enabled branded PDF, and a name is set:
  * otherwise the report falls back to the SYB defaults.
  */
 export function resolveReportBranding(

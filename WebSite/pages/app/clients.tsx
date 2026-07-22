@@ -78,7 +78,7 @@ export default function ClientsPage({
       <MonitoringLayout
         active="clients"
         title="Clients"
-        subtitle={`Regroupez vos projets par client — ${organizationName}.`}
+        subtitle={`Regroupez vos projets par client · ${organizationName}.`}
       >
         {canManage && (
           <section className="mb-6 rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">

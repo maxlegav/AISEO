@@ -31,7 +31,7 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
-      // Static assets — immutable cache
+      // Static assets: immutable cache
       {
         source: '/_next/static/(.*)',
         headers: [
@@ -66,7 +66,7 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'private, no-store, max-age=0, must-revalidate' },
         ],
       },
-      // Public marketing HTML — short cache so updates propagate. Excludes the
+      // Public marketing HTML: short cache so updates propagate. Excludes the
       // dynamic/authenticated routes handled above and Next.js data/asset paths.
       {
         source: '/((?!_next/static|_next/image|_next/data|api|app|favicon.ico).*)',
