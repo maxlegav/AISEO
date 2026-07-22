@@ -69,6 +69,18 @@ describe("analyzePrompts", () => {
   it("produces a non-empty, prompt-specific action for every insight", () => {
     for (const i of insights) expect(i.action.length).toBeGreaterThan(10);
   });
+
+  it("dedupes engines when a prompt has several rows per engine (multiple runs)", () => {
+    const dup: ResultRow[] = [
+      { prompt: "p", llm: "chatgpt", brandMentioned: false, responseText: "x", sourcesCited: [] },
+      { prompt: "p", llm: "chatgpt", brandMentioned: false, responseText: "x", sourcesCited: [] },
+      { prompt: "p", llm: "claude", brandMentioned: true, responseText: "Les Chandelles", sourcesCited: [] },
+      { prompt: "p", llm: "claude", brandMentioned: true, responseText: "Les Chandelles", sourcesCited: [] },
+    ];
+    const [insight] = analyzePrompts(dup, competitors);
+    expect(insight!.enginesMissing).toEqual(["chatgpt"]);
+    expect(insight!.enginesCiting).toEqual(["claude"]);
+  });
 });
 
 describe("buildSourceTargets", () => {

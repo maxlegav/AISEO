@@ -50,7 +50,15 @@ export function analyzePrompts(
   const enginesPerPrompt = new Set(results.map((r) => r.llm)).size || LLM_ORDER.length;
 
   const insights: PromptInsight[] = prompts.map((prompt) => {
-    const rows = results.filter((r) => r.prompt === prompt);
+    // A prompt can have several results per engine (multiple runs in the same
+    // week). Keep the latest row per engine so each engine is counted once.
+    const latestByEngine = new Map<LLMId, ResultRow>();
+    for (const r of results) {
+      if (r.prompt === prompt) latestByEngine.set(r.llm, r);
+    }
+    const rows = LLM_ORDER.filter((llm) => latestByEngine.has(llm)).map(
+      (llm) => latestByEngine.get(llm)!,
+    );
     const enginesCiting = rows.filter((r) => r.brandMentioned).map((r) => r.llm);
     const enginesMissing = rows.filter((r) => !r.brandMentioned).map((r) => r.llm);
     const absentRows = rows.filter((r) => !r.brandMentioned);
