@@ -21,6 +21,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import SybMark from "@/components/icons/SybMark";
+import ExtraSections from "@/components/landing/ExtraSections";
 
 // AI Models with their actual logo files
 const aiModels = [
@@ -697,6 +698,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Optional landing sections (reorder / keep / remove freely) */}
+        <ExtraSections />
 
         {/* ROI & Results Section */}
         <section
