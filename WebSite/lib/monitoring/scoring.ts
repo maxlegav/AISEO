@@ -6,7 +6,7 @@
  * week) and the aggregated global score. No DB / IO here.
  */
 
-import { LLMId, LLM_ORDER } from "./types";
+import { LLMId, LLM_ORDER, ENGINE_WEIGHTS } from "./types";
 
 /** One captured result for a (prompt × LLM) pair in a run. */
 export interface ResultInput {
@@ -51,13 +51,25 @@ export function computeLLMScores(results: ResultInput[]): LLMScoreValue[] {
 }
 
 /**
- * Global visibility score (0-100): the mean of the per-LLM presence rates over
- * the LLMs that were actually evaluated. Equal weighting per engine.
+ * Global visibility score (0-100): the presence rates of the evaluated engines,
+ * weighted by their approximate usage share (`ENGINE_WEIGHTS`). Weights are
+ * re-normalised over the engines actually present so a project that tracks only
+ * a subset of engines still scores on a 0-100 scale. Being cited on a widely
+ * used engine (ChatGPT) therefore moves the score more than a niche one.
  */
 export function computeGlobalScore(scores: LLMScoreValue[]): number {
   if (scores.length === 0) return 0;
-  const sum = scores.reduce((acc, s) => acc + s.presenceRate, 0);
-  return round(sum / scores.length);
+  const totalWeight = scores.reduce((acc, s) => acc + ENGINE_WEIGHTS[s.llm], 0);
+  if (totalWeight === 0) {
+    // Degenerate guard: fall back to a plain mean if no weight is known.
+    const sum = scores.reduce((acc, s) => acc + s.presenceRate, 0);
+    return round(sum / scores.length);
+  }
+  const weighted = scores.reduce(
+    (acc, s) => acc + s.presenceRate * ENGINE_WEIGHTS[s.llm],
+    0,
+  );
+  return round(weighted / totalWeight);
 }
 
 /**

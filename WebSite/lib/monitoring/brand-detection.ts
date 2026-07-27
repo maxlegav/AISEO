@@ -96,9 +96,90 @@ export function detectBrand(
 }
 
 /**
+ * How prominently a brand is featured in a response, beyond a binary mention.
+ * A brand named once in the last sentence is far less "present" to a reader than
+ * one named early and repeatedly, even though both count as a single mention.
+ */
+export interface Prominence {
+  found: boolean;
+  /** Prominence score in [0, 1]; higher = more prominent. 0 when absent. */
+  score: number;
+  /** Number of (non-overlapping) mentions in the text. */
+  mentions: number;
+  /** Position of the first mention as a fraction of the text (0 = very start). */
+  firstRatio: number;
+}
+
+/** Count non-overlapping occurrences of `brand` and the first one's token index. */
+function findOccurrences(
+  textTokens: string[],
+  brand: string,
+  opts: { fuzzy?: boolean; maxDistance?: number },
+): { count: number; firstIndex: number } {
+  const { fuzzy = true, maxDistance = 1 } = opts;
+  const brandTokens = tokenize(brand);
+  if (brandTokens.length === 0 || textTokens.length === 0) {
+    return { count: 0, firstIndex: -1 };
+  }
+  let count = 0;
+  let firstIndex = -1;
+  for (let i = 0; i + brandTokens.length <= textTokens.length; ) {
+    let matchRun = true;
+    for (let j = 0; j < brandTokens.length; j++) {
+      const t = textTokens[i + j]!;
+      const b = brandTokens[j]!;
+      if (t === b) continue;
+      if (!(fuzzy && fuzzyWordMatch(t, b, maxDistance))) {
+        matchRun = false;
+        break;
+      }
+    }
+    if (matchRun) {
+      if (firstIndex === -1) firstIndex = i;
+      count++;
+      i += brandTokens.length; // non-overlapping
+    } else {
+      i++;
+    }
+  }
+  return { count, firstIndex };
+}
+
+/**
+ * Semantic prominence of a brand in a response. Combines three signals:
+ *  - earliness: how early the first mention appears (readers weight the top),
+ *  - frequency: how often it is repeated (capped, diminishing returns),
+ *  - a lead boost when the brand appears in the first fifth of the answer.
+ */
+export function brandProminence(
+  text: string,
+  brand: string,
+  opts: { fuzzy?: boolean; maxDistance?: number } = {},
+): Prominence {
+  const textTokens = tokenize(text);
+  const total = textTokens.length;
+  const { count, firstIndex } = findOccurrences(textTokens, brand, opts);
+  if (count === 0 || total === 0) {
+    return { found: false, score: 0, mentions: 0, firstRatio: 1 };
+  }
+  const firstRatio = firstIndex / total;
+  const earliness = 1 - firstRatio;
+  const frequency = Math.min(count, 3) / 3;
+  const leadBoost = firstRatio <= 0.2 ? 1 : 0;
+  const score = 0.55 * earliness + 0.3 * frequency + 0.15 * leadBoost;
+  return {
+    found: true,
+    score: Math.round(score * 1000) / 1000,
+    mentions: count,
+    firstRatio: Math.round(firstRatio * 1000) / 1000,
+  };
+}
+
+/**
  * Given the monitored brand and the list of competitors, compute the brand's
- * 1-based rank by order of first appearance in the text (1 = mentioned before
- * every competitor). Returns null if the brand is absent.
+ * 1-based rank by *semantic prominence* (1 = most prominently featured brand in
+ * the answer), not merely by which name appears first. Ties are broken by the
+ * earlier first mention. Returns null if the brand is absent.
  */
 export function brandPosition(
   text: string,
@@ -106,14 +187,22 @@ export function brandPosition(
   competitors: string[],
   opts?: { fuzzy?: boolean; maxDistance?: number },
 ): number | null {
-  const brandMatch = detectBrand(text, brand, opts);
-  if (!brandMatch.found) return null;
+  const own = brandProminence(text, brand, opts);
+  if (!own.found) return null;
 
-  const positions: number[] = [brandMatch.tokenIndex];
-  for (const c of competitors) {
-    const m = detectBrand(text, c, opts);
-    if (m.found) positions.push(m.tokenIndex);
-  }
-  positions.sort((a, b) => a - b);
-  return positions.indexOf(brandMatch.tokenIndex) + 1;
+  const ranked = [
+    { name: brand, isOwn: true, prom: own },
+    ...competitors.map((c) => ({
+      name: c,
+      isOwn: false,
+      prom: brandProminence(text, c, opts),
+    })),
+  ]
+    .filter((e) => e.prom.found)
+    .sort((a, b) => {
+      if (b.prom.score !== a.prom.score) return b.prom.score - a.prom.score;
+      return a.prom.firstRatio - b.prom.firstRatio;
+    });
+
+  return ranked.findIndex((e) => e.isOwn) + 1;
 }
