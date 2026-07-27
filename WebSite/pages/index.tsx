@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import SybMark from "@/components/icons/SybMark";
 import ExtraSections from "@/components/landing/ExtraSections";
+import DashboardPreview from "@/components/landing/DashboardPreview";
 
 // AI Models with their actual logo files
 const aiModels = [
@@ -577,6 +578,9 @@ export default function Home() {
             <ChevronDown className="w-8 h-8 text-gray-400" />
           </a>
         </section>
+
+        {/* Interactive dashboard preview */}
+        <DashboardPreview />
 
         {/* Video Demo Section */}
         <section className="px-4 py-16 md:py-20 lg:min-h-screen lg:flex lg:flex-col lg:items-center lg:justify-center">
