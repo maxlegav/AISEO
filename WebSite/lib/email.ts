@@ -344,6 +344,57 @@ export async function sendMagicLinkEmail(
 }
 
 /**
+ * Invite a teammate to an organization (SYB v2 agency team).
+ * Sent when an owner/manager adds a member; the link accepts the invite.
+ */
+export async function sendTeamInviteEmail(params: {
+  email: string;
+  inviterName: string;
+  organizationName: string;
+  role: string;
+  inviteUrl: string;
+  language?: "en" | "fr";
+}): Promise<EmailResult> {
+  const { email, inviterName, organizationName, role, inviteUrl, language = "fr" } = params;
+
+  const roleLabel =
+    language === "fr"
+      ? role === "manager"
+        ? "responsable"
+        : "membre"
+      : role;
+
+  const subject =
+    language === "fr"
+      ? `${inviterName} vous invite à rejoindre ${organizationName} sur ShowYourBrand`
+      : `${inviterName} invited you to join ${organizationName} on ShowYourBrand`;
+
+  const heading =
+    language === "fr" ? "Invitation à rejoindre une équipe" : "You're invited to a team";
+  const body =
+    language === "fr"
+      ? `${inviterName} vous invite à rejoindre l'espace <strong>${organizationName}</strong> en tant que ${roleLabel}. Connectez-vous avec cette adresse email pour accepter.`
+      : `${inviterName} invited you to join the <strong>${organizationName}</strong> workspace as ${roleLabel}. Sign in with this email address to accept.`;
+  const cta = language === "fr" ? "Accepter l'invitation" : "Accept the invitation";
+  const ignore =
+    language === "fr"
+      ? "Si vous ne vous attendiez pas à cette invitation, vous pouvez ignorer cet email."
+      : "If you weren't expecting this invitation, you can safely ignore this email.";
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+      <h1 style="color:#1E293B; font-size:20px;">${heading}</h1>
+      <p style="color:#334155;">${body}</p>
+      <p style="margin:24px 0;">
+        <a href="${inviteUrl}" style="background:#7c3aed; color:#fff; padding:12px 22px; border-radius:8px; text-decoration:none; font-weight:600;">${cta}</a>
+      </p>
+      <p style="color:#94a3b8; font-size:13px;">${ignore}</p>
+    </div>`;
+
+  return sendEmail({ to: email, subject, html });
+}
+
+/**
  * Notify a user that their GEO visibility moved significantly on one or more
  * engines during the latest monitoring run (SYB v2 weekly/daily alert).
  */
