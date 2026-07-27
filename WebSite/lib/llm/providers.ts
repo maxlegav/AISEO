@@ -10,12 +10,35 @@ import type { LLMResponse, LLMQueryContext } from "./types";
  */
 
 const TIMEOUT_MS = 30_000;
+const MAX_RETRIES = 3;
+const BASE_BACKOFF_MS = 1_000;
+const MAX_BACKOFF_MS = 8_000;
 
 const SYSTEM_PROMPT =
   "Tu es un assistant qui répond à des questions de recherche de produits/services. " +
   "Cite tes sources sous forme d'URLs quand c'est pertinent. Réponds en français.";
 
-async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Retry on 429 and 5xx (transient); 4xx (except 429) are permanent. */
+function isRetryableStatus(status: number): boolean {
+  return status === 429 || status >= 500;
+}
+
+/** Exponential backoff (1s, 2s, 4s, capped), honouring `Retry-After` if given. */
+function backoffDelay(attempt: number, retryAfter: string | null): number {
+  if (retryAfter) {
+    const seconds = Number(retryAfter);
+    if (Number.isFinite(seconds) && seconds > 0) {
+      return Math.min(seconds * 1_000, MAX_BACKOFF_MS);
+    }
+  }
+  return Math.min(BASE_BACKOFF_MS * 2 ** attempt, MAX_BACKOFF_MS);
+}
+
+async function fetchOnce(url: string, init: RequestInit): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -23,6 +46,32 @@ async function fetchWithTimeout(url: string, init: RequestInit): Promise<Respons
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * `fetch` with a per-attempt timeout plus exponential backoff on transient
+ * failures (429, 5xx, network/timeout errors). Permanent 4xx responses are
+ * returned immediately so callers can surface the real error.
+ */
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetchOnce(url, init);
+      if (attempt < MAX_RETRIES && isRetryableStatus(res.status)) {
+        await sleep(backoffDelay(attempt, res.headers.get("retry-after")));
+        continue;
+      }
+      return res;
+    } catch (err) {
+      lastError = err;
+      if (attempt < MAX_RETRIES) {
+        await sleep(backoffDelay(attempt, null));
+        continue;
+      }
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("fetch failed after retries");
 }
 
 interface OpenAIChatResponse {

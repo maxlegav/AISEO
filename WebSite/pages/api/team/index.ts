@@ -2,8 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto";
 import mongoose from "mongoose";
 import Membership, { type MembershipRole } from "@/models/Membership";
+import User from "@/models/User";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { requireWorkspace, requireManager } from "@/lib/api-workspace";
+import { sendTeamInviteEmail } from "@/lib/email";
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -56,12 +58,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       const base = process.env.NEXTAUTH_URL || "";
+      const inviteUrl = `${base}/app/join?token=${inviteToken}`;
+
+      // Best-effort invite email: never fail the request if email is down or
+      // unconfigured (the inviteUrl is still returned as a manual fallback).
+      const inviter = await User.findById(workspace.ownerId)
+        .select("name email language")
+        .lean<{ name?: string; email?: string; language?: string } | null>();
+      try {
+        await sendTeamInviteEmail({
+          email,
+          inviterName: inviter?.name || inviter?.email || "Un membre de l'équipe",
+          organizationName: workspace.organizationName,
+          role,
+          inviteUrl,
+          language: (inviter?.language as "en" | "fr") || "fr",
+        });
+      } catch (err) {
+        console.error("[team/invite] email send failed", err);
+      }
+
       return res.status(201).json({
         success: true,
-        data: {
-          membership,
-          inviteUrl: `${base}/app/join?token=${inviteToken}`,
-        },
+        data: { membership, inviteUrl },
       });
     }
 
