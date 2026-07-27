@@ -31,12 +31,35 @@ describe("computeLLMScores", () => {
 });
 
 describe("computeGlobalScore", () => {
-  it("averages per-LLM presence rates equally", () => {
+  it("weights per-LLM presence rates by engine usage share", () => {
     const scores = computeLLMScores([
       { llm: "chatgpt", brandMentioned: true, brandPosition: 1 },
       { llm: "claude", brandMentioned: false, brandPosition: null },
     ]);
-    expect(computeGlobalScore(scores)).toBe(50); // (100 + 0) / 2
+    // chatgpt (0.6) at 100, claude (0.1) at 0 → 60 / 0.7 ≈ 86,
+    // not the equal-weight 50: being cited on the dominant engine matters more.
+    expect(computeGlobalScore(scores)).toBe(86);
+  });
+
+  it("re-normalises weights over only the evaluated engines", () => {
+    const scores = computeLLMScores([
+      { llm: "chatgpt", brandMentioned: true, brandPosition: 1 },
+    ]);
+    expect(computeGlobalScore(scores)).toBe(100);
+  });
+
+  it("ranks a widely-used engine above a niche one at equal presence", () => {
+    const heavyOnChatgpt = computeLLMScores([
+      { llm: "chatgpt", brandMentioned: true, brandPosition: 1 },
+      { llm: "claude", brandMentioned: false, brandPosition: null },
+    ]);
+    const heavyOnClaude = computeLLMScores([
+      { llm: "chatgpt", brandMentioned: false, brandPosition: null },
+      { llm: "claude", brandMentioned: true, brandPosition: 1 },
+    ]);
+    expect(computeGlobalScore(heavyOnChatgpt)).toBeGreaterThan(
+      computeGlobalScore(heavyOnClaude),
+    );
   });
 
   it("returns 0 with no scores", () => {

@@ -20,7 +20,8 @@ import MonitoredSource from "@/models/MonitoredSource";
 import { detectBrand } from "@/lib/monitoring/brand-detection";
 import { domainOf } from "@/lib/monitoring/source-extraction";
 import type { LLMId } from "@/lib/monitoring/types";
-import { LLM_ORDER } from "@/lib/monitoring/types";
+import { LLM_ORDER, ENGINE_WEIGHTS } from "@/lib/monitoring/types";
+import { measureImpact, type ScorePoint } from "@/lib/monitoring/measured-impact";
 import {
   PROJECTS as MOCK_PROJECTS,
   type Project as UIProject,
@@ -181,6 +182,14 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
   const globalScore = globalDoc ? globalDoc.presenceRate : 0;
   const globalDelta = globalDoc ? globalDoc.deltaVsLastWeek : 0;
 
+  // --- measured impact: observed movement over the last weeks (real data) ---
+  const scorePoints: ScorePoint[] = prevScores.map((s) => ({
+    scope: s.scope,
+    week: s.week,
+    presenceRate: s.presenceRate,
+  }));
+  const measuredImpact = measureImpact(scorePoints);
+
   // --- 12-week evolution series ---
   const weeks = Array.from(new Set(prevScores.map((s) => s.week))).sort().slice(-12);
   const weekly: WeeklyPoint[] = weeks.map((week, i) => {
@@ -216,11 +225,13 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
         scoresByLLM[llm] = Math.round((hits / forLLM.length) * 100);
       }
       const evaluated = LLM_ORDER.filter((llm) => results.some((r) => r.llm === llm));
+      const totalWeight = evaluated.reduce((acc, llm) => acc + ENGINE_WEIGHTS[llm], 0);
       const global =
-        evaluated.length === 0
+        evaluated.length === 0 || totalWeight === 0
           ? 0
           : Math.round(
-              evaluated.reduce((acc, llm) => acc + scoresByLLM[llm], 0) / evaluated.length,
+              evaluated.reduce((acc, llm) => acc + scoresByLLM[llm] * ENGINE_WEIGHTS[llm], 0) /
+                totalWeight,
             );
       return { name, global, trend: 0, scores: scoresByLLM };
     }),
@@ -306,6 +317,7 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
     sourceTargets,
     actionPlan,
     technical,
+    measuredImpact,
     isReal: true,
     pendingFirstRun: false,
   };

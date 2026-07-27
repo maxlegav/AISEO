@@ -50,6 +50,20 @@ export function isLLMId(value: string): value is LLMId {
   return value === "chatgpt" || value === "claude" || value === "perplexity" || value === "gemini";
 }
 
+/**
+ * Approximate share of AI-assistant usage per engine, used to weight the global
+ * visibility score so that being cited on a widely-used engine counts more than
+ * on a niche one. Heuristic figures (order of magnitude, not a precise market
+ * study); tune here as usage data evolves. Values are re-normalised over the
+ * engines actually evaluated for a project, so they need not sum to exactly 1.
+ */
+export const ENGINE_WEIGHTS: Record<LLMId, number> = {
+  chatgpt: 0.6,
+  gemini: 0.16,
+  perplexity: 0.14,
+  claude: 0.1,
+};
+
 export type MonitoringFrequency = "weekly" | "daily";
 
 /** Result of scanning a single LLM response for a brand + its cited sources. */

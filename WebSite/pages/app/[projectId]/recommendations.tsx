@@ -9,6 +9,9 @@ import {
   Check,
   X,
   TrendingUp,
+  TrendingDown,
+  Minus,
+  Activity,
   ExternalLink,
   ScanSearch,
   AlertTriangle,
@@ -33,6 +36,10 @@ import {
 } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import type {
+  MeasuredImpact,
+  ScopeMovement,
+} from "@/lib/monitoring/measured-impact";
 
 const priorityStyles: Record<Priority, { dot: string; badge: string }> = {
   high: { dot: "bg-red-500", badge: "bg-red-50 text-red-600" },
@@ -48,6 +55,61 @@ const statusStyles: Record<
   partial: { label: "Partielle", className: "bg-amber-50 text-amber-700" },
   lost: { label: "Perdue", className: "bg-red-50 text-red-600" },
 };
+
+function MovementRow({ m }: { m: ScopeMovement }) {
+  const tone =
+    m.trend === "up"
+      ? "text-emerald-600"
+      : m.trend === "down"
+        ? "text-red-600"
+        : "text-gray-400";
+  const Icon =
+    m.trend === "up" ? TrendingUp : m.trend === "down" ? TrendingDown : Minus;
+  const sign = m.delta > 0 ? "+" : "";
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2.5">
+      <span className="flex items-center gap-2 text-sm font-medium text-gray-800">
+        {m.scope === "global" ? (
+          <span className="rounded-md bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
+            Global
+          </span>
+        ) : (
+          <LLMBadge llm={m.scope} size={15} />
+        )}
+      </span>
+      <span className="flex items-center gap-3 text-sm">
+        <span className="text-gray-400">
+          {m.baseline}
+          <span className="mx-1">→</span>
+          {m.latest}
+        </span>
+        <span className={`inline-flex items-center gap-1 font-semibold ${tone}`}>
+          <Icon className="h-3.5 w-3.5" />
+          {sign}
+          {m.delta} pts
+        </span>
+      </span>
+    </div>
+  );
+}
+
+function MeasuredImpactPanel({ impact }: { impact: MeasuredImpact }) {
+  return (
+    <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm">
+      <div className="space-y-2">
+        {impact.global && <MovementRow m={impact.global} />}
+        {impact.engines.map((m) => (
+          <MovementRow key={m.scope} m={m} />
+        ))}
+      </div>
+      <p className="mt-3 text-xs leading-relaxed text-gray-400">
+        Écart réel entre la semaine {impact.baselineWeek} et {impact.latestWeek},
+        calculé sur les scores enregistrés. C'est une corrélation dans le temps,
+        pas une preuve que les actions en sont la cause.
+      </p>
+    </div>
+  );
+}
 
 function SectionTitle({
   icon: Icon,
@@ -328,6 +390,18 @@ export default function RecommendationsView({
           </div>
         ) : (
           <div className="space-y-10">
+            {/* 0. Measured impact (real week-over-week movement) */}
+            {project.measuredImpact?.hasHistory && (
+              <section>
+                <SectionTitle
+                  icon={Activity}
+                  title="Impact mesuré"
+                  subtitle={`Évolution réelle observée sur ${project.measuredImpact.weeksSpanned} semaine(s), à comparer aux gains estimés ci-dessous.`}
+                />
+                <MeasuredImpactPanel impact={project.measuredImpact} />
+              </section>
+            )}
+
             {/* 1. Prioritized action plan */}
             <section>
               <SectionTitle

@@ -6,6 +6,8 @@
  * Source) so it can be wired to Supabase later without reworking the UI.
  */
 
+import type { MeasuredImpact } from "@/lib/monitoring/measured-impact";
+
 export type LLMId = "chatgpt" | "claude" | "perplexity" | "gemini";
 
 export interface LLMMeta {
@@ -226,6 +228,8 @@ export interface Project {
   actionPlan?: ActionItem[];
   /** Technical GEO deliverables (llms.txt, robots.txt, sitemap, FAQ, descriptions). */
   technical?: TechnicalGeo;
+  /** Observed week-over-week movement of the scores (real data, not heuristic). */
+  measuredImpact?: MeasuredImpact;
   /** True when this project is backed by real monitoring data (not the demo). */
   isReal?: boolean;
   /** True for a real project that has no run yet (show onboarding state). */
