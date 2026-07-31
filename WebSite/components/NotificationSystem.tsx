@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Importer motion et AnimatePresence
+import { motion, AnimatePresence } from "motion/react"; // Importer motion et AnimatePresence
 import { X, MessageSquare, Dumbbell, Slash } from "lucide-react"; // Importer des icônes génériques de Lucide si besoin
 import {
   SiGmail,
