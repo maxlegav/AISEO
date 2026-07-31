@@ -255,12 +255,294 @@ const CHANDELLES: DemoProfile = {
   },
 };
 
-const PROFILES: DemoProfile[] = [BIOBURGER, CHANDELLES];
+/* ----------------------------------------------------------------- Alan -- */
+
+/**
+ * Alan: digital-native health insurer. Owns the "mutuelle en ligne / pour
+ * startup" framing, but generic "meilleure mutuelle" searches are dominated by
+ * incumbents and comparison sites that have twenty years of SEO behind them.
+ */
+const ALAN: DemoProfile = {
+  brand: "Alan",
+  namedCount: 3,
+  players: [
+    { name: "Malakoff Humanis", authority: { chatgpt: 0.9, perplexity: 0.8, gemini: 0.85, claude: 0.6 } },
+    { name: "Harmonie Mutuelle", authority: { chatgpt: 0.85, perplexity: 0.75, gemini: 0.8, claude: 0.55 } },
+    { name: "Axa", authority: { chatgpt: 0.85, perplexity: 0.8, gemini: 0.85, claude: 0.6 } },
+    { name: "Swiss Life", authority: { chatgpt: 0.7, perplexity: 0.65, gemini: 0.7, claude: 0.45 } },
+    { name: "Alan", authority: { chatgpt: 0.62, perplexity: 0.7, gemini: 0.5, claude: 0.55 } },
+  ],
+  families: [
+    {
+      match: ["startup", "en ligne", "digitale", "simple", "moderne", "sans paperasse"],
+      weights: { Alan: 2.3, "Malakoff Humanis": 0.5, Axa: 0.5, "Harmonie Mutuelle": 0.5 },
+      engineWeights: { Alan: { perplexity: 1.15, chatgpt: 1, gemini: 0.8, claude: 0.9 } },
+      sources: ["https://alan.com", "https://www.welcometothejungle.com", "https://www.journaldunet.com"],
+    },
+    {
+      match: ["alan"],
+      alwaysAnswers: true,
+      weights: { Alan: 3.5, "Malakoff Humanis": 0.3, Axa: 0.3 },
+      sources: ["https://alan.com", "https://fr.trustpilot.com", "https://www.journaldunet.com"],
+    },
+    {
+      match: ["comparatif", "comparateur", "classement", "moins cher", "prix", "tarif"],
+      // Comparison sites are built for exactly this query; Alan rarely leads.
+      weights: { Alan: 0.6, "Malakoff Humanis": 1.2, Axa: 1.2, "Harmonie Mutuelle": 1.1 },
+      sources: ["https://www.lesfurets.com", "https://www.lecomparateurassurance.com", "https://www.quechoisir.org"],
+    },
+  ],
+  defaultSources: [
+    "https://www.lesfurets.com",
+    "https://www.journaldunet.com",
+    "https://www.quechoisir.org",
+    "https://www.reddit.com/r/vosfinances",
+  ],
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 0.95, claude: 0.9 },
+};
+
+/* ---------------------------------------------------------------- Qonto -- */
+
+/** Qonto: the default answer for "business account" in France. Strong almost everywhere. */
+const QONTO: DemoProfile = {
+  brand: "Qonto",
+  namedCount: 3,
+  players: [
+    { name: "Qonto", authority: { chatgpt: 0.92, perplexity: 0.93, gemini: 0.8, claude: 0.75 } },
+    { name: "Shine", authority: { chatgpt: 0.75, perplexity: 0.7, gemini: 0.65, claude: 0.6 } },
+    { name: "Revolut Business", authority: { chatgpt: 0.8, perplexity: 0.78, gemini: 0.75, claude: 0.7 } },
+    { name: "Blank", authority: { chatgpt: 0.45, perplexity: 0.4, gemini: 0.4, claude: 0.3 } },
+    { name: "BNP Paribas", authority: { chatgpt: 0.7, perplexity: 0.55, gemini: 0.75, claude: 0.4 } },
+  ],
+  families: [
+    {
+      match: ["qonto"],
+      alwaysAnswers: true,
+      weights: { Qonto: 3.5, Shine: 0.3, "Revolut Business": 0.3 },
+      sources: ["https://qonto.com", "https://fr.trustpilot.com", "https://www.lesechos.fr"],
+    },
+    {
+      match: ["banque traditionnelle", "agence", "dépôt", "espèces", "chèque"],
+      // Cash and cheques are where the incumbents still win.
+      weights: { Qonto: 0.5, "BNP Paribas": 1.6, Shine: 0.6 },
+      sources: ["https://www.bnpparibas.fr", "https://www.service-public.fr"],
+    },
+  ],
+  defaultSources: [
+    "https://qonto.com",
+    "https://www.journaldunet.com",
+    "https://www.capital.fr",
+    "https://www.reddit.com/r/entrepreneur",
+  ],
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 1, claude: 0.95 },
+};
+
+/* --------------------------------------------------------------- PayFit -- */
+
+/**
+ * PayFit: owns the "payroll without an accountant" framing for small companies.
+ * Silae owns the accountant channel, which is a different question entirely.
+ */
+const PAYFIT: DemoProfile = {
+  brand: "PayFit",
+  namedCount: 3,
+  players: [
+    { name: "Silae", authority: { chatgpt: 0.85, perplexity: 0.75, gemini: 0.8, claude: 0.55 } },
+    { name: "PayFit", authority: { chatgpt: 0.72, perplexity: 0.78, gemini: 0.6, claude: 0.6 } },
+    { name: "Sage", authority: { chatgpt: 0.8, perplexity: 0.65, gemini: 0.75, claude: 0.5 } },
+    { name: "Lucca", authority: { chatgpt: 0.5, perplexity: 0.5, gemini: 0.45, claude: 0.4 } },
+    { name: "Factorial", authority: { chatgpt: 0.45, perplexity: 0.5, gemini: 0.4, claude: 0.35 } },
+  ],
+  families: [
+    {
+      match: ["startup", "pme", "sans expert-comptable", "simple", "automatisé", "en ligne"],
+      weights: { PayFit: 2, Silae: 0.6, Sage: 0.6 },
+      engineWeights: { PayFit: { perplexity: 1.15, chatgpt: 1, gemini: 0.8, claude: 0.85 } },
+      sources: ["https://payfit.com", "https://www.appvizer.fr", "https://www.journaldunet.com"],
+    },
+    {
+      match: ["expert-comptable", "cabinet", "comptable", "certifié"],
+      // Silae is sold through accountants; PayFit is not.
+      weights: { PayFit: 0.4, Silae: 2, Sage: 1.2 },
+      sources: ["https://www.silae.fr", "https://www.compta-online.com"],
+    },
+    {
+      match: ["payfit"],
+      alwaysAnswers: true,
+      weights: { PayFit: 3.5, Silae: 0.3, Sage: 0.3 },
+      sources: ["https://payfit.com", "https://www.capterra.fr", "https://www.g2.com"],
+    },
+  ],
+  defaultSources: [
+    "https://www.appvizer.fr",
+    "https://www.capterra.fr",
+    "https://www.journaldunet.com",
+    "https://www.g2.com",
+  ],
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 0.95, claude: 0.95 },
+};
+
+/* ---------------------------------------------------------------- Swile -- */
+
+/**
+ * Swile: the modern challenger on meal vouchers. Edenred and Pluxee still own
+ * the category name, so Swile wins on "card / app / modern" and loses on the
+ * generic and employer-procurement queries.
+ */
+const SWILE: DemoProfile = {
+  brand: "Swile",
+  namedCount: 3,
+  players: [
+    { name: "Edenred", authority: { chatgpt: 0.9, perplexity: 0.82, gemini: 0.85, claude: 0.6 } },
+    { name: "Swile", authority: { chatgpt: 0.75, perplexity: 0.8, gemini: 0.65, claude: 0.6 } },
+    { name: "Pluxee", authority: { chatgpt: 0.7, perplexity: 0.65, gemini: 0.7, claude: 0.45 } },
+    { name: "Up Déjeuner", authority: { chatgpt: 0.6, perplexity: 0.55, gemini: 0.6, claude: 0.4 } },
+    { name: "Bimpli", authority: { chatgpt: 0.45, perplexity: 0.42, gemini: 0.45, claude: 0.3 } },
+  ],
+  families: [
+    {
+      match: ["carte", "application", "appli", "moderne", "dématérialisé", "mobile"],
+      weights: { Swile: 2.1, Edenred: 0.7, Pluxee: 0.6, "Up Déjeuner": 0.5 },
+      engineWeights: { Swile: { perplexity: 1.15, chatgpt: 1, gemini: 0.85, claude: 0.9 } },
+      sources: ["https://www.swile.co", "https://www.journaldunet.com", "https://www.capital.fr"],
+    },
+    {
+      match: ["papier", "carnet", "urssaf", "plafond", "législation", "réglementation"],
+      weights: { Swile: 0.6, Edenred: 1.4, Pluxee: 1.2 },
+      sources: ["https://www.urssaf.fr", "https://www.service-public.fr", "https://www.edenred.fr"],
+    },
+    {
+      match: ["swile"],
+      alwaysAnswers: true,
+      weights: { Swile: 3.5, Edenred: 0.3 },
+      sources: ["https://www.swile.co", "https://fr.trustpilot.com", "https://www.journaldunet.com"],
+    },
+  ],
+  defaultSources: [
+    "https://www.journaldunet.com",
+    "https://www.capital.fr",
+    "https://www.urssaf.fr",
+    "https://www.reddit.com/r/france",
+  ],
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 1, claude: 0.9 },
+};
+
+/* ------------------------------------------------------------- Doctolib -- */
+
+/**
+ * Doctolib: near-monopoly. The interesting signal here is not "are we cited"
+ * but "where does even a dominant brand slip" — telehealth queries, where Qare
+ * and Livi are the specialists.
+ */
+const DOCTOLIB: DemoProfile = {
+  brand: "Doctolib",
+  namedCount: 3,
+  players: [
+    { name: "Doctolib", authority: { chatgpt: 0.95, perplexity: 0.95, gemini: 0.92, claude: 0.85 } },
+    { name: "Maiia", authority: { chatgpt: 0.55, perplexity: 0.5, gemini: 0.5, claude: 0.4 } },
+    { name: "KelDoc", authority: { chatgpt: 0.5, perplexity: 0.45, gemini: 0.45, claude: 0.35 } },
+    { name: "Qare", authority: { chatgpt: 0.6, perplexity: 0.6, gemini: 0.55, claude: 0.45 } },
+    { name: "Livi", authority: { chatgpt: 0.58, perplexity: 0.58, gemini: 0.5, claude: 0.45 } },
+  ],
+  families: [
+    {
+      match: ["téléconsultation", "teleconsultation", "à distance", "vidéo", "ordonnance en ligne"],
+      // The one family where pure-play telehealth outranks the incumbent.
+      weights: { Doctolib: 0.8, Qare: 1.8, Livi: 1.8, Maiia: 0.9 },
+      sources: ["https://www.qare.fr", "https://www.livi.fr", "https://www.ameli.fr"],
+    },
+    {
+      match: ["doctolib"],
+      alwaysAnswers: true,
+      weights: { Doctolib: 3.5, Maiia: 0.3, KelDoc: 0.3 },
+      sources: ["https://www.doctolib.fr", "https://fr.wikipedia.org/wiki/Doctolib", "https://www.lemonde.fr"],
+    },
+    {
+      match: ["logiciel", "praticien", "cabinet", "agenda", "libéral"],
+      weights: { Doctolib: 1.4, Maiia: 1.3, KelDoc: 1.2, Qare: 0.5, Livi: 0.4 },
+      sources: ["https://www.doctolib.fr", "https://www.maiia.com", "https://www.appvizer.fr"],
+    },
+  ],
+  defaultSources: [
+    "https://www.doctolib.fr",
+    "https://www.ameli.fr",
+    "https://www.sante.fr",
+    "https://www.lemonde.fr",
+  ],
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 1, claude: 0.95 },
+};
+
+/* -------------------------------------------------------------- lemlist -- */
+
+/** lemlist: heavy content marketing makes it a default answer on cold email. */
+const LEMLIST: DemoProfile = {
+  brand: "lemlist",
+  namedCount: 3,
+  players: [
+    { name: "lemlist", authority: { chatgpt: 0.88, perplexity: 0.9, gemini: 0.72, claude: 0.8 } },
+    { name: "Instantly", authority: { chatgpt: 0.8, perplexity: 0.82, gemini: 0.6, claude: 0.85 } },
+    { name: "Smartlead", authority: { chatgpt: 0.72, perplexity: 0.75, gemini: 0.55, claude: 0.8 } },
+    { name: "Apollo", authority: { chatgpt: 0.85, perplexity: 0.8, gemini: 0.7, claude: 0.7 } },
+    { name: "Woodpecker", authority: { chatgpt: 0.55, perplexity: 0.5, gemini: 0.45, claude: 0.5 } },
+  ],
+  families: [
+    {
+      match: ["lemlist"],
+      alwaysAnswers: true,
+      weights: { lemlist: 3.5, Instantly: 0.4, Smartlead: 0.3 },
+      sources: ["https://www.lemlist.com", "https://www.g2.com", "https://www.capterra.fr"],
+    },
+    {
+      match: ["délivrabilité", "delivrabilite", "spam", "warmup", "chauffe"],
+      // Deliverability is where the newer tools are talked about most.
+      weights: { lemlist: 0.9, Instantly: 1.6, Smartlead: 1.7 },
+      sources: ["https://www.reddit.com/r/coldemail", "https://www.g2.com", "https://www.emailtooltester.com"],
+    },
+    {
+      match: ["base de données", "leads", "prospects", "enrichissement", "contacts"],
+      weights: { lemlist: 1.1, Apollo: 1.9, Instantly: 0.9 },
+      sources: ["https://www.apollo.io", "https://www.g2.com", "https://www.capterra.fr"],
+    },
+  ],
+  defaultSources: [
+    "https://www.g2.com",
+    "https://www.capterra.fr",
+    "https://www.reddit.com/r/sales",
+    "https://www.producthunt.com",
+  ],
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 0.95, claude: 1 },
+};
+
+const PROFILES: DemoProfile[] = [
+  BIOBURGER,
+  CHANDELLES,
+  ALAN,
+  QONTO,
+  PAYFIT,
+  SWILE,
+  DOCTOLIB,
+  LEMLIST,
+];
 
 /** The authored profile for a brand, or null when it should use the generic mock. */
 export function demoProfileFor(brandName: string): DemoProfile | null {
   const key = brandName.trim().toLowerCase();
   return PROFILES.find((p) => p.brand.toLowerCase() === key) ?? null;
+}
+
+/**
+ * True for questions about how something *works* rather than which vendor to
+ * pick ("comment automatiser la paie ?", "titre restaurant plafond"). Engines
+ * answer those by explaining the mechanism and often name nobody — a real and
+ * frequent way to be absent that a pure ranking model would miss entirely.
+ */
+function isInformational(prompt: string): boolean {
+  return (
+    /^(comment|pourquoi|faut-il|combien|est-ce|à quoi|quelle est la différence)/.test(prompt) ||
+    /réglementation|législation|urssaf|plafond|obligatoire|rembours|fonctionne|résilier|mettre en place/.test(
+      prompt,
+    )
+  );
 }
 
 /** Whole-word keyword match, so "bio" never fires on "bioburger". */
@@ -305,6 +587,15 @@ export function authoredAnswer(
     return { named: [], sources: sources.slice(0, 1) };
   }
 
+  // "How does it work" questions usually get an explanation, not a shortlist.
+  if (
+    !family?.alwaysAnswers &&
+    isInformational(lower) &&
+    noise(`${llm}::${prompt}::informational`) > 0.35
+  ) {
+    return { named: [], sources: sources.slice(0, 2) };
+  }
+
   const ranked = profile.players
     .map((p) => {
       const base = p.authority[llm];
@@ -312,15 +603,17 @@ export function authoredAnswer(
       const perEngine = family?.engineWeights?.[p.name]?.[llm] ?? 1;
       // A little jitter so a brand sitting near the cut-off wins some queries
       // and loses others, as it would in reality.
-      const jitter = 0.85 + noise(`${llm}::${prompt}::${p.name}`) * 0.3;
+      const jitter = 0.7 + noise(`${llm}::${prompt}::${p.name}`) * 0.6;
       return { name: p.name, score: base * weight * perEngine * jitter };
     })
     .sort((a, b) => b.score - a.score);
 
   // Only genuinely plausible candidates get named.
+  // Answers name two or three brands, not a fixed count.
+  const count = 2 + Math.floor(noise(`${llm}::${prompt}::count`) * (profile.namedCount - 1));
   const named = ranked
-    .filter((r) => r.score >= 0.45)
-    .slice(0, profile.namedCount)
+    .filter((r) => r.score >= 0.55)
+    .slice(0, Math.max(1, count))
     .map((r) => r.name);
 
   return { named, sources };

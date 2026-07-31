@@ -83,7 +83,9 @@ describe("authored demo answers", () => {
     const organic = rate(["burger bio paris", "fast food bio paris", "burger vegan paris"]);
     const generic = rate(["meilleur burger paris", "bon burger paris", "burger paris"]);
 
-    expect(organic).toBeGreaterThan(0.6);
+    // The claim is the *gap*, not an absolute rate: an absolute threshold would
+    // break on every tuning of the model without anything being wrong.
+    expect(organic).toBeGreaterThan(generic * 1.8);
     expect(generic).toBeLessThan(0.4);
   });
 });
