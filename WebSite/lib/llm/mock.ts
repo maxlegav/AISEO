@@ -1,5 +1,6 @@
 import type { LLMId } from "@/lib/monitoring/types";
 import type { LLMResponse, LLMQueryContext } from "./types";
+import { demoProfileFor, authoredAnswer, authoredText } from "./demo-answers";
 
 /**
  * Deterministic mock LLM response, used when a provider API key is missing (dev
@@ -22,6 +23,9 @@ const MENTION_RATE: Record<LLMId, number> = {
   perplexity: 0.78,
   chatgpt: 0.54,
   gemini: 0.34,
+  // Google shows an AI Overview on only part of commercial queries, and when it
+  // does it summarises the organic top 10 — so citation is rarer than a chatbot's.
+  aio: 0.29,
   claude: 0.18,
 };
 
@@ -31,10 +35,24 @@ const SOURCE_POOL: Record<LLMId, string[]> = {
   perplexity: ["https://www.g2.com/categories", "https://news.ycombinator.com"],
   claude: ["https://www.reddit.com/r/SaaS", "https://www.quora.com"],
   gemini: ["https://www.youtube.com/results", "https://www.g2.com/categories"],
+  aio: ["https://fr.wikipedia.org/wiki", "https://www.journaldunet.com"],
 };
 
 export function mockLLMResponse(prompt: string, ctx: LLMQueryContext): LLMResponse {
   const { brandName, llm } = ctx;
+
+  // Showcase brands have a hand-authored market model, so their dashboard shows
+  // a realistic competitive picture instead of hash-driven noise.
+  const profile = demoProfileFor(brandName);
+  if (profile) {
+    const answer = authoredAnswer(profile, prompt, llm);
+    return {
+      text: authoredText(answer),
+      citations: answer.sources,
+      mock: true,
+    };
+  }
+
   const seed = hash(`${llm}::${brandName}::${prompt}`);
   const mentioned = seed < MENTION_RATE[llm];
 

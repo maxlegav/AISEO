@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
 import { LLMBadge } from "@/components/monitoring/widgets";
+import PromptSuggester from "@/components/monitoring/PromptSuggester";
 import { LLM_ORDER, LLMS, type LLMId } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import mongoose from "mongoose";
@@ -46,13 +47,11 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [category, setCategory] = useState("");
   const [competitors, setCompetitors] = useState<string[]>([""]);
-  const [prompts, setPrompts] = useState<string[]>([
-    "Quel est le meilleur outil pour [votre catégorie] ?",
-    "Quelles sont les alternatives à [concurrent] ?",
-  ]);
+  const [prompts, setPrompts] = useState<string[]>([]);
   const [frequency, setFrequency] = useState<Frequency>("weekly");
   const [engines, setEngines] = useState<Record<LLMId, boolean>>({
     chatgpt: true,
+    aio: true,
     perplexity: true,
     claude: true,
     gemini: true,
@@ -279,9 +278,39 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                   Requêtes à surveiller
                 </h2>
                 <p className="mb-4 text-sm text-gray-500">
-                  Les questions que vos prospects posent aux IA dans votre
-                  catégorie.
+                  Ce que vos prospects tapent réellement. Faites-vous en proposer
+                  une centaine, puis gardez celles qui vous ressemblent.
                 </p>
+
+                <div className="mb-5">
+                  <PromptSuggester
+                    brandName={brandName}
+                    category={category}
+                    competitors={cleanCompetitors}
+                    existing={cleanPrompts}
+                    engineCount={selectedLLMs.length || LLM_ORDER.length}
+                    frequency={frequency}
+                    onAdd={(added) =>
+                      setPrompts((prev) => {
+                        const known = new Set(
+                          prev.map((p) => p.trim().toLowerCase()).filter(Boolean),
+                        );
+                        const fresh = added.filter(
+                          (a) => !known.has(a.toLowerCase()),
+                        );
+                        return [...prev.filter((p) => p.trim()), ...fresh];
+                      })
+                    }
+                  />
+                </div>
+
+                {prompts.length > 0 && (
+                  <p className="mb-2 text-xs font-medium text-gray-400">
+                    {cleanPrompts.length} requête
+                    {cleanPrompts.length > 1 ? "s" : ""} retenue
+                    {cleanPrompts.length > 1 ? "s" : ""}
+                  </p>
+                )}
                 {prompts.map((p, i) => (
                   <div key={i} className="mb-2 flex items-center gap-2">
                     <input

@@ -44,8 +44,8 @@ const ProjectSchema = new Schema<ProjectDocument>(
     prompts: { type: [String], default: [] },
     llms: {
       type: [String],
-      enum: ["chatgpt", "claude", "perplexity", "gemini"],
-      default: ["chatgpt", "claude", "perplexity", "gemini"],
+      enum: ["chatgpt", "claude", "perplexity", "gemini", "aio"],
+      default: ["chatgpt", "claude", "perplexity", "gemini", "aio"],
     },
     frequency: {
       type: String,

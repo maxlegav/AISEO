@@ -9,55 +9,63 @@ import SybMark from "@/components/icons/SybMark";
  * seeded demo brands) — no network calls, no real account.
  */
 
-type Engine = "ChatGPT" | "Perplexity" | "Claude" | "Gemini";
+type Engine = "ChatGPT" | "AI Overview" | "Perplexity" | "Claude" | "Gemini";
 
 interface DemoBrand {
   name: string;
   domain: string;
   favicon: string;
-  global: number;
-  delta: number;
-  best: Engine;
+  /** Average rank of the brand among the brands cited in an answer. */
   avgPosition: string;
   frequency: string;
-  engines: { name: Engine; value: number; color: string }[];
-  /** 12 weekly points per engine, 0-100 */
+  /** Number of tracked prompts — every presence rate is a multiple of 100/prompts. */
+  prompts: number;
+  /** 12 weekly presence rates per engine, 0-100. Single source of truth. */
   series: Record<Engine, number[]>;
-  competitors: { name: string; value: number }[];
+  /** Rivals only — the brand's own bar is derived from its global score. */
+  rivals: { name: string; value: number }[];
 }
 
 const ENGINE_COLORS: Record<Engine, string> = {
   ChatGPT: "#10a37f",
+  "AI Overview": "#ea4335",
   Perplexity: "#7c3aed",
   Claude: "#d97757",
   Gemini: "#4285f4",
 };
+
+/**
+ * Same weights as the product (`ENGINE_WEIGHTS` in lib/monitoring/types.ts), so
+ * the global score shown here is the one the real pipeline would compute from
+ * these presence rates.
+ */
+const ENGINE_WEIGHTS: Record<Engine, number> = {
+  ChatGPT: 0.45,
+  "AI Overview": 0.25,
+  Gemini: 0.12,
+  Perplexity: 0.1,
+  Claude: 0.08,
+};
+
+const ENGINE_ORDER: Engine[] = ["ChatGPT", "AI Overview", "Perplexity", "Claude", "Gemini"];
 
 const BRANDS: DemoBrand[] = [
   {
     name: "Bioburger",
     domain: "bioburger.fr",
     favicon: "https://icons.duckduckgo.com/ip3/bioburger.fr.ico",
-    global: 47,
-    delta: 4,
-    best: "Perplexity",
-    avgPosition: "1.0",
+    avgPosition: "2.4",
     frequency: "Daily",
-    engines: [
-      { name: "Perplexity", value: 86, color: ENGINE_COLORS.Perplexity },
-      { name: "ChatGPT", value: 57, color: ENGINE_COLORS.ChatGPT },
-      { name: "Gemini", value: 29, color: ENGINE_COLORS.Gemini },
-      { name: "Claude", value: 14, color: ENGINE_COLORS.Claude },
-    ],
+    prompts: 20,
     series: {
-      Perplexity: [55, 58, 60, 62, 71, 74, 74, 78, 80, 82, 84, 86],
-      ChatGPT: [40, 41, 43, 44, 46, 50, 52, 53, 55, 56, 57, 57],
-      Gemini: [10, 12, 14, 16, 18, 20, 22, 24, 25, 27, 28, 29],
-      Claude: [8, 9, 10, 10, 11, 12, 12, 13, 13, 14, 14, 14],
+      Perplexity: [55, 55, 60, 60, 65, 70, 70, 75, 80, 80, 85, 85],
+      ChatGPT: [40, 40, 45, 45, 45, 50, 50, 50, 55, 55, 50, 55],
+      Gemini: [10, 10, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30],
+      Claude: [5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15, 15],
+      "AI Overview": [20, 20, 25, 25, 30, 30, 35, 35, 40, 40, 45, 45],
     },
-    competitors: [
+    rivals: [
       { name: "Big Fernand", value: 63 },
-      { name: "Bioburger", value: 47 },
       { name: "Blend", value: 41 },
       { name: "PNY", value: 33 },
     ],
@@ -66,25 +74,17 @@ const BRANDS: DemoBrand[] = [
     name: "lemlist",
     domain: "lemlist.com",
     favicon: "https://icons.duckduckgo.com/ip3/lemlist.com.ico",
-    global: 100,
-    delta: 25,
-    best: "ChatGPT",
-    avgPosition: "1.0",
+    avgPosition: "1.6",
     frequency: "Daily",
-    engines: [
-      { name: "ChatGPT", value: 100, color: ENGINE_COLORS.ChatGPT },
-      { name: "Perplexity", value: 100, color: ENGINE_COLORS.Perplexity },
-      { name: "Claude", value: 100, color: ENGINE_COLORS.Claude },
-      { name: "Gemini", value: 100, color: ENGINE_COLORS.Gemini },
-    ],
+    prompts: 20,
     series: {
-      ChatGPT: [70, 74, 78, 80, 85, 88, 90, 93, 95, 97, 99, 100],
-      Perplexity: [72, 75, 80, 84, 86, 90, 92, 95, 97, 98, 99, 100],
-      Claude: [55, 60, 64, 68, 72, 78, 82, 86, 90, 94, 98, 100],
-      Gemini: [50, 55, 60, 65, 70, 76, 82, 87, 91, 95, 98, 100],
+      ChatGPT: [60, 65, 65, 70, 70, 75, 80, 80, 85, 85, 85, 90],
+      Perplexity: [65, 70, 70, 75, 80, 80, 85, 85, 90, 90, 95, 95],
+      Claude: [45, 50, 50, 55, 60, 60, 65, 70, 70, 75, 75, 80],
+      Gemini: [40, 45, 50, 50, 55, 60, 65, 65, 70, 75, 75, 80],
+      "AI Overview": [50, 55, 60, 60, 65, 70, 70, 75, 80, 80, 85, 85],
     },
-    competitors: [
-      { name: "lemlist", value: 100 },
+    rivals: [
       { name: "Instantly", value: 71 },
       { name: "Smartlead", value: 64 },
       { name: "Apollo", value: 58 },
@@ -94,31 +94,52 @@ const BRANDS: DemoBrand[] = [
     name: "Les Chandelles",
     domain: "leschandelles.com",
     favicon: "https://icons.duckduckgo.com/ip3/leschandelles.com.ico",
-    global: 41,
-    delta: 0,
-    best: "Perplexity",
-    avgPosition: "1.0",
-    frequency: "Daily",
-    engines: [
-      { name: "Perplexity", value: 88, color: ENGINE_COLORS.Perplexity },
-      { name: "ChatGPT", value: 38, color: ENGINE_COLORS.ChatGPT },
-      { name: "Claude", value: 25, color: ENGINE_COLORS.Claude },
-      { name: "Gemini", value: 13, color: ENGINE_COLORS.Gemini },
-    ],
+    avgPosition: "2.8",
+    frequency: "Weekly",
+    prompts: 20,
     series: {
-      Perplexity: [70, 72, 74, 78, 80, 82, 83, 84, 85, 86, 87, 88],
-      ChatGPT: [30, 31, 32, 33, 34, 35, 36, 36, 37, 37, 38, 38],
-      Claude: [15, 16, 18, 19, 20, 21, 22, 23, 24, 24, 25, 25],
-      Gemini: [6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13],
+      Perplexity: [70, 70, 75, 75, 80, 80, 85, 85, 85, 90, 90, 90],
+      ChatGPT: [30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 40],
+      Claude: [15, 15, 20, 20, 20, 25, 25, 25, 25, 25, 25, 25],
+      Gemini: [5, 5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15],
+      "AI Overview": [25, 25, 30, 30, 30, 35, 35, 35, 40, 40, 40, 40],
     },
-    competitors: [
-      { name: "Les Chandelles", value: 41 },
+    rivals: [
       { name: "Le Set", value: 37 },
       { name: "L'Orangerie", value: 29 },
       { name: "Le 2+2", value: 22 },
     ],
   },
 ];
+
+/** Weighted global score for one week index, mirroring `computeGlobalScore`. */
+function globalScoreAt(brand: DemoBrand, week: number): number {
+  const total = ENGINE_ORDER.reduce((acc, e) => acc + ENGINE_WEIGHTS[e], 0);
+  const weighted = ENGINE_ORDER.reduce(
+    (acc, e) => acc + (brand.series[e][week] ?? 0) * ENGINE_WEIGHTS[e],
+    0,
+  );
+  return Math.round(weighted / total);
+}
+
+/** Everything the dashboard shows, derived from the 12-week series. */
+function derive(brand: DemoBrand) {
+  const last = 11;
+  const engines = ENGINE_ORDER.map((name) => ({
+    name,
+    value: brand.series[name][last] ?? 0,
+    color: ENGINE_COLORS[name],
+  })).sort((a, b) => b.value - a.value);
+
+  const global = globalScoreAt(brand, last);
+  const delta = global - globalScoreAt(brand, last - 1);
+  const best = engines[0];
+  const competitors = [...brand.rivals, { name: brand.name, value: global }].sort(
+    (a, b) => b.value - a.value,
+  );
+
+  return { engines, global, delta, best, competitors };
+}
 
 function tier(score: number): { label: string; color: string } {
   if (score >= 65) return { label: "Strong", color: "#16a34a" };
@@ -158,7 +179,6 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 function TrendChart({ brand }: { brand: DemoBrand }) {
-  const engines = brand.engines.map((e) => e.name);
   const W = 520;
   const H = 150;
   const pad = 8;
@@ -178,7 +198,7 @@ function TrendChart({ brand }: { brand: DemoBrand }) {
           strokeWidth="1"
         />
       ))}
-      {engines.map((eng) => {
+      {ENGINE_ORDER.map((eng) => {
         const pts = brand.series[eng]
           .map((v, i) => `${x(i)},${y(v)}`)
           .join(" ");
@@ -202,8 +222,8 @@ export default function DashboardPreview() {
   const [active, setActive] = useState(0);
   const brand = BRANDS[active] ?? BRANDS[0];
   if (!brand) return null;
-  const maxComp = Math.max(...brand.competitors.map((c) => c.value));
-  const topEngine = brand.engines[0];
+  const { engines, global, delta, best, competitors } = derive(brand);
+  const maxComp = Math.max(...competitors.map((c) => c.value));
 
   return (
     <section id="preview" className="px-4 py-16 md:py-24">
@@ -315,24 +335,35 @@ export default function DashboardPreview() {
               {/* KPI row */}
               <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-4 mb-5">
                 <div className="flex items-center gap-4 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                  <ScoreRing score={brand.global} />
+                  <ScoreRing score={global} />
                   <div>
                     <div className="text-xs text-gray-400">
                       Visibility score
                     </div>
                     <div className="text-2xl font-bold text-gray-900">
-                      {brand.global}
+                      {global}
                       <span className="text-sm font-normal text-gray-400">
                         /100
                       </span>
                     </div>
-                    {brand.delta > 0 ? (
+                    {delta > 0 && (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-600">
-                        ↗ +{brand.delta} pts / 7d
+                        ↗ +{delta} pts / 7d
                       </span>
-                    ) : (
-                      <span className="text-xs text-gray-400">0 pts / 7d</span>
                     )}
+                    {delta < 0 && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+                        ↘ {delta} pts / 7d
+                      </span>
+                    )}
+                    {delta === 0 && (
+                      <span className="text-xs text-gray-400">
+                        → stable / 7d
+                      </span>
+                    )}
+                    <div className="text-[11px] text-gray-400 mt-1">
+                      Weighted across {engines.length} engines
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
@@ -341,10 +372,10 @@ export default function DashboardPreview() {
                       <Trophy className="w-3.5 h-3.5" /> Best engine
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
-                      {brand.best}
+                      {best ? best.name : "—"}
                     </div>
                     <div className="text-xs text-gray-400">
-                      {topEngine ? topEngine.value : 0}% presence
+                      {best ? best.value : 0}% presence
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
@@ -363,7 +394,9 @@ export default function DashboardPreview() {
                     <div className="font-semibold text-gray-900 text-sm">
                       {brand.frequency}
                     </div>
-                    <div className="text-xs text-gray-400">4 AI engines</div>
+                    <div className="text-xs text-gray-400">
+                      {brand.prompts} prompts × {engines.length} engines
+                    </div>
                   </div>
                 </div>
               </div>
@@ -375,7 +408,7 @@ export default function DashboardPreview() {
                     12-week evolution
                   </span>
                   <div className="flex flex-wrap gap-3">
-                    {brand.engines.map((e) => (
+                    {engines.map((e) => (
                       <span
                         key={e.name}
                         className="inline-flex items-center gap-1.5 text-[11px] text-gray-500"
@@ -395,11 +428,15 @@ export default function DashboardPreview() {
               {/* Per-engine + competitors */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-                  <span className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-semibold text-gray-900">
                     Presence by engine
-                  </span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    Share of the {brand.prompts} tracked prompts citing{" "}
+                    {brand.name}
+                  </div>
                   <div className="space-y-3 mt-4">
-                    {brand.engines.map((e) => (
+                    {engines.map((e) => (
                       <div key={e.name} className="flex items-center gap-3">
                         <span className="text-xs w-20 text-gray-600">
                           {e.name}
@@ -421,11 +458,14 @@ export default function DashboardPreview() {
                   </div>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-                  <span className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-semibold text-gray-900">
                     You vs competitors
-                  </span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    Same weighted score, same prompts
+                  </div>
                   <div className="space-y-3 mt-4">
-                    {brand.competitors.map((c) => {
+                    {competitors.map((c) => {
                       const isOwn = c.name === brand.name;
                       return (
                         <div key={c.name} className="flex items-center gap-3">
@@ -459,8 +499,11 @@ export default function DashboardPreview() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
-          Illustrative product preview — demo data.
+        <p className="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
+          Illustrative product preview — demo data. The global score is computed
+          from the per-engine presence rates with the same weighting the product
+          uses (ChatGPT 45%, Google AI Overview 25%, Gemini 12%, Perplexity 10%,
+          Claude 8%).
         </p>
       </div>
     </section>

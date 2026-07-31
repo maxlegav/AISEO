@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, Printer } from "lucide-react";
 import {
   DeltaBadge,
   ScoreRing,
@@ -76,19 +76,22 @@ export default function ProjectReport({
           Retour au projet
         </Link>
         <div className="flex items-center gap-3">
-          <span className="hidden text-xs text-gray-400 sm:inline">
-            Astuce : choisissez « Enregistrer au format PDF » dans la boîte
-            d&apos;impression.
-          </span>
           <button
             type="button"
             onClick={() => window.print()}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+          >
+            <Printer className="h-4 w-4" />
+            Imprimer
+          </button>
+          <a
+            href={`/api/projects/${project.id}/report.pdf`}
             className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: branding.primaryColor }}
           >
             <Download className="h-4 w-4" />
-            Télécharger en PDF
-          </button>
+            Télécharger le PDF
+          </a>
         </div>
       </div>
 

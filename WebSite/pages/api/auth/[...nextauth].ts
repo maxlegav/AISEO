@@ -5,6 +5,7 @@ import EmailProvider from "next-auth/providers/email";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/libs/mongo";
 import User from "@/models/User";
+import { findUserByEmail, normalizeEmail } from "@/lib/auth-email";
 import mongoose from "mongoose";
 import { sendMagicLinkEmail } from "@/lib/email";
 
@@ -63,7 +64,7 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
 
         try {
-          const user = await User.findOne({ email: credentials.email });
+          const user = await findUserByEmail(credentials.email);
 
           if (!user) {
             throw new Error("USER_NOT_FOUND");
@@ -147,7 +148,7 @@ export const authOptions: NextAuthOptions = {
 
       // Pour l'authentification par credentials
       if (credentials) {
-        const dbUser = await User.findOne({ email: credentials.email });
+        const dbUser = await findUserByEmail(String(credentials.email ?? ""));
 
         if (!dbUser) {
           return false;
@@ -159,7 +160,9 @@ export const authOptions: NextAuthOptions = {
       // Pour l'authentification Google
       if (account?.provider === "google") {
         // Vérifier si l'utilisateur existe déjà
-        const existingUser = await User.findOne({ email: user.email });
+        const existingUser = user.email
+          ? await findUserByEmail(user.email)
+          : null;
 
         if (!existingUser) {
           // Auto-generate username from name
@@ -179,7 +182,7 @@ export const authOptions: NextAuthOptions = {
           const newUser = new User({
             name: user.name,
             username: generatedUsername,
-            email: user.email,
+            email: normalizeEmail(user.email ?? ""),
             image: user.image,
             emailVerified: new Date(),
           });

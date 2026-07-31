@@ -23,7 +23,7 @@ const WeeklyScoreSchema = new Schema<WeeklyScoreDocument>(
     projectId: { type: Schema.Types.ObjectId, ref: "Project", required: true, index: true },
     scope: {
       type: String,
-      enum: ["chatgpt", "claude", "perplexity", "gemini", "global"],
+      enum: ["chatgpt", "claude", "perplexity", "gemini", "aio", "global"],
       required: true,
     },
     week: { type: String, required: true },

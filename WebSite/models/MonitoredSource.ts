@@ -23,7 +23,7 @@ const MonitoredSourceSchema = new Schema<MonitoredSourceDocument>(
     projectId: { type: Schema.Types.ObjectId, ref: "Project", required: true, index: true },
     llm: {
       type: String,
-      enum: ["chatgpt", "claude", "perplexity", "gemini"],
+      enum: ["chatgpt", "claude", "perplexity", "gemini", "aio"],
       required: true,
     },
     url: { type: String, required: true },

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
-import User from '@/models/User';
+import { findUserByEmail } from '@/lib/auth-email';
 import { ForgotPasswordSchema } from '@/lib/validation/subscription';
 import { handleZodError } from '@/lib/validation/helpers';
 import { handleApiError } from '@/lib/error-handler';
@@ -37,8 +37,8 @@ export default async function handler(
 
     await connectDB();
 
-    // Find user by email
-    const user = await User.findOne({ email: email.toLowerCase(), deletedAt: null });
+    // Find user by email (tolerates legacy mixed-case accounts)
+    const user = await findUserByEmail(email, { deletedAt: null });
 
     // Always return success to prevent email enumeration
     const successResponse = {

@@ -1,4 +1,5 @@
 import type { LLMResponse, LLMQueryContext } from "./types";
+import { monitoringSystemPrompt } from "./system-prompt";
 
 /**
  * Real provider adapters. Each is a plain HTTPS call to the provider's chat
@@ -14,9 +15,7 @@ const MAX_RETRIES = 3;
 const BASE_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 8_000;
 
-const SYSTEM_PROMPT =
-  "Tu es un assistant qui répond à des questions de recherche de produits/services. " +
-  "Cite tes sources sous forme d'URLs quand c'est pertinent. Réponds en français.";
+
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -88,7 +87,7 @@ export async function queryOpenAI(prompt: string, _ctx: LLMQueryContext): Promis
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: monitoringSystemPrompt() },
         { role: "user", content: prompt },
       ],
       temperature: 0.2,
@@ -117,7 +116,7 @@ export async function queryAnthropic(prompt: string, _ctx: LLMQueryContext): Pro
     body: JSON.stringify({
       model: process.env.ANTHROPIC_MODEL || "claude-3-5-haiku-latest",
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: monitoringSystemPrompt(),
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -147,7 +146,7 @@ export async function queryPerplexity(prompt: string, _ctx: LLMQueryContext): Pr
     body: JSON.stringify({
       model: process.env.PERPLEXITY_MODEL || "sonar",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: monitoringSystemPrompt() },
         { role: "user", content: prompt },
       ],
     }),
@@ -172,7 +171,7 @@ export async function queryGemini(prompt: string, _ctx: LLMQueryContext): Promis
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: monitoringSystemPrompt() }] },
         contents: [{ role: "user", parts: [{ text: prompt }] }],
       }),
     },
@@ -185,4 +184,134 @@ export async function queryGemini(prompt: string, _ctx: LLMQueryContext): Promis
     .map((p) => p.text ?? "")
     .join("\n");
   return { text, citations: [], mock: false };
+}
+
+/* ------------------------------------------------ Google AI Overview ------ */
+
+/**
+ * Google's AI Overview is not an API — it is a block rendered inside a normal
+ * results page. Reading it means running the query through a SERP provider that
+ * parses that block for us. Two are supported, selected by `AIO_PROVIDER`:
+ *
+ *   AIO_PROVIDER=serpapi        + SERPAPI_KEY
+ *   AIO_PROVIDER=dataforseo     + DATAFORSEO_LOGIN / DATAFORSEO_PASSWORD
+ *
+ * Locale matters more here than for the chatbots: an AI Overview is
+ * country- and language-specific. `AIO_LOCATION` / `AIO_HL` default to France.
+ *
+ * When no overview is shown for a query (Google withholds them on many
+ * commercial searches), that is a *real, meaningful* result, not an error: the
+ * brand cannot be cited in a block that does not exist. We return empty text so
+ * the run records a legitimate "not mentioned".
+ */
+
+interface SerpApiResponse {
+  ai_overview?: {
+    text_blocks?: { snippet?: string; list?: { snippet?: string }[] }[];
+    references?: { link?: string }[];
+    error?: string;
+  };
+}
+
+function flattenSerpApiOverview(ov: NonNullable<SerpApiResponse["ai_overview"]>): string {
+  const parts: string[] = [];
+  for (const block of ov.text_blocks ?? []) {
+    if (block.snippet) parts.push(block.snippet);
+    for (const item of block.list ?? []) {
+      if (item.snippet) parts.push(item.snippet);
+    }
+  }
+  return parts.join("\n");
+}
+
+async function queryViaSerpApi(prompt: string): Promise<LLMResponse> {
+  const params = new URLSearchParams({
+    engine: "google",
+    q: prompt,
+    api_key: process.env.SERPAPI_KEY ?? "",
+    location: process.env.AIO_LOCATION || "France",
+    hl: process.env.AIO_HL || "fr",
+    gl: process.env.AIO_GL || "fr",
+  });
+  const res = await fetchWithTimeout(`https://serpapi.com/search.json?${params}`, {
+    method: "GET",
+  });
+  if (!res.ok) {
+    return { text: "", citations: [], mock: false, error: `SerpApi ${res.status}` };
+  }
+  const data = (await res.json()) as SerpApiResponse;
+  const ov = data.ai_overview;
+  // No overview shown for this query: a real observation, not a failure.
+  if (!ov || ov.error) return { text: "", citations: [], mock: false };
+
+  return {
+    text: flattenSerpApiOverview(ov),
+    citations: (ov.references ?? []).map((r) => r.link ?? "").filter(Boolean),
+    mock: false,
+  };
+}
+
+interface DataForSeoResponse {
+  tasks?: {
+    result?: {
+      items?: {
+        type?: string;
+        text?: string;
+        items?: { text?: string; url?: string; domain?: string }[];
+        references?: { url?: string }[];
+      }[];
+    }[];
+  }[];
+}
+
+async function queryViaDataForSeo(prompt: string): Promise<LLMResponse> {
+  const auth = Buffer.from(
+    `${process.env.DATAFORSEO_LOGIN}:${process.env.DATAFORSEO_PASSWORD}`,
+  ).toString("base64");
+
+  const res = await fetchWithTimeout(
+    "https://api.dataforseo.com/v3/serp/google/organic/live/advanced",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${auth}`,
+      },
+      body: JSON.stringify([
+        {
+          keyword: prompt,
+          location_name: process.env.AIO_LOCATION || "France",
+          language_code: process.env.AIO_HL || "fr",
+          load_async_ai_overview: true,
+        },
+      ]),
+    },
+  );
+  if (!res.ok) {
+    return { text: "", citations: [], mock: false, error: `DataForSEO ${res.status}` };
+  }
+
+  const data = (await res.json()) as DataForSeoResponse;
+  const items = data.tasks?.[0]?.result?.[0]?.items ?? [];
+  const overview = items.find((i) => i.type === "ai_overview");
+  if (!overview) return { text: "", citations: [], mock: false };
+
+  const text = [overview.text ?? "", ...(overview.items ?? []).map((i) => i.text ?? "")]
+    .filter(Boolean)
+    .join("\n");
+  const citations = [
+    ...(overview.references ?? []).map((r) => r.url ?? ""),
+    ...(overview.items ?? []).map((i) => i.url ?? ""),
+  ].filter(Boolean);
+
+  return { text, citations, mock: false };
+}
+
+export async function queryGoogleAIOverview(
+  prompt: string,
+  _ctx: LLMQueryContext,
+): Promise<LLMResponse> {
+  const provider = (process.env.AIO_PROVIDER || "serpapi").toLowerCase();
+  if (provider === "dataforseo") return queryViaDataForSeo(prompt);
+  return queryViaSerpApi(prompt);
 }
