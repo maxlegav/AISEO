@@ -18,7 +18,7 @@ describe("monitoring plans (Solo / Pro / Agence)", () => {
     expect(MONITORING_PLANS.solo.brandedPdf).toBe(false);
 
     expect(MONITORING_PLANS.pro.projects).toBe(10);
-    expect(MONITORING_PLANS.pro.maxLLMs).toBe(5);
+    expect(MONITORING_PLANS.pro.maxLLMs).toBe(4);
     expect(MONITORING_PLANS.pro.frequencies).toContain("daily");
 
     expect(MONITORING_PLANS.agency.projects).toBe(Infinity);
@@ -47,7 +47,7 @@ describe("limits derived from plans", () => {
     expect(getProjectLimit("agency")).toBe(Infinity);
 
     expect(getMaxLLMs("none")).toBe(3);
-    expect(getMaxLLMs("pro")).toBe(5);
+    expect(getMaxLLMs("pro")).toBe(4);
 
     expect(isFrequencyAllowed("none", "daily")).toBe(false);
     expect(isFrequencyAllowed("pro", "daily")).toBe(true);

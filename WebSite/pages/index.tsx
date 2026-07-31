@@ -27,11 +27,6 @@ import DashboardPreview from "@/components/landing/DashboardPreview";
 // AI Models with their actual logo files
 const aiModels = [
   {
-    name: "Google AI Overview",
-    logo: "/logos/google-aio-logo.svg",
-    text: "/logos/google-aio-text.svg",
-  },
-  {
     name: "OpenAI",
     logo: "/logos/openai-logo.svg",
     text: "/logos/openai-text.svg",
@@ -947,7 +942,7 @@ export default function Home() {
                 period="mois"
                 features={[
                   "2 projets suivis en continu",
-                  "3 moteurs IA au choix (sur 5)",
+                  "3 moteurs IA au choix",
                   "Suivi hebdomadaire automatique",
                   "Score de visibilité par moteur",
                   "Suivi des concurrents",
@@ -965,7 +960,7 @@ export default function Home() {
                 highlighted={true}
                 features={[
                   "10 projets suivis en continu",
-                  "Les 5 moteurs (ChatGPT, AI Overview Google, Perplexity, Gemini, Claude)",
+                  "Les 4 moteurs IA (ChatGPT, Claude, Perplexity, Gemini)",
                   "Suivi quotidien automatique",
                   "Historique 12 semaines par moteur",
                   "Recommandations spécifiques par moteur",
@@ -982,7 +977,7 @@ export default function Home() {
                 period="mois"
                 features={[
                   "Projets illimités",
-                  "Les 5 moteurs IA, suivi quotidien",
+                  "Les 4 moteurs IA, suivi quotidien",
                   "Dashboard multi-clients",
                   "Rapports PDF en marque blanche",
                   "Logo & couleurs de votre agence",

@@ -6,17 +6,10 @@
  * from both server and client code.
  */
 
-/**
- * `aio` is Google's **AI Overview** — the generated answer at the top of a
- * Google results page. It is not a chatbot and has no public API: it is read
- * through a SERP provider (see `lib/llm/providers.ts`). It is monitored
- * separately from `gemini` because the two answer the same question with
- * different sources.
- */
-export type LLMId = "chatgpt" | "claude" | "perplexity" | "gemini" | "aio";
+export type LLMId = "chatgpt" | "claude" | "perplexity" | "gemini";
 
-/** The five surfaces we monitor, in the order they should be displayed. */
-export const LLM_ORDER: LLMId[] = ["chatgpt", "aio", "perplexity", "gemini", "claude"];
+/** The four engines we monitor, in the order they should be displayed. */
+export const LLM_ORDER: LLMId[] = ["chatgpt", "perplexity", "claude", "gemini"];
 
 export interface LLMMeta {
   id: LLMId;
@@ -51,23 +44,10 @@ export const LLMS: Record<LLMId, LLMMeta> = {
     color: "#4285f4",
     bias: "Favorise les propriétés Google (YouTube, SGE). Une vidéo YouTube aide.",
   },
-  aio: {
-    id: "aio",
-    name: "Google AI Overview",
-    color: "#ea4335",
-    bias:
-      "Résume le top 10 organique de Google. Sans page bien classée sur la requête, aucune chance d'être résumé.",
-  },
 };
 
 export function isLLMId(value: string): value is LLMId {
-  return (
-    value === "chatgpt" ||
-    value === "claude" ||
-    value === "perplexity" ||
-    value === "gemini" ||
-    value === "aio"
-  );
+  return value === "chatgpt" || value === "claude" || value === "perplexity" || value === "gemini";
 }
 
 /**
@@ -78,14 +58,10 @@ export function isLLMId(value: string): value is LLMId {
  * engines actually evaluated for a project, so they need not sum to exactly 1.
  */
 export const ENGINE_WEIGHTS: Record<LLMId, number> = {
-  chatgpt: 0.45,
-  // AI Overviews are served inside ordinary Google searches, so their reach is
-  // far wider than any chatbot's — but they are an answer box people skim, not
-  // a conversation they act on. Hence a large share, below ChatGPT's.
-  aio: 0.25,
-  gemini: 0.12,
-  perplexity: 0.1,
-  claude: 0.08,
+  chatgpt: 0.6,
+  gemini: 0.16,
+  perplexity: 0.14,
+  claude: 0.1,
 };
 
 export type MonitoringFrequency = "weekly" | "daily";

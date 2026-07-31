@@ -81,11 +81,6 @@ const DEMO_PROMPTS: DemoPrompt[] = [
     question: "Meilleur CRM open source en 2026 ?",
     answer: [{ brand: "Odoo" }, { brand: "EspoCRM" }, { brand: "Twenty" }],
   },
-  {
-    engine: "aio",
-    question: "crm pme francais",
-    answer: [{ brand: "Axonaut" }, { brand: "Sellsy" }, { brand: "Zoho" }],
-  },
 ];
 
 function AnswerPanel({ prompt }: { prompt: DemoPrompt }) {
@@ -408,7 +403,7 @@ export default function TestLanding() {
                   {[
                     { k: `${CURRENT}/100`, v: "score global pondéré" },
                     { k: `${PROMPT_COUNT} prompts`, v: "rejoués à intervalle fixe" },
-                    { k: "5 moteurs", v: "mesurés séparément" },
+                    { k: "4 moteurs", v: "mesurés séparément" },
                   ].map((s) => (
                     <div key={s.k} className="flex items-baseline gap-3">
                       <dt

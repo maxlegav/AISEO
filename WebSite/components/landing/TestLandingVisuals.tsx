@@ -20,7 +20,6 @@ const LOGO_SRC: Record<LLMId, string> = {
   perplexity: "/logos/perplexity-logo.svg",
   claude: "/logos/claude-logo.svg",
   gemini: "/logos/gemini-logo.svg",
-  aio: "/logos/google-aio-logo.svg",
 };
 
 /**
@@ -53,7 +52,6 @@ export const WEEKS: Record<LLMId, number[]> = {
   perplexity: [45, 50, 50, 55, 60, 65, 65, 70, 75, 75, 80, 85],
   claude: [10, 10, 15, 15, 15, 20, 20, 20, 25, 25, 30, 30],
   gemini: [15, 15, 20, 20, 25, 25, 30, 30, 35, 35, 40, 40],
-  aio: [20, 25, 25, 30, 30, 35, 35, 40, 45, 45, 50, 55],
 };
 
 export const PROMPT_COUNT = 20;

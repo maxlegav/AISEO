@@ -21,7 +21,6 @@ const ENGINE_LABEL: Record<LLMId, string> = {
   claude: "Claude",
   perplexity: "Perplexity",
   gemini: "Gemini",
-  aio: "l'AI Overview de Google",
 };
 
 export interface OutreachContext {

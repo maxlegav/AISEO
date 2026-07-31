@@ -47,7 +47,7 @@ async function connectDB(): Promise<void> {
 }
 
 function zeroScores(): Record<LLMId, number> {
-  return { chatgpt: 0, claude: 0, perplexity: 0, gemini: 0, aio: 0 };
+  return { chatgpt: 0, claude: 0, perplexity: 0, gemini: 0 };
 }
 
 type Tier = "fort" | "moyen" | "faible" | "critique";
@@ -90,15 +90,6 @@ function explain(llm: LLMId, rate: number): string {
       critique:
         "Critique : aucune présence YouTube / Google structurée sur vos requêtes. C'est ce qui vous rend invisible sur Gemini.",
     },
-    aio: {
-      fort: "Fort : vos pages sont dans le top 10 Google sur ces requêtes, l'AI Overview vous résume.",
-      moyen:
-        "Moyen : vous n'êtes dans le top 10 Google que sur une partie des requêtes. L'AI Overview ne résume que ce qui est déjà bien classé.",
-      faible:
-        "Faible : vos pages sont trop loin dans les résultats Google pour être reprises dans l'AI Overview. C'est un chantier SEO classique.",
-      critique:
-        "Critique : absent du top 10 Google sur vos requêtes, donc jamais résumé. Sans classement organique, aucune visibilité dans l'AI Overview.",
-    },
     claude: {
       fort: "Fort : vous êtes bien présent sur Reddit, Quora et les forums que Claude privilégie.",
       moyen:
@@ -117,11 +108,6 @@ function recommendationFor(llm: LLMId, rate: number): Recommendation {
   const priority: Recommendation["priority"] =
     rate < 25 ? "high" : rate < 50 ? "medium" : "low";
   const templates: Record<LLMId, { title: string; detail: string }> = {
-    aio: {
-      title: "Remontez dans le top 10 Google sur vos requêtes",
-      detail:
-        "L'AI Overview résume les pages déjà bien classées. Tant qu'une requête ne vous place pas dans le top 10 organique, vous ne pouvez pas y apparaître : traitez-la comme une cible SEO classique (page dédiée, intention alignée, maillage).",
-    },
     claude: {
       title: "Gagnez en présence sur Reddit et Quora",
       detail:
@@ -215,7 +201,6 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
       claude: at("claude"),
       perplexity: at("perplexity"),
       gemini: at("gemini"),
-      aio: at("aio"),
       global: at("global"),
     };
   });

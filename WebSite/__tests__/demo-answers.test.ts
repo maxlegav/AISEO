@@ -53,9 +53,9 @@ describe("authored demo answers", () => {
   });
 
   it("answers brand-name lookups even in a category an engine avoids", () => {
-    // Google rarely renders an AI Overview for this category, but a direct
-    // lookup on the name is still answered.
-    const answer = authoredAnswer(chandelles!, "les chandelles horaires", "aio");
+    // Claude hedges on this category, but a direct lookup on the name is still
+    // answered — reticence must not swallow a brand search.
+    const answer = authoredAnswer(chandelles!, "les chandelles horaires", "claude");
     expect(answer.named).toContain("Les Chandelles");
   });
 

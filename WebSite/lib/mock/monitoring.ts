@@ -51,17 +51,9 @@ export const LLMS: Record<LLMId, LLMMeta> = {
     color: "#4285f4",
     bias: "Favorise les propriétés Google (YouTube, SGE). Une vidéo YouTube aide.",
   },
-  aio: {
-    id: "aio",
-    name: "Google AI Overview",
-    logo: "/logos/google-aio-logo.svg",
-    color: "#ea4335",
-    bias:
-      "Résume le top 10 organique de Google. Sans page bien classée sur la requête, aucune chance d'être résumé.",
-  },
 };
 
-export const LLM_ORDER: LLMId[] = ["chatgpt", "aio", "perplexity", "gemini", "claude"];
+export const LLM_ORDER: LLMId[] = ["chatgpt", "perplexity", "claude", "gemini"];
 
 export interface LLMScore {
   llm: LLMId;
@@ -81,7 +73,6 @@ export interface WeeklyPoint {
   claude: number;
   perplexity: number;
   gemini: number;
-  aio: number;
   global: number;
 }
 
@@ -269,15 +260,13 @@ function buildWeekly(
     const cl = val("claude");
     const p = val("perplexity");
     const g = val("gemini");
-    const a = val("aio");
     points.push({
       week: i === 11 ? "S0" : `S-${11 - i}`,
       chatgpt: c,
       claude: cl,
       perplexity: p,
       gemini: g,
-      aio: a,
-      global: Math.round((c + cl + p + g + a) / 5),
+      global: Math.round((c + cl + p + g) / 4),
     });
   }
   return points;
@@ -329,8 +318,8 @@ export const PROJECTS: Project[] = [
       },
     ],
     weekly: buildWeekly(
-      { chatgpt: 54, claude: 17, perplexity: 79, gemini: 33, aio: 44 },
-      { chatgpt: 41, claude: 22, perplexity: 55, gemini: 20, aio: 30 }
+      { chatgpt: 54, claude: 17, perplexity: 79, gemini: 33 },
+      { chatgpt: 41, claude: 22, perplexity: 55, gemini: 20 }
     ),
     competitorTable: [
       {
@@ -338,25 +327,25 @@ export const PROJECTS: Project[] = [
         isYou: true,
         global: 46,
         trend: 6,
-        scores: { chatgpt: 54, claude: 17, perplexity: 79, gemini: 33, aio: 44 },
+        scores: { chatgpt: 54, claude: 17, perplexity: 79, gemini: 33 },
       },
       {
         name: "Lemlist",
         global: 61,
         trend: 2,
-        scores: { chatgpt: 68, claude: 44, perplexity: 74, gemini: 58, aio: 63 },
+        scores: { chatgpt: 68, claude: 44, perplexity: 74, gemini: 58 },
       },
       {
         name: "Salesloft",
         global: 52,
         trend: -3,
-        scores: { chatgpt: 63, claude: 38, perplexity: 61, gemini: 46, aio: 54 },
+        scores: { chatgpt: 63, claude: 38, perplexity: 61, gemini: 46 },
       },
       {
         name: "Waalaxy",
         global: 39,
         trend: 1,
-        scores: { chatgpt: 47, claude: 29, perplexity: 52, gemini: 28, aio: 38 },
+        scores: { chatgpt: 47, claude: 29, perplexity: 52, gemini: 28 },
       },
     ],
     sources: [
@@ -472,8 +461,8 @@ export const PROJECTS: Project[] = [
       },
     ],
     weekly: buildWeekly(
-      { chatgpt: 44, claude: 11, perplexity: 38, gemini: 22, aio: 33 },
-      { chatgpt: 49, claude: 15, perplexity: 47, gemini: 27, aio: 38 }
+      { chatgpt: 44, claude: 11, perplexity: 38, gemini: 22 },
+      { chatgpt: 49, claude: 15, perplexity: 47, gemini: 27 }
     ),
     competitorTable: [
       {
@@ -481,25 +470,25 @@ export const PROJECTS: Project[] = [
         isYou: true,
         global: 31,
         trend: -4,
-        scores: { chatgpt: 44, claude: 11, perplexity: 38, gemini: 22, aio: 33 },
+        scores: { chatgpt: 44, claude: 11, perplexity: 38, gemini: 22 },
       },
       {
         name: "Tikamoon",
         global: 57,
         trend: 3,
-        scores: { chatgpt: 64, claude: 41, perplexity: 66, gemini: 55, aio: 60 },
+        scores: { chatgpt: 64, claude: 41, perplexity: 66, gemini: 55 },
       },
       {
         name: "Maisons du Monde",
         global: 72,
         trend: 1,
-        scores: { chatgpt: 78, claude: 59, perplexity: 74, gemini: 76, aio: 77 },
+        scores: { chatgpt: 78, claude: 59, perplexity: 74, gemini: 76 },
       },
       {
         name: "Made.com",
         global: 41,
         trend: -2,
-        scores: { chatgpt: 52, claude: 28, perplexity: 44, gemini: 39, aio: 46 },
+        scores: { chatgpt: 52, claude: 28, perplexity: 44, gemini: 39 },
       },
     ],
     sources: [

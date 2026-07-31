@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const llmEnum = z.enum(["chatgpt", "claude", "perplexity", "gemini", "aio"]);
+const llmEnum = z.enum(["chatgpt", "claude", "perplexity", "gemini"]);
 
 export const CreateProjectSchema = z.object({
   brandName: z.string().min(1).max(120),
@@ -9,7 +9,7 @@ export const CreateProjectSchema = z.object({
   competitors: z.array(z.string().min(1).max(120)).max(10).default([]),
   // 100+ is the point of the suggestion flow; the cap only guards against abuse.
   prompts: z.array(z.string().min(1).max(500)).max(200).default([]),
-  llms: z.array(llmEnum).min(1).default(["chatgpt", "claude", "perplexity", "gemini", "aio"]),
+  llms: z.array(llmEnum).min(1).default(["chatgpt", "claude", "perplexity", "gemini"]),
   frequency: z.enum(["weekly", "daily"]).default("weekly"),
 });
 

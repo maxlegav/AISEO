@@ -18,15 +18,15 @@ import type { LLMId } from "@/lib/monitoring/types";
  *
  *  1. **Players** — the brands that actually compete on these queries, each with
  *     a per-engine authority (0-1). Authority differs by engine because the
- *     engines source differently: ChatGPT follows Bing, AI Overview summarises
- *     Google's organic top 10, Perplexity favours recent high-traffic pages,
- *     Gemini leans on Google properties, Claude over-cites forums.
+ *     engines source differently: ChatGPT follows Bing, Perplexity favours
+ *     recent high-traffic pages, Gemini leans on Google properties, Claude
+ *     over-cites forums.
  *  2. **Families** — query families matched by keyword, each re-weighting the
  *     players. A niche brand can dominate its family while being invisible on
  *     the generic query, which is exactly the insight the product sells.
  *  3. **Engine reticence** — some engines answer certain categories poorly or
- *     not at all (Google withholds AI Overviews on adult-adjacent searches;
- *     Claude hedges). That is a real, measurable visibility fact.
+ *     not at all (Claude hedges on sensitive categories). That is a real,
+ *     measurable visibility fact.
  */
 
 interface Player {
@@ -90,24 +90,24 @@ const BIOBURGER: DemoProfile = {
   players: [
     {
       name: "Big Fernand",
-      authority: { chatgpt: 0.95, aio: 0.95, perplexity: 0.9, gemini: 0.9, claude: 0.75 },
+      authority: { chatgpt: 0.95, perplexity: 0.9, gemini: 0.9, claude: 0.75 },
     },
     {
       name: "Blend",
-      authority: { chatgpt: 0.85, aio: 0.8, perplexity: 0.85, gemini: 0.7, claude: 0.7 },
+      authority: { chatgpt: 0.85, perplexity: 0.85, gemini: 0.7, claude: 0.7 },
     },
     {
       name: "PNY",
-      authority: { chatgpt: 0.8, aio: 0.75, perplexity: 0.85, gemini: 0.65, claude: 0.9 },
+      authority: { chatgpt: 0.8, perplexity: 0.85, gemini: 0.65, claude: 0.9 },
     },
     {
       name: "Les Burgers de Papa",
-      authority: { chatgpt: 0.6, aio: 0.65, perplexity: 0.5, gemini: 0.6, claude: 0.35 },
+      authority: { chatgpt: 0.6, perplexity: 0.5, gemini: 0.6, claude: 0.35 },
     },
     {
       name: "Bioburger",
       // Modest generic standing: a real chain, but not the one press lists first.
-      authority: { chatgpt: 0.45, aio: 0.42, perplexity: 0.6, gemini: 0.34, claude: 0.24 },
+      authority: { chatgpt: 0.45, perplexity: 0.6, gemini: 0.34, claude: 0.24 },
     },
   ],
   families: [
@@ -117,7 +117,7 @@ const BIOBURGER: DemoProfile = {
       weights: { Bioburger: 2.1, "Big Fernand": 0.5, Blend: 0.6, PNY: 0.7, "Les Burgers de Papa": 0.4 },
       engineWeights: {
         // Own site + food press carry the organic angle; forums almost never do.
-        Bioburger: { perplexity: 1.2, chatgpt: 1, aio: 0.9, gemini: 0.7, claude: 0.5 },
+        Bioburger: { perplexity: 1.2, chatgpt: 1, gemini: 0.7, claude: 0.5 },
       },
       sources: [
         "https://www.bioburger.fr",
@@ -130,7 +130,7 @@ const BIOBURGER: DemoProfile = {
       match: ["viande française", "viande francaise", "circuit court", "local", "responsable", "durable"],
       weights: { Bioburger: 1.9, "Big Fernand": 1.1, Blend: 0.8, PNY: 0.6 },
       engineWeights: {
-        Bioburger: { perplexity: 1.15, chatgpt: 1, aio: 0.95, gemini: 0.7, claude: 0.55 },
+        Bioburger: { perplexity: 1.15, chatgpt: 1, gemini: 0.7, claude: 0.55 },
       },
       sources: [
         "https://www.bioburger.fr",
@@ -165,16 +165,16 @@ const BIOBURGER: DemoProfile = {
     "https://www.reddit.com/r/paris",
   ],
   // Everyone answers restaurant questions happily.
-  reticence: { chatgpt: 1, aio: 0.85, perplexity: 1, gemini: 1, claude: 1 },
+  reticence: { chatgpt: 1, perplexity: 1, gemini: 1, claude: 1 },
 };
 
 /* ------------------------------------------------------ Les Chandelles -- */
 
 /**
  * Les Chandelles: historic Parisian private club. The reference name in a very
- * narrow niche — but the category is one engines handle unevenly. Google rarely
- * renders an AI Overview on adult-adjacent searches and Claude hedges, so the
- * per-engine spread is the whole point of this project.
+ * narrow niche — but the category is one engines handle unevenly: Claude hedges
+ * and Gemini stays vague, so the per-engine spread is the whole point of this
+ * project.
  */
 const CHANDELLES: DemoProfile = {
   brand: "Les Chandelles",
@@ -183,23 +183,23 @@ const CHANDELLES: DemoProfile = {
     {
       name: "Les Chandelles",
       // The historic, most-documented name in its category.
-      authority: { chatgpt: 0.85, aio: 0.8, perplexity: 0.9, gemini: 0.7, claude: 0.5 },
+      authority: { chatgpt: 0.85, perplexity: 0.9, gemini: 0.7, claude: 0.5 },
     },
     {
       name: "Le Set",
-      authority: { chatgpt: 0.6, aio: 0.6, perplexity: 0.65, gemini: 0.5, claude: 0.4 },
+      authority: { chatgpt: 0.6, perplexity: 0.65, gemini: 0.5, claude: 0.4 },
     },
     {
       name: "L'Orangerie",
-      authority: { chatgpt: 0.5, aio: 0.5, perplexity: 0.55, gemini: 0.45, claude: 0.35 },
+      authority: { chatgpt: 0.5, perplexity: 0.55, gemini: 0.45, claude: 0.35 },
     },
     {
       name: "Le 2+2",
-      authority: { chatgpt: 0.4, aio: 0.45, perplexity: 0.45, gemini: 0.35, claude: 0.3 },
+      authority: { chatgpt: 0.4, perplexity: 0.45, gemini: 0.35, claude: 0.3 },
     },
     {
       name: "Chris et Manu",
-      authority: { chatgpt: 0.35, aio: 0.35, perplexity: 0.4, gemini: 0.3, claude: 0.25 },
+      authority: { chatgpt: 0.35, perplexity: 0.4, gemini: 0.3, claude: 0.25 },
     },
   ],
   families: [
@@ -248,8 +248,6 @@ const CHANDELLES: DemoProfile = {
   ],
   reticence: {
     chatgpt: 0.85,
-    // Google very rarely renders an AI Overview on this category.
-    aio: 0.15,
     perplexity: 0.9,
     gemini: 0.55,
     // Claude declines or answers without naming venues more often than the rest.

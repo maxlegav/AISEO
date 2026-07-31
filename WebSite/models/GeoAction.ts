@@ -65,7 +65,7 @@ const EngineRateSchema = new Schema<EngineRate>(
   {
     llm: {
       type: String,
-      enum: ["chatgpt", "claude", "perplexity", "gemini", "aio"],
+      enum: ["chatgpt", "claude", "perplexity", "gemini"],
       required: true,
     },
     presenceRate: { type: Number, min: 0, max: 100, required: true },

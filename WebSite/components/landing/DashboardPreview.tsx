@@ -9,7 +9,7 @@ import SybMark from "@/components/icons/SybMark";
  * seeded demo brands) — no network calls, no real account.
  */
 
-type Engine = "ChatGPT" | "AI Overview" | "Perplexity" | "Claude" | "Gemini";
+type Engine = "ChatGPT" | "Perplexity" | "Claude" | "Gemini";
 
 interface DemoBrand {
   name: string;
@@ -28,7 +28,6 @@ interface DemoBrand {
 
 const ENGINE_COLORS: Record<Engine, string> = {
   ChatGPT: "#10a37f",
-  "AI Overview": "#ea4335",
   Perplexity: "#7c3aed",
   Claude: "#d97757",
   Gemini: "#4285f4",
@@ -40,14 +39,13 @@ const ENGINE_COLORS: Record<Engine, string> = {
  * these presence rates.
  */
 const ENGINE_WEIGHTS: Record<Engine, number> = {
-  ChatGPT: 0.45,
-  "AI Overview": 0.25,
-  Gemini: 0.12,
-  Perplexity: 0.1,
-  Claude: 0.08,
+  ChatGPT: 0.6,
+  Gemini: 0.16,
+  Perplexity: 0.14,
+  Claude: 0.1,
 };
 
-const ENGINE_ORDER: Engine[] = ["ChatGPT", "AI Overview", "Perplexity", "Claude", "Gemini"];
+const ENGINE_ORDER: Engine[] = ["ChatGPT", "Perplexity", "Claude", "Gemini"];
 
 const BRANDS: DemoBrand[] = [
   {
@@ -62,7 +60,6 @@ const BRANDS: DemoBrand[] = [
       ChatGPT: [40, 40, 45, 45, 45, 50, 50, 50, 55, 55, 50, 55],
       Gemini: [10, 10, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30],
       Claude: [5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15, 15],
-      "AI Overview": [20, 20, 25, 25, 30, 30, 35, 35, 40, 40, 45, 45],
     },
     rivals: [
       { name: "Big Fernand", value: 63 },
@@ -82,7 +79,6 @@ const BRANDS: DemoBrand[] = [
       Perplexity: [65, 70, 70, 75, 80, 80, 85, 85, 90, 90, 95, 95],
       Claude: [45, 50, 50, 55, 60, 60, 65, 70, 70, 75, 75, 80],
       Gemini: [40, 45, 50, 50, 55, 60, 65, 65, 70, 75, 75, 80],
-      "AI Overview": [50, 55, 60, 60, 65, 70, 70, 75, 80, 80, 85, 85],
     },
     rivals: [
       { name: "Instantly", value: 71 },
@@ -102,7 +98,6 @@ const BRANDS: DemoBrand[] = [
       ChatGPT: [30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 40],
       Claude: [15, 15, 20, 20, 20, 25, 25, 25, 25, 25, 25, 25],
       Gemini: [5, 5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15],
-      "AI Overview": [25, 25, 30, 30, 30, 35, 35, 35, 40, 40, 40, 40],
     },
     rivals: [
       { name: "Le Set", value: 37 },
@@ -502,8 +497,7 @@ export default function DashboardPreview() {
         <p className="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
           Illustrative product preview — demo data. The global score is computed
           from the per-engine presence rates with the same weighting the product
-          uses (ChatGPT 45%, Google AI Overview 25%, Gemini 12%, Perplexity 10%,
-          Claude 8%).
+          uses (ChatGPT 60%, Gemini 16%, Perplexity 14%, Claude 10%).
         </p>
       </div>
     </section>

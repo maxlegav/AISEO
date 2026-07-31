@@ -36,9 +36,9 @@ describe("computeGlobalScore", () => {
       { llm: "chatgpt", brandMentioned: true, brandPosition: 1 },
       { llm: "claude", brandMentioned: false, brandPosition: null },
     ]);
-    // chatgpt (0.45) at 100, claude (0.08) at 0 → 45 / 0.53 ≈ 85,
+    // chatgpt (0.6) at 100, claude (0.1) at 0 → 60 / 0.7 ≈ 86,
     // not the equal-weight 50: being cited on the dominant engine matters more.
-    expect(computeGlobalScore(scores)).toBe(85);
+    expect(computeGlobalScore(scores)).toBe(86);
   });
 
   it("re-normalises weights over only the evaluated engines", () => {

@@ -79,7 +79,7 @@ const OutreachTargetSchema = new Schema<OutreachTargetDocument>(
     sampleUrl: { type: String, default: "", maxlength: 500 },
     engines: {
       type: [String],
-      enum: ["chatgpt", "claude", "perplexity", "gemini", "aio"],
+      enum: ["chatgpt", "claude", "perplexity", "gemini"],
       default: [],
     },
     citations: { type: Number, default: 0, min: 0 },

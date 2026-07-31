@@ -7,8 +7,7 @@
  * businesses, and the answers come from the market model in
  * `lib/llm/demo-answers.ts` rather than a hash. The point is a dashboard whose
  * story holds up — Bioburger owning the "bio" family while losing the generic
- * burger query, Les Chandelles strong on Perplexity and nearly invisible in
- * Google's AI Overview.
+ * burger query, Les Chandelles strong on Perplexity and weak on Claude.
  *
  * Usage (dev server must be running):
  *   node scripts/seed-showcase-projects.js
@@ -336,7 +335,7 @@ async function main() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         ...spec,
-        llms: ["chatgpt", "aio", "perplexity", "gemini", "claude"],
+        llms: ["chatgpt", "perplexity", "gemini", "claude"],
       }),
     });
     const json = await res.json();

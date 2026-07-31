@@ -25,14 +25,7 @@ export interface GenerateResult {
   error?: string;
 }
 
-/**
- * Engines that can *write* text. Google AI Overview is excluded: it is a read
- * surface (a summary Google renders on its results page), not a model we can
- * prompt to produce a deliverable.
- */
-export type WriterLLM = Exclude<LLMId, "aio">;
-
-const KEY_ENV: Record<WriterLLM, string> = {
+const KEY_ENV: Record<LLMId, string> = {
   chatgpt: "OPENAI_API_KEY",
   claude: "ANTHROPIC_API_KEY",
   gemini: "GEMINI_API_KEY",
@@ -40,10 +33,10 @@ const KEY_ENV: Record<WriterLLM, string> = {
 };
 
 // Order of preference: general-purpose writers first.
-const PROVIDER_ORDER: WriterLLM[] = ["chatgpt", "claude", "gemini", "perplexity"];
+const PROVIDER_ORDER: LLMId[] = ["chatgpt", "claude", "gemini", "perplexity"];
 
 /** The first configured provider, or null when running key-free. */
-export function firstConfiguredProvider(): WriterLLM | null {
+export function firstConfiguredProvider(): LLMId | null {
   return PROVIDER_ORDER.find((llm) => Boolean(process.env[KEY_ENV[llm]])) ?? null;
 }
 
@@ -159,7 +152,7 @@ async function callPerplexity(system: string, user: string): Promise<string> {
   return data.choices?.[0]?.message?.content ?? "";
 }
 
-const CALLERS: Record<WriterLLM, (system: string, user: string) => Promise<string>> = {
+const CALLERS: Record<LLMId, (system: string, user: string) => Promise<string>> = {
   chatgpt: callOpenAI,
   claude: callAnthropic,
   gemini: callGemini,

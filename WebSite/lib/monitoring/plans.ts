@@ -20,7 +20,7 @@ export interface MonitoringPlan {
   price: number;
   /** Max monitored projects. `Infinity` means unlimited. */
   projects: number;
-  /** Max distinct engines that can be enabled per project (5 exist). */
+  /** Max distinct engines that can be enabled per project (4 exist). */
   maxLLMs: number;
   /** Monitoring frequencies this plan may select. */
   frequencies: MonitoringFrequency[];
@@ -43,7 +43,7 @@ export const MONITORING_PLANS: Record<MonitoringPlanId, MonitoringPlan> = {
     name: appConfig.monitoring.pro.name,
     price: appConfig.monitoring.pro.price,
     projects: 10,
-    maxLLMs: 5,
+    maxLLMs: 4,
     frequencies: ["weekly", "daily"],
     brandedPdf: false,
   },
@@ -52,7 +52,7 @@ export const MONITORING_PLANS: Record<MonitoringPlanId, MonitoringPlan> = {
     name: appConfig.monitoring.agency.name,
     price: appConfig.monitoring.agency.price,
     projects: Infinity,
-    maxLLMs: 5,
+    maxLLMs: 4,
     frequencies: ["weekly", "daily"],
     brandedPdf: true,
   },

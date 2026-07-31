@@ -30,7 +30,7 @@ const LLMResultSchema = new Schema<LLMResultDocument>(
     week: { type: String, required: true, index: true },
     llm: {
       type: String,
-      enum: ["chatgpt", "claude", "perplexity", "gemini", "aio"],
+      enum: ["chatgpt", "claude", "perplexity", "gemini"],
       required: true,
     },
     prompt: { type: String, required: true },

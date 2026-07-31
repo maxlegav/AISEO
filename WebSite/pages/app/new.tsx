@@ -51,7 +51,6 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
   const [frequency, setFrequency] = useState<Frequency>("weekly");
   const [engines, setEngines] = useState<Record<LLMId, boolean>>({
     chatgpt: true,
-    aio: true,
     perplexity: true,
     claude: true,
     gemini: true,
