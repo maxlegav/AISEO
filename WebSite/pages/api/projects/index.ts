@@ -9,6 +9,7 @@ import { getProjectLimit, getMaxLLMs, isFrequencyAllowed } from "@/lib/monitorin
 import type { SubscriptionTier } from "@/lib/subscription-limits";
 import { requireWorkspace } from "@/lib/api-workspace";
 import { getWorkspacePlan } from "@/lib/monitoring/workspace";
+import { getUsage, projectedMonthlyCalls } from "@/lib/monitoring/usage";
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -73,6 +74,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           success: false,
           error: "UPGRADE_REQUIRED",
           message: `Votre plan autorise ${limit} projet(s). Passez à un plan supérieur pour en suivre davantage.`,
+        });
+      }
+
+      // Cost guard: prompts x engines x runs is unbounded by the plan limits,
+      // so a single configuration can outspend a whole month's budget. Refuse
+      // at creation rather than let it surface as an invoice.
+      const usage = await getUsage(organizationId, tier as SubscriptionTier);
+      const added = projectedMonthlyCalls({
+        prompts: parsed.data.prompts.length,
+        engines: parsed.data.llms.length,
+        frequency: parsed.data.frequency,
+      });
+      if (usage.projected + added > usage.budget) {
+        return res.status(403).json({
+          success: false,
+          error: "BUDGET_EXCEEDED",
+          message:
+            `Cette configuration consommerait ${(usage.projected + added).toLocaleString("fr-FR")} ` +
+            `interrogations par mois, au-delà des ${usage.budget.toLocaleString("fr-FR")} de votre plan. ` +
+            `Réduisez le nombre de requêtes ou de moteurs, ou passez en hebdomadaire.`,
+          details: { projected: usage.projected + added, budget: usage.budget },
         });
       }
 

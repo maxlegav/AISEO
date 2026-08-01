@@ -4,6 +4,9 @@ import Project from "@/models/Project";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { runProjectMonitoring } from "@/lib/monitoring/pipeline";
 import { requireWorkspace } from "@/lib/api-workspace";
+import { getWorkspacePlan } from "@/lib/monitoring/workspace";
+import { getUsage, canAfford, budgetMessage } from "@/lib/monitoring/usage";
+import type { SubscriptionTier } from "@/lib/subscription-limits";
 
 // A manual run queries every prompt × engine, so give it room.
 export const config = { maxDuration: 300 };
@@ -28,6 +31,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     if (project.prompts.length === 0) {
       throw new ApiError(ErrorType.VALIDATION, "Add at least one prompt before running monitoring");
+    }
+
+    // Checked before spending: a run refused whole is better than one cut off
+    // mid-prompt-set, which would score the week on a different sample.
+    const { tier } = await getWorkspacePlan(workspace.ownerId);
+    const usage = await getUsage(workspace.organizationId, tier as SubscriptionTier);
+    const cost = project.prompts.length * (project.llms.length || 1);
+    if (!canAfford(usage, cost)) {
+      return res.status(403).json({
+        success: false,
+        error: "BUDGET_EXCEEDED",
+        message: budgetMessage(usage),
+        details: { used: usage.used, budget: usage.budget, cost },
+      });
     }
 
     const summary = await runProjectMonitoring(project);

@@ -14,12 +14,16 @@ import {
 import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectSummaries, type ClientOption } from "@/lib/monitoring/dashboard";
+import { getUsage, type UsageStatus } from "@/lib/monitoring/usage";
+import { getWorkspacePlan } from "@/lib/monitoring/workspace";
+import type { SubscriptionTier } from "@/lib/subscription-limits";
 
 interface AppOverviewProps {
   projects: Project[];
   demo: boolean;
   clients: ClientOption[];
   activeClientId: string | null;
+  usage: UsageStatus | null;
 }
 
 export default function AppOverview({
@@ -27,6 +31,7 @@ export default function AppOverview({
   demo,
   clients,
   activeClientId,
+  usage,
 }: AppOverviewProps) {
   return (
     <>
@@ -50,6 +55,45 @@ export default function AppOverview({
           </Link>
         }
       >
+        {/* Consumption against the plan's monthly API budget. Shown only when
+            it starts to matter — an untouched quota is noise. */}
+        {usage && (usage.nearLimit || usage.projected > usage.budget) && (
+          <div
+            className={
+              "mb-5 rounded-2xl border p-4 " +
+              (usage.exceeded
+                ? "border-red-200 bg-red-50"
+                : "border-amber-200 bg-amber-50")
+            }
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-sm font-medium text-gray-900">
+                {usage.exceeded
+                  ? "Budget d'interrogations épuisé pour ce mois"
+                  : usage.projected > usage.budget
+                    ? "Vos projets consommeront plus que votre budget mensuel"
+                    : "Budget d'interrogations bientôt atteint"}
+              </p>
+              <p className="text-xs text-gray-500">
+                {usage.used.toLocaleString("fr-FR")} utilisées ·{" "}
+                {usage.projected.toLocaleString("fr-FR")} prévues ce mois ·{" "}
+                budget {usage.budget.toLocaleString("fr-FR")}
+              </p>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white">
+              <div
+                className={"h-full rounded-full " + (usage.exceeded ? "bg-red-500" : "bg-amber-500")}
+                style={{ width: `${Math.min(100, usage.ratio * 100)}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-gray-600">
+              Une analyse coûte une interrogation par requête et par moteur.
+              Réduisez le nombre de requêtes, désactivez un moteur, ou passez en
+              hebdomadaire pour rester dans le budget.
+            </p>
+          </div>
+        )}
+
         {clients.length > 0 && (
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -207,5 +251,8 @@ export const getServerSideProps: GetServerSideProps<AppOverviewProps> = async (
     return { redirect: { destination: "/app/onboarding", permanent: false } };
   }
 
-  return { props: { projects, demo, clients, activeClientId } };
+  const { tier } = await getWorkspacePlan(session.workspace.ownerId);
+  const usage = await getUsage(session.workspace.organizationId, tier as SubscriptionTier);
+
+  return { props: { projects, demo, clients, activeClientId, usage } };
 };

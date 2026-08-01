@@ -3,8 +3,12 @@ import mongoose from "mongoose";
 import Project from "@/models/Project";
 import User from "@/models/User";
 import { runProjectMonitoring } from "@/lib/monitoring/pipeline";
+import { getWorkspacePlan } from "@/lib/monitoring/workspace";
+import { getUsage, canAfford } from "@/lib/monitoring/usage";
+import type { SubscriptionTier } from "@/lib/subscription-limits";
 import { sendMonitoringAlertEmail } from "@/lib/email";
 import { LLMS, isLLMId } from "@/lib/monitoring/types";
+import { nextRunDate } from "@/lib/monitoring/week";
 
 /**
  * Vercel Cron entry point. Runs every active project whose next run is due,
@@ -54,8 +58,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const projects = await Project.find(query).limit(50);
     const summaries = [];
+    const skipped: { projectId: string; brandName: string; reason: string }[] = [];
+
+    // Usage is per organization and read once per org, not per project: the
+    // cron can hold dozens of projects belonging to the same workspace.
+    const usageCache = new Map<string, Awaited<ReturnType<typeof getUsage>>>();
 
     for (const project of projects) {
+      const orgId = project.organizationId?.toString() ?? "";
+      let usage = usageCache.get(orgId);
+      if (!usage) {
+        const { tier } = await getWorkspacePlan(project.userId.toString());
+        usage = await getUsage(orgId, tier as SubscriptionTier);
+        usageCache.set(orgId, usage);
+      }
+
+      const cost = project.prompts.length * (project.llms.length || 1);
+      if (!canAfford(usage, cost)) {
+        skipped.push({
+          projectId: project._id.toString(),
+          brandName: project.brandName,
+          reason: `budget épuisé (${usage.used}/${usage.budget})`,
+        });
+        // Push the next attempt out so a saturated workspace does not retry on
+        // every cron tick for the rest of the month.
+        project.nextRunAt = nextRunDate(project.frequency);
+        await project.save();
+        continue;
+      }
+      // Keep the cached counter in step within this tick.
+      usage.used += cost;
+
       const summary = await runProjectMonitoring(project);
       summaries.push(summary);
 
@@ -80,7 +113,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       success: true,
-      data: { ranProjects: summaries.length, summaries },
+      data: { ranProjects: summaries.length, summaries, skippedForBudget: skipped },
     });
   } catch (error) {
     console.error("[cron/run-monitoring]", error);
