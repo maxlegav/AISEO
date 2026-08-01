@@ -13,6 +13,8 @@ module.exports = {
     "/settings",
     "/admin/*",
     "/waitlist",
+    // Experimental alternative landing: noindex, must not be advertised either.
+    "/testlanding",
     "/checkout/*",
     "/forgot-password",
     "/reset-password",

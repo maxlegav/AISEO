@@ -1,4 +1,5 @@
 import type { LLMResponse, LLMQueryContext } from "./types";
+import { monitoringSystemPrompt } from "./system-prompt";
 
 /**
  * Real provider adapters. Each is a plain HTTPS call to the provider's chat
@@ -14,9 +15,7 @@ const MAX_RETRIES = 3;
 const BASE_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 8_000;
 
-const SYSTEM_PROMPT =
-  "Tu es un assistant qui répond à des questions de recherche de produits/services. " +
-  "Cite tes sources sous forme d'URLs quand c'est pertinent. Réponds en français.";
+
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -88,7 +87,7 @@ export async function queryOpenAI(prompt: string, _ctx: LLMQueryContext): Promis
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: monitoringSystemPrompt() },
         { role: "user", content: prompt },
       ],
       temperature: 0.2,
@@ -117,7 +116,7 @@ export async function queryAnthropic(prompt: string, _ctx: LLMQueryContext): Pro
     body: JSON.stringify({
       model: process.env.ANTHROPIC_MODEL || "claude-3-5-haiku-latest",
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: monitoringSystemPrompt(),
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -147,7 +146,7 @@ export async function queryPerplexity(prompt: string, _ctx: LLMQueryContext): Pr
     body: JSON.stringify({
       model: process.env.PERPLEXITY_MODEL || "sonar",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: monitoringSystemPrompt() },
         { role: "user", content: prompt },
       ],
     }),
@@ -172,7 +171,7 @@ export async function queryGemini(prompt: string, _ctx: LLMQueryContext): Promis
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: monitoringSystemPrompt() }] },
         contents: [{ role: "user", parts: [{ text: prompt }] }],
       }),
     },

@@ -1,5 +1,6 @@
 import type { LLMId } from "@/lib/monitoring/types";
 import type { LLMResponse, LLMQueryContext } from "./types";
+import { demoProfileFor, authoredAnswer, authoredText } from "./demo-answers";
 
 /**
  * Deterministic mock LLM response, used when a provider API key is missing (dev
@@ -35,6 +36,19 @@ const SOURCE_POOL: Record<LLMId, string[]> = {
 
 export function mockLLMResponse(prompt: string, ctx: LLMQueryContext): LLMResponse {
   const { brandName, llm } = ctx;
+
+  // Showcase brands have a hand-authored market model, so their dashboard shows
+  // a realistic competitive picture instead of hash-driven noise.
+  const profile = demoProfileFor(brandName);
+  if (profile) {
+    const answer = authoredAnswer(profile, prompt, llm);
+    return {
+      text: authoredText(answer),
+      citations: answer.sources,
+      mock: true,
+    };
+  }
+
   const seed = hash(`${llm}::${brandName}::${prompt}`);
   const mentioned = seed < MENTION_RATE[llm];
 

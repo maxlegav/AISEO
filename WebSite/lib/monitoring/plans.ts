@@ -20,7 +20,7 @@ export interface MonitoringPlan {
   price: number;
   /** Max monitored projects. `Infinity` means unlimited. */
   projects: number;
-  /** Max distinct engines that can be enabled per project. */
+  /** Max distinct engines that can be enabled per project (4 exist). */
   maxLLMs: number;
   /** Monitoring frequencies this plan may select. */
   frequencies: MonitoringFrequency[];

@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Next infère sa racine en remontant les lockfiles. Un package-lock.json
+  // parasite à la racine du monorepo lui a déjà fait prendre AISEO/ (qui
+  // contient video/ ~842 Mo et Admin/ ~574 Mo) comme racine, élargissant la
+  // surveillance et la résolution de Turbopack bien au-delà de l'app.
+  // Le parasite est supprimé ; on épingle quand même pour que la réapparition
+  // d'un lockfile au-dessus ne puisse plus déplacer la racine silencieusement.
+  turbopack: {
+    root: __dirname,
+  },
   images: {
     remotePatterns: [
       {

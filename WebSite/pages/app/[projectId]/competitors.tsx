@@ -51,6 +51,68 @@ export default function CompetitorsView({ project, demo }: CompetitorsProps) {
         demo={demo}
       >
         <DemoBanner demo={demo} />
+
+        {/* Share of voice: the same measurement, framed competitively. */}
+        {project.shareOfVoice && project.shareOfVoice.ranking.length > 1 && (
+          <section className="mb-5 rounded-2xl border border-gray-100 bg-white p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="font-heading text-base font-semibold text-gray-900">
+                Part de voix
+              </h2>
+              <span className="text-xs text-gray-400">
+                Répartition des citations entre les {project.shareOfVoice.ranking.length}{" "}
+                marques suivies · parité à {project.shareOfVoice.parity}%
+              </span>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-end gap-6">
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-gray-900">
+                    {project.shareOfVoice.overall}
+                  </span>
+                  <span className="text-lg text-gray-400">%</span>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {project.shareOfVoice.position === 1
+                    ? "1re place de votre panel"
+                    : `${project.shareOfVoice.position}e place · ${project.shareOfVoice.gapToLeader} pts derrière le leader`}
+                </p>
+              </div>
+
+              <div className="min-w-[240px] flex-1">
+                {/* One stacked bar: the category, and the slice you hold. */}
+                <div className="flex h-6 w-full overflow-hidden rounded-lg">
+                  {project.shareOfVoice.ranking.map((r, i) => (
+                    <div
+                      key={r.name}
+                      title={`${r.name} · ${r.share}%`}
+                      style={{
+                        width: `${r.share}%`,
+                        backgroundColor: r.isYou
+                          ? "#7c3aed"
+                          : ["#d1d5db", "#e5e7eb", "#eef0f5", "#f3f4f6"][i % 4],
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                  {project.shareOfVoice.ranking.map((r) => (
+                    <span
+                      key={r.name}
+                      className={
+                        "text-xs " +
+                        (r.isYou ? "font-semibold text-violet-700" : "text-gray-500")
+                      }
+                    >
+                      {r.name} {r.share}%
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
         {you && (
           <div className="mb-5 flex items-start gap-3 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
             <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-violet-600" />

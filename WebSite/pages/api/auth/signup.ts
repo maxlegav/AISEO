@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
 import User from "@/models/User";
+import { findUserByEmail, normalizeEmail } from "@/lib/auth-email";
 import { sendWelcomeEmail } from "@/lib/email";
 
 // Connect to MongoDB
@@ -40,8 +41,12 @@ export default async function handler(
         .json({ error: "Le mot de passe doit contenir au moins 8 caractères" });
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    // Emails are stored canonically (lower-cased) so sign-in and password reset
+    // can find the account whatever casing the user types later.
+    const normalizedEmail = normalizeEmail(email);
+
+    // Check if user already exists (also catches legacy mixed-case accounts)
+    const existingUser = await findUserByEmail(normalizedEmail);
     if (existingUser) {
       return res.status(409).json({ error: "Cet email est déjà utilisé" });
     }
@@ -50,7 +55,7 @@ export default async function handler(
     const newUser = new User({
       name,
       company: company || "",
-      email,
+      email: normalizedEmail,
       password,
       subscriptionStatus: "inactive",
       subscriptionTier: "none",

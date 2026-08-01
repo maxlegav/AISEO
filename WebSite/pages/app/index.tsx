@@ -199,5 +199,13 @@ export const getServerSideProps: GetServerSideProps<AppOverviewProps> = async (
     session.workspace.organizationId,
     activeClientId,
   );
+
+  // A brand-new account otherwise lands on the demo projects with no path
+  // forward. Send it through onboarding instead; `?demo=1` keeps the sample
+  // dashboard reachable for anyone who wants to look around first.
+  if (demo && !ctx.query.demo) {
+    return { redirect: { destination: "/app/onboarding", permanent: false } };
+  }
+
   return { props: { projects, demo, clients, activeClientId } };
 };

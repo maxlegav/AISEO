@@ -18,6 +18,7 @@ import LLMResult from "@/models/LLMResult";
 import WeeklyScore from "@/models/WeeklyScore";
 import MonitoredSource from "@/models/MonitoredSource";
 import { detectBrand } from "@/lib/monitoring/brand-detection";
+import { computeShareOfVoice } from "@/lib/monitoring/share-of-voice";
 import { domainOf } from "@/lib/monitoring/source-extraction";
 import type { LLMId } from "@/lib/monitoring/types";
 import { LLM_ORDER, ENGINE_WEIGHTS } from "@/lib/monitoring/types";
@@ -311,6 +312,12 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
     llmScores,
     weekly,
     competitorTable,
+    // Scoped to the engines this project actually evaluates, so a three-engine
+    // project is not diluted by the one it ignores.
+    shareOfVoice: computeShareOfVoice(
+      competitorTable,
+      llmScores.map((s) => s.llm),
+    ),
     sources,
     recommendations,
     promptInsights,

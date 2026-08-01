@@ -7,8 +7,12 @@
  */
 
 import type { MeasuredImpact } from "@/lib/monitoring/measured-impact";
+import type { ShareOfVoice } from "@/lib/monitoring/share-of-voice";
 
-export type LLMId = "chatgpt" | "claude" | "perplexity" | "gemini";
+// Single source of truth for the engine list lives in lib/monitoring/types.ts;
+// re-exported here so UI code keeps importing it from one place.
+export type { LLMId } from "@/lib/monitoring/types";
+import type { LLMId } from "@/lib/monitoring/types";
 
 export interface LLMMeta {
   id: LLMId;
@@ -230,6 +234,8 @@ export interface Project {
   technical?: TechnicalGeo;
   /** Observed week-over-week movement of the scores (real data, not heuristic). */
   measuredImpact?: MeasuredImpact;
+  /** Slice of the category's visibility held by the brand. */
+  shareOfVoice?: ShareOfVoice;
   /** True when this project is backed by real monitoring data (not the demo). */
   isReal?: boolean;
   /** True for a real project that has no run yet (show onboarding state). */
