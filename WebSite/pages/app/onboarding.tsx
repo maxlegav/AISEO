@@ -390,7 +390,7 @@ export default function Onboarding({
                     category={[category, city].filter(Boolean).join(" ")}
                     competitors={cleanCompetitors}
                     existing={cleanPrompts}
-                    engineCount={selectedLLMs.length || maxLLMs}
+                    engines={selectedLLMs.length ? selectedLLMs : LLM_ORDER.slice(0, maxLLMs)}
                     frequency={frequency}
                     onAdd={(added) =>
                       setPrompts((prev) => {

@@ -57,7 +57,7 @@ export default function AppOverview({
       >
         {/* Consumption against the plan's monthly API budget. Shown only when
             it starts to matter — an untouched quota is noise. */}
-        {usage && (usage.nearLimit || usage.projected > usage.budget) && (
+        {usage && (usage.nearLimit || usage.projectedUEur > usage.budgetUEur) && (
           <div
             className={
               "mb-5 rounded-2xl border p-4 " +
@@ -69,15 +69,14 @@ export default function AppOverview({
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="text-sm font-medium text-gray-900">
                 {usage.exceeded
-                  ? "Budget d'interrogations épuisé pour ce mois"
-                  : usage.projected > usage.budget
+                  ? "Budget d'analyse épuisé pour ce mois"
+                  : usage.projectedUEur > usage.budgetUEur
                     ? "Vos projets consommeront plus que votre budget mensuel"
-                    : "Budget d'interrogations bientôt atteint"}
+                    : "Budget d'analyse bientôt atteint"}
               </p>
               <p className="text-xs text-gray-500">
-                {usage.used.toLocaleString("fr-FR")} utilisées ·{" "}
-                {usage.projected.toLocaleString("fr-FR")} prévues ce mois ·{" "}
-                budget {usage.budget.toLocaleString("fr-FR")}
+                {usage.used} consommés · {usage.projected} prévus ce mois ·
+                budget {usage.budget}
               </p>
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white">
@@ -87,9 +86,10 @@ export default function AppOverview({
               />
             </div>
             <p className="mt-2 text-xs text-gray-600">
-              Une analyse coûte une interrogation par requête et par moteur.
-              Réduisez le nombre de requêtes, désactivez un moteur, ou passez en
-              hebdomadaire pour rester dans le budget.
+              Chaque requête est posée à chaque moteur activé, à chaque analyse.
+              Perplexity représente à lui seul environ deux tiers du coût :
+              le désactiver, réduire le nombre de requêtes ou passer en
+              hebdomadaire sont les trois leviers.
             </p>
           </div>
         )}

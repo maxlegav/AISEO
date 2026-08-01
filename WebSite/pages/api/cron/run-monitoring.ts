@@ -4,7 +4,8 @@ import Project from "@/models/Project";
 import User from "@/models/User";
 import { runProjectMonitoring } from "@/lib/monitoring/pipeline";
 import { getWorkspacePlan } from "@/lib/monitoring/workspace";
-import { getUsage, canAfford } from "@/lib/monitoring/usage";
+import { getUsage, canAffordRun } from "@/lib/monitoring/usage";
+import { runCostUEur, formatEur } from "@/lib/monitoring/cost";
 import type { SubscriptionTier } from "@/lib/subscription-limits";
 import { sendMonitoringAlertEmail } from "@/lib/email";
 import { LLMS, isLLMId } from "@/lib/monitoring/types";
@@ -73,12 +74,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         usageCache.set(orgId, usage);
       }
 
-      const cost = project.prompts.length * (project.llms.length || 1);
-      if (!canAfford(usage, cost)) {
+      if (!canAffordRun(usage, project.prompts.length, project.llms)) {
         skipped.push({
           projectId: project._id.toString(),
           brandName: project.brandName,
-          reason: `budget épuisé (${usage.used}/${usage.budget})`,
+          reason: `budget épuisé (${usage.used} / ${usage.budget})`,
         });
         // Push the next attempt out so a saturated workspace does not retry on
         // every cron tick for the rest of the month.
@@ -87,7 +87,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         continue;
       }
       // Keep the cached counter in step within this tick.
-      usage.used += cost;
+      usage.usedUEur += runCostUEur(project.prompts.length, project.llms);
+      usage.used = formatEur(usage.usedUEur);
 
       const summary = await runProjectMonitoring(project);
       summaries.push(summary);

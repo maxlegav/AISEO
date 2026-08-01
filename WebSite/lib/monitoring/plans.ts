@@ -24,6 +24,14 @@ export interface MonitoringPlan {
   maxLLMs: number;
   /** Monitoring frequencies this plan may select. */
   frequencies: MonitoringFrequency[];
+  /**
+   * How many projects may run *daily* at once.
+   *
+   * Daily monitoring costs 7.5× weekly, so leaving it open on every project
+   * puts a Pro workspace at ~197 €/month of API calls against 79 € of revenue.
+   * Capping the count keeps the commercial argument while bounding the bill.
+   */
+  dailyProjects: number;
   /** Branded PDF export (agency white-label). */
   brandedPdf: boolean;
 }
@@ -36,6 +44,7 @@ export const MONITORING_PLANS: Record<MonitoringPlanId, MonitoringPlan> = {
     projects: 2,
     maxLLMs: 3,
     frequencies: ["weekly"],
+    dailyProjects: 0,
     brandedPdf: false,
   },
   pro: {
@@ -45,6 +54,7 @@ export const MONITORING_PLANS: Record<MonitoringPlanId, MonitoringPlan> = {
     projects: 10,
     maxLLMs: 4,
     frequencies: ["weekly", "daily"],
+    dailyProjects: 2,
     brandedPdf: false,
   },
   agency: {
@@ -54,6 +64,7 @@ export const MONITORING_PLANS: Record<MonitoringPlanId, MonitoringPlan> = {
     projects: Infinity,
     maxLLMs: 4,
     frequencies: ["weekly", "daily"],
+    dailyProjects: 5,
     brandedPdf: true,
   },
 };

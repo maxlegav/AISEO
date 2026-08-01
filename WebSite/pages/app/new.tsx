@@ -287,7 +287,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                     category={category}
                     competitors={cleanCompetitors}
                     existing={cleanPrompts}
-                    engineCount={selectedLLMs.length || LLM_ORDER.length}
+                    engines={selectedLLMs.length ? selectedLLMs : LLM_ORDER}
                     frequency={frequency}
                     onAdd={(added) =>
                       setPrompts((prev) => {

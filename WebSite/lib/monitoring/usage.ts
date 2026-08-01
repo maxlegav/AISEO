@@ -1,70 +1,53 @@
 /**
  * Spend guard for the LLM APIs.
  *
- * Every (prompt × engine) pair in a run is one paid API call, so cost scales as
- * `prompts × engines × runs`. Nothing in the plan limits caps that product:
- * `maxLLMs` and `projects` are bounded, but the prompt count and the daily
- * frequency multiply freely. A single Pro project with 100 prompts on 4 engines
- * running daily is ~12 000 calls a month — on its own, more than the plan's
- * margin can absorb.
+ * Cost scales as `prompts × engines × runs`, and nothing in the plan limits
+ * caps that product: `maxLLMs` and `projects` are bounded, but the question
+ * count and the daily frequency multiply freely. One project at 150 questions
+ * on four engines running daily is ~34 € a month — more than the whole Pro
+ * budget, for one of the ten projects that plan advertises.
  *
- * ⚠️ The budgets below are a **business decision**, not a technical one. They
- * are set so the LLM bill stays around a quarter of the plan price at an
- * assumed ~€0.002 per call (small models; Perplexity's search-backed calls are
- * the expensive ones and pull the average up). Re-derive them the moment real
- * invoices exist — and override without a deploy via
- * `MONITORING_BUDGET_SOLO` / `_PRO` / `_AGENCY`.
+ * Budgets are set so the LLM bill stays under a third of the plan price, which
+ * on Solo means 8,50 € against 29 € — inside the 5-10 € the business asked for,
+ * and enough for 150 questions per project (405 without Perplexity).
  *
- * Cost math behind the defaults:
- *   Solo    €29/mo → ~€7  of LLM  →  4 000 calls
- *   Pro     €79/mo → ~€20 of LLM  → 10 000 calls
- *   Agence €149/mo → ~€40 of LLM  → 20 000 calls
- *
- * Note what this reveals: at 100 prompts × 4 engines, Pro affords roughly
- * **one** daily project, not the ten the plan advertises. Either the prompt
- * count per project stays modest, or the daily frequency is reserved for fewer
- * projects, or the pricing moves. The guard makes that trade-off visible
- * instead of letting it surface as a surprise invoice.
+ * ⚠️ These are a **business decision**, not a technical one. Re-derive them
+ * from real invoices; override without a deploy via
+ * `MONITORING_BUDGET_SOLO_EUR` / `_PRO_EUR` / `_AGENCY_EUR`.
  */
 import mongoose from "mongoose";
 import LLMResult from "@/models/LLMResult";
 import Project from "@/models/Project";
 import { planForTier } from "@/lib/monitoring/plans";
 import type { SubscriptionTier } from "@/lib/subscription-limits";
-import type { MonitoringFrequency } from "@/lib/monitoring/types";
+import type { LLMId, MonitoringFrequency } from "@/lib/monitoring/types";
+import { isLLMId } from "@/lib/monitoring/types";
+import { callCostUEur, monthlyCostUEur, runCostUEur, formatEur } from "@/lib/monitoring/cost";
 
-/** Runs per month, by frequency. Deliberately generous (30 vs 28-31). */
-const RUNS_PER_MONTH: Record<MonitoringFrequency, number> = {
-  weekly: 4,
-  daily: 30,
+/**
+ * Monthly LLM budget per plan, in euros.
+ *
+ * Sized from the promise made to the business rather than a round number:
+ * Solo must fund 150 questions on two weekly projects, which costs 8,15 € on
+ * the worst engine mix — hence 8,50 € and not 8, which would have refused the
+ * advertised configuration by 2 %. Same reasoning for Agence and its 20
+ * projects. All three sit under a third of the plan price.
+ */
+const DEFAULT_BUDGET_EUR: Record<string, number> = {
+  solo: 8.5,
+  pro: 22,
+  agency: 45,
 };
 
-const DEFAULT_BUDGET: Record<string, number> = {
-  solo: 4_000,
-  pro: 10_000,
-  agency: 20_000,
-};
-
-function envBudget(planId: string): number | null {
-  const raw = process.env[`MONITORING_BUDGET_${planId.toUpperCase()}`];
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
-/** Monthly API-call budget for a tier. */
-export function monthlyCallBudget(tier: SubscriptionTier): number {
+/** Monthly budget for a tier, in micro-euros. */
+export function monthlyBudgetUEur(tier: SubscriptionTier): number {
   const plan = planForTier(tier);
-  return envBudget(plan.id) ?? DEFAULT_BUDGET[plan.id] ?? DEFAULT_BUDGET.solo!;
-}
-
-/** Calls one project configuration will consume in a month. Pure. */
-export function projectedMonthlyCalls(input: {
-  prompts: number;
-  engines: number;
-  frequency: MonitoringFrequency;
-}): number {
-  return input.prompts * input.engines * RUNS_PER_MONTH[input.frequency];
+  const override = Number(process.env[`MONITORING_BUDGET_${plan.id.toUpperCase()}_EUR`]);
+  const eur =
+    Number.isFinite(override) && override > 0
+      ? override
+      : (DEFAULT_BUDGET_EUR[plan.id] ?? DEFAULT_BUDGET_EUR.solo!);
+  return Math.round(eur * 1_000_000);
 }
 
 /** First instant of the current month, UTC — the counter resets here. */
@@ -73,86 +56,117 @@ export function startOfMonth(now: Date = new Date()): Date {
 }
 
 export interface UsageStatus {
-  /** Calls actually made since the start of the month. */
-  used: number;
-  /** Calls the current project configurations will consume over a full month. */
-  projected: number;
-  budget: number;
-  remaining: number;
-  /** Consumption as a share of the budget, 0-1+ (can exceed 1). */
+  /** Actually spent since the start of the month, micro-euros. */
+  usedUEur: number;
+  /** What the active configurations will spend over a full month. */
+  projectedUEur: number;
+  budgetUEur: number;
+  remainingUEur: number;
+  /** Spend as a share of the budget, 0-1+ (can exceed 1). */
   ratio: number;
   /** True once the month's budget is spent: runs must stop. */
   exceeded: boolean;
   /** True past 80 %: worth warning about before it bites. */
   nearLimit: boolean;
+  /** Pre-formatted for display, so the UI never re-derives the division. */
+  used: string;
+  projected: string;
+  budget: string;
+}
+
+function buildStatus(usedUEur: number, projectedUEur: number, budgetUEur: number): UsageStatus {
+  return {
+    usedUEur,
+    projectedUEur,
+    budgetUEur,
+    remainingUEur: Math.max(0, budgetUEur - usedUEur),
+    ratio: budgetUEur === 0 ? 0 : usedUEur / budgetUEur,
+    exceeded: usedUEur >= budgetUEur,
+    nearLimit: budgetUEur > 0 && usedUEur / budgetUEur >= 0.8,
+    used: formatEur(usedUEur),
+    projected: formatEur(projectedUEur),
+    budget: formatEur(budgetUEur),
+  };
 }
 
 /**
- * Actual + projected consumption for an organization this month.
+ * Actual + projected spend for an organization this month.
  *
- * `used` counts stored `LLMResult` documents, which is exactly one per API
- * call, so the counter cannot drift from what was really spent. Mock results
- * are counted too: they represent calls that *would* be paid once keys are
- * configured, which is the whole point of sizing the guard before that happens.
+ * `used` is derived from the stored `LLMResult` documents — one per API call —
+ * grouped by engine, so an expensive Perplexity call is not counted like a
+ * cheap Gemini one. Mock results count too: they stand for calls that *would*
+ * be paid once keys are configured, which is the point of sizing the guard
+ * before that happens.
  */
 export async function getUsage(
   organizationId: string,
   tier: SubscriptionTier,
 ): Promise<UsageStatus> {
+  const budgetUEur = monthlyBudgetUEur(tier);
+
   const projects = await Project.find({ organizationId })
     .select("prompts llms frequency active")
-    .lean<{ prompts: string[]; llms: string[]; frequency: MonitoringFrequency; active: boolean }[]>();
+    .lean<
+      { prompts: string[]; llms: LLMId[]; frequency: MonitoringFrequency; active: boolean }[]
+    >();
 
-  const projected = projects
+  const projectedUEur = projects
     .filter((p) => p.active)
     .reduce(
       (acc, p) =>
         acc +
-        projectedMonthlyCalls({
+        monthlyCostUEur({
           prompts: p.prompts.length,
-          engines: p.llms.length,
+          engines: p.llms,
           frequency: p.frequency,
         }),
       0,
     );
 
-  const ids = await Project.find({ organizationId }).distinct("_id");
-  const used = ids.length
-    ? await LLMResult.countDocuments({
-        projectId: { $in: ids as mongoose.Types.ObjectId[] },
-        capturedAt: { $gte: startOfMonth() },
-      })
-    : 0;
+  const ids = (await Project.find({ organizationId }).distinct(
+    "_id",
+  )) as mongoose.Types.ObjectId[];
 
-  const budget = monthlyCallBudget(tier);
-  const remaining = Math.max(0, budget - used);
+  let usedUEur = 0;
+  if (ids.length > 0) {
+    const byEngine = await LLMResult.aggregate<{ _id: string; count: number }>([
+      { $match: { projectId: { $in: ids }, capturedAt: { $gte: startOfMonth() } } },
+      { $group: { _id: "$llm", count: { $sum: 1 } } },
+    ]);
+    for (const row of byEngine) {
+      if (isLLMId(row._id)) usedUEur += row.count * callCostUEur(row._id);
+    }
+  }
 
-  return {
-    used,
-    projected,
-    budget,
-    remaining,
-    ratio: budget === 0 ? 0 : used / budget,
-    exceeded: used >= budget,
-    nearLimit: budget > 0 && used / budget >= 0.8,
-  };
+  return buildStatus(usedUEur, projectedUEur, budgetUEur);
 }
 
 /**
- * Can this organization afford one more run of `calls` API calls?
+ * Can this organization afford one more run?
+ *
  * Checked before spending, not after: a run that would cross the ceiling is
- * skipped whole rather than truncated halfway through a prompt set, which
- * would leave a week's score computed on a partial sample.
+ * skipped whole rather than truncated halfway through a question set, which
+ * would leave the week's score computed on a different sample than the week
+ * before — destroying the only thing the product sells, comparability.
  */
-export function canAfford(usage: UsageStatus, calls: number): boolean {
-  return usage.used + calls <= usage.budget;
+export function canAffordRun(
+  usage: UsageStatus,
+  prompts: number,
+  engines: LLMId[],
+): boolean {
+  return usage.usedUEur + runCostUEur(prompts, engines) <= usage.budgetUEur;
 }
 
 /** Human-readable reason, for the API response and the run log. */
 export function budgetMessage(usage: UsageStatus): string {
   return (
-    `Budget d'appels épuisé pour ce mois : ${usage.used.toLocaleString("fr-FR")} sur ` +
-    `${usage.budget.toLocaleString("fr-FR")}. Réduisez le nombre de requêtes ou de ` +
-    `moteurs, passez en hebdomadaire, ou attendez la remise à zéro du mois prochain.`
+    `Budget d'analyse épuisé pour ce mois : ${usage.used} consommés sur ${usage.budget}. ` +
+    `Réduisez le nombre de requêtes, désactivez un moteur (Perplexity représente ~2/3 du coût), ` +
+    `passez en hebdomadaire, ou attendez la remise à zéro du mois prochain.`
   );
+}
+
+/** Number of active daily projects in an organization — see `dailyProjects`. */
+export async function countDailyProjects(organizationId: string): Promise<number> {
+  return Project.countDocuments({ organizationId, frequency: "daily", active: true });
 }

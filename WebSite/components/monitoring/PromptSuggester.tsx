@@ -6,6 +6,8 @@ import {
   type PromptStyle,
   type PromptSuggestion,
 } from "@/lib/monitoring/prompt-suggestions";
+import { monthlyCostUEur, runCostUEur, formatEur } from "@/lib/monitoring/cost";
+import type { LLMId } from "@/lib/monitoring/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,7 +29,7 @@ interface Props {
   existing: string[];
   onAdd: (prompts: string[]) => void;
   /** Engines enabled on the project — drives the cost estimate. */
-  engineCount: number;
+  engines: LLMId[];
   frequency: "weekly" | "daily";
 }
 
@@ -37,7 +39,7 @@ export default function PromptSuggester({
   competitors,
   existing,
   onAdd,
-  engineCount,
+  engines,
   frequency,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -135,8 +137,9 @@ export default function PromptSuggester({
   })).filter((g) => g.items.length > 0);
 
   const total = existing.length + selected.size;
-  const callsPerRun = total * engineCount;
-  const runsPerMonth = frequency === "daily" ? 30 : 4;
+  const callsPerRun = total * engines.length;
+  const costPerRun = runCostUEur(total, engines);
+  const costPerMonth = monthlyCostUEur({ prompts: total, engines, frequency });
 
   return (
     <div>
@@ -218,11 +221,12 @@ export default function PromptSuggester({
 
           {/* Volume matters: each prompt is queried on every engine, every run. */}
           <div className="border-b border-gray-100 bg-gray-50 px-5 py-2 text-xs text-gray-500">
-            {total} requête{total > 1 ? "s" : ""} × {engineCount} moteur
-            {engineCount > 1 ? "s" : ""} ={" "}
-            <span className="font-medium text-gray-700">{callsPerRun} appels</span> par
-            analyse, soit ~{callsPerRun * runsPerMonth} par mois en{" "}
-            {frequency === "daily" ? "quotidien" : "hebdomadaire"}.
+            {total} requête{total > 1 ? "s" : ""} × {engines.length} moteur
+            {engines.length > 1 ? "s" : ""} = {callsPerRun} interrogations (
+            <span className="font-medium text-gray-700">{formatEur(costPerRun)}</span>) par
+            analyse, soit{" "}
+            <span className="font-medium text-gray-700">{formatEur(costPerMonth)}</span> par
+            mois en {frequency === "daily" ? "quotidien" : "hebdomadaire"}.
           </div>
 
           <div className="max-h-[26rem] overflow-y-auto px-5 py-4">

@@ -5,11 +5,17 @@ import Client from "@/models/Client";
 import { handleApiError, ApiError, ErrorType } from "@/lib/error-handler";
 import { handleZodError } from "@/lib/validation/helpers";
 import { CreateProjectSchema } from "@/lib/validation/project";
-import { getProjectLimit, getMaxLLMs, isFrequencyAllowed } from "@/lib/monitoring/limits";
+import {
+  getProjectLimit,
+  getMaxLLMs,
+  isFrequencyAllowed,
+  getDailyProjectLimit,
+} from "@/lib/monitoring/limits";
 import type { SubscriptionTier } from "@/lib/subscription-limits";
 import { requireWorkspace } from "@/lib/api-workspace";
 import { getWorkspacePlan } from "@/lib/monitoring/workspace";
-import { getUsage, projectedMonthlyCalls } from "@/lib/monitoring/usage";
+import { getUsage, countDailyProjects } from "@/lib/monitoring/usage";
+import { monthlyCostUEur, formatEur, affordablePrompts } from "@/lib/monitoring/cost";
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
@@ -77,24 +83,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       }
 
+      // Daily costs 7.5x weekly, so it is a quota rather than a free setting.
+      if (parsed.data.frequency === "daily") {
+        const dailyLimit = getDailyProjectLimit(tier);
+        const dailyUsed = await countDailyProjects(organizationId);
+        if (dailyUsed >= dailyLimit) {
+          return res.status(403).json({
+            success: false,
+            error: "DAILY_LIMIT_REACHED",
+            message:
+              dailyLimit === 0
+                ? "Votre plan ne permet pas le suivi quotidien."
+                : `Votre plan autorise ${dailyLimit} projet(s) en suivi quotidien, et vous en avez déjà ${dailyUsed}. Passez ce projet en hebdomadaire ou repassez-en un autre en hebdomadaire.`,
+            details: { dailyUsed, dailyLimit },
+          });
+        }
+      }
+
       // Cost guard: prompts x engines x runs is unbounded by the plan limits,
       // so a single configuration can outspend a whole month's budget. Refuse
       // at creation rather than let it surface as an invoice.
       const usage = await getUsage(organizationId, tier as SubscriptionTier);
-      const added = projectedMonthlyCalls({
+      const added = monthlyCostUEur({
         prompts: parsed.data.prompts.length,
-        engines: parsed.data.llms.length,
+        engines: parsed.data.llms,
         frequency: parsed.data.frequency,
       });
-      if (usage.projected + added > usage.budget) {
+      if (usage.projectedUEur + added > usage.budgetUEur) {
+        const affordable = affordablePrompts(
+          Math.max(0, usage.budgetUEur - usage.projectedUEur),
+          parsed.data.llms,
+          parsed.data.frequency,
+          1,
+        );
         return res.status(403).json({
           success: false,
           error: "BUDGET_EXCEEDED",
           message:
-            `Cette configuration consommerait ${(usage.projected + added).toLocaleString("fr-FR")} ` +
-            `interrogations par mois, au-delà des ${usage.budget.toLocaleString("fr-FR")} de votre plan. ` +
-            `Réduisez le nombre de requêtes ou de moteurs, ou passez en hebdomadaire.`,
-          details: { projected: usage.projected + added, budget: usage.budget },
+            `Cette configuration porterait votre consommation à ${formatEur(usage.projectedUEur + added)} ` +
+            `par mois, au-delà des ${usage.budget} de votre plan. ` +
+            (affordable > 0
+              ? `Avec ces moteurs et cette fréquence, il vous reste de quoi suivre ${affordable} requête(s).`
+              : `Désactivez un moteur (Perplexity représente ~2/3 du coût) ou passez en hebdomadaire.`),
+          details: {
+            projected: formatEur(usage.projectedUEur + added),
+            budget: usage.budget,
+            affordablePrompts: affordable,
+          },
         });
       }
 
