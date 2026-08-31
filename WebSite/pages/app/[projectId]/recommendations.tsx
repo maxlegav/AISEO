@@ -35,7 +35,11 @@ import {
   type OnPageItem,
 } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
-import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import {
+  getProjectDashboard,
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import type {
   MeasuredImpact,
   ScopeMovement,
@@ -305,11 +309,13 @@ function OnPageRow({ item }: { item: OnPageItem }) {
 }
 
 interface RecommendationsProps {
+  switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
 }
 
 export default function RecommendationsView({
+  switcherProjects,
   project,
   demo,
 }: RecommendationsProps) {
@@ -317,6 +323,7 @@ export default function RecommendationsView({
   if (project.pendingFirstRun) {
     return (
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="recommendations"
         title="Recommandations"
@@ -776,5 +783,9 @@ export const getServerSideProps: GetServerSideProps<RecommendationsProps> = asyn
     session.workspace.organizationId,
     projectId,
   );
-  return { props: { project, demo } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { project, demo, switcherProjects } };
 };

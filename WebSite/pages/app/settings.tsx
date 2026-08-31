@@ -3,6 +3,10 @@ import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { ImagePlus, Lock, Globe, FileText, Loader2, Check } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import Favicon from "@/components/monitoring/Favicon";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getUserBranding } from "@/lib/monitoring/branding";
@@ -19,6 +23,7 @@ const PRESET_COLORS = [
 ];
 
 interface BrandingSettingsProps {
+  switcherProjects: SwitcherEntry[];
   initial: {
     agencyName: string;
     logoUrl: string;
@@ -30,6 +35,7 @@ interface BrandingSettingsProps {
 }
 
 export default function BrandingSettings({
+  switcherProjects,
   initial,
   whiteLabelActive,
 }: BrandingSettingsProps) {
@@ -78,6 +84,7 @@ export default function BrandingSettings({
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         active="settings"
         title="Branding & équipe"
         subtitle="Personnalisez les rapports remis à vos clients (option agences)."
@@ -285,5 +292,9 @@ export const getServerSideProps: GetServerSideProps<
   const { branding, whiteLabelActive } = await getUserBranding(
     session.workspace.ownerId,
   );
-  return { props: { initial: branding, whiteLabelActive } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { initial: branding, whiteLabelActive, switcherProjects } };
 };

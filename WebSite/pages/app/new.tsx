@@ -14,6 +14,10 @@ import {
   X,
 } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import PromptSuggester from "@/components/monitoring/PromptSuggester";
 import { LLM_ORDER, LLMS, type LLMId } from "@/lib/mock/monitoring";
@@ -30,13 +34,15 @@ interface ClientOption {
 }
 
 interface NewProjectProps {
+  switcherProjects: SwitcherEntry[];
   clients: ClientOption[];
   initialClientId: string | null;
 }
 
 const STEPS = ["Marque", "Concurrents & requêtes", "Moteurs & lancement"];
 
-export default function NewProject({ clients, initialClientId }: NewProjectProps) {
+export default function NewProject({
+  switcherProjects, clients, initialClientId }: NewProjectProps) {
   const router = useRouter();
   const [clientId, setClientId] = useState<string>(initialClientId ?? "");
   const [step, setStep] = useState(0);
@@ -125,6 +131,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         active="dashboard"
         title="Nouveau projet"
         subtitle="Configurez une marque à monitorer : vous verrez un premier score en quelques minutes."
@@ -484,8 +491,12 @@ export const getServerSideProps: GetServerSideProps<NewProjectProps> = async (
   })
     .sort({ createdAt: -1 })
     .lean()) as unknown as { _id: mongoose.Types.ObjectId; name: string }[];
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
   return {
     props: {
+      switcherProjects,
       clients: clients.map((c) => ({ id: c._id.toString(), name: c.name })),
       initialClientId: (ctx.query.client as string) || null,
     },

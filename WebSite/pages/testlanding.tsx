@@ -734,7 +734,7 @@ export default function TestLanding() {
                 {
                   who: "Agence",
                   q: "« Comment je suis 15 clients sans y passer mes lundis ? »",
-                  d: "Projets illimités, exécution quotidienne, rapports en marque blanche, alertes automatiques quand un compte décroche.",
+                  d: "Projets illimités, jusqu'à 5 en exécution quotidienne, rapports en marque blanche, alertes automatiques quand un compte décroche.",
                 },
               ].map((p) => (
                 <div

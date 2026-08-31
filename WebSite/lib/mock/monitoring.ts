@@ -217,6 +217,8 @@ export interface Project {
   competitors: string[];
   prompts: number;
   frequency: "Hebdomadaire" | "Quotidien";
+  /** ISO date of the next scheduled run, null when never scheduled. */
+  nextRunAt?: string | null;
   globalScore: number;
   globalDelta: number;
   llmScores: LLMScore[];

@@ -12,18 +12,25 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
-import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import {
+  getProjectDashboard,
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 
 interface CompetitorsProps {
+  switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
 }
 
-export default function CompetitorsView({ project, demo }: CompetitorsProps) {
+export default function CompetitorsView({
+  switcherProjects, project, demo }: CompetitorsProps) {
   if (!project) return <ProjectNotFound />;
   if (project.pendingFirstRun) {
     return (
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="competitors"
         title="Concurrents"
@@ -221,5 +228,9 @@ export const getServerSideProps: GetServerSideProps<CompetitorsProps> = async (
     session.workspace.organizationId,
     projectId,
   );
-  return { props: { project, demo } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { project, demo, switcherProjects } };
 };

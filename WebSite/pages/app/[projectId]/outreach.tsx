@@ -1,6 +1,10 @@
 import Head from "next/head";
 import type { GetServerSideProps } from "next";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
 import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
 import RunButton from "@/components/monitoring/RunButton";
@@ -29,7 +33,13 @@ function layoutProject(meta: NonNullable<OutreachPageData["project"]>): Project 
   };
 }
 
-export default function OutreachView({ data }: { data: OutreachPageData }) {
+export default function OutreachView({
+  data,
+  switcherProjects,
+}: {
+  data: OutreachPageData;
+  switcherProjects: SwitcherEntry[];
+}) {
   if (!data.project) return <ProjectNotFound />;
   const project = layoutProject(data.project);
 
@@ -48,6 +58,7 @@ export default function OutreachView({ data }: { data: OutreachPageData }) {
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="outreach"
         title="Outreach"
@@ -67,10 +78,14 @@ export default function OutreachView({ data }: { data: OutreachPageData }) {
 
 export const getServerSideProps: GetServerSideProps<{
   data: OutreachPageData;
+  switcherProjects: SwitcherEntry[];
 }> = async (ctx) => {
   const session = await getSessionWorkspace(ctx);
   if (!session) return loginRedirect("/app");
   const projectId = ctx.params?.projectId as string;
   const data = await getOutreachData(session.workspace.organizationId, projectId);
-  return { props: { data } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+  return { props: { data, switcherProjects } };
 };

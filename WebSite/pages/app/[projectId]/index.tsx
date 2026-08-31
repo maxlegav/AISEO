@@ -26,19 +26,44 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
-import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import {
+  getProjectDashboard,
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 
 interface ProjectDashboardProps {
+  switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
 }
 
-export default function ProjectDashboard({ project, demo }: ProjectDashboardProps) {
+/**
+ * "prochain run dans 6 h" used to be hardcoded, so a weekly project claimed an
+ * hourly cadence and a project whose schedule had lapsed still promised a run.
+ * Both are the kind of detail a prospect checks. This says what the schedule
+ * actually holds — including when it is overdue, which is information, not
+ * something to hide.
+ */
+function nextRunHint(nextRunAt?: string | null): string {
+  if (!nextRunAt) return "aucun run planifié";
+  const ms = new Date(nextRunAt).getTime() - Date.now();
+  if (Number.isNaN(ms)) return "aucun run planifié";
+  if (ms <= 0) return "run en attente";
+  const hours = Math.round(ms / 3_600_000);
+  if (hours < 24) return `prochain run dans ${Math.max(1, hours)} h`;
+  const days = Math.round(hours / 24);
+  return `prochain run dans ${days} j`;
+}
+
+export default function ProjectDashboard({
+  switcherProjects, project, demo }: ProjectDashboardProps) {
   if (!project) return <ProjectNotFound />;
 
   if (project.pendingFirstRun) {
     return (
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="dashboard"
         title={project.brandName}
@@ -80,7 +105,7 @@ export default function ProjectDashboard({ project, demo }: ProjectDashboardProp
       icon: RefreshCw,
       label: "Fréquence",
       value: project.frequency,
-      hint: "prochain run dans 6 h",
+      hint: nextRunHint(project.nextRunAt),
     },
   ];
 
@@ -293,5 +318,9 @@ export const getServerSideProps: GetServerSideProps<ProjectDashboardProps> = asy
     session.workspace.organizationId,
     projectId,
   );
-  return { props: { project, demo } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { project, demo, switcherProjects } };
 };

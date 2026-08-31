@@ -961,7 +961,7 @@ export default function Home() {
                 features={[
                   "10 projets suivis en continu",
                   "Les 4 moteurs IA (ChatGPT, Claude, Perplexity, Gemini)",
-                  "Suivi quotidien automatique",
+                  "Suivi hebdomadaire, dont 2 projets en quotidien",
                   "Historique 12 semaines par moteur",
                   "Recommandations spécifiques par moteur",
                   "Suivi concurrents avancé",
@@ -977,7 +977,7 @@ export default function Home() {
                 period="mois"
                 features={[
                   "Projets illimités",
-                  "Les 4 moteurs IA, suivi quotidien",
+                  "Les 4 moteurs IA, dont 5 projets en quotidien",
                   "Dashboard multi-clients",
                   "Rapports PDF en marque blanche",
                   "Logo & couleurs de votre agence",
