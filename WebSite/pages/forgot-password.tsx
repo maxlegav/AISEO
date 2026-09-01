@@ -57,10 +57,10 @@ export default function ForgotPasswordPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center bg-ink-100 px-4 relative overflow-hidden">
         {/* Decorative blobs */}
-        <div className="absolute top-10 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+        <div className="absolute top-10 left-10 w-72 h-72 bg-ink-200/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-ink-200/20 rounded-full blur-3xl" />
 
         <div className="max-w-md w-full relative z-10">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 text-center">
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
                   setIsSubmitted(false);
                   setEmail("");
                 }}
-                className="text-purple-600 hover:underline"
+                className="text-accent hover:underline"
               >
                 try again
               </button>
@@ -103,10 +103,10 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-ink-100 px-4 relative overflow-hidden">
       {/* Decorative blobs */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-10 left-10 w-72 h-72 bg-ink-200/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-ink-200/20 rounded-full blur-3xl" />
 
       {/* Back to login */}
       <Link
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-ink-900 rounded-xl flex items-center justify-center">
               <span className="text-white text-sm font-bold">AI</span>
             </div>
             <span className="text-2xl font-bold text-gray-900">

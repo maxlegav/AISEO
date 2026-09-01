@@ -238,7 +238,7 @@ export default function ProjectDashboard({
             <h2 className="font-heading text-lg font-semibold text-gray-900">
               Pourquoi votre score diffère selon le modèle
             </h2>
-            <span className="rounded-full bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-700">
+            <span className="rounded-full bg-accent-muted px-2.5 py-1 text-[11px] font-semibold text-accent">
               Le + SYB : granularité par LLM
             </span>
           </div>

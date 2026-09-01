@@ -51,8 +51,8 @@ export default function Navbar() {
                   href={href}
                   className={`text-sm transition-colors ${
                     isActive
-                      ? "text-purple-700 font-semibold"
-                      : "text-gray-600 hover:text-purple-600"
+                      ? "text-accent font-semibold"
+                      : "text-gray-600 hover:text-accent"
                   }`}
                 >
                   {link.label}
@@ -70,7 +70,7 @@ export default function Navbar() {
             </Link>
             <Button
               onClick={openWaitlistModal}
-              className="text-sm font-semibold rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white px-5 shadow-premium"
+              className="text-sm font-semibold rounded-full bg-ink-900 hover:from-ink-900 hover:to-ink-900 text-white px-5 shadow-premium"
             >
               Book a demo
             </Button>
@@ -102,7 +102,7 @@ export default function Navbar() {
                 <El
                   key={link.label}
                   href={href}
-                  className="text-base text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                  className="text-base text-gray-700 hover:text-accent transition-colors font-medium"
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
@@ -112,7 +112,7 @@ export default function Navbar() {
           </nav>
           <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
             <Button
-              className="w-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-semibold shadow-premium"
+              className="w-full rounded-full bg-ink-900 hover:from-ink-900 hover:to-ink-900 text-white font-semibold shadow-premium"
               onClick={() => { openWaitlistModal(); setMobileOpen(false); }}
             >
               Book a demo

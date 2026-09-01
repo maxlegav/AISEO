@@ -84,7 +84,7 @@ function ScorePill({ score }: { score: number }) {
 function ChannelBadge({ channel }: { channel: OutreachChannelKind }) {
   const Icon = CHANNEL_ICON[channel];
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-700">
+    <span className="inline-flex items-center gap-1 rounded-full bg-accent-muted px-2 py-0.5 text-[11px] font-semibold text-accent">
       <Icon className="h-3 w-3" /> {CHANNEL_META[channel].label}
     </span>
   );
@@ -257,7 +257,7 @@ function TargetCard({
               href={target.sampleUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-0.5 inline-flex items-center gap-1 text-xs text-violet-600 hover:underline"
+              className="mt-0.5 inline-flex items-center gap-1 text-xs text-accent hover:underline"
             >
               Voir la page citée <ExternalLink className="h-3 w-3" />
             </a>
@@ -277,7 +277,7 @@ function TargetCard({
         </button>
       </div>
 
-      <div className="mb-3 flex items-start gap-1.5 rounded-lg bg-violet-50/60 px-3 py-2 text-[12px] text-violet-800">
+      <div className="mb-3 flex items-start gap-1.5 rounded-lg bg-accent-muted/60 px-3 py-2 text-[12px] text-accent">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         <span>{meta.howto}</span>
       </div>
@@ -364,7 +364,7 @@ function TargetCard({
           rel={usesEmail ? undefined : "noopener noreferrer"}
           className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
             actionEnabled
-              ? "border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
+              ? "border-ink-200 bg-accent-muted text-accent hover:bg-accent-muted"
               : "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
           }`}
         >
@@ -462,7 +462,7 @@ export default function OutreachManager({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5">
+      <div className="rounded-2xl border border-ink-200 bg-accent-muted p-5">
         <p className="text-sm font-semibold text-gray-900">
           Transformez les « sources à conquérir » en actions ciblées.
         </p>
@@ -477,7 +477,7 @@ export default function OutreachManager({
           <button
             onClick={generate}
             disabled={generating || dailyRemaining <= 0}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {generating ? (
               <>
@@ -495,7 +495,7 @@ export default function OutreachManager({
               : "Plafond quotidien atteint, réessayez demain"}
           </span>
         </div>
-        {notice && <p className="mt-2 text-[12px] text-violet-700">{notice}</p>}
+        {notice && <p className="mt-2 text-[12px] text-accent">{notice}</p>}
         {error && <p className="mt-2 text-[12px] text-red-600">{error}</p>}
       </div>
 

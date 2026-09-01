@@ -10,7 +10,7 @@ export default function PrivacyPage() {
         description="Privacy Policy for ShowYourBrand - Learn how we collect, use, and protect your data."
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
+      <div className="min-h-screen bg-ink-100">
         <Navbar />
 
         {/* Content */}

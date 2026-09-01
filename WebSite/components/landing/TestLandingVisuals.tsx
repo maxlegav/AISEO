@@ -109,7 +109,7 @@ function ScoreRing({ score, delta }: { score: number; delta: number }) {
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className="text-[34px] font-bold leading-none text-white"
-          style={{ fontFamily: "var(--font-grotesk)" }}
+          style={{ fontFamily: "var(--font-sans)" }}
         >
           {score}
         </span>

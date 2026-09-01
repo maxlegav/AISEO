@@ -25,14 +25,14 @@ function formatDate(dateStr: string) {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "GEO Strategy": "bg-purple-50 text-purple-700",
+  "GEO Strategy": "bg-accent-muted text-accent",
   "GEO Basics": "bg-blue-50 text-blue-700",
   "AI Search": "bg-orange-50 text-orange-700",
   "Technical GEO": "bg-green-50 text-green-700",
-  "Content Strategy": "bg-pink-50 text-pink-700",
+  "Content Strategy": "bg-accent-muted text-accent",
   "Case Study": "bg-amber-50 text-amber-700",
   Research: "bg-cyan-50 text-cyan-700",
-  Measurement: "bg-indigo-50 text-indigo-700",
+  Measurement: "bg-accent-muted text-accent",
   "GEO Audit": "bg-red-50 text-red-700",
 };
 
@@ -96,7 +96,7 @@ function renderMarkdown(md: string): string {
     if (line.startsWith("> ")) {
       const text = inlineFormat(line.slice(2));
       output.push(
-        `<blockquote class="border-l-4 border-purple-400 pl-4 py-1 my-4 text-gray-600 italic bg-purple-50/40 rounded-r-lg">${text}</blockquote>`
+        `<blockquote class="border-l-4 border-ink-200 pl-4 py-1 my-4 text-gray-600 italic bg-accent-muted/40 rounded-r-lg">${text}</blockquote>`
       );
       i++;
       continue;
@@ -107,7 +107,7 @@ function renderMarkdown(md: string): string {
       const items: string[] = [];
       while (i < lines.length && (lines[i] ?? "").startsWith("- ")) {
         items.push(
-          `<li class="flex gap-2.5 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0"></span><span>${inlineFormat((lines[i] ?? "").slice(2))}</span></li>`
+          `<li class="flex gap-2.5 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-ink-200 flex-shrink-0"></span><span>${inlineFormat((lines[i] ?? "").slice(2))}</span></li>`
         );
         i++;
       }
@@ -124,7 +124,7 @@ function renderMarkdown(md: string): string {
       while (i < lines.length && /^\d+\.\s/.test(lines[i] ?? "")) {
         const text = (lines[i] ?? "").replace(/^\d+\.\s/, "");
         items.push(
-          `<li class="flex gap-3 items-start"><span class="mt-0.5 w-6 h-6 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center flex-shrink-0">${num}</span><span class="text-gray-700">${inlineFormat(text)}</span></li>`
+          `<li class="flex gap-3 items-start"><span class="mt-0.5 w-6 h-6 rounded-full bg-accent-muted text-accent text-xs font-bold flex items-center justify-center flex-shrink-0">${num}</span><span class="text-gray-700">${inlineFormat(text)}</span></li>`
         );
         num++;
         i++;
@@ -185,8 +185,8 @@ function inlineFormat(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong class=\"font-semibold text-gray-900\">$1</strong>")
     .replace(/\*(.*?)\*/g, "<em class=\"italic\">$1</em>")
-    .replace(/`([^`]+)`/g, "<code class=\"bg-gray-100 text-purple-700 px-1.5 py-0.5 rounded text-sm font-mono\">$1</code>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-purple-600 hover:text-purple-700 underline" target="_blank" rel="noopener">$1</a>');
+    .replace(/`([^`]+)`/g, "<code class=\"bg-gray-100 text-accent px-1.5 py-0.5 rounded text-sm font-mono\">$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent hover:text-accent underline" target="_blank" rel="noopener">$1</a>');
 }
 
 export default function BlogPostPage({ post, content, relatedPosts }: Props) {
@@ -291,7 +291,7 @@ export default function BlogPostPage({ post, content, relatedPosts }: Props) {
         />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
+      <div className="min-h-screen bg-gradient-to-br from-ink-200 via-accent-muted via-40% to-orange-100">
         <Navbar />
 
         {/* Content */}
@@ -299,7 +299,7 @@ export default function BlogPostPage({ post, content, relatedPosts }: Props) {
           <div className="container mx-auto max-w-3xl">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-              <Link href="/blog" className="hover:text-purple-600 transition-colors font-medium">
+              <Link href="/blog" className="hover:text-accent transition-colors font-medium">
                 ← Blog
               </Link>
               <span>/</span>
@@ -364,7 +364,7 @@ export default function BlogPostPage({ post, content, relatedPosts }: Props) {
                     const color = CATEGORY_COLORS[related.category] || "bg-gray-50 text-gray-700";
                     return (
                       <Link key={related.slug} href={`/blog/${related.slug}`}>
-                        <article className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col cursor-pointer">
+                        <article className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-ink-200 hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col cursor-pointer">
                           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full w-fit mb-3 ${color}`}>
                             {related.category}
                           </span>
@@ -384,7 +384,7 @@ export default function BlogPostPage({ post, content, relatedPosts }: Props) {
             <div className="mt-8 text-center">
               <Link
                 href="/blog"
-                className="text-sm text-gray-500 hover:text-purple-600 transition-colors font-medium"
+                className="text-sm text-gray-500 hover:text-accent transition-colors font-medium"
               >
                 ← Back to all articles
               </Link>

@@ -26,7 +26,7 @@ import SybMark from "@/components/icons/SybMark";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-xs font-semibold text-violet-700">
+    <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-4 py-1.5 text-xs font-semibold text-accent">
       <SybMark className="w-3.5 h-3.5" />
       {children}
     </span>
@@ -76,11 +76,11 @@ export function HowItWorks() {
               key={s.title}
               className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-7 shadow-premium border border-white/60"
             >
-              <span className="absolute top-6 right-6 text-4xl font-heading font-medium text-violet-100">
+              <span className="absolute top-6 right-6 text-4xl font-heading font-medium text-ink-200">
                 {i + 1}
               </span>
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 flex items-center justify-center ring-1 ring-violet-100 mb-5">
-                <s.Icon className="w-6 h-6 text-violet-700" />
+              <div className="w-12 h-12 rounded-2xl bg-accent-muted flex items-center justify-center ring-1 ring-ink-200 mb-5">
+                <s.Icon className="w-6 h-6 text-accent" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {s.title}
@@ -97,10 +97,10 @@ export function HowItWorks() {
 /* 2. Alternating feature deep-dives with lightweight, honest mockups */
 function ScoreMock() {
   const rows = [
-    { name: "Perplexity", v: 86, c: "bg-violet-500" },
-    { name: "ChatGPT", v: 57, c: "bg-fuchsia-500" },
-    { name: "Gemini", v: 29, c: "bg-indigo-400" },
-    { name: "Claude", v: 14, c: "bg-purple-400" },
+    { name: "Perplexity", v: 86, c: "bg-[#7c3aed]" },
+    { name: "ChatGPT", v: 57, c: "bg-[#10a37f]" },
+    { name: "Gemini", v: 29, c: "bg-[#4285f4]" },
+    { name: "Claude", v: 14, c: "bg-[#d97757]" },
   ];
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-premium p-6">
@@ -170,7 +170,7 @@ function SourcesMock() {
 
 function CompetitorMock() {
   const rows = [
-    { name: "You", v: 47, bold: true, c: "bg-violet-500" },
+    { name: "You", v: 47, bold: true, c: "bg-accent" },
     { name: "Competitor A", v: 71, bold: false, c: "bg-gray-400" },
     { name: "Competitor B", v: 63, bold: false, c: "bg-gray-400" },
     { name: "Competitor C", v: 38, bold: false, c: "bg-gray-400" },
@@ -221,7 +221,7 @@ function ImpactMock() {
         {[31, 34, 33, 40, 44, 50].map((h, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
             <div
-              className="w-full rounded-t-md bg-gradient-to-t from-violet-500 to-fuchsia-400"
+              className="w-full rounded-t-md bg-accent"
               style={{ height: `${h * 1.6}px` }}
             />
             <span className="text-[10px] text-gray-400">W{i + 1}</span>
@@ -264,8 +264,8 @@ function FeatureRow({
         <ul className="space-y-2.5">
           {bullets.map((b) => (
             <li key={b} className="flex items-start gap-2.5 text-gray-700">
-              <span className="mt-1 w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
-                <Check className="w-3 h-3 text-violet-700" />
+              <span className="mt-1 w-5 h-5 rounded-full bg-accent-muted flex items-center justify-center flex-shrink-0">
+                <Check className="w-3 h-3 text-accent" />
               </span>
               <span className="text-sm md:text-base leading-relaxed">{b}</span>
             </li>
@@ -273,7 +273,7 @@ function FeatureRow({
         </ul>
       </div>
       <div className={`relative ${flip ? "lg:order-1" : ""}`}>
-        <div className="absolute -inset-4 bg-gradient-to-br from-violet-200/40 via-fuchsia-200/25 to-transparent rounded-[2.5rem] blur-2xl" />
+        <div className="absolute -inset-4 bg-ink-100/70 rounded-[2.5rem] blur-2xl" />
         <div className="relative">{mock}</div>
       </div>
     </div>
@@ -358,8 +358,8 @@ export function WhatAISays() {
                 "Catch a bad or outdated description before it spreads",
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2.5 text-gray-700">
-                  <span className="mt-1 w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-violet-700" />
+                  <span className="mt-1 w-5 h-5 rounded-full bg-accent-muted flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-accent" />
                   </span>
                   <span className="text-sm md:text-base leading-relaxed">
                     {b}
@@ -369,10 +369,10 @@ export function WhatAISays() {
             </ul>
           </div>
           <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-br from-violet-200/40 via-fuchsia-200/25 to-transparent rounded-[2.5rem] blur-2xl" />
+            <div className="absolute -inset-4 bg-ink-100/70 rounded-[2.5rem] blur-2xl" />
             <div className="relative bg-white rounded-3xl border border-gray-100 shadow-premium-lg p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Quote className="w-4 h-4 text-violet-500" />
+                <Quote className="w-4 h-4 text-accent" />
                 <span className="text-xs font-medium text-gray-400">
                   Perplexity, answer stored on this week&apos;s run
                 </span>
@@ -380,7 +380,7 @@ export function WhatAISays() {
               <p className="text-sm text-gray-700 leading-relaxed">
                 &ldquo;For French B2B cold email, the tools most often
                 recommended are{" "}
-                <span className="bg-violet-100 text-violet-800 rounded px-1 font-medium">
+                <span className="bg-accent-muted text-accent rounded px-1 font-medium">
                   your brand
                 </span>{" "}
                 and Competitor A. Your brand is usually cited first for
@@ -448,8 +448,8 @@ export function BeyondMonitoring() {
               key={c.title}
               className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-8 shadow-premium border border-white/60 flex gap-5"
             >
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 flex items-center justify-center ring-1 ring-violet-100 flex-shrink-0">
-                <c.Icon className="w-6 h-6 text-violet-700" />
+              <div className="w-12 h-12 rounded-2xl bg-accent-muted flex items-center justify-center ring-1 ring-ink-200 flex-shrink-0">
+                <c.Icon className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -501,8 +501,8 @@ export function WhoItsFor() {
               key={p.title}
               className="bg-white/90 backdrop-blur-sm rounded-3xl p-7 shadow-premium border border-white/60"
             >
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 flex items-center justify-center ring-1 ring-violet-100 mb-5">
-                <p.Icon className="w-6 h-6 text-violet-700" />
+              <div className="w-12 h-12 rounded-2xl bg-accent-muted flex items-center justify-center ring-1 ring-ink-200 mb-5">
+                <p.Icon className="w-6 h-6 text-accent" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {p.title}
@@ -523,10 +523,9 @@ export function AgencyBand() {
       <div className="container mx-auto max-w-6xl">
         <div className="relative overflow-hidden rounded-[2rem] bg-[#0B1120] px-6 py-14 md:px-14 md:py-20 text-white shadow-premium-lg">
           <div className="absolute inset-0 bg-grid-dark opacity-70" />
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl" />
-          <div className="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
+                    <div className="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-violet-200 mb-5">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-ink-300 mb-5">
                 <SybMark className="w-3.5 h-3.5" />
                 Agency mode
               </span>
@@ -556,8 +555,8 @@ export function AgencyBand() {
                   key={b}
                   className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4"
                 >
-                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500/40 to-fuchsia-500/40 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3.5 h-3.5 text-violet-100" />
+                  <span className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3.5 h-3.5 text-ink-200" />
                   </span>
                   <span className="text-sm text-gray-200">{b}</span>
                 </div>
@@ -594,7 +593,7 @@ export function GeoVsSeo() {
           <div className="grid grid-cols-3 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
             <div className="px-5 py-4" />
             <div className="px-5 py-4">Classic SEO</div>
-            <div className="px-5 py-4 text-violet-700">GEO with SYB</div>
+            <div className="px-5 py-4 text-accent">GEO with SYB</div>
           </div>
           {rows.map((r, i) => (
             <div

@@ -176,11 +176,11 @@ export default function Onboarding({
         <meta name="robots" content="noindex" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-b from-violet-50/40 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-accent-muted/40 to-white">
         <header className="border-b border-gray-100 bg-white/70 backdrop-blur-sm">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-2">
-              <SybMark className="h-5 w-5 text-violet-600" />
+              <SybMark className="h-5 w-5 text-accent" />
               <span className="font-heading text-sm font-semibold text-gray-900">
                 ShowYourBrand
               </span>
@@ -203,9 +203,9 @@ export default function Onboarding({
                   className={cn(
                     "flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
                     i < step
-                      ? "bg-violet-600 text-white"
+                      ? "bg-ink-900 text-white"
                       : i === step
-                        ? "bg-violet-100 text-violet-700 ring-2 ring-violet-300"
+                        ? "bg-accent-muted text-accent ring-2 ring-ink-200"
                         : "bg-gray-100 text-gray-400",
                   )}
                 >
@@ -250,7 +250,7 @@ export default function Onboarding({
                         if (!brandName) setBrandName(brandFromUrl(e.target.value));
                       }}
                       placeholder="bioburger.fr"
-                      className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                      className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                     />
                   </div>
                   <div>
@@ -261,7 +261,7 @@ export default function Onboarding({
                       value={brandName}
                       onChange={(e) => setBrandName(e.target.value)}
                       placeholder="Bioburger"
-                      className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                      className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                     />
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function Onboarding({
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       placeholder="restauration rapide bio"
-                      className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                      className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                     />
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -300,7 +300,7 @@ export default function Onboarding({
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="Paris"
-                        className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                        className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                       />
                       <p className="mt-1 text-xs text-gray-400">
                         Si vos clients cherchent localement.
@@ -314,7 +314,7 @@ export default function Onboarding({
                         value={audience}
                         onChange={(e) => setAudience(e.target.value)}
                         placeholder="PME, familles, freelances…"
-                        className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                        className="mt-1.5 w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                       />
                     </div>
                   </div>
@@ -345,7 +345,7 @@ export default function Onboarding({
                           )
                         }
                         placeholder={i === 0 ? "Big Fernand" : "Concurrent"}
-                        className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                        className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                       />
                       <button
                         type="button"
@@ -362,7 +362,7 @@ export default function Onboarding({
                     <button
                       type="button"
                       onClick={() => setCompetitors((prev) => [...prev, ""])}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent"
                     >
                       <Plus className="h-3.5 w-3.5" />
                       Ajouter un concurrent
@@ -423,7 +423,7 @@ export default function Onboarding({
                                 prev.map((v, j) => (j === i ? e.target.value : v)),
                               )
                             }
-                            className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+                            className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ink-200"
                           />
                           <button
                             type="button"
@@ -443,7 +443,7 @@ export default function Onboarding({
                 <button
                   type="button"
                   onClick={() => setPrompts((prev) => [...prev, ""])}
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ajouter une requête à la main
@@ -482,7 +482,7 @@ export default function Onboarding({
                         className={cn(
                           "flex w-full items-start gap-3 rounded-xl border p-3.5 text-left transition-colors",
                           on
-                            ? "border-violet-300 bg-violet-50/60"
+                            ? "border-ink-200 bg-accent-muted/60"
                             : "border-gray-200 bg-white hover:border-gray-300",
                           blocked && "cursor-not-allowed opacity-40",
                         )}
@@ -490,7 +490,7 @@ export default function Onboarding({
                         <span
                           className={cn(
                             "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border",
-                            on ? "border-violet-600 bg-violet-600" : "border-gray-300",
+                            on ? "border-ink-200 bg-ink-900" : "border-gray-300",
                           )}
                         >
                           {on && <Check className="h-3 w-3 text-white" />}
@@ -536,7 +536,7 @@ export default function Onboarding({
                           className={cn(
                             "rounded-lg border px-4 py-2 text-sm transition-colors",
                             frequency === f
-                              ? "border-violet-300 bg-violet-50 font-medium text-violet-700"
+                              ? "border-ink-200 bg-accent-muted font-medium text-accent"
                               : "border-gray-200 text-gray-600 hover:border-gray-300",
                             locked && "cursor-not-allowed opacity-40",
                           )}
@@ -618,7 +618,7 @@ export default function Onboarding({
             {step === 5 && result && (
               <>
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-violet-600 text-2xl font-bold text-white">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-ink-900 text-2xl font-bold text-white">
                     {result.globalScore}
                   </div>
                   <div>
@@ -666,7 +666,7 @@ export default function Onboarding({
                       ],
                     ].map(([when, what]) => (
                       <li key={when} className="flex gap-3">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink-900" />
                         <span className="text-sm">
                           <span className="font-medium text-gray-900">{when}</span>
                           <span className="text-gray-500"> — {what}</span>

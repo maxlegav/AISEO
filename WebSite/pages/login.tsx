@@ -130,17 +130,17 @@ export default function LoginPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
-        <div className="animate-pulse text-purple-600 font-medium">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-ink-100">
+        <div className="animate-pulse text-accent font-medium">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-ink-100 px-4 relative overflow-hidden">
       {/* Decorative blobs */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-10 left-10 w-72 h-72 bg-ink-200/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-ink-200/20 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-orange-300/20 rounded-full blur-3xl" />
 
       {/* Back to home */}

@@ -5,8 +5,8 @@ import SybMark from "@/components/icons/SybMark";
 export default function DemoBanner({ demo }: { demo: boolean }) {
   if (!demo) return null;
   return (
-    <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
-      <SybMark className="h-4 w-4 shrink-0 text-violet-600" />
+    <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-ink-200 bg-accent-muted/70 p-4 text-sm text-gray-600">
+      <SybMark className="h-4 w-4 shrink-0 text-accent" />
       <span>
         Données de démonstration. Créez votre premier projet pour lancer un vrai
         monitoring.

@@ -113,7 +113,7 @@ function ActionCard({
       <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="mb-1 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-violet-50 px-2.5 py-0.5 text-[11px] font-semibold text-violet-700">
+            <span className="inline-flex items-center rounded-full bg-accent-muted px-2.5 py-0.5 text-[11px] font-semibold text-accent">
               {kindLabel(action.kind)}
             </span>
             <span
@@ -139,7 +139,7 @@ function ActionCard({
               href={action.publishedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-0.5 inline-flex items-center gap-1 text-xs text-violet-600 hover:underline"
+              className="mt-0.5 inline-flex items-center gap-1 text-xs text-accent hover:underline"
             >
               {action.publishedUrl} <ExternalLink className="h-3 w-3" />
             </a>
@@ -217,7 +217,7 @@ function ActionCard({
         <button
           onClick={measure}
           disabled={busy !== null}
-          className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3.5 py-2 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-100 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-3.5 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent-muted disabled:opacity-60"
         >
           {busy === "measure" ? (
             <>
@@ -296,7 +296,7 @@ export default function ImpactManager({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5">
+      <div className="rounded-2xl border border-ink-200 bg-accent-muted p-5">
         <p className="text-sm font-semibold text-gray-900">
           Mesurez l&apos;effet réel de vos actions GEO.
         </p>
@@ -307,7 +307,7 @@ export default function ImpactManager({
         </p>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="mt-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90"
+          className="mt-3 inline-flex items-center gap-2 rounded-full bg-ink-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90"
         >
           <Plus className="h-4 w-4" /> Suivre une nouvelle action
         </button>

@@ -145,7 +145,7 @@ export default function NewProject({
                   className={cn(
                     "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
                     i < step
-                      ? "bg-violet-600 text-white"
+                      ? "bg-ink-900 text-white"
                       : i === step
                         ? "bg-gray-900 text-white"
                         : "bg-gray-100 text-gray-400"
@@ -191,7 +191,7 @@ export default function NewProject({
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
                     placeholder="Linkflow"
-                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                   />
                 </div>
                 <div>
@@ -202,7 +202,7 @@ export default function NewProject({
                     value={websiteUrl}
                     onChange={(e) => setWebsiteUrl(e.target.value)}
                     placeholder="linkflow.io"
-                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                   />
                 </div>
                 <div className="sm:col-span-2">
@@ -213,7 +213,7 @@ export default function NewProject({
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     placeholder="SaaS B2B, automatisation commerciale"
-                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                   />
                 </div>
                 {clients.length > 0 && (
@@ -224,7 +224,7 @@ export default function NewProject({
                     <select
                       value={clientId}
                       onChange={(e) => setClientId(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                     >
                       <option value="">Aucun client</option>
                       {clients.map((c) => (
@@ -256,7 +256,7 @@ export default function NewProject({
                         updateList(competitors, setCompetitors, i, e.target.value)
                       }
                       placeholder="Concurrent"
-                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                     />
                     <button
                       type="button"
@@ -272,7 +272,7 @@ export default function NewProject({
                 <button
                   type="button"
                   onClick={() => setCompetitors([...competitors, ""])}
-                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ajouter un concurrent
@@ -324,7 +324,7 @@ export default function NewProject({
                       onChange={(e) =>
                         updateList(prompts, setPrompts, i, e.target.value)
                       }
-                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                     />
                     <button
                       type="button"
@@ -340,7 +340,7 @@ export default function NewProject({
                 <button
                   type="button"
                   onClick={() => setPrompts([...prompts, ""])}
-                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ajouter une requête
@@ -366,7 +366,7 @@ export default function NewProject({
                       className={cn(
                         "flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all",
                         engines[llm]
-                          ? "border-violet-400 bg-violet-50/60"
+                          ? "border-ink-200 bg-accent-muted/60"
                           : "border-gray-100 bg-white opacity-60"
                       )}
                     >
@@ -397,7 +397,7 @@ export default function NewProject({
                       className={cn(
                         "rounded-xl border-2 p-4 text-left transition-all",
                         frequency === opt.id
-                          ? "border-violet-400 bg-violet-50/60"
+                          ? "border-ink-200 bg-accent-muted/60"
                           : "border-gray-100 bg-white"
                       )}
                     >
@@ -410,7 +410,7 @@ export default function NewProject({
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5 text-sm text-gray-700">
+              <section className="rounded-2xl border border-ink-200 bg-accent-muted p-5 text-sm text-gray-700">
                 <p className="font-semibold text-gray-900">Récapitulatif</p>
                 <p className="mt-1">
                   <strong>{brandName || "Votre marque"}</strong> · {cleanPrompts.length}{" "}

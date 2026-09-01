@@ -97,13 +97,13 @@ export default function ClientsPage({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nom du client"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-ink-200"
               />
               <input
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="site.fr (optionnel)"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-ink-200"
               />
               <button
                 type="button"
@@ -158,7 +158,7 @@ export default function ClientsPage({
                 )}
                 <a
                   href={`/app?client=${c.id}`}
-                  className="mt-auto text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-auto text-sm font-medium text-accent hover:text-accent"
                 >
                   {c.projectCount} projet{c.projectCount > 1 ? "s" : ""} →
                 </a>

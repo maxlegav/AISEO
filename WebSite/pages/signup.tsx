@@ -84,7 +84,7 @@ const PlanCard = ({
   >
     {highlighted && (
       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-        <span className="bg-pink-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+        <span className="bg-ink-200 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
           POPULAR
         </span>
       </div>
@@ -476,8 +476,8 @@ export default function SignupPage() {
   // Loading state
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
-        <div className="animate-pulse text-purple-600 font-medium">
+      <div className="min-h-screen flex items-center justify-center bg-ink-100">
+        <div className="animate-pulse text-accent font-medium">
           Loading...
         </div>
       </div>
@@ -485,10 +485,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-ink-100 px-4 relative overflow-hidden">
       {/* Decorative blobs */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-10 left-10 w-72 h-72 bg-ink-200/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-ink-200/20 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-orange-300/20 rounded-full blur-3xl" />
 
       {/* Back to home */}
@@ -520,7 +520,7 @@ export default function SignupPage() {
                       isActive
                         ? "bg-[#1E293B] text-white shadow-lg"
                         : isCompleted
-                          ? "bg-purple-500 text-white"
+                          ? "bg-ink-900 text-white"
                           : "bg-white/80 text-gray-400 border border-gray-200"
                     }`}
                   >
@@ -535,7 +535,7 @@ export default function SignupPage() {
                       isActive
                         ? "text-gray-900"
                         : isCompleted
-                          ? "text-purple-600"
+                          ? "text-accent"
                           : "text-gray-400"
                     }`}
                   >
@@ -545,7 +545,7 @@ export default function SignupPage() {
                 {i < STEP_CONFIG.length - 1 && (
                   <div
                     className={`w-6 h-0.5 mt-[-16px] sm:mt-[-4px] ${
-                      stepNum < step ? "bg-purple-400" : "bg-gray-200"
+                      stepNum < step ? "bg-ink-200" : "bg-gray-200"
                     }`}
                   />
                 )}
@@ -587,14 +587,14 @@ export default function SignupPage() {
                     onClick={() => setSeoExperience(level.value)}
                     className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
                       seoExperience === level.value
-                        ? "border-purple-500 bg-purple-50"
+                        ? "border-ink-200 bg-accent-muted"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <div
                       className={`font-medium ${
                         seoExperience === level.value
-                          ? "text-purple-700"
+                          ? "text-accent"
                           : "text-gray-900"
                       }`}
                     >
@@ -603,7 +603,7 @@ export default function SignupPage() {
                     <div
                       className={`text-sm mt-1 ${
                         seoExperience === level.value
-                          ? "text-purple-600"
+                          ? "text-accent"
                           : "text-gray-500"
                       }`}
                     >
@@ -636,7 +636,7 @@ export default function SignupPage() {
                     onClick={() => setReferral(source)}
                     className={`p-3 text-sm rounded-xl border-2 transition-all text-left ${
                       referral === source
-                        ? "border-purple-500 bg-purple-50 text-purple-700"
+                        ? "border-ink-200 bg-accent-muted text-accent"
                         : "border-gray-200 hover:border-gray-300 text-gray-700"
                     }`}
                   >
@@ -669,8 +669,8 @@ export default function SignupPage() {
                     if (!plan || typeof plan !== "object" || !("price" in plan))
                       return null;
                     return (
-                      <div className="mt-4 inline-block bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
-                        <p className="text-sm font-medium text-purple-700">
+                      <div className="mt-4 inline-block bg-accent-muted border border-ink-200 rounded-lg px-4 py-2">
+                        <p className="text-sm font-medium text-accent">
                           Plan{" "}
                           <span className="font-bold">{plan.name}</span> : €
                           {plan.price}/mois
@@ -792,8 +792,8 @@ export default function SignupPage() {
           {step === 4 && (
             <div className="space-y-6">
               <div className="text-center">
-                <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <CreditCard className="w-8 h-8 text-indigo-600" />
+                <div className="w-16 h-16 bg-accent-muted rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="w-8 h-8 text-accent" />
                 </div>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                   Choisissez votre plan

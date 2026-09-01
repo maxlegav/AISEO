@@ -137,7 +137,7 @@ export default function BrandingSettings({
                 value={logoUrl}
                 onChange={(e) => setLogoUrl(e.target.value)}
                 placeholder="https://…/logo.png"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
               />
             </div>
 
@@ -152,7 +152,7 @@ export default function BrandingSettings({
               value={agencyName}
               onChange={(e) => setAgencyName(e.target.value)}
               placeholder="Mon Agence"
-              className="mb-5 w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+              className="mb-5 w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
             />
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -226,7 +226,7 @@ export default function BrandingSettings({
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 placeholder="reports.monagence.fr"
-                className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
               />
 
               <div className="mt-5 flex items-center justify-between">
@@ -239,7 +239,7 @@ export default function BrandingSettings({
                   onClick={() => setPdf((v) => !v)}
                   className={cn(
                     "relative h-6 w-11 rounded-full transition-colors",
-                    pdf ? "bg-violet-600" : "bg-gray-200"
+                    pdf ? "bg-ink-900" : "bg-gray-200"
                   )}
                   aria-pressed={pdf}
                 >

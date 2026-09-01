@@ -3,14 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import "@/styles/globals.css";
-import {
-  Inter,
-  Playfair_Display,
-  Space_Grotesk,
-  Poppins,
-  Lato,
-  Cormorant_Garamond,
-} from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 import { NotificationProvider } from "../components/NotificationSystem";
@@ -19,45 +12,33 @@ import WaitlistModal from "../components/WaitlistModal";
 import { useUserStore } from "@/stores";
 import type { AppProps } from "next/app";
 
-// Configure fonts
-const inter = Inter({
+/**
+ * Three typefaces, not six.
+ *
+ * The site used to load Inter, Playfair, Space Grotesk, Poppins, Lato and
+ * Cormorant — Poppins and Lato were never referenced at all, and the mix is
+ * most of what made the design read as generated rather than designed.
+ *
+ * Geist for text, Geist Mono for anything that is a measurement (a score, a
+ * delta, an engine label — mono keeps digits aligned between rows), and
+ * Instrument Serif for display headings.
+ */
+const sans = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
   display: "swap",
 });
 
-const playfair = Playfair_Display({
+const mono = Geist_Mono({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-playfair",
+  variable: "--font-mono",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const serif = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-grotesk",
-  display: "swap",
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
-  display: "swap",
-});
-
-const lato = Lato({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-lato",
-  display: "swap",
-});
-
-const cormorantGaramond = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
+  weight: "400",
+  variable: "--font-serif",
   display: "swap",
 });
 
@@ -92,7 +73,7 @@ export default function App({
       <LanguageProvider>
     
         <div
-          className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} ${poppins.variable} ${lato.variable} ${cormorantGaramond.variable} font-sans`}
+          className={`${sans.variable} ${mono.variable} ${serif.variable} font-sans`}
         >
           <NotificationProvider position="top-right" maxNotifications={3}>
             <Component {...pageProps} />

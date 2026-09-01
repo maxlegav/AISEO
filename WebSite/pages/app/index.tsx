@@ -104,7 +104,7 @@ export default function AppOverview({
               className={
                 "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                 (!activeClientId
-                  ? "border-violet-300 bg-violet-50 text-violet-700"
+                  ? "border-ink-200 bg-accent-muted text-accent"
                   : "border-white/60 bg-white/60 text-gray-500 hover:text-gray-800")
               }
             >
@@ -117,7 +117,7 @@ export default function AppOverview({
                 className={
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                   (activeClientId === c.id
-                    ? "border-violet-300 bg-violet-50 text-violet-700"
+                    ? "border-ink-200 bg-accent-muted text-accent"
                     : "border-white/60 bg-white/60 text-gray-500 hover:text-gray-800")
                 }
               >
@@ -126,15 +126,15 @@ export default function AppOverview({
             ))}
             <Link
               href="/app/clients"
-              className="ml-auto text-xs font-medium text-violet-600 hover:text-violet-700"
+              className="ml-auto text-xs font-medium text-accent hover:text-accent"
             >
               Gérer les clients
             </Link>
           </div>
         )}
         {demo && (
-          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
-            <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-ink-200 bg-accent-muted/70 p-4 text-sm text-gray-600">
+            <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
             <span>
               Voici des <strong>données de démonstration</strong>. Créez votre
               premier projet pour lancer un vrai monitoring et voir vos propres
@@ -206,7 +206,7 @@ export default function AppOverview({
                 })}
               </div>
 
-              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-violet-600 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
                 Ouvrir le dashboard
                 <ArrowRight className="h-3.5 w-3.5" />
               </div>
@@ -215,9 +215,9 @@ export default function AppOverview({
 
           <Link
             href="/app/new"
-            className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-violet-200 bg-white/40 p-5 text-center transition-colors hover:border-violet-300 hover:bg-white/60"
+            className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-ink-200 bg-white/40 p-5 text-center transition-colors hover:border-ink-200 hover:bg-white/60"
           >
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-ink-900 text-white">
               <Plus className="h-5 w-5" />
             </span>
             <span className="text-sm font-semibold text-gray-800">
