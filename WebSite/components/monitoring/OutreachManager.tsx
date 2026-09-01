@@ -241,8 +241,10 @@ function TargetCard({
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
             <span>
-              Cité sur {target.citations} requête(s) par {target.engines.length}{" "}
-              moteur(s)
+              {/* Summed across engines, like the sources page: this counts
+                  answers, not queries. */}
+              Cité dans {target.citations} réponse(s) par{" "}
+              {target.engines.length} moteur(s)
             </span>
             <span className="flex items-center gap-1">
               {target.engines.map((e) => (

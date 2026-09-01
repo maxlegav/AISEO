@@ -741,10 +741,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   if (!session) return loginRedirect("/app/onboarding");
 
   // Onboarding is the first-run path only: once a project exists, it is done.
+  // `?revoir=1` reopens it deliberately — to walk someone through the setup, or
+  // to add a brand the long way — without emptying the workspace first, which
+  // was the only way to see this screen again.
   const existing = await Project.countDocuments({
     organizationId: session.workspace.organizationId,
   });
-  if (existing > 0) {
+  if (existing > 0 && !ctx.query.revoir) {
     return { redirect: { destination: "/app", permanent: false } };
   }
 
