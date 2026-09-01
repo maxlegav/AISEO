@@ -1,0 +1,26 @@
+# What the Vercel build never needs.
+#
+# The project's Root Directory is `WebSite`, but the CLI uploads from the
+# repository root, and the siblings weigh 2.4 GB — `video/` (Remotion) and
+# `Admin/` alone are 1.4 GB. A deploy from the root would spend minutes
+# uploading files the build discards. Only `WebSite/` matters.
+#
+# Note: the presence of this file replaces .gitignore for upload filtering,
+# so the usual ignores have to be repeated here.
+
+video
+Admin
+server
+_bmad
+_bmad-output
+sales
+
+node_modules
+**/node_modules
+.next
+**/.next
+.git
+**/.env*.local
+**/*.log
+.DS_Store
+**/.DS_Store
