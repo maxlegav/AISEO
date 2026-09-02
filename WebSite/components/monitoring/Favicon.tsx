@@ -39,7 +39,7 @@ export default function Favicon({
     return (
       <span
         className={cn(
-          "flex shrink-0 items-center justify-center bg-gradient-to-br from-violet-600 to-fuchsia-600 font-bold text-white",
+          "flex shrink-0 items-center justify-center bg-ink-900 font-bold text-white",
           rounded,
           className,
         )}

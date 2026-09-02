@@ -3,6 +3,10 @@ import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { Loader2, UserPlus, Trash2, Check, Clock, Copy } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import mongoose from "mongoose";
 import Membership, { type MembershipRole, type MembershipStatus } from "@/models/Membership";
@@ -15,6 +19,7 @@ interface MemberRow {
 }
 
 interface TeamPageProps {
+  switcherProjects: SwitcherEntry[];
   members: MemberRow[];
   canManage: boolean;
   organizationName: string;
@@ -27,6 +32,7 @@ const ROLE_LABEL: Record<MembershipRole, string> = {
 };
 
 export default function TeamPage({
+  switcherProjects,
   members: initial,
   canManage,
   organizationName,
@@ -77,6 +83,7 @@ export default function TeamPage({
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         active="team"
         title="Équipe"
         subtitle={`Invitez vos collègues à collaborer sur ${organizationName}.`}
@@ -92,12 +99,12 @@ export default function TeamPage({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="collegue@agence.fr"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-ink-200"
               />
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as MembershipRole)}
-                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-violet-500"
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-ink-200"
               >
                 <option value="member">Membre</option>
                 <option value="admin">Admin</option>
@@ -197,8 +204,11 @@ export const getServerSideProps: GetServerSideProps<TeamPageProps> = async (ctx)
     status: MembershipStatus;
   }[];
 
+  const switcherProjects = await listSwitcherProjects(organizationId);
+
   return {
     props: {
+      switcherProjects,
       members: members.map((m) => ({
         id: m._id.toString(),
         email: m.email,

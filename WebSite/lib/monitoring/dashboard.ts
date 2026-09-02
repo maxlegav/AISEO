@@ -146,6 +146,7 @@ interface LeanProject {
   prompts: string[];
   llms: LLMId[];
   frequency: string;
+  nextRunAt?: Date | null;
   clientId?: mongoose.Types.ObjectId | null;
 }
 
@@ -307,6 +308,7 @@ async function buildRanProject(p: LeanProject, latestWeek: string): Promise<UIPr
     competitors: p.competitors,
     prompts: p.prompts.length,
     frequency: frequencyLabel(p.frequency),
+    nextRunAt: p.nextRunAt ? p.nextRunAt.toISOString() : null,
     globalScore,
     globalDelta,
     llmScores,
@@ -340,6 +342,7 @@ function buildPendingProject(p: LeanProject): UIProject {
     competitors: p.competitors,
     prompts: p.prompts.length,
     frequency: frequencyLabel(p.frequency),
+    nextRunAt: p.nextRunAt ? p.nextRunAt.toISOString() : null,
     globalScore: 0,
     globalDelta: 0,
     llmScores: [],
@@ -447,4 +450,49 @@ export async function getProjectDashboard(
     }
   }
   return { project, demo: false };
+}
+
+export interface SwitcherEntry {
+  id: string;
+  brandName: string;
+  websiteUrl: string;
+}
+
+/**
+ * The project list behind the sidebar switcher.
+ *
+ * Every page that renders `MonitoringLayout` needs it, not just `/app`: the
+ * layout used to fall back to the mock projects whenever a page omitted the
+ * prop, so navigating to Concurrents, Sources or Réglages replaced the user's
+ * own brands with "Linkflow" and "Atelier Moreau" in the sidebar. This is the
+ * cheap query for that — three fields, no scoring — so any page can afford it.
+ */
+export async function listSwitcherProjects(
+  organizationId: string,
+): Promise<SwitcherEntry[]> {
+  await connectDB();
+  const docs = (await Project.find({ organizationId })
+    .select("brandName websiteUrl")
+    .sort({ createdAt: -1 })
+    .lean()) as unknown as {
+    _id: mongoose.Types.ObjectId;
+    brandName: string;
+    websiteUrl: string;
+  }[];
+
+  // No project yet: the pages themselves are showing demo data, so the
+  // switcher matching it is the coherent answer, not an empty list.
+  if (docs.length === 0) {
+    return MOCK_PROJECTS.map((p) => ({
+      id: p.id,
+      brandName: p.brandName,
+      websiteUrl: p.websiteUrl,
+    }));
+  }
+
+  return docs.map((d) => ({
+    id: d._id.toString(),
+    brandName: d.brandName,
+    websiteUrl: d.websiteUrl,
+  }));
 }

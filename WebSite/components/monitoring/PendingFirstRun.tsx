@@ -31,7 +31,7 @@ export default function PendingFirstRun({ projectId }: { projectId: string }) {
 
   return (
     <div className="mx-auto max-w-xl rounded-2xl border border-white/60 bg-white/80 p-10 text-center shadow-premium backdrop-blur-sm">
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-ink-900 text-white">
         <Play className="h-6 w-6" />
       </div>
       <h2 className="font-heading text-xl font-semibold text-gray-900">

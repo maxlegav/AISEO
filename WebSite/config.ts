@@ -157,13 +157,17 @@ const config = {
     supportEmail: "support@ShowYourBrand.com",
   },
 
-  // Theme & Colors (based on UX Design specification)
+  // Theme & Colors. The source of truth for the UI is tailwind.config.ts
+  // (`ink` / `paper` / `accent`); these mirror it for anywhere that needs a
+  // raw hex — an email, an OG image, a meta theme-color.
   colors: {
-    primary: "#7C3AED", // Purple (Primary brand color)
-    success: "#10B981", // Green (Success)
-    error: "#EF4444", // Red (Error)
-    warning: "#F59E0B", // Orange (Warning)
-    neutral: "#6B7280", // Gray (Neutral)
+    primary: "#141311", // Ink — the primary action colour is near-black
+    accent: "#AE3B22", // The single accent, spent sparingly
+    paper: "#F7F5F0", // Warm off-white ground
+    success: "#15803D",
+    error: "#B3311F",
+    warning: "#B45309",
+    neutral: "#6B665D",
   },
 
   // Callback URL after authentication

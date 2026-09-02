@@ -176,7 +176,7 @@ export function buildActionPlan(
     items.push({
       id: "source-top",
       title: `Obtenez une mention sur ${topSource.domain}`,
-      detail: `${topSource.domain} est cité par ${labelEngines(topSource.engines)} sur ${topSource.citations} requête(s) de votre catégorie, sans jamais vous mentionner. Une présence sur cette page vous rendrait citable sur ces requêtes.`,
+      detail: `${topSource.domain} est cité par ${labelEngines(topSource.engines)} dans ${topSource.citations} réponse(s) sur votre catégorie, sans jamais vous mentionner. Une présence sur cette page vous rendrait citable sur ces requêtes.`,
       priority: "high",
       impact: Math.min(15, topSource.citations * 3),
       effort: "Moyen",

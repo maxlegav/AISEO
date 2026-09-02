@@ -80,7 +80,7 @@ function ProjectSwitcher({
               size={28}
             />
           ) : (
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-xs font-bold text-white">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-xs font-bold text-white">
               •
             </span>
           )}
@@ -136,7 +136,7 @@ function ProjectSwitcher({
           <Link
             href="/app/new"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-violet-600 hover:bg-violet-50"
+            className="flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-accent hover:bg-accent-muted"
           >
             <Plus className="h-3.5 w-3.5" />
             Nouveau projet
@@ -206,7 +206,7 @@ export default function MonitoringLayout({
   ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-violet-50 via-purple-50/60 to-fuchsia-50/40">
+    <div className="flex min-h-screen bg-accent-muted">
       {/* Sidebar */}
       <aside className="flex w-60 shrink-0 flex-col border-r border-white/60 py-5">
         <Link href="/" className="mb-6 flex items-center gap-2 px-5">
@@ -312,9 +312,9 @@ export default function MonitoringLayout({
         </nav>
 
         {demo && (
-          <div className="mx-3 rounded-xl border border-violet-100 bg-white/80 p-3.5 shadow-sm">
+          <div className="mx-3 rounded-xl border border-ink-200 bg-white/80 p-3.5 shadow-sm">
             <div className="mb-1 flex items-center gap-1.5">
-              <SybMark className="h-3.5 w-3.5 text-violet-600" />
+              <SybMark className="h-3.5 w-3.5 text-accent" />
               <span className="text-[12px] font-semibold text-gray-800">
                 Données de démonstration
               </span>

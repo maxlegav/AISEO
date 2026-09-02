@@ -45,11 +45,11 @@ export default function JoinPage({ token }: JoinPageProps) {
         <title>Rejoindre l&apos;équipe · ShowYourBrand</title>
         <meta name="robots" content="noindex" />
       </Head>
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 via-purple-50/60 to-fuchsia-50/40 p-6">
+      <div className="flex min-h-screen items-center justify-center bg-accent-muted p-6">
         <div className="w-full max-w-sm rounded-2xl border border-white/60 bg-white/80 p-8 text-center shadow-premium backdrop-blur-sm">
           {state === "loading" && (
             <>
-              <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-violet-600" />
+              <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-accent" />
               <p className="text-sm text-gray-600">Validation de votre invitation…</p>
             </>
           )}

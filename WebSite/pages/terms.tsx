@@ -11,7 +11,7 @@ export default function TermsPage() {
         description="Terms of Service for ShowYourBrand - Read our terms and conditions for using our GEO platform."
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100">
+      <div className="min-h-screen bg-ink-100">
         <Navbar />
 
         {/* Content */}
@@ -365,7 +365,7 @@ export default function TermsPage() {
                   our{" "}
                   <Link
                     href="/privacy"
-                    className="text-purple-600 hover:underline"
+                    className="text-accent hover:underline"
                   >
                     Privacy Policy
                   </Link>

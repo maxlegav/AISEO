@@ -245,7 +245,7 @@ export default function TestLanding() {
               <SybMark className="w-5 h-5 text-[#C6F24E]" />
               <span
                 className="font-bold tracking-tight"
-                style={{ fontFamily: "var(--font-grotesk)" }}
+                style={{ fontFamily: "var(--font-sans)" }}
               >
                 ShowYourBrand
               </span>
@@ -302,7 +302,7 @@ export default function TestLanding() {
 
               <h1
                 className="mt-6 text-[2.6rem] leading-[1.05] sm:text-5xl md:text-6xl font-bold tracking-[-0.03em]"
-                style={{ fontFamily: "var(--font-grotesk)" }}
+                style={{ fontFamily: "var(--font-sans)" }}
               >
                 Vos clients ne
                 <br />
@@ -387,7 +387,7 @@ export default function TestLanding() {
                 </p>
                 <h2
                   className="mt-4 text-3xl md:text-[2.5rem] leading-[1.1] font-bold tracking-[-0.02em]"
-                  style={{ fontFamily: "var(--font-grotesk)" }}
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   Un chiffre,
                   <br />
@@ -408,7 +408,7 @@ export default function TestLanding() {
                     <div key={s.k} className="flex items-baseline gap-3">
                       <dt
                         className="text-xl font-bold text-[#C6F24E] tabular-nums"
-                        style={{ fontFamily: "var(--font-grotesk)" }}
+                        style={{ fontFamily: "var(--font-sans)" }}
                       >
                         {s.k}
                       </dt>
@@ -431,7 +431,7 @@ export default function TestLanding() {
             </p>
             <h2
               className="mt-4 text-3xl md:text-[2.75rem] leading-tight font-bold tracking-[-0.02em] max-w-3xl"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               Vos outils SEO ne voient rien de ce qui se passe dans une
               conversation.
@@ -489,7 +489,7 @@ export default function TestLanding() {
             </p>
             <h2
               className="mt-4 text-3xl md:text-4xl font-bold tracking-[-0.02em]"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               Quatre étapes, puis ça tourne tout seul.
             </h2>
@@ -523,7 +523,7 @@ export default function TestLanding() {
                 >
                   <span
                     className="font-mono text-sm text-[#C6F24E]"
-                    style={{ fontFamily: "var(--font-grotesk)" }}
+                    style={{ fontFamily: "var(--font-sans)" }}
                   >
                     {s.n}
                   </span>
@@ -547,7 +547,7 @@ export default function TestLanding() {
                 </p>
                 <h2
                   className="mt-4 text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight"
-                  style={{ fontFamily: "var(--font-grotesk)" }}
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   Fort sur Perplexity, absent de Claude — et ce n&apos;est pas la
                   même correction.
@@ -600,7 +600,7 @@ export default function TestLanding() {
                       <EngineLogo id={id} size={32} />
                       <span
                         className="font-semibold"
-                        style={{ fontFamily: "var(--font-grotesk)" }}
+                        style={{ fontFamily: "var(--font-sans)" }}
                       >
                         {LLMS[id].name}
                       </span>
@@ -632,7 +632,7 @@ export default function TestLanding() {
             </p>
             <h2
               className="mt-4 text-3xl md:text-4xl font-bold tracking-[-0.02em] max-w-2xl"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               Six écrans. Un seul objectif : savoir quoi faire lundi matin.
             </h2>
@@ -660,7 +660,7 @@ export default function TestLanding() {
                 <SurfaceIcon className="w-6 h-6 text-[#C6F24E]" />
                 <h3
                   className="mt-4 text-2xl font-bold tracking-[-0.02em]"
-                  style={{ fontFamily: "var(--font-grotesk)" }}
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   {surface.title}
                 </h3>
@@ -714,7 +714,7 @@ export default function TestLanding() {
             </p>
             <h2
               className="mt-4 text-3xl md:text-4xl font-bold tracking-[-0.02em]"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               Trois métiers, trois questions différentes.
             </h2>
@@ -734,7 +734,7 @@ export default function TestLanding() {
                 {
                   who: "Agence",
                   q: "« Comment je suis 15 clients sans y passer mes lundis ? »",
-                  d: "Projets illimités, exécution quotidienne, rapports en marque blanche, alertes automatiques quand un compte décroche.",
+                  d: "Projets illimités, jusqu'à 5 en exécution quotidienne, rapports en marque blanche, alertes automatiques quand un compte décroche.",
                 },
               ].map((p) => (
                 <div
@@ -746,7 +746,7 @@ export default function TestLanding() {
                   </div>
                   <p
                     className="mt-4 text-lg leading-snug text-white"
-                    style={{ fontFamily: "var(--font-grotesk)" }}
+                    style={{ fontFamily: "var(--font-sans)" }}
                   >
                     {p.q}
                   </p>
@@ -767,7 +767,7 @@ export default function TestLanding() {
             </p>
             <h2
               className="mt-4 text-3xl md:text-4xl font-bold tracking-[-0.02em]"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               Le prix d&apos;un outil, pas d&apos;un consultant.
             </h2>
@@ -788,7 +788,7 @@ export default function TestLanding() {
                     <div className="flex items-center justify-between">
                       <span
                         className="font-semibold"
-                        style={{ fontFamily: "var(--font-grotesk)" }}
+                        style={{ fontFamily: "var(--font-sans)" }}
                       >
                         {plan.name}
                       </span>
@@ -802,7 +802,7 @@ export default function TestLanding() {
                     <div className="mt-5 flex items-baseline gap-1">
                       <span
                         className="text-4xl font-bold tracking-tight"
-                        style={{ fontFamily: "var(--font-grotesk)" }}
+                        style={{ fontFamily: "var(--font-sans)" }}
                       >
                         {plan.price}€
                       </span>
@@ -857,7 +857,7 @@ export default function TestLanding() {
           <div className="mx-auto max-w-3xl px-5 py-20 md:py-28">
             <h2
               className="text-3xl md:text-4xl font-bold tracking-[-0.02em] mb-10"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               Questions légitimes.
             </h2>
@@ -908,7 +908,7 @@ export default function TestLanding() {
           <div className="mx-auto max-w-3xl px-5 py-24 text-center">
             <h2
               className="text-3xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.1]"
-              style={{ fontFamily: "var(--font-grotesk)" }}
+              style={{ fontFamily: "var(--font-sans)" }}
             >
               En ce moment, une IA recommande
               <br />

@@ -12,7 +12,7 @@
 @layer base {
   html {
     overflow-x: hidden;
-    background-color: #ffffff;
+    background-color: #f7f5f0;
     scroll-behavior: smooth;
 
   }
@@ -21,8 +21,8 @@
   body {
     overflow-x: hidden;
     font-family:
-      var(--font-inter),
-      "Inter",
+      var(--font-sans),
+      "Geist",
       -apple-system,
       BlinkMacSystemFont,
       "Segoe UI",
@@ -30,32 +30,34 @@
       sans-serif;
   }
 
-  /* Classes utilitaires pour respecter la charte graphique */
-  .font-title {
-    font-family: var(--font-playfair), "Playfair Display", serif;
-  }
-
-  .font-subtitle {
-    font-family: var(--font-grotesk), "Space Grotesk", sans-serif;
-  }
-
+  /* Display headings. `.font-title` and `.font-subtitle` were never used
+     anywhere and are gone with the typefaces that backed them. */
   .font-heading {
-    font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+    font-family: var(--font-serif), "Instrument Serif", Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+
+  /* Anything that is a measurement — a score, a delta, an engine name —
+     reads better set in mono: the digits line up between rows. */
+  .font-data {
+    font-family: var(--font-mono), "Geist Mono", ui-monospace, monospace;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: -0.01em;
   }
 }
 
 @layer utilities {
-  /* Premium gradient text for hero / key words */
+  /* Was a purple→pink gradient on the hero words, which is the single most
+     recognisable "generated template" tell. A word worth emphasising is now
+     simply set in the accent — one colour, no gradient. The class name is
+     kept so the existing markup does not have to change. */
   .text-gradient-premium {
-    background-image: linear-gradient(100deg, #6d28d9 0%, #a855f7 45%, #ec4899 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #ae3b22;
   }
 
-  /* Subtle dotted grid for premium backgrounds */
+  /* Ruled paper rather than a purple dot grid. */
   .bg-grid-premium {
-    background-image: radial-gradient(circle at 1px 1px, rgba(124, 58, 237, 0.09) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, rgba(20, 19, 17, 0.07) 1px, transparent 0);
     background-size: 34px 34px;
   }
 

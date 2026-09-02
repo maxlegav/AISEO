@@ -9,15 +9,21 @@ import DemoBanner from "@/components/monitoring/DemoBanner";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import { LLMId, LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
-import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import {
+  getProjectDashboard,
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import { cn } from "@/lib/utils";
 
 interface SourcesProps {
+  switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
 }
 
-export default function SourcesView({ project, demo }: SourcesProps) {
+export default function SourcesView({
+  switcherProjects, project, demo }: SourcesProps) {
   const [filter, setFilter] = useState<LLMId | "all">("all");
 
   if (!project) return <ProjectNotFound />;
@@ -41,6 +47,7 @@ export default function SourcesView({ project, demo }: SourcesProps) {
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="sources"
         title="Sources citées"
@@ -95,8 +102,12 @@ export default function SourcesView({ project, demo }: SourcesProps) {
 
               <div className="flex items-center gap-4">
                 <span className="text-xs text-gray-400">
-                  cité sur <strong className="text-gray-600">{s.citations}</strong>{" "}
-                  requêtes
+                  {/* Summed across engines on the "tous les moteurs" view, so
+                      this counts answers, not queries: 50 queries on 4 engines
+                      can legitimately reach 200. Naming it "réponses" keeps the
+                      number from reading as an impossible query count. */}
+                  cité dans <strong className="text-gray-600">{s.citations}</strong>{" "}
+                  réponses
                 </span>
                 <div className="flex items-center gap-1">
                   {s.llms.map((llm) => (
@@ -139,5 +150,9 @@ export const getServerSideProps: GetServerSideProps<SourcesProps> = async (
     session.workspace.organizationId,
     projectId,
   );
-  return { props: { project, demo } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { project, demo, switcherProjects } };
 };

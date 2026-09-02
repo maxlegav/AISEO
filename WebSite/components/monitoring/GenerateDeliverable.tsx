@@ -63,7 +63,7 @@ export default function GenerateDeliverable({
       <button
         onClick={run}
         disabled={loading}
-        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
       >
         {loading ? (
           <>

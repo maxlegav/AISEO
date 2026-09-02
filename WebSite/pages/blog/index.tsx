@@ -31,14 +31,14 @@ function formatDate(dateStr: string) {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "GEO Strategy": "bg-purple-50 text-purple-700",
+  "GEO Strategy": "bg-accent-muted text-accent",
   "GEO Basics": "bg-blue-50 text-blue-700",
   "AI Search": "bg-orange-50 text-orange-700",
   "Technical GEO": "bg-green-50 text-green-700",
-  "Content Strategy": "bg-pink-50 text-pink-700",
+  "Content Strategy": "bg-accent-muted text-accent",
   "Case Study": "bg-amber-50 text-amber-700",
   "Research": "bg-cyan-50 text-cyan-700",
-  "Measurement": "bg-indigo-50 text-indigo-700",
+  "Measurement": "bg-accent-muted text-accent",
   "GEO Audit": "bg-red-50 text-red-700",
 };
 
@@ -100,14 +100,14 @@ export default function BlogIndex({ posts }: Props) {
         />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 via-40% to-orange-100">
+      <div className="min-h-screen bg-gradient-to-br from-ink-200 via-accent-muted via-40% to-orange-100">
         <Navbar />
 
         {/* Hero */}
         <section className="pt-32 pb-12 px-4">
           <div className="container mx-auto max-w-4xl text-center">
-            <div className="inline-flex items-center gap-2 bg-purple-100 border border-purple-200 rounded-full px-4 py-1.5 mb-6">
-              <span className="text-purple-700 text-sm font-semibold tracking-wide">
+            <div className="inline-flex items-center gap-2 bg-accent-muted border border-ink-200 rounded-full px-4 py-1.5 mb-6">
+              <span className="text-accent text-sm font-semibold tracking-wide">
                 GEO INSIGHTS
               </span>
             </div>
@@ -129,7 +129,7 @@ export default function BlogIndex({ posts }: Props) {
                 const categoryColor = CATEGORY_COLORS[post.category] || "bg-gray-50 text-gray-700";
                 return (
                   <Link key={post.slug} href={`/blog/${post.slug}`}>
-                    <article className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col cursor-pointer">
+                    <article className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-ink-200 hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col cursor-pointer">
                       <div className="flex items-center gap-2 mb-4">
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${categoryColor}`}>
                           {post.category}
@@ -144,7 +144,7 @@ export default function BlogIndex({ posts }: Props) {
                       </p>
                       <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
                         <span className="text-xs text-gray-400">{formatDate(post.date)}</span>
-                        <span className="text-xs font-semibold text-purple-600 group-hover:underline">
+                        <span className="text-xs font-semibold text-accent group-hover:underline">
                           Read more →
                         </span>
                       </div>

@@ -148,12 +148,12 @@ const FAQItem = ({
 }) => (
   <div className="border-b border-gray-200 last:border-b-0">
     <button
-      className="w-full py-5 flex items-center justify-between text-left hover:text-purple-600 transition-colors"
+      className="w-full py-5 flex items-center justify-between text-left hover:text-accent transition-colors"
       onClick={onClick}
     >
       <span className="font-medium text-gray-900 pr-4">{question}</span>
       {isOpen ? (
-        <ChevronUp className="w-5 h-5 text-purple-500 flex-shrink-0" />
+        <ChevronUp className="w-5 h-5 text-accent flex-shrink-0" />
       ) : (
         <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
       )}
@@ -199,12 +199,12 @@ const PricingCard = ({
   >
     {highlighted && (
       <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-        <span className="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+        <span className="bg-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
           MOST POPULAR
         </span>
       </div>
     )}
-    <div className={`text-xs font-bold tracking-widest mb-1 ${highlighted ? "text-pink-400" : "text-violet-600"}`}>
+    <div className={`text-xs font-bold tracking-widest mb-1 ${highlighted ? "text-accent-soft" : "text-accent"}`}>
       {title}
     </div>
     <div className={`text-sm mb-4 ${highlighted ? "text-gray-400" : "text-gray-500"}`}>
@@ -493,21 +493,18 @@ export default function Home() {
         }
       `}</style>
 
-      <main ref={mainRef} className="bg-gradient-to-b from-[#f4f1ff] via-white to-[#faf3f8]">
+      <main ref={mainRef} className="bg-paper">
         <Navbar />
 
         {/* Hero Section */}
         <section className="h-screen px-4 relative overflow-hidden flex flex-col items-center">
           <div className="absolute inset-0 bg-grid-premium opacity-60 [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]" />
-          <div className="absolute top-10 left-0 w-48 h-48 md:w-96 md:h-96 bg-violet-400/25 rounded-full blur-3xl animate-float-slow" />
-          <div className="absolute top-20 right-0 w-48 h-48 md:w-[500px] md:h-[500px] bg-fuchsia-400/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-[520px] md:h-[520px] bg-indigo-300/25 rounded-full blur-3xl" />
 
           <div className="container mx-auto max-w-6xl text-center relative z-10 flex flex-col items-center h-full pt-20 md:pt-28 pb-16 md:pb-20">
             {/* Centered: Title + Subtitle + Marquee */}
             <div className="flex-1 flex flex-col items-center justify-center gap-5 md:gap-7">
-              <span className="eyebrow-pill inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium text-gray-700">
-                <SybMark className="w-3.5 h-3.5 text-violet-600" />
+              <span className="eyebrow-pill font-data inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.14em] text-ink-600">
+                <SybMark className="w-3.5 h-3.5 text-accent" />
                 Continuous GEO monitoring across every AI engine
               </span>
               <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium text-gray-900 leading-[1.05] tracking-tight px-2 sm:px-0">
@@ -555,7 +552,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <Button
                   onClick={openWaitlistModal}
-                  className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-premium px-9 py-4 h-auto text-base font-semibold transition-all hover:-translate-y-0.5"
+                  className="rounded-full bg-ink-900 hover:bg-ink-800 text-white shadow-premium px-9 py-4 h-auto text-base font-semibold transition-all hover:-translate-y-0.5"
                 >
                   <Calendar className="w-4 h-4 mr-2" />
                   Book a demo
@@ -620,8 +617,8 @@ export default function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-premium border border-white/60 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-violet-100">
-                  <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-accent-muted rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-ink-200">
+                  <Eye className="w-6 h-6 lg:w-7 lg:h-7 text-accent" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   Track every engine, every week
@@ -634,8 +631,8 @@ export default function Home() {
               </div>
 
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-premium border border-white/60 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-violet-100">
-                  <Target className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-accent-muted rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-ink-200">
+                  <Target className="w-6 h-6 lg:w-7 lg:h-7 text-accent" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   Know why each model ignores you
@@ -648,8 +645,8 @@ export default function Home() {
               </div>
 
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-10 shadow-premium border border-white/60 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300 sm:col-span-2 lg:col-span-1">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-violet-100">
-                  <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-violet-700" />
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-accent-muted rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ring-1 ring-ink-200">
+                  <Zap className="w-6 h-6 lg:w-7 lg:h-7 text-accent" />
                 </div>
                 <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   See competitors and the sources AI cites
@@ -668,10 +665,10 @@ export default function Home() {
           <div className="container mx-auto max-w-6xl">
             <div className="relative overflow-hidden rounded-[2rem] bg-[#0B1120] px-6 py-14 md:px-14 md:py-20 text-white shadow-premium-lg">
               <div className="absolute inset-0 bg-grid-dark opacity-70" />
-              <div className="absolute -top-24 -right-24 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
+              <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
               <div className="relative z-10">
                 <div className="text-center max-w-2xl mx-auto mb-12">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-violet-200 mb-5">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-ink-300 mb-5">
                     <SybMark className="w-3.5 h-3.5" />
                     Why ShowYourBrand
                   </span>
@@ -690,8 +687,8 @@ export default function Home() {
                     { Icon: ShieldCheck, title: "Made for the French market", desc: "Interface, support and use cases in French, pricing in euros: the GEO tool French brands and agencies actually get." },
                   ].map(({ Icon, title, desc }) => (
                     <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 flex items-center justify-center mb-4">
-                        <Icon className="w-6 h-6 text-violet-200" />
+                      <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-4">
+                        <Icon className="w-6 h-6 text-ink-300" />
                       </div>
                       <h3 className="text-lg font-semibold mb-2">{title}</h3>
                       <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
@@ -714,7 +711,7 @@ export default function Home() {
           <div className="container mx-auto max-w-6xl">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-12">
               <div>
-                <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-xs font-semibold text-violet-700 mb-5">
+                <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-4 py-1.5 text-xs font-semibold text-accent mb-5">
                   <SybMark className="w-3.5 h-3.5" />
                   The new front page of the internet
                 </span>
@@ -734,10 +731,10 @@ export default function Home() {
 
               {/* AI answer mockup: shows "the answer" vs "invisible" */}
               <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-br from-violet-200/50 via-fuchsia-200/30 to-transparent rounded-[2.5rem] blur-2xl" />
+                <div className="absolute -inset-4 bg-ink-100/70 rounded-[2.5rem] blur-2xl" />
                 <div className="relative bg-white rounded-3xl border border-white/60 shadow-premium-lg p-5 md:p-7">
                   <div className="flex items-center gap-2 mb-5">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center">
                       <SybMark className="w-3.5 h-3.5 text-white" />
                     </div>
                     <span className="text-xs md:text-sm font-medium text-gray-400">Asked to ChatGPT · Perplexity · Gemini</span>
@@ -857,7 +854,7 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-purple-500 rounded-full" style={{ width: "74%" }} />
+                      <div className="h-full bg-accent rounded-full" style={{ width: "74%" }} />
                     </div>
                   </div>
 
@@ -880,7 +877,7 @@ export default function Home() {
                     <span className="text-xs text-gray-400 block mb-3">vs. Competitors</span>
                     <div className="space-y-2.5">
                       {[
-                        { name: "You", score: 74, color: "bg-purple-500", bold: true },
+                        { name: "You", score: 74, color: "bg-accent", bold: true },
                         { name: "Competitor A", score: 79, color: "bg-gray-500", bold: false },
                         { name: "Competitor B", score: 68, color: "bg-gray-500", bold: false },
                         { name: "Competitor C", score: 55, color: "bg-gray-500", bold: false },
@@ -961,7 +958,7 @@ export default function Home() {
                 features={[
                   "10 projets suivis en continu",
                   "Les 4 moteurs IA (ChatGPT, Claude, Perplexity, Gemini)",
-                  "Suivi quotidien automatique",
+                  "Suivi hebdomadaire, dont 2 projets en quotidien",
                   "Historique 12 semaines par moteur",
                   "Recommandations spécifiques par moteur",
                   "Suivi concurrents avancé",
@@ -977,7 +974,7 @@ export default function Home() {
                 period="mois"
                 features={[
                   "Projets illimités",
-                  "Les 4 moteurs IA, suivi quotidien",
+                  "Les 4 moteurs IA, dont 5 projets en quotidien",
                   "Dashboard multi-clients",
                   "Rapports PDF en marque blanche",
                   "Logo & couleurs de votre agence",
@@ -1005,7 +1002,7 @@ export default function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-purple-50/50">
+        <section className="py-16 px-4 bg-gradient-to-b from-transparent to-paper-sunken">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
               <h2 className="font-heading text-3xl md:text-4xl font-medium text-gray-900 mb-3">
@@ -1021,14 +1018,14 @@ export default function Home() {
                   name: "Thomas R.",
                   role: "Founder, SaaS B2B",
                   avatar: "T",
-                  bg: "bg-purple-600",
+                  bg: "bg-ink-900",
                   quote: "We had no idea AI models barely mentioned us. After the audit we understood exactly why, and fixed it in a week. Our citation rate on ChatGPT doubled.",
                 },
                 {
                   name: "Sophie M.",
                   role: "CEO, Marketing Agency",
                   avatar: "S",
-                  bg: "bg-pink-500",
+                  bg: "bg-accent",
                   quote: "I now offer GEO audits to all my clients as an add-on service. ShowYourBrand gives me the data and the reports, and I just present them. It's a game changer for the agency.",
                 },
                 {
@@ -1093,9 +1090,8 @@ export default function Home() {
         {/* CTA Section */}
         <section className="min-h-[60vh] md:h-[75vh] px-4 py-20 md:py-0 bg-[#0B1120] relative overflow-hidden flex flex-col items-center justify-center">
           <div className="absolute inset-0 bg-grid-dark opacity-70" />
-          <div className="absolute top-10 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-          <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-10 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
 
           <div className="container mx-auto max-w-5xl text-center relative z-10">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-medium text-white mb-4 md:mb-6 lg:mb-8 leading-tight">
@@ -1110,7 +1106,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
                 <button
                   onClick={openWaitlistModal}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-premium px-10 py-4 text-base font-semibold transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 rounded-full bg-ink-900 hover:bg-ink-800 text-white shadow-premium px-10 py-4 text-base font-semibold transition-all hover:-translate-y-0.5"
                 >
                   <Calendar className="w-4 h-4" />
                   Book a demo

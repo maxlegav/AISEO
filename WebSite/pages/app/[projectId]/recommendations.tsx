@@ -35,7 +35,11 @@ import {
   type OnPageItem,
 } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
-import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import {
+  getProjectDashboard,
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import type {
   MeasuredImpact,
   ScopeMovement,
@@ -122,7 +126,7 @@ function SectionTitle({
 }) {
   return (
     <div className="mb-3 flex items-start gap-3">
-      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white">
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-white">
         <Icon className="h-4 w-4" />
       </span>
       <div>
@@ -161,7 +165,7 @@ function ActionCard({ item }: { item: ActionItem }) {
           <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
           {priorityLabel(item.priority)}
         </span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-700">
+        <span className="inline-flex items-center gap-1 rounded-full bg-accent-muted px-2.5 py-1 text-[11px] font-semibold text-accent">
           <TrendingUp className="h-3 w-3" />
           +{item.impact} pts estimés
         </span>
@@ -195,7 +199,7 @@ function PromptCard({
           {st.label}
         </span>
         {insight.potential > 0 && (
-          <span className="text-[11px] font-semibold text-violet-600">
+          <span className="text-[11px] font-semibold text-accent">
             +{insight.potential} pts potentiels
           </span>
         )}
@@ -241,7 +245,7 @@ function PromptCard({
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-violet-600 hover:underline"
+                className="text-accent hover:underline"
               >
                 {s.domain}
               </a>
@@ -250,8 +254,8 @@ function PromptCard({
         </p>
       )}
 
-      <div className="rounded-xl bg-violet-50/70 p-3 text-sm leading-relaxed text-gray-700">
-        <span className="font-semibold text-violet-700">Action : </span>
+      <div className="rounded-xl bg-accent-muted/70 p-3 text-sm leading-relaxed text-gray-700">
+        <span className="font-semibold text-accent">Action : </span>
         {insight.action}
       </div>
 
@@ -305,11 +309,13 @@ function OnPageRow({ item }: { item: OnPageItem }) {
 }
 
 interface RecommendationsProps {
+  switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
 }
 
 export default function RecommendationsView({
+  switcherProjects,
   project,
   demo,
 }: RecommendationsProps) {
@@ -317,6 +323,7 @@ export default function RecommendationsView({
   if (project.pendingFirstRun) {
     return (
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="recommendations"
         title="Recommandations"
@@ -474,7 +481,7 @@ export default function RecommendationsView({
                               href={s.sampleUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-violet-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-accent hover:underline"
                             >
                               Voir <ExternalLink className="h-3 w-3" />
                             </a>
@@ -486,7 +493,7 @@ export default function RecommendationsView({
                 </div>
                 <a
                   href={`/app/${project.id}/outreach`}
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-100"
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent-muted"
                 >
                   <Send className="h-4 w-4" /> Préparer des demandes de mention
                 </a>
@@ -609,7 +616,7 @@ export default function RecommendationsView({
                         href={technical.sitemap.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-violet-600 hover:underline"
+                        className="text-accent hover:underline"
                       >
                         {technical.sitemap.url}
                       </a>
@@ -750,7 +757,7 @@ export default function RecommendationsView({
           </div>
         )}
 
-        <div className="mt-8 flex items-center justify-between rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5">
+        <div className="mt-8 flex items-center justify-between rounded-2xl border border-ink-200 bg-accent-muted p-5">
           <div>
             <p className="text-sm font-semibold text-gray-900">
               Ces recommandations sont recalculées à chaque run.
@@ -776,5 +783,9 @@ export const getServerSideProps: GetServerSideProps<RecommendationsProps> = asyn
     session.workspace.organizationId,
     projectId,
   );
-  return { props: { project, demo } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { project, demo, switcherProjects } };
 };

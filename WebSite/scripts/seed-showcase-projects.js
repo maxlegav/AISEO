@@ -10,6 +10,11 @@
  * family and loses the generic burger query, PayFit loses to Silae on the
  * accountant channel, Swile loses to Edenred on the regulatory queries.
  *
+ * Frequencies mirror what a real Agence workspace can afford: one project in
+ * daily monitoring, the rest weekly. Daily costs 7.5x weekly, so eight daily
+ * projects would run at ~112 EUR/month against a 45 EUR budget — the seed would
+ * contradict the guard it is meant to demonstrate.
+ *
  * Usage (dev server must be running):
  *   node scripts/seed-showcase-projects.js
  *   RESET=1 node scripts/seed-showcase-projects.js   # delete + recreate
@@ -602,7 +607,7 @@ const PROJECTS = [
     category: "Club privé parisien",
     competitors: ["Le Set", "L'Orangerie", "Le 2+2", "Chris et Manu"],
     prompts: CHANDELLES_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
   {
     brandName: "Alan",
@@ -610,7 +615,7 @@ const PROJECTS = [
     category: "Mutuelle santé d'entreprise",
     competitors: ["Malakoff Humanis", "Harmonie Mutuelle", "Axa", "Swiss Life"],
     prompts: ALAN_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
   {
     brandName: "Qonto",
@@ -618,7 +623,7 @@ const PROJECTS = [
     category: "Banque professionnelle en ligne",
     competitors: ["Shine", "Revolut Business", "Blank", "BNP Paribas"],
     prompts: QONTO_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
   {
     brandName: "PayFit",
@@ -626,7 +631,7 @@ const PROJECTS = [
     category: "Logiciel de paie et SIRH",
     competitors: ["Silae", "Sage", "Lucca", "Factorial"],
     prompts: PAYFIT_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
   {
     brandName: "Swile",
@@ -634,7 +639,7 @@ const PROJECTS = [
     category: "Titres-restaurant et avantages salariés",
     competitors: ["Edenred", "Pluxee", "Up Déjeuner", "Bimpli"],
     prompts: SWILE_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
   {
     brandName: "Doctolib",
@@ -642,7 +647,7 @@ const PROJECTS = [
     category: "Prise de rendez-vous médicaux",
     competitors: ["Maiia", "KelDoc", "Qare", "Livi"],
     prompts: DOCTOLIB_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
   {
     brandName: "lemlist",
@@ -650,7 +655,7 @@ const PROJECTS = [
     category: "Cold email et prospection B2B",
     competitors: ["Instantly", "Smartlead", "Apollo", "Woodpecker"],
     prompts: LEMLIST_PROMPTS,
-    frequency: "daily",
+    frequency: "weekly",
   },
 ];
 

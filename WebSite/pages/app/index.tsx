@@ -14,12 +14,16 @@ import {
 import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getProjectSummaries, type ClientOption } from "@/lib/monitoring/dashboard";
+import { getUsage, type UsageStatus } from "@/lib/monitoring/usage";
+import { getWorkspacePlan } from "@/lib/monitoring/workspace";
+import type { SubscriptionTier } from "@/lib/subscription-limits";
 
 interface AppOverviewProps {
   projects: Project[];
   demo: boolean;
   clients: ClientOption[];
   activeClientId: string | null;
+  usage: UsageStatus | null;
 }
 
 export default function AppOverview({
@@ -27,6 +31,7 @@ export default function AppOverview({
   demo,
   clients,
   activeClientId,
+  usage,
 }: AppOverviewProps) {
   return (
     <>
@@ -50,6 +55,45 @@ export default function AppOverview({
           </Link>
         }
       >
+        {/* Consumption against the plan's monthly API budget. Shown only when
+            it starts to matter — an untouched quota is noise. */}
+        {usage && (usage.nearLimit || usage.projectedUEur > usage.budgetUEur) && (
+          <div
+            className={
+              "mb-5 rounded-2xl border p-4 " +
+              (usage.exceeded
+                ? "border-red-200 bg-red-50"
+                : "border-amber-200 bg-amber-50")
+            }
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-sm font-medium text-gray-900">
+                {usage.exceeded
+                  ? "Budget d'analyse épuisé pour ce mois"
+                  : usage.projectedUEur > usage.budgetUEur
+                    ? "Vos projets consommeront plus que votre budget mensuel"
+                    : "Budget d'analyse bientôt atteint"}
+              </p>
+              <p className="text-xs text-gray-500">
+                {usage.used} consommés · {usage.projected} prévus ce mois ·
+                budget {usage.budget}
+              </p>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white">
+              <div
+                className={"h-full rounded-full " + (usage.exceeded ? "bg-red-500" : "bg-amber-500")}
+                style={{ width: `${Math.min(100, usage.ratio * 100)}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-gray-600">
+              Chaque requête est posée à chaque moteur activé, à chaque analyse.
+              Perplexity représente à lui seul environ deux tiers du coût :
+              le désactiver, réduire le nombre de requêtes ou passer en
+              hebdomadaire sont les trois leviers.
+            </p>
+          </div>
+        )}
+
         {clients.length > 0 && (
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -60,7 +104,7 @@ export default function AppOverview({
               className={
                 "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                 (!activeClientId
-                  ? "border-violet-300 bg-violet-50 text-violet-700"
+                  ? "border-ink-200 bg-accent-muted text-accent"
                   : "border-white/60 bg-white/60 text-gray-500 hover:text-gray-800")
               }
             >
@@ -73,7 +117,7 @@ export default function AppOverview({
                 className={
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                   (activeClientId === c.id
-                    ? "border-violet-300 bg-violet-50 text-violet-700"
+                    ? "border-ink-200 bg-accent-muted text-accent"
                     : "border-white/60 bg-white/60 text-gray-500 hover:text-gray-800")
                 }
               >
@@ -82,15 +126,15 @@ export default function AppOverview({
             ))}
             <Link
               href="/app/clients"
-              className="ml-auto text-xs font-medium text-violet-600 hover:text-violet-700"
+              className="ml-auto text-xs font-medium text-accent hover:text-accent"
             >
               Gérer les clients
             </Link>
           </div>
         )}
         {demo && (
-          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-gray-600">
-            <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-ink-200 bg-accent-muted/70 p-4 text-sm text-gray-600">
+            <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
             <span>
               Voici des <strong>données de démonstration</strong>. Créez votre
               premier projet pour lancer un vrai monitoring et voir vos propres
@@ -162,7 +206,7 @@ export default function AppOverview({
                 })}
               </div>
 
-              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-violet-600 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
                 Ouvrir le dashboard
                 <ArrowRight className="h-3.5 w-3.5" />
               </div>
@@ -171,9 +215,9 @@ export default function AppOverview({
 
           <Link
             href="/app/new"
-            className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-violet-200 bg-white/40 p-5 text-center transition-colors hover:border-violet-300 hover:bg-white/60"
+            className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-ink-200 bg-white/40 p-5 text-center transition-colors hover:border-ink-200 hover:bg-white/60"
           >
-            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-ink-900 text-white">
               <Plus className="h-5 w-5" />
             </span>
             <span className="text-sm font-semibold text-gray-800">
@@ -207,5 +251,8 @@ export const getServerSideProps: GetServerSideProps<AppOverviewProps> = async (
     return { redirect: { destination: "/app/onboarding", permanent: false } };
   }
 
-  return { props: { projects, demo, clients, activeClientId } };
+  const { tier } = await getWorkspacePlan(session.workspace.ownerId);
+  const usage = await getUsage(session.workspace.organizationId, tier as SubscriptionTier);
+
+  return { props: { projects, demo, clients, activeClientId, usage } };
 };

@@ -3,6 +3,10 @@ import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { Building2, Loader2, Plus, Trash2, ExternalLink } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import mongoose from "mongoose";
 import Client from "@/models/Client";
@@ -17,12 +21,14 @@ interface ClientRow {
 }
 
 interface ClientsPageProps {
+  switcherProjects: SwitcherEntry[];
   clients: ClientRow[];
   canManage: boolean;
   organizationName: string;
 }
 
 export default function ClientsPage({
+  switcherProjects,
   clients: initial,
   canManage,
   organizationName,
@@ -76,6 +82,7 @@ export default function ClientsPage({
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         active="clients"
         title="Clients"
         subtitle={`Regroupez vos projets par client · ${organizationName}.`}
@@ -90,13 +97,13 @@ export default function ClientsPage({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nom du client"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-ink-200"
               />
               <input
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="site.fr (optionnel)"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-ink-200"
               />
               <button
                 type="button"
@@ -151,7 +158,7 @@ export default function ClientsPage({
                 )}
                 <a
                   href={`/app?client=${c.id}`}
-                  className="mt-auto text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-auto text-sm font-medium text-accent hover:text-accent"
                 >
                   {c.projectCount} projet{c.projectCount > 1 ? "s" : ""} →
                 </a>
@@ -184,8 +191,11 @@ export const getServerSideProps: GetServerSideProps<ClientsPageProps> = async (c
   ]);
   const countById = new Map(counts.filter((c) => c._id).map((c) => [c._id!.toString(), c.n]));
 
+  const switcherProjects = await listSwitcherProjects(organizationId);
+
   return {
     props: {
+      switcherProjects,
       clients: clients.map((c) => ({
         id: c._id.toString(),
         name: c.name,

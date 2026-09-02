@@ -3,6 +3,10 @@ import type { GetServerSideProps } from "next";
 import { useState } from "react";
 import { ImagePlus, Lock, Globe, FileText, Loader2, Check } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import Favicon from "@/components/monitoring/Favicon";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
 import { getUserBranding } from "@/lib/monitoring/branding";
@@ -19,6 +23,7 @@ const PRESET_COLORS = [
 ];
 
 interface BrandingSettingsProps {
+  switcherProjects: SwitcherEntry[];
   initial: {
     agencyName: string;
     logoUrl: string;
@@ -30,6 +35,7 @@ interface BrandingSettingsProps {
 }
 
 export default function BrandingSettings({
+  switcherProjects,
   initial,
   whiteLabelActive,
 }: BrandingSettingsProps) {
@@ -78,6 +84,7 @@ export default function BrandingSettings({
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         active="settings"
         title="Branding & équipe"
         subtitle="Personnalisez les rapports remis à vos clients (option agences)."
@@ -130,7 +137,7 @@ export default function BrandingSettings({
                 value={logoUrl}
                 onChange={(e) => setLogoUrl(e.target.value)}
                 placeholder="https://…/logo.png"
-                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                className="flex-1 rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
               />
             </div>
 
@@ -145,7 +152,7 @@ export default function BrandingSettings({
               value={agencyName}
               onChange={(e) => setAgencyName(e.target.value)}
               placeholder="Mon Agence"
-              className="mb-5 w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+              className="mb-5 w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
             />
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -219,7 +226,7 @@ export default function BrandingSettings({
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 placeholder="reports.monagence.fr"
-                className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm text-gray-900 outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
               />
 
               <div className="mt-5 flex items-center justify-between">
@@ -232,7 +239,7 @@ export default function BrandingSettings({
                   onClick={() => setPdf((v) => !v)}
                   className={cn(
                     "relative h-6 w-11 rounded-full transition-colors",
-                    pdf ? "bg-violet-600" : "bg-gray-200"
+                    pdf ? "bg-ink-900" : "bg-gray-200"
                   )}
                   aria-pressed={pdf}
                 >
@@ -285,5 +292,9 @@ export const getServerSideProps: GetServerSideProps<
   const { branding, whiteLabelActive } = await getUserBranding(
     session.workspace.ownerId,
   );
-  return { props: { initial: branding, whiteLabelActive } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { initial: branding, whiteLabelActive, switcherProjects } };
 };

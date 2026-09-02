@@ -6,6 +6,8 @@ import {
   type PromptStyle,
   type PromptSuggestion,
 } from "@/lib/monitoring/prompt-suggestions";
+import { monthlyCostUEur, runCostUEur, formatEur } from "@/lib/monitoring/cost";
+import type { LLMId } from "@/lib/monitoring/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,7 +29,7 @@ interface Props {
   existing: string[];
   onAdd: (prompts: string[]) => void;
   /** Engines enabled on the project — drives the cost estimate. */
-  engineCount: number;
+  engines: LLMId[];
   frequency: "weekly" | "daily";
 }
 
@@ -37,7 +39,7 @@ export default function PromptSuggester({
   competitors,
   existing,
   onAdd,
-  engineCount,
+  engines,
   frequency,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -135,8 +137,9 @@ export default function PromptSuggester({
   })).filter((g) => g.items.length > 0);
 
   const total = existing.length + selected.size;
-  const callsPerRun = total * engineCount;
-  const runsPerMonth = frequency === "daily" ? 30 : 4;
+  const callsPerRun = total * engines.length;
+  const costPerRun = runCostUEur(total, engines);
+  const costPerMonth = monthlyCostUEur({ prompts: total, engines, frequency });
 
   return (
     <div>
@@ -145,7 +148,7 @@ export default function PromptSuggester({
         onClick={generate}
         disabled={!canGenerate || loading}
         className={cn(
-          "inline-flex items-center gap-2 rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-100",
+          "inline-flex items-center gap-2 rounded-lg border border-ink-200 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent-muted",
           (!canGenerate || loading) && "cursor-not-allowed opacity-50",
         )}
       >
@@ -169,13 +172,13 @@ export default function PromptSuggester({
           value={city}
           onChange={(e) => setCity(e.target.value)}
           placeholder="Ville (optionnel) — ex. Paris"
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+          className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ink-200"
         />
         <input
           value={audience}
           onChange={(e) => setAudience(e.target.value)}
           placeholder="Cible (optionnel) — ex. PME, freelance"
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+          className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ink-200"
         />
       </div>
 
@@ -218,11 +221,12 @@ export default function PromptSuggester({
 
           {/* Volume matters: each prompt is queried on every engine, every run. */}
           <div className="border-b border-gray-100 bg-gray-50 px-5 py-2 text-xs text-gray-500">
-            {total} requête{total > 1 ? "s" : ""} × {engineCount} moteur
-            {engineCount > 1 ? "s" : ""} ={" "}
-            <span className="font-medium text-gray-700">{callsPerRun} appels</span> par
-            analyse, soit ~{callsPerRun * runsPerMonth} par mois en{" "}
-            {frequency === "daily" ? "quotidien" : "hebdomadaire"}.
+            {total} requête{total > 1 ? "s" : ""} × {engines.length} moteur
+            {engines.length > 1 ? "s" : ""} = {callsPerRun} interrogations (
+            <span className="font-medium text-gray-700">{formatEur(costPerRun)}</span>) par
+            analyse, soit{" "}
+            <span className="font-medium text-gray-700">{formatEur(costPerMonth)}</span> par
+            mois en {frequency === "daily" ? "quotidien" : "hebdomadaire"}.
           </div>
 
           <div className="max-h-[26rem] overflow-y-auto px-5 py-4">
@@ -242,7 +246,7 @@ export default function PromptSuggester({
                     <button
                       type="button"
                       onClick={() => toggleGroup(style, !allOn)}
-                      className="text-xs font-medium text-violet-600 hover:text-violet-700"
+                      className="text-xs font-medium text-accent hover:text-accent"
                     >
                       {allOn ? "Tout décocher" : "Tout cocher"}
                     </button>
@@ -258,7 +262,7 @@ export default function PromptSuggester({
                           className={cn(
                             "flex items-center gap-2 rounded-lg border px-3 py-2",
                             on
-                              ? "border-violet-200 bg-violet-50/60"
+                              ? "border-ink-200 bg-accent-muted/60"
                               : "border-gray-100 bg-white",
                           )}
                         >
@@ -266,7 +270,7 @@ export default function PromptSuggester({
                             type="checkbox"
                             checked={on}
                             onChange={() => toggle(s.text)}
-                            className="h-4 w-4 shrink-0 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                            className="h-4 w-4 shrink-0 rounded border-gray-300 text-accent focus:ring-ink-200"
                           />
                           {isEditing ? (
                             <input
@@ -281,7 +285,7 @@ export default function PromptSuggester({
                                   setEditing(null);
                                 }
                               }}
-                              className="min-w-0 flex-1 rounded border border-violet-300 px-2 py-1 text-sm outline-none"
+                              className="min-w-0 flex-1 rounded border border-ink-200 px-2 py-1 text-sm outline-none"
                             />
                           ) : (
                             <button

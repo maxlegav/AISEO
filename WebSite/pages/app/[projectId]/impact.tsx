@@ -1,6 +1,10 @@
 import Head from "next/head";
 import type { GetServerSideProps } from "next";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import ProjectNotFound from "@/components/monitoring/ProjectNotFound";
 import PendingFirstRun from "@/components/monitoring/PendingFirstRun";
 import RunButton from "@/components/monitoring/RunButton";
@@ -29,7 +33,13 @@ function layoutProject(meta: NonNullable<ImpactPageData["project"]>): Project {
   };
 }
 
-export default function ImpactView({ data }: { data: ImpactPageData }) {
+export default function ImpactView({
+  data,
+  switcherProjects,
+}: {
+  data: ImpactPageData;
+  switcherProjects: SwitcherEntry[];
+}) {
   if (!data.project) return <ProjectNotFound />;
   const project = layoutProject(data.project);
 
@@ -48,6 +58,7 @@ export default function ImpactView({ data }: { data: ImpactPageData }) {
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="impact"
         title="Impact"
@@ -66,10 +77,14 @@ export default function ImpactView({ data }: { data: ImpactPageData }) {
 
 export const getServerSideProps: GetServerSideProps<{
   data: ImpactPageData;
+  switcherProjects: SwitcherEntry[];
 }> = async (ctx) => {
   const session = await getSessionWorkspace(ctx);
   if (!session) return loginRedirect("/app");
   const projectId = ctx.params?.projectId as string;
   const data = await getImpactData(session.workspace.organizationId, projectId);
-  return { props: { data } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+  return { props: { data, switcherProjects } };
 };

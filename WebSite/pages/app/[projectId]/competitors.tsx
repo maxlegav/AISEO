@@ -12,18 +12,25 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
-import { getProjectDashboard } from "@/lib/monitoring/dashboard";
+import {
+  getProjectDashboard,
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 
 interface CompetitorsProps {
+  switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
 }
 
-export default function CompetitorsView({ project, demo }: CompetitorsProps) {
+export default function CompetitorsView({
+  switcherProjects, project, demo }: CompetitorsProps) {
   if (!project) return <ProjectNotFound />;
   if (project.pendingFirstRun) {
     return (
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="competitors"
         title="Concurrents"
@@ -102,7 +109,7 @@ export default function CompetitorsView({ project, demo }: CompetitorsProps) {
                       key={r.name}
                       className={
                         "text-xs " +
-                        (r.isYou ? "font-semibold text-violet-700" : "text-gray-500")
+                        (r.isYou ? "font-semibold text-accent" : "text-gray-500")
                       }
                     >
                       {r.name} {r.share}%
@@ -114,8 +121,8 @@ export default function CompetitorsView({ project, demo }: CompetitorsProps) {
           </section>
         )}
         {you && (
-          <div className="mb-5 flex items-start gap-3 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
-            <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-violet-600" />
+          <div className="mb-5 flex items-start gap-3 rounded-2xl border border-ink-200 bg-accent-muted/70 p-4">
+            <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
             <p className="text-sm text-gray-700">
               {ahead.length === 0 ? (
                 <>
@@ -157,7 +164,7 @@ export default function CompetitorsView({ project, demo }: CompetitorsProps) {
                     key={r.name}
                     className={
                       r.isYou
-                        ? "bg-violet-50/50"
+                        ? "bg-accent-muted/50"
                         : "border-t border-gray-50 hover:bg-gray-50/50"
                     }
                   >
@@ -165,7 +172,7 @@ export default function CompetitorsView({ project, demo }: CompetitorsProps) {
                       <span className="flex items-center gap-2">
                         {r.name}
                         {r.isYou && (
-                          <span className="rounded-full bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
+                          <span className="rounded-full bg-ink-900 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
                             Vous
                           </span>
                         )}
@@ -221,5 +228,9 @@ export const getServerSideProps: GetServerSideProps<CompetitorsProps> = async (
     session.workspace.organizationId,
     projectId,
   );
-  return { props: { project, demo } };
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
+
+  return { props: { project, demo, switcherProjects } };
 };

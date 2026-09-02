@@ -114,7 +114,7 @@ export async function queryAnthropic(prompt: string, _ctx: LLMQueryContext): Pro
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: process.env.ANTHROPIC_MODEL || "claude-3-5-haiku-latest",
+      model: process.env.ANTHROPIC_MODEL || "claude-haiku-4-5",
       max_tokens: 1024,
       system: monitoringSystemPrompt(),
       messages: [{ role: "user", content: prompt }],
@@ -145,6 +145,11 @@ export async function queryPerplexity(prompt: string, _ctx: LLMQueryContext): Pr
     },
     body: JSON.stringify({
       model: process.env.PERPLEXITY_MODEL || "sonar",
+      // Perplexity bills a flat fee per request that scales with the search
+      // context: $5/1k on "low", $8 on medium, $12 on high. Our questions are
+      // three words long and the answer is a shortlist — "low" is both the
+      // right depth and two-thirds of the price of "high".
+      web_search_options: { search_context_size: "low" },
       messages: [
         { role: "system", content: monitoringSystemPrompt() },
         { role: "user", content: prompt },
@@ -164,7 +169,7 @@ interface GeminiResponse {
 }
 
 export async function queryGemini(prompt: string, _ctx: LLMQueryContext): Promise<LLMResponse> {
-  const model = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const res = await fetchWithTimeout(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {

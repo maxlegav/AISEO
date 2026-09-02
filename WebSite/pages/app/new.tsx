@@ -14,6 +14,10 @@ import {
   X,
 } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import {
+  listSwitcherProjects,
+  type SwitcherEntry,
+} from "@/lib/monitoring/dashboard";
 import { LLMBadge } from "@/components/monitoring/widgets";
 import PromptSuggester from "@/components/monitoring/PromptSuggester";
 import { LLM_ORDER, LLMS, type LLMId } from "@/lib/mock/monitoring";
@@ -30,13 +34,15 @@ interface ClientOption {
 }
 
 interface NewProjectProps {
+  switcherProjects: SwitcherEntry[];
   clients: ClientOption[];
   initialClientId: string | null;
 }
 
 const STEPS = ["Marque", "Concurrents & requêtes", "Moteurs & lancement"];
 
-export default function NewProject({ clients, initialClientId }: NewProjectProps) {
+export default function NewProject({
+  switcherProjects, clients, initialClientId }: NewProjectProps) {
   const router = useRouter();
   const [clientId, setClientId] = useState<string>(initialClientId ?? "");
   const [step, setStep] = useState(0);
@@ -125,6 +131,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         active="dashboard"
         title="Nouveau projet"
         subtitle="Configurez une marque à monitorer : vous verrez un premier score en quelques minutes."
@@ -138,7 +145,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                   className={cn(
                     "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
                     i < step
-                      ? "bg-violet-600 text-white"
+                      ? "bg-ink-900 text-white"
                       : i === step
                         ? "bg-gray-900 text-white"
                         : "bg-gray-100 text-gray-400"
@@ -184,7 +191,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
                     placeholder="Linkflow"
-                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                   />
                 </div>
                 <div>
@@ -195,7 +202,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                     value={websiteUrl}
                     onChange={(e) => setWebsiteUrl(e.target.value)}
                     placeholder="linkflow.io"
-                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                   />
                 </div>
                 <div className="sm:col-span-2">
@@ -206,7 +213,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     placeholder="SaaS B2B, automatisation commerciale"
-                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                    className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                   />
                 </div>
                 {clients.length > 0 && (
@@ -217,7 +224,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                     <select
                       value={clientId}
                       onChange={(e) => setClientId(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                     >
                       <option value="">Aucun client</option>
                       {clients.map((c) => (
@@ -249,7 +256,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                         updateList(competitors, setCompetitors, i, e.target.value)
                       }
                       placeholder="Concurrent"
-                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                     />
                     <button
                       type="button"
@@ -265,7 +272,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                 <button
                   type="button"
                   onClick={() => setCompetitors([...competitors, ""])}
-                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ajouter un concurrent
@@ -287,7 +294,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                     category={category}
                     competitors={cleanCompetitors}
                     existing={cleanPrompts}
-                    engineCount={selectedLLMs.length || LLM_ORDER.length}
+                    engines={selectedLLMs.length ? selectedLLMs : LLM_ORDER}
                     frequency={frequency}
                     onAdd={(added) =>
                       setPrompts((prev) => {
@@ -317,7 +324,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                       onChange={(e) =>
                         updateList(prompts, setPrompts, i, e.target.value)
                       }
-                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-violet-500"
+                      className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-ink-200"
                     />
                     <button
                       type="button"
@@ -333,7 +340,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                 <button
                   type="button"
                   onClick={() => setPrompts([...prompts, ""])}
-                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Ajouter une requête
@@ -359,7 +366,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                       className={cn(
                         "flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all",
                         engines[llm]
-                          ? "border-violet-400 bg-violet-50/60"
+                          ? "border-ink-200 bg-accent-muted/60"
                           : "border-gray-100 bg-white opacity-60"
                       )}
                     >
@@ -390,7 +397,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                       className={cn(
                         "rounded-xl border-2 p-4 text-left transition-all",
                         frequency === opt.id
-                          ? "border-violet-400 bg-violet-50/60"
+                          ? "border-ink-200 bg-accent-muted/60"
                           : "border-gray-100 bg-white"
                       )}
                     >
@@ -403,7 +410,7 @@ export default function NewProject({ clients, initialClientId }: NewProjectProps
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5 text-sm text-gray-700">
+              <section className="rounded-2xl border border-ink-200 bg-accent-muted p-5 text-sm text-gray-700">
                 <p className="font-semibold text-gray-900">Récapitulatif</p>
                 <p className="mt-1">
                   <strong>{brandName || "Votre marque"}</strong> · {cleanPrompts.length}{" "}
@@ -484,8 +491,12 @@ export const getServerSideProps: GetServerSideProps<NewProjectProps> = async (
   })
     .sort({ createdAt: -1 })
     .lean()) as unknown as { _id: mongoose.Types.ObjectId; name: string }[];
+  const switcherProjects = await listSwitcherProjects(
+    session.workspace.organizationId,
+  );
   return {
     props: {
+      switcherProjects,
       clients: clients.map((c) => ({ id: c._id.toString(), name: c.name })),
       initialClientId: (ctx.query.client as string) || null,
     },

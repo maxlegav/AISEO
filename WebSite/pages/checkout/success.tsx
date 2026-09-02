@@ -44,10 +44,10 @@ export default function CheckoutSuccessPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-orange-100 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-ink-100 px-4 relative overflow-hidden">
       {/* Decorative blobs */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-green-400/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-ink-200/20 rounded-full blur-3xl" />
 
       <div className="max-w-md w-full relative z-10">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 text-center">
@@ -70,7 +70,7 @@ export default function CheckoutSuccessPage() {
 
           {/* Countdown */}
           <p className="text-sm text-gray-500 mb-6">
-            Redirection vers votre espace dans <span className="font-semibold text-purple-600">{countdown}</span> secondes...
+            Redirection vers votre espace dans <span className="font-semibold text-accent">{countdown}</span> secondes...
           </p>
 
           {/* CTA Button */}
@@ -85,7 +85,7 @@ export default function CheckoutSuccessPage() {
           {/* Support link */}
           <p className="mt-6 text-sm text-gray-500">
             Need help?{' '}
-            <Link href="/contact" className="text-purple-600 hover:underline">
+            <Link href="/contact" className="text-accent hover:underline">
               Contact support
             </Link>
           </p>

@@ -15,6 +15,11 @@ export function getMaxLLMs(tier: SubscriptionTier): number {
   return planForTier(tier).maxLLMs;
 }
 
+/** How many projects this plan may run daily at once. */
+export function getDailyProjectLimit(tier: SubscriptionTier): number {
+  return planForTier(tier).dailyProjects;
+}
+
 export function isFrequencyAllowed(
   tier: SubscriptionTier,
   frequency: MonitoringFrequency,

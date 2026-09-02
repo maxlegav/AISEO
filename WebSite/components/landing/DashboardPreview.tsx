@@ -87,22 +87,22 @@ const BRANDS: DemoBrand[] = [
     ],
   },
   {
-    name: "Les Chandelles",
-    domain: "leschandelles.com",
-    favicon: "https://icons.duckduckgo.com/ip3/leschandelles.com.ico",
-    avgPosition: "2.8",
+    name: "Qonto",
+    domain: "qonto.com",
+    favicon: "https://icons.duckduckgo.com/ip3/qonto.com.ico",
+    avgPosition: "1.9",
     frequency: "Weekly",
     prompts: 20,
     series: {
       Perplexity: [70, 70, 75, 75, 80, 80, 85, 85, 85, 90, 90, 90],
-      ChatGPT: [30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 40],
-      Claude: [15, 15, 20, 20, 20, 25, 25, 25, 25, 25, 25, 25],
-      Gemini: [5, 5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15],
+      ChatGPT: [55, 55, 60, 60, 65, 65, 70, 70, 75, 80, 85, 85],
+      Claude: [40, 40, 45, 50, 50, 55, 55, 60, 65, 65, 70, 70],
+      Gemini: [40, 45, 45, 50, 55, 55, 60, 65, 65, 70, 70, 75],
     },
     rivals: [
-      { name: "Le Set", value: 37 },
-      { name: "L'Orangerie", value: 29 },
-      { name: "Le 2+2", value: 22 },
+      { name: "Shine", value: 54 },
+      { name: "Revolut Business", value: 47 },
+      { name: "Blank", value: 26 },
     ],
   },
 ];
@@ -164,7 +164,7 @@ function ScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-2xl font-bold text-gray-900">{score}</span>
+        <span className="font-data text-2xl font-bold text-gray-900">{score}</span>
         <span className="text-[11px] font-semibold" style={{ color: t.color }}>
           {t.label}
         </span>
@@ -224,7 +224,7 @@ export default function DashboardPreview() {
     <section id="preview" className="px-4 py-16 md:py-24">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-xs font-semibold text-violet-700">
+          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-4 py-1.5 text-xs font-semibold text-accent">
             <SybMark className="w-3.5 h-3.5" />
             Live dashboard preview
           </span>
@@ -296,7 +296,7 @@ export default function DashboardPreview() {
                   key={item}
                   className={`rounded-lg px-3 py-1.5 text-xs ${
                     i === 0
-                      ? "bg-violet-50 text-violet-700 font-semibold"
+                      ? "bg-accent-muted text-accent font-semibold"
                       : "text-gray-500"
                   }`}
                 >
@@ -335,19 +335,19 @@ export default function DashboardPreview() {
                     <div className="text-xs text-gray-400">
                       Visibility score
                     </div>
-                    <div className="text-2xl font-bold text-gray-900">
+                    <div className="font-data text-2xl font-bold text-gray-900">
                       {global}
                       <span className="text-sm font-normal text-gray-400">
                         /100
                       </span>
                     </div>
                     {delta > 0 && (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-600">
+                      <span className="font-data inline-flex items-center gap-1 text-xs font-semibold text-green-600">
                         ↗ +{delta} pts / 7d
                       </span>
                     )}
                     {delta < 0 && (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+                      <span className="font-data inline-flex items-center gap-1 text-xs font-semibold text-red-600">
                         ↘ {delta} pts / 7d
                       </span>
                     )}
@@ -377,7 +377,7 @@ export default function DashboardPreview() {
                     <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
                       <Crosshair className="w-3.5 h-3.5" /> Avg. position
                     </div>
-                    <div className="font-semibold text-gray-900 text-sm">
+                    <div className="font-data font-semibold text-gray-900 text-sm">
                       {brand.avgPosition}
                     </div>
                     <div className="text-xs text-gray-400">when cited</div>
@@ -445,7 +445,7 @@ export default function DashboardPreview() {
                             }}
                           />
                         </div>
-                        <span className="text-xs font-semibold text-gray-700 w-9 text-right">
+                        <span className="font-data text-xs font-semibold text-gray-700 w-9 text-right">
                           {e.value}%
                         </span>
                       </div>
@@ -467,7 +467,7 @@ export default function DashboardPreview() {
                           <span
                             className={`text-xs w-24 truncate ${
                               isOwn
-                                ? "font-semibold text-violet-700"
+                                ? "font-semibold text-accent"
                                 : "text-gray-600"
                             }`}
                           >
@@ -476,7 +476,7 @@ export default function DashboardPreview() {
                           <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
-                                isOwn ? "bg-violet-500" : "bg-gray-300"
+                                isOwn ? "bg-accent" : "bg-gray-300"
                               }`}
                               style={{ width: `${(c.value / maxComp) * 100}%` }}
                             />
