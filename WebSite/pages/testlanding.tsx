@@ -114,7 +114,7 @@ function AnswerCard() {
 function ShiftPanels() {
   return (
     <div className="grid gap-5 md:grid-cols-2">
-      <div className="rounded-2xl border border-ink-200 bg-paper-sunken/60 p-6">
+      <div className="rounded-2xl border border-ink-200 bg-paper-sunken p-6">
         <p className="font-data mb-5 text-[11px] uppercase tracking-[0.16em] text-ink-500">
           Hier · dix liens bleus
         </p>
@@ -769,7 +769,11 @@ export default function TestLanding() {
             </nav>
           </div>
           <p className="mx-auto mt-8 max-w-6xl text-xs text-ink-500">
-            © {new Date().getFullYear()} ShowYourBrand. Tous droits réservés.
+            ©{" "}
+            {/* Read at render time on both sides; the year is the one text
+                node here that a build-time prerender can disagree with. */}
+            <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
+            ShowYourBrand. Tous droits réservés.
           </p>
         </footer>
       </div>

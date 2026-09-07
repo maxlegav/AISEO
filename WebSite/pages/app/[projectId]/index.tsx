@@ -37,6 +37,8 @@ interface ProjectDashboardProps {
   switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
+  /** Computed server-side: see `nextRunHint`. */
+  nextRunLabel: string;
 }
 
 /**
@@ -45,8 +47,13 @@ interface ProjectDashboardProps {
  * Both are the kind of detail a prospect checks. This says what the schedule
  * actually holds — including when it is overdue, which is information, not
  * something to hide.
+ *
+ * It reads the clock, so it must run on the server only and travel as a prop:
+ * computing it again at hydration produced a different string (the countdown
+ * had moved, or crossed zero) and React threw "the server rendered text didn't
+ * match the client", discarding and re-rendering the whole tree.
  */
-function nextRunHint(nextRunAt?: string | null): string {
+export function nextRunHint(nextRunAt?: string | null): string {
   if (!nextRunAt) return "aucun run planifié";
   const ms = new Date(nextRunAt).getTime() - Date.now();
   if (Number.isNaN(ms)) return "aucun run planifié";
@@ -58,7 +65,7 @@ function nextRunHint(nextRunAt?: string | null): string {
 }
 
 export default function ProjectDashboard({
-  switcherProjects, project, demo }: ProjectDashboardProps) {
+  switcherProjects, project, demo, nextRunLabel }: ProjectDashboardProps) {
   const base = useAppBase();
   const publicDemo = base === "/demo";
   if (!project) return <ProjectNotFound />;
@@ -108,7 +115,7 @@ export default function ProjectDashboard({
       icon: RefreshCw,
       label: "Fréquence",
       value: project.frequency,
-      hint: nextRunHint(project.nextRunAt),
+      hint: nextRunLabel,
     },
   ];
 
@@ -328,5 +335,12 @@ export const getServerSideProps: GetServerSideProps<ProjectDashboardProps> = asy
     session.workspace.organizationId,
   );
 
-  return { props: { project, demo, switcherProjects } };
+  return {
+    props: {
+      project,
+      demo,
+      switcherProjects,
+      nextRunLabel: nextRunHint(project?.nextRunAt),
+    },
+  };
 };
