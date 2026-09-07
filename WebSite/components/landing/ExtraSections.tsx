@@ -76,7 +76,7 @@ export function HowItWorks() {
               key={s.title}
               className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-7 shadow-premium border border-white/60"
             >
-              <span className="absolute top-6 right-6 text-4xl font-heading font-medium text-ink-200">
+              <span className="absolute top-6 right-6 text-4xl font-heading font-medium text-ink-300">
                 {i + 1}
               </span>
               <div className="w-12 h-12 rounded-2xl bg-accent-muted flex items-center justify-center ring-1 ring-ink-200 mb-5">

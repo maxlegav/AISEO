@@ -54,7 +54,7 @@ export default function ImpactView({
   return (
     <>
       <Head>
-        <title>{project.brandName} · Impact</title>
+        <title>{`${project.brandName} · Impact`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout

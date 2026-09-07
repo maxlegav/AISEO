@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Trophy, Crosshair, CalendarClock } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Trophy, Crosshair, CalendarClock } from "lucide-react";
 import SybMark from "@/components/icons/SybMark";
 
 /**
@@ -53,7 +54,7 @@ const BRANDS: DemoBrand[] = [
     domain: "bioburger.fr",
     favicon: "https://icons.duckduckgo.com/ip3/bioburger.fr.ico",
     avgPosition: "2.4",
-    frequency: "Daily",
+    frequency: "Quotidien",
     prompts: 20,
     series: {
       Perplexity: [55, 55, 60, 60, 65, 70, 70, 75, 80, 80, 85, 85],
@@ -72,7 +73,7 @@ const BRANDS: DemoBrand[] = [
     domain: "lemlist.com",
     favicon: "https://icons.duckduckgo.com/ip3/lemlist.com.ico",
     avgPosition: "1.6",
-    frequency: "Daily",
+    frequency: "Quotidien",
     prompts: 20,
     series: {
       ChatGPT: [60, 65, 65, 70, 70, 75, 80, 80, 85, 85, 85, 90],
@@ -91,7 +92,7 @@ const BRANDS: DemoBrand[] = [
     domain: "qonto.com",
     favicon: "https://icons.duckduckgo.com/ip3/qonto.com.ico",
     avgPosition: "1.9",
-    frequency: "Weekly",
+    frequency: "Hebdomadaire",
     prompts: 20,
     series: {
       Perplexity: [70, 70, 75, 75, 80, 80, 85, 85, 85, 90, 90, 90],
@@ -137,10 +138,10 @@ function derive(brand: DemoBrand) {
 }
 
 function tier(score: number): { label: string; color: string } {
-  if (score >= 65) return { label: "Strong", color: "#16a34a" };
-  if (score >= 40) return { label: "Medium", color: "#ea580c" };
-  if (score >= 20) return { label: "Weak", color: "#dc2626" };
-  return { label: "Critical", color: "#991b1b" };
+  if (score >= 65) return { label: "Fort", color: "#16a34a" };
+  if (score >= 40) return { label: "Moyen", color: "#ea580c" };
+  if (score >= 20) return { label: "Faible", color: "#dc2626" };
+  return { label: "Critique", color: "#991b1b" };
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -213,7 +214,14 @@ function TrendChart({ brand }: { brand: DemoBrand }) {
   );
 }
 
-export default function DashboardPreview() {
+interface DashboardPreviewProps {
+  /** Where "open the full dashboard" goes. Defaults to the public demo. */
+  ctaHref?: string;
+}
+
+export default function DashboardPreview({
+  ctaHref = "/demo",
+}: DashboardPreviewProps) {
   const [active, setActive] = useState(0);
   const brand = BRANDS[active] ?? BRANDS[0];
   if (!brand) return null;
@@ -226,14 +234,15 @@ export default function DashboardPreview() {
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-4 py-1.5 text-xs font-semibold text-accent">
             <SybMark className="w-3.5 h-3.5" />
-            Live dashboard preview
+            Le produit, pas une maquette
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium text-gray-900 mt-5 mb-4">
-            See exactly what your visibility looks like
+            Voilà à quoi ressemble votre visibilité
           </h2>
           <p className="text-gray-600 text-base md:text-lg leading-relaxed">
-            This is the real ShowYourBrand dashboard. Switch brands to see how
-            scores, engines and competitors move.
+            Changez de marque pour voir bouger le score, les moteurs et les
+            concurrents. Le dashboard complet s&apos;ouvre juste en dessous,
+            sans compte.
           </p>
         </div>
 
@@ -270,8 +279,8 @@ export default function DashboardPreview() {
             <span className="w-3 h-3 rounded-full bg-red-400" />
             <span className="w-3 h-3 rounded-full bg-yellow-400" />
             <span className="w-3 h-3 rounded-full bg-green-400" />
-            <div className="ml-3 flex-1 max-w-md rounded-md bg-white border border-gray-200 px-3 py-1 text-xs text-gray-400 truncate">
-              app.showyourbrand.app/app/{brand.domain}
+            <div className="ml-3 flex-1 max-w-md rounded-md bg-white border border-gray-200 px-3 py-1 text-xs text-gray-500 truncate">
+              showyourbrand.app/demo/{brand.domain}
             </div>
           </div>
 
@@ -285,10 +294,10 @@ export default function DashboardPreview() {
                 </span>
               </div>
               {[
-                "Overview",
-                "Competitors",
-                "Cited sources",
-                "Recommendations",
+                "Vue projet",
+                "Concurrents",
+                "Sources citées",
+                "Recommandations",
                 "Impact",
                 "Outreach",
               ].map((item, i) => (
@@ -297,7 +306,7 @@ export default function DashboardPreview() {
                   className={`rounded-lg px-3 py-1.5 text-xs ${
                     i === 0
                       ? "bg-accent-muted text-accent font-semibold"
-                      : "text-gray-500"
+                      : "text-gray-600"
                   }`}
                 >
                   {item}
@@ -321,7 +330,7 @@ export default function DashboardPreview() {
                   <h3 className="font-heading text-lg font-semibold text-gray-900 leading-tight">
                     {brand.name}
                   </h3>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-500">
                     https://www.{brand.domain}
                   </span>
                 </div>
@@ -332,65 +341,65 @@ export default function DashboardPreview() {
                 <div className="flex items-center gap-4 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
                   <ScoreRing score={global} />
                   <div>
-                    <div className="text-xs text-gray-400">
-                      Visibility score
+                    <div className="text-xs text-gray-500">
+                      Score de visibilité
                     </div>
                     <div className="font-data text-2xl font-bold text-gray-900">
                       {global}
-                      <span className="text-sm font-normal text-gray-400">
+                      <span className="text-sm font-normal text-gray-500">
                         /100
                       </span>
                     </div>
                     {delta > 0 && (
                       <span className="font-data inline-flex items-center gap-1 text-xs font-semibold text-green-600">
-                        ↗ +{delta} pts / 7d
+                        ↗ +{delta} pts / 7j
                       </span>
                     )}
                     {delta < 0 && (
                       <span className="font-data inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                        ↘ {delta} pts / 7d
+                        ↘ {delta} pts / 7j
                       </span>
                     )}
                     {delta === 0 && (
-                      <span className="text-xs text-gray-400">
-                        → stable / 7d
+                      <span className="text-xs text-gray-500">
+                        → stable / 7j
                       </span>
                     )}
-                    <div className="text-[11px] text-gray-400 mt-1">
-                      Weighted across {engines.length} engines
+                    <div className="text-[11px] text-gray-500 mt-1">
+                      Pondéré sur {engines.length} moteurs
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
-                      <Trophy className="w-3.5 h-3.5" /> Best engine
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                      <Trophy className="w-3.5 h-3.5" /> Meilleur moteur
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
                       {best ? best.name : "—"}
                     </div>
-                    <div className="text-xs text-gray-400">
-                      {best ? best.value : 0}% presence
+                    <div className="text-xs text-gray-500">
+                      {best ? best.value : 0}% de présence
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
-                      <Crosshair className="w-3.5 h-3.5" /> Avg. position
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                      <Crosshair className="w-3.5 h-3.5" /> Position moyenne
                     </div>
                     <div className="font-data font-semibold text-gray-900 text-sm">
                       {brand.avgPosition}
                     </div>
-                    <div className="text-xs text-gray-400">when cited</div>
+                    <div className="text-xs text-gray-500">quand elle est citée</div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
-                      <CalendarClock className="w-3.5 h-3.5" /> Frequency
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                      <CalendarClock className="w-3.5 h-3.5" /> Fréquence
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
                       {brand.frequency}
                     </div>
-                    <div className="text-xs text-gray-400">
-                      {brand.prompts} prompts × {engines.length} engines
+                    <div className="text-xs text-gray-500">
+                      {brand.prompts} requêtes × {engines.length} moteurs
                     </div>
                   </div>
                 </div>
@@ -400,7 +409,7 @@ export default function DashboardPreview() {
               <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm mb-5">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-gray-900">
-                    12-week evolution
+                    Évolution sur 12 semaines
                   </span>
                   <div className="flex flex-wrap gap-3">
                     {engines.map((e) => (
@@ -424,10 +433,10 @@ export default function DashboardPreview() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <div className="text-sm font-semibold text-gray-900">
-                    Presence by engine
+                    Présence par moteur
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    Share of the {brand.prompts} tracked prompts citing{" "}
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    Part des {brand.prompts} requêtes suivies qui citent{" "}
                     {brand.name}
                   </div>
                   <div className="space-y-3 mt-4">
@@ -454,10 +463,10 @@ export default function DashboardPreview() {
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <div className="text-sm font-semibold text-gray-900">
-                    You vs competitors
+                    Vous vs concurrents
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    Same weighted score, same prompts
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    Même score pondéré, mêmes requêtes
                   </div>
                   <div className="space-y-3 mt-4">
                     {competitors.map((c) => {
@@ -494,10 +503,24 @@ export default function DashboardPreview() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
-          Illustrative product preview — demo data. The global score is computed
-          from the per-engine presence rates with the same weighting the product
-          uses (ChatGPT 60%, Gemini 16%, Perplexity 14%, Claude 10%).
+        <div className="mt-6 flex justify-center">
+          <Link
+            href={ctaHref}
+            className="group inline-flex items-center gap-2 rounded-full bg-ink-900 px-7 py-3.5 text-base font-semibold text-white shadow-premium transition-all hover:-translate-y-0.5 hover:bg-ink-800"
+          >
+            Ouvrir le dashboard complet
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+        <p className="mt-2.5 text-center text-xs text-gray-500">
+          Démo publique, en lecture seule. Ni compte, ni carte bancaire.
+        </p>
+
+        <p className="text-center text-xs text-gray-500 mt-4 max-w-2xl mx-auto">
+          Aperçu illustratif, données de démonstration. Le score global est
+          calculé à partir des taux de présence par moteur, avec la pondération
+          réelle du produit (ChatGPT 60 %, Gemini 16 %, Perplexity 14 %,
+          Claude 10 %).
         </p>
       </div>
     </section>

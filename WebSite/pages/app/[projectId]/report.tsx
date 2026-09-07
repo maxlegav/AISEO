@@ -20,6 +20,7 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import { useAppBase } from "@/lib/app-base";
 import { getProjectDashboard } from "@/lib/monitoring/dashboard";
 import {
   getUserBranding,
@@ -52,6 +53,7 @@ export default function ProjectReport({
   generatedAt,
   demo,
 }: ReportProps) {
+  const base = useAppBase();
   const ranked = [...project.llmScores].sort(
     (a, b) => b.presenceRate - a.presenceRate,
   );
@@ -60,16 +62,14 @@ export default function ProjectReport({
   return (
     <>
       <Head>
-        <title>
-          Rapport GEO · {project.brandName} · {branding.name}
-        </title>
+        <title>{`Rapport GEO · ${project.brandName} · ${branding.name}`}</title>
         <meta name="robots" content="noindex" />
       </Head>
 
       {/* Screen-only toolbar (hidden when printing / saving to PDF) */}
       <div className="report-toolbar sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
         <Link
-          href={`/app/${project.id}`}
+          href={`${base}/${project.id}`}
           className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-800"
         >
           <ArrowLeft className="h-4 w-4" />

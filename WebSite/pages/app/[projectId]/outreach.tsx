@@ -54,7 +54,7 @@ export default function OutreachView({
   return (
     <>
       <Head>
-        <title>{project.brandName} · Outreach</title>
+        <title>{`${project.brandName} · Outreach`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout

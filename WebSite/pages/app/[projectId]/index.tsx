@@ -26,6 +26,7 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import { useAppBase } from "@/lib/app-base";
 import {
   getProjectDashboard,
   listSwitcherProjects,
@@ -58,6 +59,8 @@ function nextRunHint(nextRunAt?: string | null): string {
 
 export default function ProjectDashboard({
   switcherProjects, project, demo }: ProjectDashboardProps) {
+  const base = useAppBase();
+  const publicDemo = base === "/demo";
   if (!project) return <ProjectNotFound />;
 
   if (project.pendingFirstRun) {
@@ -112,10 +115,11 @@ export default function ProjectDashboard({
   return (
     <>
       <Head>
-        <title>{project.brandName} · Monitoring GEO</title>
+        <title>{`${project.brandName} · Monitoring GEO`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="dashboard"
         title={project.brandName}
@@ -123,9 +127,11 @@ export default function ProjectDashboard({
         demo={demo}
         actions={
           <>
-            {project.isReal && !demo && <RunButton projectId={project.id} />}
+            {project.isReal && !demo && !publicDemo && (
+              <RunButton projectId={project.id} />
+            )}
             <Link
-              href={`/app/${project.id}/report`}
+              href={`${base}/${project.id}/report`}
               className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
             >
               <FileDown className="h-4 w-4" />

@@ -26,7 +26,7 @@ describe("resolveReportBranding", () => {
     const b = resolveReportBranding(agencyBranding, false);
     expect(b.whiteLabel).toBe(false);
     expect(b.name).toBe("ShowYourBrand");
-    expect(b.primaryColor).toBe("#7c3aed");
+    expect(b.primaryColor).toBe("#AE3B22");
   });
 
   it("falls back to SYB when branded PDF is disabled", () => {

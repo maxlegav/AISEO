@@ -18,7 +18,6 @@ import {
   Target,
   Zap,
   Star,
-  ShieldCheck,
 } from "lucide-react";
 import SybMark from "@/components/icons/SybMark";
 import ExtraSections from "@/components/landing/ExtraSections";
@@ -64,11 +63,11 @@ const cmsLogos = [
 // Animated AI Model Marquee with real logos
 const AIModelMarquee = () => (
   <div className="mt-8 w-full">
-    <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
+    <p className="text-center text-gray-600 text-sm font-medium mb-4 tracking-wide">
       MENTIONED BY ALL MAJOR AI ENGINES
     </p>
 
-    <div className="relative overflow-hidden py-4 lg:py-6 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-[280px] sm:max-w-sm md:max-w-xl lg:max-w-4xl border border-white/50 shadow-sm">
+    <div className="relative overflow-hidden py-4 lg:py-6 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-[280px] sm:max-w-sm md:max-w-xl lg:max-w-4xl border border-ink-200 shadow-sm">
       <div className="flex animate-marquee items-center w-max">
         {[...aiModels, ...aiModels].map((model, i) => (
           <div
@@ -98,12 +97,12 @@ const AIModelMarquee = () => (
 
 // CMS Platform logos with scrolling marquee
 const CMSLogos = () => (
-  <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-3xl border border-white/50 shadow-sm">
+  <div className="relative overflow-hidden py-4 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-3xl border border-ink-200 shadow-sm">
     <div className="flex animate-marquee-slow items-center">
       {cmsLogos.map((cms, i) => (
         <div
           key={`first-${i}`}
-          className="flex items-center gap-3 mx-8 md:mx-12 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+          className="flex items-center gap-3 mx-8 md:mx-12 flex-shrink-0 opacity-80 hover:opacity-100 transition-opacity"
         >
           <Image
             src={cms.logo}
@@ -112,13 +111,13 @@ const CMSLogos = () => (
             height={36}
             className="h-9 w-9 object-contain"
           />
-          <span className="text-gray-600 font-medium text-sm">{cms.name}</span>
+          <span className="text-gray-700 font-medium text-sm">{cms.name}</span>
         </div>
       ))}
       {cmsLogos.map((cms, i) => (
         <div
           key={`second-${i}`}
-          className="flex items-center gap-3 mx-8 md:mx-12 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+          className="flex items-center gap-3 mx-8 md:mx-12 flex-shrink-0 opacity-80 hover:opacity-100 transition-opacity"
         >
           <Image
             src={cms.logo}
@@ -127,7 +126,7 @@ const CMSLogos = () => (
             height={36}
             className="h-9 w-9 object-contain"
           />
-          <span className="text-gray-600 font-medium text-sm">{cms.name}</span>
+          <span className="text-gray-700 font-medium text-sm">{cms.name}</span>
         </div>
       ))}
     </div>
@@ -155,7 +154,7 @@ const FAQItem = ({
       {isOpen ? (
         <ChevronUp className="w-5 h-5 text-accent flex-shrink-0" />
       ) : (
-        <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+        <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
       )}
     </button>
     {isOpen && (
@@ -223,7 +222,7 @@ const PricingCard = ({
     <div className="mb-5 h-6">
       {oldPrice ? (
         <>
-          <span className={`text-sm line-through ${highlighted ? "text-gray-500" : "text-gray-400"}`}>
+          <span className={`text-sm line-through ${highlighted ? "text-gray-400" : "text-gray-500"}`}>
             {oldPrice}
           </span>
           <span className={`text-xs ml-2 font-semibold ${highlighted ? "text-green-400" : "text-green-600"}`}>
@@ -233,7 +232,7 @@ const PricingCard = ({
       ) : null}
     </div>
     {note && (
-      <p className={`text-xs mb-4 -mt-3 ${highlighted ? "text-gray-400" : "text-gray-400"}`}>
+      <p className={`text-xs mb-4 -mt-3 ${highlighted ? "text-gray-400" : "text-gray-500"}`}>
         {note}
       </p>
     )}
@@ -291,7 +290,7 @@ const HandDrawnUnderline = () => (
   >
     <path
       d="M2 8C20 4 40 10 60 6C80 2 100 9 120 5C140 1 160 8 180 4C190 2 198 6 198 6"
-      stroke="#7C3AED"
+      stroke="#AE3B22"
       strokeWidth="3"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -572,7 +571,7 @@ export default function Home() {
             href="#features"
             className="absolute bottom-8 inset-x-0 mx-auto w-fit z-10 animate-bounce-slow"
           >
-            <ChevronDown className="w-8 h-8 text-gray-400" />
+            <ChevronDown className="w-8 h-8 text-gray-500" />
           </a>
         </section>
 
@@ -588,7 +587,7 @@ export default function Home() {
               </h2>
               
             </div>
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/50">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-ink-200">
               <video
                 ref={videoRef}
                 className="w-full aspect-video object-cover"
@@ -660,46 +659,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Why ShowYourBrand */}
-        <section className="px-4 py-16 md:py-24">
-          <div className="container mx-auto max-w-6xl">
-            <div className="relative overflow-hidden rounded-[2rem] bg-[#0B1120] px-6 py-14 md:px-14 md:py-20 text-white shadow-premium-lg">
-              <div className="absolute inset-0 bg-grid-dark opacity-70" />
-              <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
-              <div className="relative z-10">
-                <div className="text-center max-w-2xl mx-auto mb-12">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-ink-300 mb-5">
-                    <SybMark className="w-3.5 h-3.5" />
-                    Why ShowYourBrand
-                  </span>
-                  <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
-                    GEO monitoring, built for the French market
-                  </h2>
-                  <p className="text-gray-400 text-base md:text-lg leading-relaxed">
-                    Everything the best AI-visibility tools do, from continuous multi-LLM tracking
-                    to per-engine explanations and French-first support.
-                  </p>
-                </div>
-                <div className="grid gap-6 md:grid-cols-3">
-                  {[
-                    { Icon: Target, title: "Every engine that matters", desc: "ChatGPT, Claude, Perplexity and Gemini, tracked together, so you see your visibility everywhere your customers ask." },
-                    { Icon: Zap, title: "Evolution, week after week", desc: "Watch your visibility score move over 12 weeks, catch drops early with alerts, and prove the impact of every change." },
-                    { Icon: ShieldCheck, title: "Made for the French market", desc: "Interface, support and use cases in French, pricing in euros: the GEO tool French brands and agencies actually get." },
-                  ].map(({ Icon, title, desc }) => (
-                    <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10">
-                      <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-4">
-                        <Icon className="w-6 h-6 text-ink-300" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-                      <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Optional landing sections (reorder / keep / remove freely) */}
         <ExtraSections />
 
@@ -737,7 +696,7 @@ export default function Home() {
                     <div className="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center">
                       <SybMark className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-xs md:text-sm font-medium text-gray-400">Asked to ChatGPT · Perplexity · Gemini</span>
+                    <span className="text-xs md:text-sm font-medium text-gray-500">Asked to ChatGPT · Perplexity · Gemini</span>
                   </div>
 
                   {/* user prompt */}
@@ -766,7 +725,7 @@ export default function Home() {
                       <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
                         <span className="block w-2 h-[2px] bg-white rounded-full" />
                       </div>
-                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Without it, you&apos;re invisible</span>
+                      <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Without it, you&apos;re invisible</span>
                     </div>
                     <p className="text-sm text-gray-500 leading-relaxed pl-7">
                       &ldquo;I&apos;d recommend <span className="font-medium text-gray-600">Competitor A</span> or <span className="font-medium text-gray-600">Competitor B</span>.&rdquo;
@@ -787,7 +746,7 @@ export default function Home() {
                 <div key={stat.value} className="bg-white rounded-2xl p-5 md:p-6 shadow-premium border border-white/60">
                   <div className="text-3xl md:text-4xl font-bold text-gradient-premium mb-1.5">{stat.value}</div>
                   <div className="text-sm font-semibold text-gray-800 mb-0.5">{stat.label}</div>
-                  <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                  <div className="text-xs text-gray-500 leading-snug">{stat.sub}</div>
                 </div>
               ))}
             </div>
@@ -1127,15 +1086,8 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-4 gap-8 md:gap-12 mb-12">
               <div className="md:col-span-2">
-                <Link href="/" className="flex items-center gap-2 mb-6">
-                  <div className="w-16 h-16  rounded-lg flex items-center justify-center">
-                    <Image
-                      src={"/syb_logo_transparent.png"}
-                      alt="logo"
-                      width={120}
-                      height={120}
-                    ></Image>
-                  </div>
+                <Link href="/" className="flex items-center gap-2.5 mb-6">
+                  <SybMark className="w-8 h-8 text-white" />
                   <span className="text-base font-semibold text-white tracking-tight">
                     ShowYourBrand
                   </span>

@@ -13,6 +13,7 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import { useAppBase } from "@/lib/app-base";
 import { getProjectSummaries, type ClientOption } from "@/lib/monitoring/dashboard";
 import { getUsage, type UsageStatus } from "@/lib/monitoring/usage";
 import { getWorkspacePlan } from "@/lib/monitoring/workspace";
@@ -33,31 +34,35 @@ export default function AppOverview({
   activeClientId,
   usage,
 }: AppOverviewProps) {
+  const base = useAppBase();
+  const publicDemo = base === "/demo";
   return (
     <>
       <Head>
-        <title>Mes projets · ShowYourBrand</title>
+        <title>
+          {publicDemo ? "Démo · ShowYourBrand" : "Mes projets · ShowYourBrand"}
+        </title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
         active="dashboard"
-        title="Mes projets"
+        title={publicDemo ? "Projets d'exemple" : "Mes projets"}
         subtitle="Suivez la visibilité de chaque marque dans les réponses des IA."
         projects={projects}
         demo={demo}
         actions={
           <Link
-            href="/app/new"
+            href={publicDemo ? "/signup" : "/app/new"}
             className="inline-flex h-9 items-center gap-1.5 rounded-full bg-gray-900 px-4 text-sm font-medium text-white transition-colors hover:bg-gray-800"
           >
             <Plus className="h-3.5 w-3.5" />
-            Nouveau projet
+            {publicDemo ? "Suivre ma marque" : "Nouveau projet"}
           </Link>
         }
       >
         {/* Consumption against the plan's monthly API budget. Shown only when
             it starts to matter — an untouched quota is noise. */}
-        {usage && (usage.nearLimit || usage.projectedUEur > usage.budgetUEur) && (
+        {!publicDemo && usage && (usage.nearLimit || usage.projectedUEur > usage.budgetUEur) && (
           <div
             className={
               "mb-5 rounded-2xl border p-4 " +
@@ -94,7 +99,7 @@ export default function AppOverview({
           </div>
         )}
 
-        {clients.length > 0 && (
+        {!publicDemo && clients.length > 0 && (
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
               Clients
@@ -132,21 +137,32 @@ export default function AppOverview({
             </Link>
           </div>
         )}
-        {demo && (
-          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-ink-200 bg-accent-muted/70 p-4 text-sm text-gray-600">
+        {publicDemo ? (
+          <div className="mb-5 flex items-start gap-2 rounded-2xl border border-ink-200 bg-white p-4 text-sm text-gray-700">
             <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
             <span>
-              Voici des <strong>données de démonstration</strong>. Créez votre
-              premier projet pour lancer un vrai monitoring et voir vos propres
-              scores ici.
+              Démo publique, en lecture seule. Ouvrez une marque pour voir le
+              score par moteur, les concurrents, les sources citées et le plan
+              d&apos;action, exactement comme dans un compte.
             </span>
           </div>
+        ) : (
+          demo && (
+            <div className="mb-5 flex items-start gap-2 rounded-2xl border border-ink-200 bg-accent-muted/70 p-4 text-sm text-gray-600">
+              <SybMark className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+              <span>
+                Voici des <strong>données de démonstration</strong>. Créez votre
+                premier projet pour lancer un vrai monitoring et voir vos propres
+                scores ici.
+              </span>
+            </div>
+          )
         )}
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((p) => (
             <Link
               key={p.id}
-              href={`/app/${p.id}`}
+              href={`${base}/${p.id}`}
               className="group flex flex-col rounded-2xl border border-white/60 bg-white/80 p-5 shadow-premium backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-lg"
             >
               <div className="mb-4 flex items-start justify-between gap-3">
