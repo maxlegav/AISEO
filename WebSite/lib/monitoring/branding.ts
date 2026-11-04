@@ -30,10 +30,12 @@ const DEFAULT_BRANDING: Branding = {
 };
 
 /** SYB defaults used when white-label is not active on the report. */
-const SYB_REPORT_BRANDING = {
+export const SYB_REPORT_BRANDING = {
   name: "ShowYourBrand",
   logoUrl: "/syb_logo_transparent.png",
-  primaryColor: "#7c3aed",
+  // Was #7C3AED — the violet of the palette the product moved off. The report
+  // was the last surface still printing it.
+  primaryColor: "#AE3B22",
   domain: "showyourbrand.io",
 } as const;
 

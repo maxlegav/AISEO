@@ -26,6 +26,7 @@ import {
 } from "@/components/monitoring/widgets";
 import { LLMS, LLM_ORDER, type Project } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import { useAppBase } from "@/lib/app-base";
 import {
   getProjectDashboard,
   listSwitcherProjects,
@@ -36,6 +37,8 @@ interface ProjectDashboardProps {
   switcherProjects: SwitcherEntry[];
   project: Project | null;
   demo: boolean;
+  /** Computed server-side: see `nextRunHint`. */
+  nextRunLabel: string;
 }
 
 /**
@@ -44,8 +47,13 @@ interface ProjectDashboardProps {
  * Both are the kind of detail a prospect checks. This says what the schedule
  * actually holds — including when it is overdue, which is information, not
  * something to hide.
+ *
+ * It reads the clock, so it must run on the server only and travel as a prop:
+ * computing it again at hydration produced a different string (the countdown
+ * had moved, or crossed zero) and React threw "the server rendered text didn't
+ * match the client", discarding and re-rendering the whole tree.
  */
-function nextRunHint(nextRunAt?: string | null): string {
+export function nextRunHint(nextRunAt?: string | null): string {
   if (!nextRunAt) return "aucun run planifié";
   const ms = new Date(nextRunAt).getTime() - Date.now();
   if (Number.isNaN(ms)) return "aucun run planifié";
@@ -57,7 +65,9 @@ function nextRunHint(nextRunAt?: string | null): string {
 }
 
 export default function ProjectDashboard({
-  switcherProjects, project, demo }: ProjectDashboardProps) {
+  switcherProjects, project, demo, nextRunLabel }: ProjectDashboardProps) {
+  const base = useAppBase();
+  const publicDemo = base === "/demo";
   if (!project) return <ProjectNotFound />;
 
   if (project.pendingFirstRun) {
@@ -105,17 +115,18 @@ export default function ProjectDashboard({
       icon: RefreshCw,
       label: "Fréquence",
       value: project.frequency,
-      hint: nextRunHint(project.nextRunAt),
+      hint: nextRunLabel,
     },
   ];
 
   return (
     <>
       <Head>
-        <title>{project.brandName} · Monitoring GEO</title>
+        <title>{`${project.brandName} · Monitoring GEO`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
+        projects={switcherProjects}
         project={project}
         active="dashboard"
         title={project.brandName}
@@ -123,9 +134,11 @@ export default function ProjectDashboard({
         demo={demo}
         actions={
           <>
-            {project.isReal && !demo && <RunButton projectId={project.id} />}
+            {project.isReal && !demo && !publicDemo && (
+              <RunButton projectId={project.id} />
+            )}
             <Link
-              href={`/app/${project.id}/report`}
+              href={`${base}/${project.id}/report`}
               className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/60 px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
             >
               <FileDown className="h-4 w-4" />
@@ -322,5 +335,12 @@ export const getServerSideProps: GetServerSideProps<ProjectDashboardProps> = asy
     session.workspace.organizationId,
   );
 
-  return { props: { project, demo, switcherProjects } };
+  return {
+    props: {
+      project,
+      demo,
+      switcherProjects,
+      nextRunLabel: nextRunHint(project?.nextRunAt),
+    },
+  };
 };

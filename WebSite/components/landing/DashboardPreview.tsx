@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Trophy, Crosshair, CalendarClock } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { ArrowRight, Trophy, Crosshair, CalendarClock } from "lucide-react";
 import SybMark from "@/components/icons/SybMark";
 
 /**
@@ -56,10 +57,10 @@ const BRANDS: DemoBrand[] = [
     frequency: "Daily",
     prompts: 20,
     series: {
-      Perplexity: [55, 55, 60, 60, 65, 70, 70, 75, 80, 80, 85, 85],
-      ChatGPT: [40, 40, 45, 45, 45, 50, 50, 50, 55, 55, 50, 55],
-      Gemini: [10, 10, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30],
-      Claude: [5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15, 15],
+      Perplexity: [50, 60, 55, 65, 55, 70, 60, 75, 85, 70, 80, 85],
+      ChatGPT: [35, 45, 40, 50, 40, 55, 45, 50, 60, 50, 60, 55],
+      Gemini: [10, 20, 10, 15, 25, 15, 20, 30, 20, 25, 35, 30],
+      Claude: [5, 15, 5, 10, 20, 10, 15, 25, 10, 20, 10, 15],
     },
     rivals: [
       { name: "Big Fernand", value: 63 },
@@ -75,10 +76,10 @@ const BRANDS: DemoBrand[] = [
     frequency: "Daily",
     prompts: 20,
     series: {
-      ChatGPT: [60, 65, 65, 70, 70, 75, 80, 80, 85, 85, 85, 90],
-      Perplexity: [65, 70, 70, 75, 80, 80, 85, 85, 90, 90, 95, 95],
-      Claude: [45, 50, 50, 55, 60, 60, 65, 70, 70, 75, 75, 80],
-      Gemini: [40, 45, 50, 50, 55, 60, 65, 65, 70, 75, 75, 80],
+      ChatGPT: [55, 70, 60, 75, 65, 80, 70, 85, 75, 90, 80, 90],
+      Perplexity: [60, 70, 80, 65, 85, 75, 90, 80, 95, 85, 90, 95],
+      Claude: [40, 55, 45, 60, 50, 65, 55, 75, 60, 80, 70, 80],
+      Gemini: [45, 35, 55, 45, 60, 50, 70, 55, 75, 65, 85, 80],
     },
     rivals: [
       { name: "Instantly", value: 71 },
@@ -94,10 +95,10 @@ const BRANDS: DemoBrand[] = [
     frequency: "Weekly",
     prompts: 20,
     series: {
-      Perplexity: [70, 70, 75, 75, 80, 80, 85, 85, 85, 90, 90, 90],
-      ChatGPT: [55, 55, 60, 60, 65, 65, 70, 70, 75, 80, 85, 85],
-      Claude: [40, 40, 45, 50, 50, 55, 55, 60, 65, 65, 70, 70],
-      Gemini: [40, 45, 45, 50, 55, 55, 60, 65, 65, 70, 70, 75],
+      Perplexity: [65, 80, 70, 85, 75, 90, 80, 95, 85, 90, 80, 90],
+      ChatGPT: [50, 60, 55, 70, 60, 75, 65, 80, 70, 85, 75, 85],
+      Claude: [35, 50, 40, 55, 45, 60, 50, 65, 55, 75, 60, 70],
+      Gemini: [45, 40, 55, 50, 65, 55, 60, 70, 60, 75, 65, 75],
     },
     rivals: [
       { name: "Shine", value: 54 },
@@ -138,7 +139,7 @@ function derive(brand: DemoBrand) {
 
 function tier(score: number): { label: string; color: string } {
   if (score >= 65) return { label: "Strong", color: "#16a34a" };
-  if (score >= 40) return { label: "Medium", color: "#ea580c" };
+  if (score >= 40) return { label: "Average", color: "#ea580c" };
   if (score >= 20) return { label: "Weak", color: "#dc2626" };
   return { label: "Critical", color: "#991b1b" };
 }
@@ -159,6 +160,7 @@ function ScoreRing({ score }: { score: number }) {
           fill="none"
           stroke={t.color}
           strokeWidth="8"
+          className="transition-[stroke-dasharray] duration-700 ease-out"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${circ}`}
         />
@@ -175,65 +177,122 @@ function ScoreRing({ score }: { score: number }) {
 
 function TrendChart({ brand }: { brand: DemoBrand }) {
   const W = 520;
-  const H = 150;
+  const H = 170;
   const pad = 8;
   const n = 12;
   const x = (i: number) => pad + (i * (W - 2 * pad)) / (n - 1);
   const y = (v: number) => H - pad - (v / 100) * (H - 2 * pad);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[150px]" preserveAspectRatio="none">
-      {[0, 25, 50, 75, 100].map((g) => (
-        <line
-          key={g}
-          x1={pad}
-          x2={W - pad}
-          y1={y(g)}
-          y2={y(g)}
-          stroke="#f1f1f4"
-          strokeWidth="1"
-        />
-      ))}
-      {ENGINE_ORDER.map((eng) => {
-        const pts = brand.series[eng]
-          .map((v, i) => `${x(i)},${y(v)}`)
-          .join(" ");
-        return (
-          <polyline
-            key={eng}
-            points={pts}
-            fill="none"
-            stroke={ENGINE_COLORS[eng]}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            strokeLinecap="round"
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[170px]" preserveAspectRatio="none">
+        {[0, 25, 50, 75, 100].map((g) => (
+          <line key={`h${g}`} x1={pad} x2={W - pad} y1={y(g)} y2={y(g)} stroke="#f1f1f4" strokeWidth="1" />
+        ))}
+        {Array.from({ length: n }, (_, i) => (
+          <line
+            key={`v${i}`}
+            x1={x(i)}
+            x2={x(i)}
+            y1={pad}
+            y2={H - pad}
+            stroke="#e7e5e0"
+            strokeWidth="1"
+            strokeDasharray="3 4"
+            vectorEffect="non-scaling-stroke"
           />
-        );
-      })}
-    </svg>
+        ))}
+        {ENGINE_ORDER.map((eng, k) => {
+          const pts = brand.series[eng].map((v, i) => `${x(i)},${y(v)}`).join(" ");
+          return (
+            <polyline
+              key={`${brand.name}-${eng}`}
+              points={pts}
+              pathLength={1}
+              fill="none"
+              stroke={ENGINE_COLORS[eng]}
+              strokeWidth="2"
+              strokeLinejoin="miter"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              className="animate-draw"
+              style={{ strokeDasharray: 1, animationDelay: `${k * 120}ms` }}
+            />
+          );
+        })}
+      </svg>
+      <div className="mt-1 flex justify-between px-0.5 font-data text-[10px] text-gray-400">
+        {Array.from({ length: n }, (_, i) => (
+          <span key={i}>W{i + 1}</span>
+        ))}
+      </div>
+    </div>
   );
 }
 
-export default function DashboardPreview() {
+function useCountUp(target: number, duration = 700) {
+  const [value, setValue] = useState(target);
+  const from = useRef(target);
+  useEffect(() => {
+    const start = performance.now();
+    const origin = from.current;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(origin + (target - origin) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else from.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
+
+interface DashboardPreviewProps {
+  /** Where "open the full dashboard" goes. Defaults to the public demo. */
+  ctaHref?: string;
+}
+
+export default function DashboardPreview({
+  ctaHref = "/demo",
+}: DashboardPreviewProps) {
   const [active, setActive] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(!!e?.isIntersecting), { threshold: 0.35 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!autoplay || !inView) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % BRANDS.length), 5000);
+    return () => clearInterval(id);
+  }, [autoplay, inView]);
+
   const brand = BRANDS[active] ?? BRANDS[0];
+  const derived = derive(brand ?? BRANDS[0]!);
+  const animatedGlobal = useCountUp(inView ? derived.global : 0);
   if (!brand) return null;
-  const { engines, global, delta, best, competitors } = derive(brand);
+  const { engines, delta, best, competitors } = derived;
   const maxComp = Math.max(...competitors.map((c) => c.value));
 
   return (
-    <section id="preview" className="px-4 py-16 md:py-24">
+    <section id="preview" ref={sectionRef} className="px-4 py-16 md:py-24">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-4 py-1.5 text-xs font-semibold text-accent">
-            <SybMark className="w-3.5 h-3.5" />
-            Live dashboard preview
-          </span>
-          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium text-gray-900 mt-5 mb-4">
-            See exactly what your visibility looks like
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="font-heading text-4xl md:text-5xl font-medium text-gray-900 mb-4">
+            What your dashboard looks like
           </h2>
           <p className="text-gray-600 text-base md:text-lg leading-relaxed">
-            This is the real ShowYourBrand dashboard. Switch brands to see how
-            scores, engines and competitors move.
+            Switch brands to see the score, the engines and the competitors
+            move.
           </p>
         </div>
 
@@ -243,10 +302,13 @@ export default function DashboardPreview() {
             <button
               key={b.name}
               type="button"
-              onClick={() => setActive(i)}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+              onClick={() => {
+                setActive(i);
+                setAutoplay(false);
+              }}
+              className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${
                 i === active
-                  ? "bg-gray-900 text-white shadow-premium"
+                  ? "bg-gray-900 text-white"
                   : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
               }`}
             >
@@ -270,8 +332,8 @@ export default function DashboardPreview() {
             <span className="w-3 h-3 rounded-full bg-red-400" />
             <span className="w-3 h-3 rounded-full bg-yellow-400" />
             <span className="w-3 h-3 rounded-full bg-green-400" />
-            <div className="ml-3 flex-1 max-w-md rounded-md bg-white border border-gray-200 px-3 py-1 text-xs text-gray-400 truncate">
-              app.showyourbrand.app/app/{brand.domain}
+            <div className="ml-3 flex-1 max-w-md rounded-md bg-white border border-gray-200 px-3 py-1 text-xs text-gray-500 truncate">
+              showyourbrand.app/demo/{brand.domain}
             </div>
           </div>
 
@@ -297,7 +359,7 @@ export default function DashboardPreview() {
                   className={`rounded-lg px-3 py-1.5 text-xs ${
                     i === 0
                       ? "bg-accent-muted text-accent font-semibold"
-                      : "text-gray-500"
+                      : "text-gray-600"
                   }`}
                 >
                   {item}
@@ -321,7 +383,7 @@ export default function DashboardPreview() {
                   <h3 className="font-heading text-lg font-semibold text-gray-900 leading-tight">
                     {brand.name}
                   </h3>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-500">
                     https://www.{brand.domain}
                   </span>
                 </div>
@@ -330,14 +392,14 @@ export default function DashboardPreview() {
               {/* KPI row */}
               <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-4 mb-5">
                 <div className="flex items-center gap-4 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                  <ScoreRing score={global} />
+                  <ScoreRing score={animatedGlobal} />
                   <div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500">
                       Visibility score
                     </div>
                     <div className="font-data text-2xl font-bold text-gray-900">
-                      {global}
-                      <span className="text-sm font-normal text-gray-400">
+                      {animatedGlobal}
+                      <span className="text-sm font-normal text-gray-500">
                         /100
                       </span>
                     </div>
@@ -352,44 +414,44 @@ export default function DashboardPreview() {
                       </span>
                     )}
                     {delta === 0 && (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         → stable / 7d
                       </span>
                     )}
-                    <div className="text-[11px] text-gray-400 mt-1">
+                    <div className="text-[11px] text-gray-500 mt-1">
                       Weighted across {engines.length} engines
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
                       <Trophy className="w-3.5 h-3.5" /> Best engine
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
                       {best ? best.name : "—"}
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500">
                       {best ? best.value : 0}% presence
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
                       <Crosshair className="w-3.5 h-3.5" /> Avg. position
                     </div>
                     <div className="font-data font-semibold text-gray-900 text-sm">
                       {brand.avgPosition}
                     </div>
-                    <div className="text-xs text-gray-400">when cited</div>
+                    <div className="text-xs text-gray-500">when cited</div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
                       <CalendarClock className="w-3.5 h-3.5" /> Frequency
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
                       {brand.frequency}
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500">
                       {brand.prompts} prompts × {engines.length} engines
                     </div>
                   </div>
@@ -400,7 +462,7 @@ export default function DashboardPreview() {
               <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm mb-5">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-gray-900">
-                    12-week evolution
+                    Last 12 weeks
                   </span>
                   <div className="flex flex-wrap gap-3">
                     {engines.map((e) => (
@@ -426,8 +488,8 @@ export default function DashboardPreview() {
                   <div className="text-sm font-semibold text-gray-900">
                     Presence by engine
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    Share of the {brand.prompts} tracked prompts citing{" "}
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    Share of the {brand.prompts} tracked prompts that cite{" "}
                     {brand.name}
                   </div>
                   <div className="space-y-3 mt-4">
@@ -438,9 +500,9 @@ export default function DashboardPreview() {
                         </span>
                         <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
                           <div
-                            className="h-full rounded-full"
+                            className="h-full rounded-full transition-[width] duration-700 ease-out"
                             style={{
-                              width: `${e.value}%`,
+                              width: inView ? `${e.value}%` : "0%",
                               backgroundColor: e.color,
                             }}
                           />
@@ -456,7 +518,7 @@ export default function DashboardPreview() {
                   <div className="text-sm font-semibold text-gray-900">
                     You vs competitors
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
+                  <div className="text-xs text-gray-500 mt-0.5">
                     Same weighted score, same prompts
                   </div>
                   <div className="space-y-3 mt-4">
@@ -475,10 +537,10 @@ export default function DashboardPreview() {
                           </span>
                           <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
                             <div
-                              className={`h-full rounded-full ${
+                              className={`h-full rounded-full transition-[width] duration-700 ease-out ${
                                 isOwn ? "bg-accent" : "bg-gray-300"
                               }`}
-                              style={{ width: `${(c.value / maxComp) * 100}%` }}
+                              style={{ width: inView ? `${(c.value / maxComp) * 100}%` : "0%" }}
                             />
                           </div>
                           <span className="text-xs font-semibold text-gray-700 w-9 text-right">
@@ -494,11 +556,19 @@ export default function DashboardPreview() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
-          Illustrative product preview — demo data. The global score is computed
-          from the per-engine presence rates with the same weighting the product
-          uses (ChatGPT 60%, Gemini 16%, Perplexity 14%, Claude 10%).
-        </p>
+        <div className="mt-6 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
+          <p className="text-xs text-gray-500 max-w-xl">
+            Illustrative demo data. The global score uses the product&apos;s
+            real weighting: ChatGPT 60%, Gemini 16%, Perplexity 14%, Claude 10%.
+          </p>
+          <Link
+            href={ctaHref}
+            className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink-900 hover:underline"
+          >
+            Open the full demo dashboard
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
       </div>
     </section>
   );

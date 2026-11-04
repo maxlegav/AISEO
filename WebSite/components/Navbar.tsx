@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useWaitlistModalStore } from "@/stores";
 
 const navLinks = [
-  { label: "Features", href: "/#features", anchor: "#features" },
-  { label: "Process", href: "/#process", anchor: "#process" },
+  { label: "Product", href: "/#preview", anchor: "#preview" },
   { label: "Pricing", href: "/#pricing", anchor: "#pricing" },
   { label: "FAQ", href: "/#faq", anchor: "#faq" },
   { label: "Blog", href: "/blog" },
@@ -21,7 +20,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_1px_20px_-8px_rgba(124,58,237,0.15)]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-ink-200/70 shadow-[0_1px_20px_-8px_rgba(20,19,17,0.18)]">
       <div className="container mx-auto px-4">
         <div className="flex items-center h-16 relative">
           <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>

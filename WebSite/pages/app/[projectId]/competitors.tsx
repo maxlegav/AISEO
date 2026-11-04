@@ -47,7 +47,7 @@ export default function CompetitorsView({
   return (
     <>
       <Head>
-        <title>{project.brandName} · Concurrents</title>
+        <title>{`${project.brandName} · Concurrents`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout

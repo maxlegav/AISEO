@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import MonitoringLayout from "@/components/monitoring/MonitoringLayout";
+import { useAppBase } from "@/lib/app-base";
 
 export default function ProjectNotFound() {
+  const base = useAppBase();
   return (
     <MonitoringLayout active="dashboard" title="Projet introuvable">
       <div className="flex flex-col items-center justify-center rounded-2xl border border-white/60 bg-white/70 py-20 text-center shadow-premium">
@@ -13,7 +15,7 @@ export default function ProjectNotFound() {
           Il a peut-être été supprimé, ou le lien est incorrect.
         </p>
         <Link
-          href="/app"
+          href={base}
           className="inline-flex items-center gap-1.5 rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
         >
           <ArrowLeft className="h-3.5 w-3.5" />

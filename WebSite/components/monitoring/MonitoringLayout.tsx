@@ -17,6 +17,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { PROJECTS, Project } from "@/lib/mock/monitoring";
+import { useAppBase } from "@/lib/app-base";
 import { cn } from "@/lib/utils";
 import SybMark from "@/components/icons/SybMark";
 import Favicon from "@/components/monitoring/Favicon";
@@ -51,9 +52,13 @@ interface MonitoringLayoutProps {
 function ProjectSwitcher({
   current,
   projects,
+  base,
+  publicDemo,
 }: {
   current?: Project;
   projects: SwitcherProject[];
+  base: string;
+  publicDemo: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -104,7 +109,7 @@ function ProjectSwitcher({
       {open && (
         <div className="absolute left-3 right-3 top-full z-50 mt-1.5 rounded-xl border border-gray-200 bg-white py-1.5 shadow-xl">
           <Link
-            href="/app"
+            href={base}
             onClick={() => setOpen(false)}
             className="block px-3 py-2 text-[13px] text-gray-600 hover:bg-gray-50"
           >
@@ -114,7 +119,7 @@ function ProjectSwitcher({
           {projects.map((p) => (
             <Link
               key={p.id}
-              href={`/app/${p.id}`}
+              href={`${base}/${p.id}`}
               onClick={() => setOpen(false)}
               className={cn(
                 "flex items-center gap-2.5 px-3 py-2 text-[13px] hover:bg-gray-50",
@@ -132,15 +137,19 @@ function ProjectSwitcher({
               {p.brandName}
             </Link>
           ))}
-          <div className="my-1 border-t border-gray-100" />
-          <Link
-            href="/app/new"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-accent hover:bg-accent-muted"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Nouveau projet
-          </Link>
+          {!publicDemo && (
+            <>
+              <div className="my-1 border-t border-gray-100" />
+              <Link
+                href="/app/new"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-accent hover:bg-accent-muted"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Nouveau projet
+              </Link>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -157,7 +166,9 @@ export default function MonitoringLayout({
   projects,
   demo = false,
 }: MonitoringLayoutProps) {
-  const base = project ? `/app/${project.id}` : "/app";
+  const root = useAppBase();
+  const publicDemo = root === "/demo";
+  const base = project ? `${root}/${project.id}` : root;
   const switcherProjects: SwitcherProject[] = projects ?? PROJECTS;
 
   const nav: {
@@ -194,14 +205,14 @@ export default function MonitoringLayout({
       label: "Impact",
       icon: Activity,
       href: `${base}/impact`,
-      disabled: !project,
+      disabled: !project || publicDemo,
     },
     {
       key: "outreach",
       label: "Outreach",
       icon: Send,
       href: `${base}/outreach`,
-      disabled: !project,
+      disabled: !project || publicDemo,
     },
   ];
 
@@ -221,7 +232,12 @@ export default function MonitoringLayout({
           </span>
         </Link>
 
-        <ProjectSwitcher current={project} projects={switcherProjects} />
+        <ProjectSwitcher
+          current={project}
+          projects={switcherProjects}
+          base={root}
+          publicDemo={publicDemo}
+        />
 
         <nav className="mt-5 flex-1 space-y-0.5 px-3">
           <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
@@ -232,7 +248,11 @@ export default function MonitoringLayout({
               <span
                 key={item.key}
                 className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] text-gray-300"
-                title="Choisissez un projet"
+                title={
+                  publicDemo
+                    ? "Disponible sur votre propre projet"
+                    : "Choisissez un projet"
+                }
               >
                 <item.icon className="h-[17px] w-[17px]" strokeWidth={1.8} />
                 {item.label}
@@ -257,73 +277,98 @@ export default function MonitoringLayout({
             )
           )}
 
-          <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-            Agence
-          </p>
-          <Link
-            href="/app/clients"
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
-              active === "clients"
-                ? "bg-white/90 font-medium text-gray-900 shadow-sm"
-                : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
-            )}
-          >
-            <Building2
-              className="h-[17px] w-[17px]"
-              strokeWidth={active === "clients" ? 2.2 : 1.8}
-            />
-            Clients
-          </Link>
-          <Link
-            href="/app/team"
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
-              active === "team"
-                ? "bg-white/90 font-medium text-gray-900 shadow-sm"
-                : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
-            )}
-          >
-            <UserPlus
-              className="h-[17px] w-[17px]"
-              strokeWidth={active === "team" ? 2.2 : 1.8}
-            />
-            Équipe
-          </Link>
+          {!publicDemo && (
+            <>
+            <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Agence
+            </p>
+            <Link
+              href="/app/clients"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
+                active === "clients"
+                  ? "bg-white/90 font-medium text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
+              )}
+            >
+              <Building2
+                className="h-[17px] w-[17px]"
+                strokeWidth={active === "clients" ? 2.2 : 1.8}
+              />
+              Clients
+            </Link>
+            <Link
+              href="/app/team"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
+                active === "team"
+                  ? "bg-white/90 font-medium text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
+              )}
+            >
+              <UserPlus
+                className="h-[17px] w-[17px]"
+                strokeWidth={active === "team" ? 2.2 : 1.8}
+              />
+              Équipe
+            </Link>
 
-          <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-            Compte
-          </p>
-          <Link
-            href="/app/settings"
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
-              active === "settings"
-                ? "bg-white/90 font-medium text-gray-900 shadow-sm"
-                : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
-            )}
-          >
-            <Settings
-              className="h-[17px] w-[17px]"
-              strokeWidth={active === "settings" ? 2.2 : 1.8}
-            />
-            Branding
-          </Link>
+            <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Compte
+            </p>
+            <Link
+              href="/app/settings"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] transition-all",
+                active === "settings"
+                  ? "bg-white/90 font-medium text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
+              )}
+            >
+              <Settings
+                className="h-[17px] w-[17px]"
+                strokeWidth={active === "settings" ? 2.2 : 1.8}
+              />
+              Branding
+            </Link>
+            </>
+          )}
         </nav>
 
-        {demo && (
-          <div className="mx-3 rounded-xl border border-ink-200 bg-white/80 p-3.5 shadow-sm">
+        {publicDemo ? (
+          <div className="mx-3 rounded-xl border border-ink-200 bg-white p-3.5 shadow-sm">
             <div className="mb-1 flex items-center gap-1.5">
               <SybMark className="h-3.5 w-3.5 text-accent" />
-              <span className="text-[12px] font-semibold text-gray-800">
-                Données de démonstration
+              <span className="text-[12px] font-semibold text-gray-900">
+                Démo publique
               </span>
             </div>
-            <p className="text-[11px] leading-snug text-gray-500">
-              Créez votre premier projet pour voir vos propres données de
-              monitoring ici.
+            <p className="text-[11px] leading-snug text-gray-600">
+              Vous consultez un projet d&apos;exemple, en lecture seule. Le vôtre
+              se configure en deux minutes.
             </p>
+            <Link
+              href="/signup"
+              className="mt-2.5 flex items-center justify-center rounded-full bg-ink-900 px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-ink-800"
+            >
+              Suivre ma marque
+            </Link>
           </div>
+        ) : (
+          demo && (
+            <div className="mx-3 rounded-xl border border-ink-200 bg-white/80 p-3.5 shadow-sm">
+              <div className="mb-1 flex items-center gap-1.5">
+                <SybMark className="h-3.5 w-3.5 text-accent" />
+                <span className="text-[12px] font-semibold text-gray-800">
+                  Données de démonstration
+                </span>
+              </div>
+              <p className="text-[11px] leading-snug text-gray-500">
+                Créez votre premier projet pour voir vos propres données de
+                monitoring ici.
+              </p>
+            </div>
+          )
         )}
       </aside>
 
@@ -332,8 +377,8 @@ export default function MonitoringLayout({
         <header className="flex items-start justify-between gap-4 px-8 py-5">
           <div className="flex items-center gap-3">
             <Link
-              href="/app"
-              className="mt-0.5 rounded-lg border border-white/60 bg-white/60 p-1.5 text-gray-400 transition-colors hover:text-gray-700"
+              href={root}
+              className="mt-0.5 rounded-lg border border-white/60 bg-white/60 p-1.5 text-gray-500 transition-colors hover:text-gray-900"
               title="Tous les projets"
             >
               <ChevronsLeft className="h-4 w-4" />

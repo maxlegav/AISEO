@@ -35,6 +35,7 @@ import {
   type OnPageItem,
 } from "@/lib/mock/monitoring";
 import { getSessionWorkspace, loginRedirect } from "@/lib/app-auth";
+import { useAppBase } from "@/lib/app-base";
 import {
   getProjectDashboard,
   listSwitcherProjects,
@@ -319,6 +320,7 @@ export default function RecommendationsView({
   project,
   demo,
 }: RecommendationsProps) {
+  const base = useAppBase();
   if (!project) return <ProjectNotFound />;
   if (project.pendingFirstRun) {
     return (
@@ -353,7 +355,7 @@ export default function RecommendationsView({
   return (
     <>
       <Head>
-        <title>{project.brandName} · Recommandations</title>
+        <title>{`${project.brandName} · Recommandations`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
@@ -492,7 +494,7 @@ export default function RecommendationsView({
                   </table>
                 </div>
                 <a
-                  href={`/app/${project.id}/outreach`}
+                  href={`${base}/${project.id}/outreach`}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent-muted"
                 >
                   <Send className="h-4 w-4" /> Préparer des demandes de mention

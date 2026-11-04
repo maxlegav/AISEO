@@ -43,7 +43,7 @@ export default function SourcesView({
   return (
     <>
       <Head>
-        <title>{project.brandName} · Sources citées</title>
+        <title>{`${project.brandName} · Sources citées`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <MonitoringLayout
