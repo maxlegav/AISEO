@@ -45,7 +45,7 @@ const engineRows = [
 ];
 
 export function AnswerSection() {
-  const { ref, inView } = useInView<HTMLDivElement>(0.4);
+  const { ref, inView } = useInView<HTMLDivElement>(0.7);
   const [typed, setTyped] = useState(0);
   useEffect(() => {
     if (!inView) return;
@@ -63,26 +63,26 @@ export function AnswerSection() {
   const done = typed >= ANSWER.length;
 
   return (
-    <section className="px-4 py-20 md:py-28 border-t border-ink-200">
-      <div className="container mx-auto max-w-6xl grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+    <section className="px-4 py-16 md:py-28 border-t border-ink-200">
+      <div className="container mx-auto max-w-6xl grid gap-8 md:gap-12 lg:grid-cols-2 lg:gap-16 items-center">
         <div>
           <h2 className="font-heading text-4xl md:text-5xl font-medium leading-[1.08]">
             Search gave ten links.
             <br />
             AI gives one answer.
           </h2>
-          <p className="mt-6 text-lg leading-relaxed text-ink-600">
+          <p className="mt-5 text-base md:text-lg leading-relaxed text-ink-600">
             Your buyers ask ChatGPT, Claude or Perplexity which tool to pick, and act on the
             two or three brands they are given. If yours is not in that answer, a competitor is.
           </p>
-          <p className="mt-4 text-lg leading-relaxed text-ink-600">
+          <p className="mt-4 hidden sm:block text-base md:text-lg leading-relaxed text-ink-600">
             ShowYourBrand asks your buyers&apos; questions to every engine, on a schedule, and
             records who gets named.
           </p>
         </div>
 
-        <div ref={ref} className="space-y-4">
-          <div className="overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-premium-lg">
+        <div className="mx-auto w-full max-w-xl space-y-4 lg:max-w-none">
+          <div ref={ref} className="overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-premium-lg">
             <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
               <div className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
@@ -94,9 +94,9 @@ export function AnswerSection() {
               </span>
               <span className="w-[52px]" />
             </div>
-            <div className="space-y-5 px-5 py-6 md:px-7">
+            <div className="space-y-4 px-4 py-5 md:space-y-5 md:px-7 md:py-6">
               <div className="flex justify-end">
-                <div className="max-w-[80%] rounded-3xl bg-[#f4f4f4] px-4 py-2.5 text-[15px] text-gray-900">
+                <div className="max-w-[85%] rounded-3xl bg-[#f4f4f4] px-4 py-2.5 text-sm md:text-[15px] text-gray-900">
                   What&apos;s the best cold email tool for a B2B startup in France?
                 </div>
               </div>
@@ -104,7 +104,7 @@ export function AnswerSection() {
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white">
                   <Image src="/logos/openai-logo.svg" alt="" width={16} height={16} className="h-4 w-4" />
                 </span>
-                <p className="min-h-[96px] pt-0.5 text-[15px] leading-relaxed text-gray-800">
+                <p className="min-h-[120px] sm:min-h-[96px] pt-0.5 text-sm md:text-[15px] leading-relaxed text-gray-800">
                   {ANSWER.slice(0, typed)}
                   {!done && <span className="ml-1 inline-block h-3 w-3 rounded-full bg-gray-900 align-middle animate-pulse" />}
                 </p>

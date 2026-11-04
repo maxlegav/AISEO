@@ -190,23 +190,23 @@ export default function Home() {
               ShowYourBrand tells you, every week, whether yours is one of them, and what to change
               when it is not.
             </p>
-            <AIModelMarquee />
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mx-auto mt-10 flex max-w-xs flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
               <button
                 type="button"
                 onClick={openWaitlistModal}
-                className="rounded-full bg-ink-900 px-8 py-4 text-base font-semibold text-white transition-colors hover:bg-ink-800"
+                className="w-full sm:w-auto whitespace-nowrap rounded-full bg-ink-900 px-8 sm:px-10 py-4 text-base sm:text-lg font-semibold text-white shadow-premium transition-all hover:-translate-y-0.5 hover:bg-ink-800"
               >
                 Book a demo
               </button>
               <Link
                 href="/demo"
-                className="group inline-flex items-center gap-2 rounded-full border border-ink-300 px-8 py-4 text-base font-semibold text-ink-900 transition-colors hover:border-ink-900"
+                className="group inline-flex w-full sm:w-auto justify-center whitespace-nowrap items-center gap-2 rounded-full border border-ink-300 bg-white/60 px-8 sm:px-10 py-4 text-base sm:text-lg font-semibold text-ink-900 transition-colors hover:border-ink-900"
               >
                 See the live dashboard
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
+            <AIModelMarquee />
           </div>
         </section>
 
