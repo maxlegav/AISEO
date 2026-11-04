@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Check, Minus, X } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, Minus, Plus, X } from "lucide-react";
 
 function useInView<T extends HTMLElement>(threshold = 0.3) {
   const ref = useRef<T>(null);
@@ -81,18 +81,49 @@ export function AnswerSection() {
           </p>
         </div>
 
-        <div ref={ref} className="rounded-2xl border border-ink-200 bg-paper-raised p-5 md:p-7 shadow-premium">
-          <div className="flex justify-end">
-            <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-ink-100 px-4 py-2.5 text-sm text-ink-800">
-              What&apos;s the best cold email tool for a B2B startup in France?
+        <div ref={ref} className="space-y-4">
+          <div className="overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-premium-lg">
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+              <div className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+                <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
+                <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+              </div>
+              <span className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                ChatGPT <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+              </span>
+              <span className="w-[52px]" />
+            </div>
+            <div className="space-y-5 px-5 py-6 md:px-7">
+              <div className="flex justify-end">
+                <div className="max-w-[80%] rounded-3xl bg-[#f4f4f4] px-4 py-2.5 text-[15px] text-gray-900">
+                  What&apos;s the best cold email tool for a B2B startup in France?
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white">
+                  <Image src="/logos/openai-logo.svg" alt="" width={16} height={16} className="h-4 w-4" />
+                </span>
+                <p className="min-h-[96px] pt-0.5 text-[15px] leading-relaxed text-gray-800">
+                  {ANSWER.slice(0, typed)}
+                  {!done && <span className="ml-1 inline-block h-3 w-3 rounded-full bg-gray-900 align-middle animate-pulse" />}
+                </p>
+              </div>
+            </div>
+            <div className="px-4 pb-4">
+              <div className="flex items-center justify-between rounded-3xl border border-gray-200 px-4 py-2.5 shadow-sm">
+                <span className="flex items-center gap-3 text-[15px] text-gray-400">
+                  <Plus className="h-4 w-4" /> Ask anything
+                </span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-white">
+                  <ArrowUp className="h-4 w-4" />
+                </span>
+              </div>
             </div>
           </div>
-          <p className="mt-5 min-h-[72px] text-sm leading-relaxed text-ink-700">
-            {ANSWER.slice(0, typed)}
-            {!done && <span className="ml-0.5 inline-block h-4 w-[2px] -mb-0.5 bg-ink-900 animate-pulse" />}
-          </p>
-          <div className="mt-6 border-t border-ink-100 pt-4">
-            <div className="mb-3 font-data text-[11px] uppercase tracking-[0.12em] text-ink-400">
+
+          <div className="rounded-2xl border border-ink-200 bg-paper-raised px-5 py-4 shadow-premium">
+            <div className="mb-1 font-data text-[11px] uppercase tracking-[0.12em] text-ink-400">
               Your brand on this prompt
             </div>
             <div className="divide-y divide-ink-100">
@@ -233,7 +264,7 @@ function FeatureRow({
   flip?: boolean;
 }) {
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+    <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
       <div className={flip ? "lg:order-2" : ""}>
         <div className="font-data text-xs uppercase tracking-[0.14em] text-ink-400">
           {index} <span className="mx-1.5 text-ink-300">/</span> {label}

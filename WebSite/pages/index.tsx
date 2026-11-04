@@ -18,17 +18,34 @@ const aiModels = [
   { name: "Grok", logo: "/logos/grok-logo.png", text: "/logos/grok-text.svg" },
 ];
 
+// Animated AI Model Marquee with real logos
 const AIModelMarquee = () => (
-  <div className="mt-14 w-full">
-    <p className="font-data mb-4 text-center text-xs font-medium uppercase tracking-[0.14em] text-ink-500">
-      Mentioned by all major AI engines
+  <div className="mt-8 w-full">
+    <p className="text-center text-gray-500 text-sm font-medium mb-4 tracking-wide">
+      MENTIONED BY ALL MAJOR AI ENGINES
     </p>
-    <div className="relative mx-auto max-w-[300px] overflow-hidden rounded-full border border-ink-200 bg-white/60 py-4 shadow-sm sm:max-w-sm md:max-w-xl lg:max-w-4xl lg:py-6">
-      <div className="flex w-max animate-marquee items-center">
+
+    <div className="relative overflow-hidden py-4 lg:py-6 bg-white/60 backdrop-blur-sm rounded-full mx-auto max-w-[280px] sm:max-w-sm md:max-w-xl lg:max-w-4xl border border-white/50 shadow-sm">
+      <div className="flex animate-marquee items-center w-max">
         {[...aiModels, ...aiModels].map((model, i) => (
-          <div key={i} className="mx-4 flex flex-shrink-0 items-center gap-2 md:mx-6 md:gap-3 lg:mx-10">
-            <Image src={model.logo} alt={`${model.name} logo`} width={32} height={32} className="h-7 w-7 object-contain lg:h-12 lg:w-12" />
-            <Image src={model.text} alt={model.name} width={100} height={24} className="h-5 w-auto object-contain lg:h-8" />
+          <div
+            key={i}
+            className="flex items-center gap-2 md:gap-3 mx-4 md:mx-6 lg:mx-10 flex-shrink-0"
+          >
+            <Image
+              src={model.logo}
+              alt={`${model.name} logo`}
+              width={32}
+              height={32}
+              className="h-7 w-7 lg:h-12 lg:w-12 object-contain"
+            />
+            <Image
+              src={model.text}
+              alt={model.name}
+              width={100}
+              height={24}
+              className="h-5 lg:h-8 w-auto object-contain"
+            />
           </div>
         ))}
       </div>
@@ -136,6 +153,28 @@ export default function Home() {
       />
       <TagSchema />
 
+      <style jsx global>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+        @media (min-width: 1024px) {
+          .animate-marquee {
+            animation-duration: 18s;
+          }
+        }
+      `}</style>
+
       <main className="bg-paper text-ink-900">
         <Navbar />
 
@@ -151,6 +190,7 @@ export default function Home() {
               ShowYourBrand tells you, every week, whether yours is one of them, and what to change
               when it is not.
             </p>
+            <AIModelMarquee />
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <button
                 type="button"
@@ -167,7 +207,6 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
-            <AIModelMarquee />
           </div>
         </section>
 
