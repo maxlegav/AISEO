@@ -8,28 +8,33 @@ import { ArrowRight, Check, Linkedin, Mail, Plus, Minus, Twitter } from "lucide-
 import { useWaitlistModalStore } from "@/stores";
 import SybMark from "@/components/icons/SybMark";
 import DashboardPreview from "@/components/landing/DashboardPreview";
+import { AnswerSection, FeatureRows, GeoVsSeo } from "@/components/landing/LandingSections";
 
-const engines = [
-  { name: "ChatGPT", logo: "/logos/openai-logo.svg" },
-  { name: "Claude", logo: "/logos/claude-logo.svg" },
-  { name: "Perplexity", logo: "/logos/perplexity-logo.svg" },
-  { name: "Gemini", logo: "/logos/gemini-logo.svg" },
+const aiModels = [
+  { name: "ChatGPT", logo: "/logos/openai-logo.svg", text: "/logos/openai-text.svg" },
+  { name: "Claude", logo: "/logos/claude-logo.svg", text: "/logos/claude-text.svg" },
+  { name: "Gemini", logo: "/logos/gemini-logo.svg", text: "/logos/gemini-text.svg" },
+  { name: "Perplexity", logo: "/logos/perplexity-logo.svg", text: "/logos/perplexity-text.svg" },
+  { name: "Grok", logo: "/logos/grok-logo.png", text: "/logos/grok-text.svg" },
 ];
 
-const points = [
-  {
-    title: "A score per engine",
-    body: "One global score out of 100, and the breakdown behind it. Strong on Perplexity and absent from Claude is two different problems, with two different fixes.",
-  },
-  {
-    title: "Your competitors, same prompts",
-    body: "The brands that get named instead of you, measured on exactly the same questions, week after week.",
-  },
-  {
-    title: "The sources AI reads",
-    body: "Which pages each engine pulls its answer from, and whether they mention you. That is where the work is.",
-  },
-];
+const AIModelMarquee = () => (
+  <div className="mt-14 w-full">
+    <p className="font-data mb-4 text-center text-xs font-medium uppercase tracking-[0.14em] text-ink-500">
+      Mentioned by all major AI engines
+    </p>
+    <div className="relative mx-auto max-w-[300px] overflow-hidden rounded-full border border-ink-200 bg-white/60 py-4 shadow-sm sm:max-w-sm md:max-w-xl lg:max-w-4xl lg:py-6">
+      <div className="flex w-max animate-marquee items-center">
+        {[...aiModels, ...aiModels].map((model, i) => (
+          <div key={i} className="mx-4 flex flex-shrink-0 items-center gap-2 md:mx-6 md:gap-3 lg:mx-10">
+            <Image src={model.logo} alt={`${model.name} logo`} width={32} height={32} className="h-7 w-7 object-contain lg:h-12 lg:w-12" />
+            <Image src={model.text} alt={model.name} width={100} height={24} className="h-5 w-auto object-contain lg:h-8" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const plans = [
   {
@@ -95,24 +100,6 @@ function FAQItem({ q, a, open, onClick }: { q: string; a: string; open: boolean;
   );
 }
 
-const HandDrawnUnderline = () => (
-  <svg
-    className="absolute -bottom-2 left-0 h-3 w-full"
-    viewBox="0 0 200 12"
-    fill="none"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M2 8C20 4 40 10 60 6C80 2 100 9 120 5C140 1 160 8 180 4C190 2 198 6 198 6"
-      stroke="#AE3B22"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export default function Home() {
   const { openWaitlistModal } = useWaitlistModalStore();
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
@@ -157,10 +144,7 @@ export default function Home() {
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium leading-[1.02] tracking-tight">
               Your brand,{" "}
-              <span className="relative inline-block text-accent">
-                cited by AI
-                <HandDrawnUnderline />
-              </span>
+              <em className="italic text-ink-500">cited by AI</em>
             </h1>
             <p className="mx-auto mt-8 max-w-2xl text-lg md:text-xl leading-relaxed text-ink-600">
               When a buyer asks ChatGPT which tool to pick, the answer names two or three brands.
@@ -183,15 +167,7 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
-            <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-ink-500">
-              <span>Tracked on</span>
-              {engines.map((e) => (
-                <span key={e.name} className="inline-flex items-center gap-2 font-medium text-ink-700">
-                  <Image src={e.logo} alt="" width={20} height={20} className="h-5 w-5 object-contain" />
-                  {e.name}
-                </span>
-              ))}
-            </div>
+            <AIModelMarquee />
           </div>
         </section>
 
@@ -218,22 +194,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* What you get */}
-        <section id="features" className="px-4 py-20 md:py-28 border-t border-ink-200">
-          <div className="container mx-auto max-w-6xl">
-            <h2 className="font-heading text-4xl md:text-5xl font-medium max-w-2xl">
-              Search gave ten links. AI gives one answer.
-            </h2>
-            <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-12">
-              {points.map((p) => (
-                <div key={p.title} className="border-t-2 border-ink-900 pt-5">
-                  <h3 className="text-lg font-semibold">{p.title}</h3>
-                  <p className="mt-3 leading-relaxed text-ink-600">{p.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <AnswerSection />
+        <FeatureRows />
+        <GeoVsSeo />
 
         {/* Pricing */}
         <section id="pricing" className="px-4 py-20 md:py-28 border-t border-ink-200">

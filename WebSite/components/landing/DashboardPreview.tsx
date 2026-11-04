@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Trophy, Crosshair, CalendarClock } from "lucide-react";
 import SybMark from "@/components/icons/SybMark";
@@ -57,10 +57,10 @@ const BRANDS: DemoBrand[] = [
     frequency: "Daily",
     prompts: 20,
     series: {
-      Perplexity: [52, 58, 54, 63, 61, 70, 66, 74, 79, 72, 81, 85],
-      ChatGPT: [38, 44, 41, 47, 52, 46, 49, 55, 51, 58, 53, 57],
-      Gemini: [8, 14, 11, 9, 18, 22, 17, 24, 21, 28, 26, 31],
-      Claude: [4, 9, 6, 12, 8, 13, 17, 11, 14, 19, 13, 16],
+      Perplexity: [50, 60, 55, 65, 55, 70, 60, 75, 85, 70, 80, 85],
+      ChatGPT: [35, 45, 40, 50, 40, 55, 45, 50, 60, 50, 60, 55],
+      Gemini: [10, 20, 10, 15, 25, 15, 20, 30, 20, 25, 35, 30],
+      Claude: [5, 15, 5, 10, 20, 10, 15, 25, 10, 20, 10, 15],
     },
     rivals: [
       { name: "Big Fernand", value: 63 },
@@ -76,10 +76,10 @@ const BRANDS: DemoBrand[] = [
     frequency: "Daily",
     prompts: 20,
     series: {
-      ChatGPT: [58, 66, 62, 71, 68, 74, 83, 77, 82, 88, 84, 90],
-      Perplexity: [63, 69, 74, 71, 79, 76, 84, 88, 83, 91, 89, 95],
-      Claude: [44, 49, 55, 51, 58, 63, 59, 67, 73, 69, 76, 80],
-      Gemini: [41, 43, 52, 48, 54, 61, 58, 66, 71, 68, 77, 79],
+      ChatGPT: [55, 70, 60, 75, 65, 80, 70, 85, 75, 90, 80, 90],
+      Perplexity: [60, 70, 80, 65, 85, 75, 90, 80, 95, 85, 90, 95],
+      Claude: [40, 55, 45, 60, 50, 65, 55, 75, 60, 80, 70, 80],
+      Gemini: [45, 35, 55, 45, 60, 50, 70, 55, 75, 65, 85, 80],
     },
     rivals: [
       { name: "Instantly", value: 71 },
@@ -95,10 +95,10 @@ const BRANDS: DemoBrand[] = [
     frequency: "Weekly",
     prompts: 20,
     series: {
-      Perplexity: [68, 73, 71, 77, 74, 82, 79, 86, 83, 88, 92, 90],
-      ChatGPT: [54, 57, 63, 59, 66, 62, 71, 68, 76, 79, 84, 86],
-      Claude: [38, 43, 41, 49, 53, 51, 57, 62, 60, 67, 66, 71],
-      Gemini: [42, 44, 48, 53, 51, 57, 63, 61, 66, 72, 69, 74],
+      Perplexity: [65, 80, 70, 85, 75, 90, 80, 95, 85, 90, 80, 90],
+      ChatGPT: [50, 60, 55, 70, 60, 75, 65, 80, 70, 85, 75, 85],
+      Claude: [35, 50, 40, 55, 45, 60, 50, 65, 55, 75, 60, 70],
+      Gemini: [45, 40, 55, 50, 65, 55, 60, 70, 60, 75, 65, 75],
     },
     rivals: [
       { name: "Shine", value: 54 },
@@ -160,6 +160,7 @@ function ScoreRing({ score }: { score: number }) {
           fill="none"
           stroke={t.color}
           strokeWidth="8"
+          className="transition-[stroke-dasharray] duration-700 ease-out"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${circ}`}
         />
@@ -176,42 +177,76 @@ function ScoreRing({ score }: { score: number }) {
 
 function TrendChart({ brand }: { brand: DemoBrand }) {
   const W = 520;
-  const H = 150;
+  const H = 170;
   const pad = 8;
   const n = 12;
   const x = (i: number) => pad + (i * (W - 2 * pad)) / (n - 1);
   const y = (v: number) => H - pad - (v / 100) * (H - 2 * pad);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[150px]" preserveAspectRatio="none">
-      {[0, 25, 50, 75, 100].map((g) => (
-        <line
-          key={g}
-          x1={pad}
-          x2={W - pad}
-          y1={y(g)}
-          y2={y(g)}
-          stroke="#f1f1f4"
-          strokeWidth="1"
-        />
-      ))}
-      {ENGINE_ORDER.map((eng) => {
-        const pts = brand.series[eng]
-          .map((v, i) => `${x(i)},${y(v)}`)
-          .join(" ");
-        return (
-          <polyline
-            key={eng}
-            points={pts}
-            fill="none"
-            stroke={ENGINE_COLORS[eng]}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            strokeLinecap="round"
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[170px]" preserveAspectRatio="none">
+        {[0, 25, 50, 75, 100].map((g) => (
+          <line key={`h${g}`} x1={pad} x2={W - pad} y1={y(g)} y2={y(g)} stroke="#f1f1f4" strokeWidth="1" />
+        ))}
+        {Array.from({ length: n }, (_, i) => (
+          <line
+            key={`v${i}`}
+            x1={x(i)}
+            x2={x(i)}
+            y1={pad}
+            y2={H - pad}
+            stroke="#e7e5e0"
+            strokeWidth="1"
+            strokeDasharray="3 4"
+            vectorEffect="non-scaling-stroke"
           />
-        );
-      })}
-    </svg>
+        ))}
+        {ENGINE_ORDER.map((eng, k) => {
+          const pts = brand.series[eng].map((v, i) => `${x(i)},${y(v)}`).join(" ");
+          return (
+            <polyline
+              key={`${brand.name}-${eng}`}
+              points={pts}
+              pathLength={1}
+              fill="none"
+              stroke={ENGINE_COLORS[eng]}
+              strokeWidth="2"
+              strokeLinejoin="miter"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              className="animate-draw"
+              style={{ strokeDasharray: 1, animationDelay: `${k * 120}ms` }}
+            />
+          );
+        })}
+      </svg>
+      <div className="mt-1 flex justify-between px-0.5 font-data text-[10px] text-gray-400">
+        {Array.from({ length: n }, (_, i) => (
+          <span key={i}>W{i + 1}</span>
+        ))}
+      </div>
+    </div>
   );
+}
+
+function useCountUp(target: number, duration = 700) {
+  const [value, setValue] = useState(target);
+  const from = useRef(target);
+  useEffect(() => {
+    const start = performance.now();
+    const origin = from.current;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(origin + (target - origin) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else from.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
 }
 
 interface DashboardPreviewProps {
@@ -223,13 +258,33 @@ export default function DashboardPreview({
   ctaHref = "/demo",
 }: DashboardPreviewProps) {
   const [active, setActive] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(!!e?.isIntersecting), { threshold: 0.35 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!autoplay || !inView) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % BRANDS.length), 5000);
+    return () => clearInterval(id);
+  }, [autoplay, inView]);
+
   const brand = BRANDS[active] ?? BRANDS[0];
+  const derived = derive(brand ?? BRANDS[0]!);
+  const animatedGlobal = useCountUp(inView ? derived.global : 0);
   if (!brand) return null;
-  const { engines, global, delta, best, competitors } = derive(brand);
+  const { engines, delta, best, competitors } = derived;
   const maxComp = Math.max(...competitors.map((c) => c.value));
 
   return (
-    <section id="preview" className="px-4 py-16 md:py-24">
+    <section id="preview" ref={sectionRef} className="px-4 py-16 md:py-24">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <h2 className="font-heading text-4xl md:text-5xl font-medium text-gray-900 mb-4">
@@ -247,7 +302,10 @@ export default function DashboardPreview({
             <button
               key={b.name}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => {
+                setActive(i);
+                setAutoplay(false);
+              }}
               className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${
                 i === active
                   ? "bg-gray-900 text-white"
@@ -334,13 +392,13 @@ export default function DashboardPreview({
               {/* KPI row */}
               <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-4 mb-5">
                 <div className="flex items-center gap-4 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                  <ScoreRing score={global} />
+                  <ScoreRing score={animatedGlobal} />
                   <div>
                     <div className="text-xs text-gray-500">
                       Visibility score
                     </div>
                     <div className="font-data text-2xl font-bold text-gray-900">
-                      {global}
+                      {animatedGlobal}
                       <span className="text-sm font-normal text-gray-500">
                         /100
                       </span>
@@ -442,9 +500,9 @@ export default function DashboardPreview({
                         </span>
                         <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
                           <div
-                            className="h-full rounded-full"
+                            className="h-full rounded-full transition-[width] duration-700 ease-out"
                             style={{
-                              width: `${e.value}%`,
+                              width: inView ? `${e.value}%` : "0%",
                               backgroundColor: e.color,
                             }}
                           />
@@ -479,10 +537,10 @@ export default function DashboardPreview({
                           </span>
                           <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
                             <div
-                              className={`h-full rounded-full ${
+                              className={`h-full rounded-full transition-[width] duration-700 ease-out ${
                                 isOwn ? "bg-accent" : "bg-gray-300"
                               }`}
-                              style={{ width: `${(c.value / maxComp) * 100}%` }}
+                              style={{ width: inView ? `${(c.value / maxComp) * 100}%` : "0%" }}
                             />
                           </div>
                           <span className="text-xs font-semibold text-gray-700 w-9 text-right">
