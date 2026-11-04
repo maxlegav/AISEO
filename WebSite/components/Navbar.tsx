@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useWaitlistModalStore } from "@/stores";
 
 const navLinks = [
-  { label: "Features", href: "/#features", anchor: "#features" },
-  { label: "Process", href: "/#process", anchor: "#process" },
+  { label: "Product", href: "/#preview", anchor: "#preview" },
   { label: "Pricing", href: "/#pricing", anchor: "#pricing" },
   { label: "FAQ", href: "/#faq", anchor: "#faq" },
   { label: "Blog", href: "/blog" },

@@ -54,13 +54,13 @@ const BRANDS: DemoBrand[] = [
     domain: "bioburger.fr",
     favicon: "https://icons.duckduckgo.com/ip3/bioburger.fr.ico",
     avgPosition: "2.4",
-    frequency: "Quotidien",
+    frequency: "Daily",
     prompts: 20,
     series: {
-      Perplexity: [55, 55, 60, 60, 65, 70, 70, 75, 80, 80, 85, 85],
-      ChatGPT: [40, 40, 45, 45, 45, 50, 50, 50, 55, 55, 50, 55],
-      Gemini: [10, 10, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30],
-      Claude: [5, 10, 10, 10, 10, 15, 15, 15, 15, 15, 15, 15],
+      Perplexity: [52, 58, 54, 63, 61, 70, 66, 74, 79, 72, 81, 85],
+      ChatGPT: [38, 44, 41, 47, 52, 46, 49, 55, 51, 58, 53, 57],
+      Gemini: [8, 14, 11, 9, 18, 22, 17, 24, 21, 28, 26, 31],
+      Claude: [4, 9, 6, 12, 8, 13, 17, 11, 14, 19, 13, 16],
     },
     rivals: [
       { name: "Big Fernand", value: 63 },
@@ -73,13 +73,13 @@ const BRANDS: DemoBrand[] = [
     domain: "lemlist.com",
     favicon: "https://icons.duckduckgo.com/ip3/lemlist.com.ico",
     avgPosition: "1.6",
-    frequency: "Quotidien",
+    frequency: "Daily",
     prompts: 20,
     series: {
-      ChatGPT: [60, 65, 65, 70, 70, 75, 80, 80, 85, 85, 85, 90],
-      Perplexity: [65, 70, 70, 75, 80, 80, 85, 85, 90, 90, 95, 95],
-      Claude: [45, 50, 50, 55, 60, 60, 65, 70, 70, 75, 75, 80],
-      Gemini: [40, 45, 50, 50, 55, 60, 65, 65, 70, 75, 75, 80],
+      ChatGPT: [58, 66, 62, 71, 68, 74, 83, 77, 82, 88, 84, 90],
+      Perplexity: [63, 69, 74, 71, 79, 76, 84, 88, 83, 91, 89, 95],
+      Claude: [44, 49, 55, 51, 58, 63, 59, 67, 73, 69, 76, 80],
+      Gemini: [41, 43, 52, 48, 54, 61, 58, 66, 71, 68, 77, 79],
     },
     rivals: [
       { name: "Instantly", value: 71 },
@@ -92,13 +92,13 @@ const BRANDS: DemoBrand[] = [
     domain: "qonto.com",
     favicon: "https://icons.duckduckgo.com/ip3/qonto.com.ico",
     avgPosition: "1.9",
-    frequency: "Hebdomadaire",
+    frequency: "Weekly",
     prompts: 20,
     series: {
-      Perplexity: [70, 70, 75, 75, 80, 80, 85, 85, 85, 90, 90, 90],
-      ChatGPT: [55, 55, 60, 60, 65, 65, 70, 70, 75, 80, 85, 85],
-      Claude: [40, 40, 45, 50, 50, 55, 55, 60, 65, 65, 70, 70],
-      Gemini: [40, 45, 45, 50, 55, 55, 60, 65, 65, 70, 70, 75],
+      Perplexity: [68, 73, 71, 77, 74, 82, 79, 86, 83, 88, 92, 90],
+      ChatGPT: [54, 57, 63, 59, 66, 62, 71, 68, 76, 79, 84, 86],
+      Claude: [38, 43, 41, 49, 53, 51, 57, 62, 60, 67, 66, 71],
+      Gemini: [42, 44, 48, 53, 51, 57, 63, 61, 66, 72, 69, 74],
     },
     rivals: [
       { name: "Shine", value: 54 },
@@ -138,10 +138,10 @@ function derive(brand: DemoBrand) {
 }
 
 function tier(score: number): { label: string; color: string } {
-  if (score >= 65) return { label: "Fort", color: "#16a34a" };
-  if (score >= 40) return { label: "Moyen", color: "#ea580c" };
-  if (score >= 20) return { label: "Faible", color: "#dc2626" };
-  return { label: "Critique", color: "#991b1b" };
+  if (score >= 65) return { label: "Strong", color: "#16a34a" };
+  if (score >= 40) return { label: "Average", color: "#ea580c" };
+  if (score >= 20) return { label: "Weak", color: "#dc2626" };
+  return { label: "Critical", color: "#991b1b" };
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -231,18 +231,13 @@ export default function DashboardPreview({
   return (
     <section id="preview" className="px-4 py-16 md:py-24">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-accent-muted px-4 py-1.5 text-xs font-semibold text-accent">
-            <SybMark className="w-3.5 h-3.5" />
-            Le produit, pas une maquette
-          </span>
-          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-medium text-gray-900 mt-5 mb-4">
-            Voilà à quoi ressemble votre visibilité
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="font-heading text-4xl md:text-5xl font-medium text-gray-900 mb-4">
+            What your dashboard looks like
           </h2>
           <p className="text-gray-600 text-base md:text-lg leading-relaxed">
-            Changez de marque pour voir bouger le score, les moteurs et les
-            concurrents. Le dashboard complet s&apos;ouvre juste en dessous,
-            sans compte.
+            Switch brands to see the score, the engines and the competitors
+            move.
           </p>
         </div>
 
@@ -253,9 +248,9 @@ export default function DashboardPreview({
               key={b.name}
               type="button"
               onClick={() => setActive(i)}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${
                 i === active
-                  ? "bg-gray-900 text-white shadow-premium"
+                  ? "bg-gray-900 text-white"
                   : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
               }`}
             >
@@ -294,10 +289,10 @@ export default function DashboardPreview({
                 </span>
               </div>
               {[
-                "Vue projet",
-                "Concurrents",
-                "Sources citées",
-                "Recommandations",
+                "Overview",
+                "Competitors",
+                "Cited sources",
+                "Recommendations",
                 "Impact",
                 "Outreach",
               ].map((item, i) => (
@@ -342,7 +337,7 @@ export default function DashboardPreview({
                   <ScoreRing score={global} />
                   <div>
                     <div className="text-xs text-gray-500">
-                      Score de visibilité
+                      Visibility score
                     </div>
                     <div className="font-data text-2xl font-bold text-gray-900">
                       {global}
@@ -352,54 +347,54 @@ export default function DashboardPreview({
                     </div>
                     {delta > 0 && (
                       <span className="font-data inline-flex items-center gap-1 text-xs font-semibold text-green-600">
-                        ↗ +{delta} pts / 7j
+                        ↗ +{delta} pts / 7d
                       </span>
                     )}
                     {delta < 0 && (
                       <span className="font-data inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                        ↘ {delta} pts / 7j
+                        ↘ {delta} pts / 7d
                       </span>
                     )}
                     {delta === 0 && (
                       <span className="text-xs text-gray-500">
-                        → stable / 7j
+                        → stable / 7d
                       </span>
                     )}
                     <div className="text-[11px] text-gray-500 mt-1">
-                      Pondéré sur {engines.length} moteurs
+                      Weighted across {engines.length} engines
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
-                      <Trophy className="w-3.5 h-3.5" /> Meilleur moteur
+                      <Trophy className="w-3.5 h-3.5" /> Best engine
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
                       {best ? best.name : "—"}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {best ? best.value : 0}% de présence
+                      {best ? best.value : 0}% presence
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
-                      <Crosshair className="w-3.5 h-3.5" /> Position moyenne
+                      <Crosshair className="w-3.5 h-3.5" /> Avg. position
                     </div>
                     <div className="font-data font-semibold text-gray-900 text-sm">
                       {brand.avgPosition}
                     </div>
-                    <div className="text-xs text-gray-500">quand elle est citée</div>
+                    <div className="text-xs text-gray-500">when cited</div>
                   </div>
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
-                      <CalendarClock className="w-3.5 h-3.5" /> Fréquence
+                      <CalendarClock className="w-3.5 h-3.5" /> Frequency
                     </div>
                     <div className="font-semibold text-gray-900 text-sm">
                       {brand.frequency}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {brand.prompts} requêtes × {engines.length} moteurs
+                      {brand.prompts} prompts × {engines.length} engines
                     </div>
                   </div>
                 </div>
@@ -409,7 +404,7 @@ export default function DashboardPreview({
               <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm mb-5">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-gray-900">
-                    Évolution sur 12 semaines
+                    Last 12 weeks
                   </span>
                   <div className="flex flex-wrap gap-3">
                     {engines.map((e) => (
@@ -433,10 +428,10 @@ export default function DashboardPreview({
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <div className="text-sm font-semibold text-gray-900">
-                    Présence par moteur
+                    Presence by engine
                   </div>
                   <div className="text-xs text-gray-500 mt-0.5">
-                    Part des {brand.prompts} requêtes suivies qui citent{" "}
+                    Share of the {brand.prompts} tracked prompts that cite{" "}
                     {brand.name}
                   </div>
                   <div className="space-y-3 mt-4">
@@ -463,10 +458,10 @@ export default function DashboardPreview({
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <div className="text-sm font-semibold text-gray-900">
-                    Vous vs concurrents
+                    You vs competitors
                   </div>
                   <div className="text-xs text-gray-500 mt-0.5">
-                    Même score pondéré, mêmes requêtes
+                    Same weighted score, same prompts
                   </div>
                   <div className="space-y-3 mt-4">
                     {competitors.map((c) => {
@@ -503,25 +498,19 @@ export default function DashboardPreview({
           </div>
         </div>
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
+          <p className="text-xs text-gray-500 max-w-xl">
+            Illustrative demo data. The global score uses the product&apos;s
+            real weighting: ChatGPT 60%, Gemini 16%, Perplexity 14%, Claude 10%.
+          </p>
           <Link
             href={ctaHref}
-            className="group inline-flex items-center gap-2 rounded-full bg-ink-900 px-7 py-3.5 text-base font-semibold text-white shadow-premium transition-all hover:-translate-y-0.5 hover:bg-ink-800"
+            className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink-900 hover:underline"
           >
-            Ouvrir le dashboard complet
+            Open the full demo dashboard
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
-        <p className="mt-2.5 text-center text-xs text-gray-500">
-          Démo publique, en lecture seule. Ni compte, ni carte bancaire.
-        </p>
-
-        <p className="text-center text-xs text-gray-500 mt-4 max-w-2xl mx-auto">
-          Aperçu illustratif, données de démonstration. Le score global est
-          calculé à partir des taux de présence par moteur, avec la pondération
-          réelle du produit (ChatGPT 60 %, Gemini 16 %, Perplexity 14 %,
-          Claude 10 %).
-        </p>
       </div>
     </section>
   );
